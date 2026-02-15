@@ -552,12 +552,12 @@ class SiteGenerator:
     def _copy_static_assets(self) -> None:
         """Copy static assets (CSS, JS, images) to output directory."""
         output_static = self.output_dir / "static"
-        
+
         # Clear output static directory if it exists
         if output_static.exists():
             shutil.rmtree(output_static)
         output_static.mkdir(parents=True, exist_ok=True)
-        
+
         # First, copy bundled static assets
         try:
             # Get bundled static directory
@@ -572,7 +572,7 @@ class SiteGenerator:
                 print("Copied bundled static assets")
         except Exception as e:
             print(f"Warning: Could not copy bundled static assets: {e}")
-        
+
         # Then, copy custom static assets (if provided), which will override bundled ones
         if self.templates_dir is not None:
             custom_static_dir = self.templates_dir / "static"
