@@ -35,6 +35,10 @@ def sanitize_for_url(value: str) -> str:
 class SiteGenerator:
     """Generate a static blog site from markdown posts."""
 
+    # Directory names for organizing content
+    TAG_DIR = "tag"
+    CATEGORY_DIR = "category"
+
     def __init__(
         self,
         content_dir: Path,
@@ -67,6 +71,8 @@ class SiteGenerator:
         return {
             "site_title": self.site_title,
             "site_url": self.site_url,
+            "tag_dir": self.TAG_DIR,
+            "category_dir": self.CATEGORY_DIR,
         }
 
     def generate(self, include_drafts: bool = False) -> None:
@@ -148,7 +154,7 @@ class SiteGenerator:
                     posts_by_tag[tag].append(post)
 
         # Create tag directory
-        tag_dir = self.output_dir / "tag"
+        tag_dir = self.output_dir / self.TAG_DIR
         tag_dir.mkdir(exist_ok=True)
 
         # Generate a page for each tag
@@ -179,7 +185,7 @@ class SiteGenerator:
                 posts_by_category[post.category].append(post)
 
         # Create category directory
-        category_dir = self.output_dir / "category"
+        category_dir = self.output_dir / self.CATEGORY_DIR
         category_dir.mkdir(exist_ok=True)
 
         # Generate a page for each category
