@@ -658,3 +658,36 @@ footer a:hover {
 :root[data-theme="dark"] .highlight .vi { color: #f8f8f2 } /* Name.Variable.Instance */
 :root[data-theme="dark"] .highlight .vm { color: #f8f8f2 } /* Name.Variable.Magic */
 :root[data-theme="dark"] .highlight .il { color: #ae81ff } /* Literal.Number.Integer.Long */
+
+/* Tags page styles */
+.tags-page h1 {
+    margin-bottom: 30px;
+}
+
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: baseline;
+    justify-content: flex-start;
+    line-height: 2;
+    margin: 30px 0;
+}
+
+.tag-cloud-item {
+    display: inline-block;
+    text-decoration: none;
+    color: var(--link-color);
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.tag-cloud-item:hover {
+    color: var(--link-hover-color);
+    transform: scale(1.05);
+}
+
+.tag-cloud-item .tag-count {
+    font-size: 0.7em;
+    color: var(--text-secondary);
+    margin-left: 2px;
+}

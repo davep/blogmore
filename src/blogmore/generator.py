@@ -164,6 +164,10 @@ class SiteGenerator:
         print("Generating tag pages...")
         self._generate_tag_pages(posts, pages)
 
+        # Generate tags overview page
+        print("Generating tags overview page...")
+        self._generate_tags_page(posts, pages)
+
         # Generate category pages
         print("Generating category pages...")
         self._generate_category_pages(posts, pages)
@@ -466,6 +470,71 @@ class SiteGenerator:
                         posts_by_tag[tag_lower] = (tag, [])
                     posts_by_tag[tag_lower][1].append(post)
         return posts_by_tag
+
+    def _generate_tags_page(self, posts: list[Post], pages: list[Page]) -> None:
+        """Generate the tags overview page with word cloud."""
+        # Group posts by tag to get counts
+        posts_by_tag = self._group_posts_by_tag(posts)
+
+        if not posts_by_tag:
+            # No tags, skip generation
+            return
+
+        # Calculate tag counts and prepare data
+        tag_data: list[dict[str, Any]] = []
+        min_count: int | None = None
+        max_count: int | None = None
+
+        for tag_lower, (tag_display, tag_posts) in posts_by_tag.items():
+            count = len(tag_posts)
+            safe_tag = sanitize_for_url(tag_lower)
+            tag_data.append(
+                {
+                    "display_name": tag_display,
+                    "safe_tag": safe_tag,
+                    "count": count,
+                    "tag_lower": tag_lower,
+                }
+            )
+            if min_count is None or count < min_count:
+                min_count = count
+            if max_count is None or count > max_count:
+                max_count = count
+
+        # Sort alphabetically by display name
+        tag_data.sort(key=lambda x: x["display_name"].lower())
+
+        # Calculate font sizes for word cloud effect
+        # Font sizes range from 1.0em to 2.5em
+        min_font_size = 1.0
+        max_font_size = 2.5
+
+        # min_count and max_count are guaranteed to be set since posts_by_tag is non-empty
+        assert min_count is not None
+        assert max_count is not None
+
+        if max_count > min_count:
+            # Scale based on count
+            for tag_info in tag_data:
+                # Linear interpolation between min and max font size
+                ratio = (tag_info["count"] - min_count) / (max_count - min_count)
+                tag_info["font_size"] = min_font_size + ratio * (
+                    max_font_size - min_font_size
+                )
+        else:
+            # All tags have the same count, use middle size
+            for tag_info in tag_data:
+                tag_info["font_size"] = (min_font_size + max_font_size) / 2
+
+        # Render the tags page
+        context = self._get_global_context()
+        context["pages"] = pages
+
+        html = self.renderer.render_tags_page(tag_data, **context)
+
+        # Output to root of site
+        output_path = self.output_dir / "tags.html"
+        output_path.write_text(html, encoding="utf-8")
 
     def _generate_category_pages(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate pages for each category with pagination."""

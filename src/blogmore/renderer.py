@@ -237,6 +237,32 @@ class TemplateRenderer:
             **context,
         )
 
+    def render_tags_page(
+        self,
+        tags: list[dict[str, Any]],
+        **context: Any,
+    ) -> str:
+        """
+        Render the tags page showing all tags as a word cloud.
+
+        Args:
+            tags: List of tag dictionaries with keys:
+                  - display_name: The tag display name
+                  - safe_tag: URL-safe version of the tag
+                  - count: Number of posts with this tag
+                  - font_size: Font size for word cloud effect
+            **context: Additional context variables
+
+        Returns:
+            Rendered HTML string
+        """
+        template = self.env.get_template("tags.html")
+        return template.render(
+            tags=tags,
+            extra_stylesheets=self.extra_stylesheets,
+            **context,
+        )
+
     def render_template(self, template_name: str, **context: Any) -> str:
         """
         Render an arbitrary template.
