@@ -18,6 +18,9 @@
             <a href="{{ site_url }}/{{ category_dir }}/{{ post.safe_category }}.html" class="category-link">{{ post.category }}</a>
         </div>
         {% endif %}
+        <div class="post-content">
+            {{ post.html_content|safe }}
+        </div>
         {% if post.tags %}
         <div class="tags">
             {% for tag in post.tags %}
@@ -25,9 +28,6 @@
             {% endfor %}
         </div>
         {% endif %}
-        <div class="post-content">
-            {{ post.html_content|safe }}
-        </div>
     </article>
     {% endfor %}
     {% else %}
