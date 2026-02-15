@@ -131,17 +131,17 @@ class SiteGenerator:
         context["all_posts"] = all_posts
 
         html = self.renderer.render_post(post, **context)
-        
+
         # Determine output path based on date
         if post.date:
             # Create year/month/day directory structure
             year = post.date.year
             month = f"{post.date.month:02d}"
             day = f"{post.date.day:02d}"
-            
+
             # Remove date prefix from slug if present
             slug = remove_date_prefix(post.slug)
-            
+
             # Create directory structure
             post_dir = self.output_dir / str(year) / month / day
             post_dir.mkdir(parents=True, exist_ok=True)
@@ -149,7 +149,7 @@ class SiteGenerator:
         else:
             # Fallback for posts without dates
             output_path = self.output_dir / f"{post.slug}.html"
-        
+
         output_path.write_text(html, encoding="utf-8")
 
     def _generate_index_page(self, posts: list[Post]) -> None:
@@ -189,11 +189,9 @@ class SiteGenerator:
         for year, year_posts in posts_by_year.items():
             year_dir = self.output_dir / str(year)
             year_dir.mkdir(parents=True, exist_ok=True)
-            
+
             html = self.renderer.render_archive(
-                year_posts, 
-                archive_title=f"Posts from {year}",
-                **context
+                year_posts, archive_title=f"Posts from {year}", **context
             )
             output_path = year_dir / "index.html"
             output_path.write_text(html, encoding="utf-8")
@@ -202,12 +200,10 @@ class SiteGenerator:
         for (year, month), month_posts in posts_by_month.items():
             month_dir = self.output_dir / str(year) / f"{month:02d}"
             month_dir.mkdir(parents=True, exist_ok=True)
-            
+
             month_name = dt.datetime(year, month, 1).strftime("%B %Y")
             html = self.renderer.render_archive(
-                month_posts,
-                archive_title=f"Posts from {month_name}",
-                **context
+                month_posts, archive_title=f"Posts from {month_name}", **context
             )
             output_path = month_dir / "index.html"
             output_path.write_text(html, encoding="utf-8")
@@ -216,12 +212,10 @@ class SiteGenerator:
         for (year, month, day), day_posts in posts_by_day.items():
             day_dir = self.output_dir / str(year) / f"{month:02d}" / f"{day:02d}"
             day_dir.mkdir(parents=True, exist_ok=True)
-            
+
             date_str = dt.datetime(year, month, day).strftime("%B %d, %Y")
             html = self.renderer.render_archive(
-                day_posts,
-                archive_title=f"Posts from {date_str}",
-                **context
+                day_posts, archive_title=f"Posts from {date_str}", **context
             )
             output_path = day_dir / "index.html"
             output_path.write_text(html, encoding="utf-8")

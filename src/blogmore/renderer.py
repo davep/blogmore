@@ -89,7 +89,9 @@ class TemplateRenderer:
         template = self.env.get_template("index.html")
         return template.render(posts=posts, **context)
 
-    def render_archive(self, posts: list[Post], archive_title: str | None = None, **context: Any) -> str:
+    def render_archive(
+        self, posts: list[Post], archive_title: str | None = None, **context: Any
+    ) -> str:
         """
         Render the blog archive page.
 

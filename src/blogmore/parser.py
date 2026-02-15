@@ -42,7 +42,7 @@ def remove_date_prefix(slug: str) -> str:
     Returns:
         The slug without the date prefix
     """
-    return re.sub(r'^\d{4}-\d{2}-\d{2}-', '', slug)
+    return re.sub(r"^\d{4}-\d{2}-\d{2}-", "", slug)
 
 
 @dataclass
