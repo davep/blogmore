@@ -110,6 +110,9 @@ class SiteGenerator:
         # Copy static assets if they exist
         self._copy_static_assets()
 
+        # Copy post attachments from content directory
+        self._copy_attachments()
+
         print(f"Site generation complete! Output: {self.output_dir}")
 
     def _generate_post_page(self, post: Post, all_posts: list[Post]) -> None:
@@ -209,3 +212,23 @@ class SiteGenerator:
                 shutil.rmtree(output_static)
             shutil.copytree(static_dir, output_static)
             print(f"Copied static assets from {static_dir}")
+
+    def _copy_attachments(self) -> None:
+        """Copy post attachments (images, files, etc.) from content directory to output directory."""
+        if not self.content_dir.exists():
+            return
+
+        # Count how many attachments we copy
+        attachment_count = 0
+
+        # Copy all non-markdown files from the content directory
+        for file_path in self.content_dir.iterdir():
+            # Skip markdown files and directories
+            if file_path.is_file() and file_path.suffix.lower() != ".md":
+                # Copy to output directory with the same name
+                output_path = self.output_dir / file_path.name
+                shutil.copy2(file_path, output_path)
+                attachment_count += 1
+
+        if attachment_count > 0:
+            print(f"Copied {attachment_count} attachment(s) from {self.content_dir}")
