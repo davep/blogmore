@@ -235,8 +235,8 @@ class SiteGenerator:
                     # Create parent directories if they don't exist
                     output_path.parent.mkdir(parents=True, exist_ok=True)
                     
-                    # Copy file using pathlib
-                    output_path.write_bytes(file_path.read_bytes())
+                    # Copy file preserving metadata
+                    shutil.copy2(file_path, output_path)
                     attachment_count += 1
                 except (OSError, PermissionError) as e:
                     print(f"Warning: Failed to copy attachment {file_path}: {e}")
