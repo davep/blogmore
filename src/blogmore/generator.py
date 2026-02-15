@@ -483,7 +483,7 @@ class SiteGenerator:
         # Calculate tag counts and prepare data
         tag_data: list[dict[str, Any]] = []
         min_count: int | None = None
-        max_count = 0
+        max_count: int | None = None
 
         for tag_lower, (tag_display, tag_posts) in posts_by_tag.items():
             count = len(tag_posts)
@@ -498,18 +498,20 @@ class SiteGenerator:
             )
             if min_count is None or count < min_count:
                 min_count = count
-            max_count = max(max_count, count)
+            if max_count is None or count > max_count:
+                max_count = count
 
         # Sort alphabetically by display name
-        tag_data.sort(key=lambda x: str(x["display_name"]).lower())
+        tag_data.sort(key=lambda x: x["display_name"].lower())
 
         # Calculate font sizes for word cloud effect
         # Font sizes range from 1.0em to 2.5em
         min_font_size = 1.0
         max_font_size = 2.5
 
-        # min_count is guaranteed to be set since posts_by_tag is non-empty
+        # min_count and max_count are guaranteed to be set since posts_by_tag is non-empty
         assert min_count is not None
+        assert max_count is not None
 
         if max_count > min_count:
             # Scale based on count
