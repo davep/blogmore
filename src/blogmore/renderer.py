@@ -4,7 +4,14 @@ import datetime as dt
 from pathlib import Path
 from typing import Any
 
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from jinja2 import (
+    BaseLoader,
+    ChoiceLoader,
+    Environment,
+    FileSystemLoader,
+    PackageLoader,
+    select_autoescape,
+)
 
 from blogmore.parser import Post
 
@@ -12,16 +19,32 @@ from blogmore.parser import Post
 class TemplateRenderer:
     """Render blog content using Jinja2 templates."""
 
-    def __init__(self, templates_dir: Path) -> None:
+    def __init__(
+        self,
+        templates_dir: Path | None = None,
+        extra_stylesheets: list[str] | None = None,
+    ) -> None:
         """
         Initialize the renderer with a templates directory.
 
         Args:
-            templates_dir: Path to the directory containing Jinja2 templates
+            templates_dir: Optional path to a directory containing custom Jinja2 templates.
+                          If not provided, uses bundled templates. If provided, custom
+                          templates take precedence but fall back to bundled templates.
+            extra_stylesheets: Optional list of URLs for additional stylesheets to include
         """
         self.templates_dir = templates_dir
+        self.extra_stylesheets = extra_stylesheets or []
+
+        # Set up loaders: custom templates first (if provided), then bundled templates
+        loaders: list[BaseLoader] = []
+        if templates_dir is not None:
+            loaders.append(FileSystemLoader(str(templates_dir)))
+        # Always include bundled templates as fallback
+        loaders.append(PackageLoader("blogmore", "templates"))
+
         self.env = Environment(
-            loader=FileSystemLoader(str(templates_dir)),
+            loader=ChoiceLoader(loaders),
             autoescape=select_autoescape(["html", "xml"]),
         )
 
@@ -73,7 +96,9 @@ class TemplateRenderer:
             Rendered HTML string
         """
         template = self.env.get_template("post.html")
-        return template.render(post=post, **context)
+        return template.render(
+            post=post, extra_stylesheets=self.extra_stylesheets, **context
+        )
 
     def render_index(
         self,
@@ -96,7 +121,11 @@ class TemplateRenderer:
         """
         template = self.env.get_template("index.html")
         return template.render(
-            posts=posts, page=page, total_pages=total_pages, **context
+            posts=posts,
+            page=page,
+            total_pages=total_pages,
+            extra_stylesheets=self.extra_stylesheets,
+            **context,
         )
 
     def render_archive(
@@ -126,6 +155,7 @@ class TemplateRenderer:
             archive_title=archive_title,
             page=page,
             total_pages=total_pages,
+            extra_stylesheets=self.extra_stylesheets,
             **context,
         )
 
@@ -152,7 +182,12 @@ class TemplateRenderer:
         """
         template = self.env.get_template("tag.html")
         return template.render(
-            tag=tag, posts=posts, page=page, total_pages=total_pages, **context
+            tag=tag,
+            posts=posts,
+            page=page,
+            total_pages=total_pages,
+            extra_stylesheets=self.extra_stylesheets,
+            **context,
         )
 
     def render_category_page(
@@ -182,6 +217,7 @@ class TemplateRenderer:
             posts=posts,
             page=page,
             total_pages=total_pages,
+            extra_stylesheets=self.extra_stylesheets,
             **context,
         )
 
@@ -197,4 +233,4 @@ class TemplateRenderer:
             Rendered HTML string
         """
         template = self.env.get_template(template_name)
-        return template.render(**context)
+        return template.render(extra_stylesheets=self.extra_stylesheets, **context)

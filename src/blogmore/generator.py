@@ -4,6 +4,7 @@ import datetime as dt
 import re
 import shutil
 from collections import defaultdict
+from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
@@ -74,22 +75,25 @@ class SiteGenerator:
     def __init__(
         self,
         content_dir: Path,
-        templates_dir: Path,
+        templates_dir: Path | None,
         output_dir: Path,
         site_title: str = "My Blog",
         site_url: str = "",
         posts_per_feed: int = 20,
+        extra_stylesheets: list[str] | None = None,
     ) -> None:
         """
         Initialize the site generator.
 
         Args:
             content_dir: Directory containing markdown posts
-            templates_dir: Directory containing Jinja2 templates
+            templates_dir: Optional directory containing custom Jinja2 templates.
+                          If not provided, uses bundled templates.
             output_dir: Directory where generated site will be written
             site_title: Title of the blog site
             site_url: Base URL of the site
             posts_per_feed: Maximum number of posts to include in feeds (default: 20)
+            extra_stylesheets: Optional list of URLs for additional stylesheets
         """
         self.content_dir = content_dir
         self.templates_dir = templates_dir
@@ -99,7 +103,7 @@ class SiteGenerator:
         self.posts_per_feed = posts_per_feed
 
         self.parser = PostParser()
-        self.renderer = TemplateRenderer(templates_dir)
+        self.renderer = TemplateRenderer(templates_dir, extra_stylesheets)
 
     def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
@@ -547,13 +551,39 @@ class SiteGenerator:
 
     def _copy_static_assets(self) -> None:
         """Copy static assets (CSS, JS, images) to output directory."""
-        static_dir = self.templates_dir / "static"
-        if static_dir.exists():
-            output_static = self.output_dir / "static"
-            if output_static.exists():
-                shutil.rmtree(output_static)
-            shutil.copytree(static_dir, output_static)
-            print(f"Copied static assets from {static_dir}")
+        output_static = self.output_dir / "static"
+        
+        # Clear output static directory if it exists
+        if output_static.exists():
+            shutil.rmtree(output_static)
+        output_static.mkdir(parents=True, exist_ok=True)
+        
+        # First, copy bundled static assets
+        try:
+            # Get bundled static directory
+            bundled_static = files("blogmore").joinpath("templates", "static")
+            if bundled_static.is_dir():
+                for item in bundled_static.iterdir():
+                    if item.is_file():
+                        # Read content and write to output
+                        content = item.read_bytes()
+                        output_file = output_static / item.name
+                        output_file.write_bytes(content)
+                print("Copied bundled static assets")
+        except Exception as e:
+            print(f"Warning: Could not copy bundled static assets: {e}")
+        
+        # Then, copy custom static assets (if provided), which will override bundled ones
+        if self.templates_dir is not None:
+            custom_static_dir = self.templates_dir / "static"
+            if custom_static_dir.exists():
+                for item in custom_static_dir.rglob("*"):
+                    if item.is_file():
+                        relative_path = item.relative_to(custom_static_dir)
+                        output_file = output_static / relative_path
+                        output_file.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(item, output_file)
+                print(f"Copied custom static assets from {custom_static_dir}")
 
     def _copy_attachments(self) -> None:
         """Copy post attachments (images, files, etc.) from content directory to output directory."""

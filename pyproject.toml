@@ -49,6 +49,9 @@ blogmore = "blogmore.__main__:main"
 requires = ["uv_build>=0.9.4"]
 build-backend = "uv_build"
 
+[tool.uv]
+package = true
+
 [tool.pyright]
 venvPath="."
 venv=".venv"
