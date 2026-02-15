@@ -7,7 +7,7 @@
     <h1>Recent Posts</h1>
     
     {% if posts %}
-    {% for post in posts[:10] %}
+    {% for post in posts %}
     <article class="post-summary">
         <h2><a href="{{ site_url }}{{ post.url }}">{{ post.title }}</a></h2>
         {% if post.date %}
@@ -34,8 +34,22 @@
     <p>No posts yet.</p>
     {% endif %}
     
-    {% if posts|length > 10 %}
-    <p><a href="{{ site_url }}/archive.html">View all posts →</a></p>
+    {% if total_pages > 1 %}
+    <nav class="pagination">
+        {% if page > 1 %}
+            {% if page == 2 %}
+                <a href="{{ site_url }}/index.html" class="pagination-prev">← Previous</a>
+            {% else %}
+                <a href="{{ site_url }}/page/{{ page - 1 }}.html" class="pagination-prev">← Previous</a>
+            {% endif %}
+        {% endif %}
+        
+        <span class="pagination-info">Page {{ page }} of {{ total_pages }}</span>
+        
+        {% if page < total_pages %}
+            <a href="{{ site_url }}/page/{{ page + 1 }}.html" class="pagination-next">Next →</a>
+        {% endif %}
+    </nav>
     {% endif %}
 </div>
 {% endblock %}
