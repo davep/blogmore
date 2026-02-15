@@ -7,6 +7,9 @@
     --text-secondary: #666;
     --border-color: #eee;
     --border-color-light: #f0f0f0;
+    --link-color: #0066cc;
+    --link-hover-color: #0052a3;
+    --link-visited-color: #551a8b;
     --hover-color: #0066cc;
     --hover-color-dark: #0052a3;
     --code-bg: #f5f5f5;
@@ -26,14 +29,17 @@
         --text-secondary: #a0a0a0;
         --border-color: #333;
         --border-color-light: #2a2a2a;
-        --hover-color: #4d9fff;
-        --hover-color-dark: #66b0ff;
+        --link-color: #6eb3ff;
+        --link-hover-color: #8cc5ff;
+        --link-visited-color: #b399ff;
+        --hover-color: #6eb3ff;
+        --hover-color-dark: #8cc5ff;
         --code-bg: #2a2a2a;
         --tag-bg: #2a2a2a;
         --tag-hover-bg: #333;
         --category-bg: #1a3a4a;
         --category-hover-bg: #2a4a5a;
-        --category-text: #4d9fff;
+        --category-text: #6eb3ff;
         --blockquote-border: #444;
     }
 }
@@ -45,14 +51,17 @@
     --text-secondary: #a0a0a0;
     --border-color: #333;
     --border-color-light: #2a2a2a;
-    --hover-color: #4d9fff;
-    --hover-color-dark: #66b0ff;
+    --link-color: #6eb3ff;
+    --link-hover-color: #8cc5ff;
+    --link-visited-color: #b399ff;
+    --hover-color: #6eb3ff;
+    --hover-color-dark: #8cc5ff;
     --code-bg: #2a2a2a;
     --tag-bg: #2a2a2a;
     --tag-hover-bg: #333;
     --category-bg: #1a3a4a;
     --category-hover-bg: #2a4a5a;
-    --category-text: #4d9fff;
+    --category-text: #6eb3ff;
     --blockquote-border: #444;
 }
 
@@ -69,6 +78,20 @@ body {
     color: var(--text-color);
     background: var(--bg-color);
     transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* General link styles for content */
+a {
+    color: var(--link-color);
+    text-decoration: underline;
+}
+
+a:hover {
+    color: var(--link-hover-color);
+}
+
+a:visited {
+    color: var(--link-visited-color);
 }
 
 header {
@@ -316,32 +339,38 @@ footer a:hover {
 /* Theme toggle button */
 .theme-toggle {
     background: none;
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
+    border: none;
+    color: var(--text-secondary);
     cursor: pointer;
-    padding: 6px 12px;
+    padding: 4px;
     border-radius: 4px;
-    font-size: 0.9em;
+    font-size: 1.2em;
     display: flex;
     align-items: center;
-    gap: 6px;
     transition: all 0.2s ease;
+    opacity: 0.7;
 }
 
 .theme-toggle:hover {
+    opacity: 1;
     background: var(--tag-bg);
-    border-color: var(--text-secondary);
 }
 
 .theme-toggle:focus {
     outline: 2px solid var(--hover-color);
     outline-offset: 2px;
+    opacity: 1;
 }
 
 /* Icons for theme toggle */
 .theme-toggle .icon {
-    font-size: 1.1em;
+    font-size: 1em;
     line-height: 1;
+}
+
+/* Hide the text label */
+.theme-toggle .theme-label {
+    display: none;
 }
 
 /* Hide appropriate icon based on theme */
