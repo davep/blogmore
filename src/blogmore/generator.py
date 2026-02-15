@@ -221,14 +221,20 @@ class SiteGenerator:
         # Count how many attachments we copy
         attachment_count = 0
 
-        # Copy all non-markdown files from the content directory
-        for file_path in self.content_dir.iterdir():
+        # Recursively copy all non-markdown files from the content directory
+        for file_path in self.content_dir.rglob("*"):
             # Skip markdown files and directories
             if file_path.is_file() and file_path.suffix.lower() != ".md":
                 try:
-                    # Copy to output directory with the same name
-                    output_path = self.output_dir / file_path.name
-                    shutil.copy2(file_path, output_path)
+                    # Calculate relative path to preserve directory structure
+                    relative_path = file_path.relative_to(self.content_dir)
+                    output_path = self.output_dir / relative_path
+                    
+                    # Create parent directories if they don't exist
+                    output_path.parent.mkdir(parents=True, exist_ok=True)
+                    
+                    # Copy file using pathlib
+                    output_path.write_bytes(file_path.read_bytes())
                     attachment_count += 1
                 except (OSError, PermissionError) as e:
                     print(f"Warning: Failed to copy attachment {file_path}: {e}")
