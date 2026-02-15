@@ -148,7 +148,7 @@ class SiteGenerator:
                     posts_by_tag[tag].append(post)
 
         # Create tag directory
-        tag_dir = self.output_dir / "tags"
+        tag_dir = self.output_dir / "tag"
         tag_dir.mkdir(exist_ok=True)
 
         # Generate a page for each tag
