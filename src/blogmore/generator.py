@@ -225,10 +225,14 @@ class SiteGenerator:
         for file_path in self.content_dir.iterdir():
             # Skip markdown files and directories
             if file_path.is_file() and file_path.suffix.lower() != ".md":
-                # Copy to output directory with the same name
-                output_path = self.output_dir / file_path.name
-                shutil.copy2(file_path, output_path)
-                attachment_count += 1
+                try:
+                    # Copy to output directory with the same name
+                    output_path = self.output_dir / file_path.name
+                    shutil.copy2(file_path, output_path)
+                    attachment_count += 1
+                except (OSError, PermissionError) as e:
+                    print(f"Warning: Failed to copy attachment {file_path}: {e}")
+                    continue
 
         if attachment_count > 0:
             print(f"Copied {attachment_count} attachment(s) from {self.content_dir}")
