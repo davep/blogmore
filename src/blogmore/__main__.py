@@ -198,12 +198,10 @@ def serve_site(
                     observer.join()
     except KeyboardInterrupt:
         print("\nServer stopped")
-        return 0
     except OSError as e:
         print(f"Error starting server: {e}", file=sys.stderr)
         return 1
 
-    # This should never be reached as serve_forever() blocks indefinitely
     return 0
 
 
