@@ -2,19 +2,9 @@
 
 {% block title %}Tag: {{ tag }} - {{ site_title }}{% endblock %}
 
-{% block feed_links %}
-<link rel="alternate" type="application/rss+xml" title="{{ site_title }} - {{ tag }} - RSS Feed" href="{{ site_url }}/{{ tag_dir }}/{{ safe_tag }}/feed.rss">
-<link rel="alternate" type="application/atom+xml" title="{{ site_title }} - {{ tag }} - Atom Feed" href="{{ site_url }}/{{ tag_dir }}/{{ safe_tag }}/feed.atom">
-{% endblock %}
-
 {% block content %}
 <div class="tag-page">
     <h1>Posts tagged with "{{ tag }}"</h1>
-    
-    <div class="feed-links">
-        <a href="{{ site_url }}/{{ tag_dir }}/{{ safe_tag }}/feed.rss" class="feed-link rss-link">RSS Feed</a>
-        <a href="{{ site_url }}/{{ tag_dir }}/{{ safe_tag }}/feed.atom" class="feed-link atom-link">Atom Feed</a>
-    </div>
     
     {% if posts %}
     {% for post in posts %}

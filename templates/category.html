@@ -3,8 +3,8 @@
 {% block title %}Category: {{ category }} - {{ site_title }}{% endblock %}
 
 {% block feed_links %}
-<link rel="alternate" type="application/rss+xml" title="{{ site_title }} - {{ category }} - RSS Feed" href="{{ site_url }}/{{ category_dir }}/{{ safe_category }}/feed.rss">
-<link rel="alternate" type="application/atom+xml" title="{{ site_title }} - {{ category }} - Atom Feed" href="{{ site_url }}/{{ category_dir }}/{{ safe_category }}/feed.atom">
+<link rel="alternate" type="application/rss+xml" title="{{ site_title }} - {{ category }} - RSS Feed" href="{{ site_url }}/feeds/{{ safe_category }}.rss.xml">
+<link rel="alternate" type="application/atom+xml" title="{{ site_title }} - {{ category }} - Atom Feed" href="{{ site_url }}/feeds/{{ safe_category }}.atom.xml">
 {% endblock %}
 
 {% block content %}
@@ -12,8 +12,8 @@
     <h1>Posts in category "{{ category }}"</h1>
     
     <div class="feed-links">
-        <a href="{{ site_url }}/{{ category_dir }}/{{ safe_category }}/feed.rss" class="feed-link rss-link">RSS Feed</a>
-        <a href="{{ site_url }}/{{ category_dir }}/{{ safe_category }}/feed.atom" class="feed-link atom-link">Atom Feed</a>
+        <a href="{{ site_url }}/feeds/{{ safe_category }}.rss.xml" class="feed-link rss-link">RSS Feed</a>
+        <a href="{{ site_url }}/feeds/{{ safe_category }}.atom.xml" class="feed-link atom-link">Atom Feed</a>
     </div>
     
     {% if posts %}

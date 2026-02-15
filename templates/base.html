@@ -6,8 +6,8 @@
     <title>{% block title %}{{ site_title }}{% endblock %}</title>
     <link rel="stylesheet" href="{{ site_url }}/static/style.css">
     {% block feed_links %}
-    <link rel="alternate" type="application/rss+xml" title="{{ site_title }} - RSS Feed" href="{{ site_url }}/feed.rss">
-    <link rel="alternate" type="application/atom+xml" title="{{ site_title }} - Atom Feed" href="{{ site_url }}/feed.atom">
+    <link rel="alternate" type="application/rss+xml" title="{{ site_title }} - RSS Feed" href="{{ site_url }}/feed.xml">
+    <link rel="alternate" type="application/atom+xml" title="{{ site_title }} - Atom Feed" href="{{ site_url }}/feeds/all.atom.xml">
     {% endblock %}
     {% block extra_head %}{% endblock %}
 </head>
