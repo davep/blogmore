@@ -554,7 +554,10 @@ class SiteGenerator:
         min_count: int | None = None
         max_count: int | None = None
 
-        for category_lower, (category_display, category_posts) in posts_by_category.items():
+        for category_lower, (
+            category_display,
+            category_posts,
+        ) in posts_by_category.items():
             count = len(category_posts)
             safe_category = sanitize_for_url(category_lower)
             category_data.append(
