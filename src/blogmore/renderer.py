@@ -263,6 +263,32 @@ class TemplateRenderer:
             **context,
         )
 
+    def render_categories_page(
+        self,
+        categories: list[dict[str, Any]],
+        **context: Any,
+    ) -> str:
+        """
+        Render the categories page showing all categories as a word cloud.
+
+        Args:
+            categories: List of category dictionaries with keys:
+                  - display_name: The category display name
+                  - safe_category: URL-safe version of the category
+                  - count: Number of posts with this category
+                  - font_size: Font size for word cloud effect
+            **context: Additional context variables
+
+        Returns:
+            Rendered HTML string
+        """
+        template = self.env.get_template("categories.html")
+        return template.render(
+            categories=categories,
+            extra_stylesheets=self.extra_stylesheets,
+            **context,
+        )
+
     def render_template(self, template_name: str, **context: Any) -> str:
         """
         Render an arbitrary template.

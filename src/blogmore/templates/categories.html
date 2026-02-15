@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}All Categories - {{ site_title }}{% endblock %}
+
+{% block content %}
+<div class="categories-page">
+    <h1>All Categories</h1>
+    
+    {% if categories %}
+    <div class="tag-cloud">
+        {% for category_info in categories %}
+        <a href="{{ site_url }}/{{ category_dir }}/{{ category_info.safe_category }}.html" 
+           class="tag-cloud-item" 
+           style="font-size: {{ category_info.font_size }}em;"
+           title="{{ category_info.count }} post{% if category_info.count != 1 %}s{% endif %}">
+            {{ category_info.display_name }}
+            <span class="tag-count">({{ category_info.count }})</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No categories yet.</p>
+    {% endif %}
+    
+    <p><a href="{{ site_url }}/">← Back to home</a></p>
+</div>
+{% endblock %}

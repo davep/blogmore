@@ -172,6 +172,10 @@ class SiteGenerator:
         print("Generating category pages...")
         self._generate_category_pages(posts, pages)
 
+        # Generate categories overview page
+        print("Generating categories overview page...")
+        self._generate_categories_page(posts, pages)
+
         # Generate feeds
         print("Generating RSS and Atom feeds...")
         self._generate_feeds(posts)
@@ -534,6 +538,71 @@ class SiteGenerator:
 
         # Output to root of site
         output_path = self.output_dir / "tags.html"
+        output_path.write_text(html, encoding="utf-8")
+
+    def _generate_categories_page(self, posts: list[Post], pages: list[Page]) -> None:
+        """Generate the categories overview page with word cloud."""
+        # Group posts by category to get counts
+        posts_by_category = self._group_posts_by_category(posts)
+
+        if not posts_by_category:
+            # No categories, skip generation
+            return
+
+        # Calculate category counts and prepare data
+        category_data: list[dict[str, Any]] = []
+        min_count: int | None = None
+        max_count: int | None = None
+
+        for category_lower, (category_display, category_posts) in posts_by_category.items():
+            count = len(category_posts)
+            safe_category = sanitize_for_url(category_lower)
+            category_data.append(
+                {
+                    "display_name": category_display,
+                    "safe_category": safe_category,
+                    "count": count,
+                    "category_lower": category_lower,
+                }
+            )
+            if min_count is None or count < min_count:
+                min_count = count
+            if max_count is None or count > max_count:
+                max_count = count
+
+        # Sort alphabetically by display name
+        category_data.sort(key=lambda x: x["display_name"].lower())
+
+        # Calculate font sizes for word cloud effect
+        # Font sizes range from 1.0em to 2.5em
+        min_font_size = 1.0
+        max_font_size = 2.5
+
+        # min_count and max_count are guaranteed to be set since posts_by_category is non-empty
+        assert min_count is not None
+        assert max_count is not None
+
+        if max_count > min_count:
+            # Scale based on count
+            for category_info in category_data:
+                # Linear interpolation between min and max font size
+                ratio = (category_info["count"] - min_count) / (max_count - min_count)
+                category_info["font_size"] = min_font_size + ratio * (
+                    max_font_size - min_font_size
+                )
+        else:
+            # All categories have the same count, use middle size
+            for category_info in category_data:
+                category_info["font_size"] = (min_font_size + max_font_size) / 2
+
+        # Render the categories page
+        context = self._get_global_context()
+        context["pages"] = pages
+
+        html = self.renderer.render_categories_page(category_data, **context)
+
+        # Output to root of site
+        output_path = self.output_dir / "categories.html"
         output_path.write_text(html, encoding="utf-8")
 
     def _generate_category_pages(self, posts: list[Post], pages: list[Page]) -> None:
