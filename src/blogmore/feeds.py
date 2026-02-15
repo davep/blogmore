@@ -27,10 +27,12 @@ def create_feed_generator(
         Configured FeedGenerator instance
     """
     fg = FeedGen()
-    fg.id(site_url)
+    # Use a fallback URL if site_url is empty
+    base_url = site_url if site_url else "https://example.com"
+    fg.id(base_url)
     fg.title(site_title)
-    fg.link(href=site_url, rel="alternate")
-    fg.link(href=feed_url, rel="self")
+    fg.link(href=base_url, rel="alternate")
+    fg.link(href=feed_url if feed_url else f"{base_url}/feed.rss", rel="self")
     fg.description(description or f"Latest posts from {site_title}")
     fg.language("en")
     return fg
@@ -46,9 +48,11 @@ def add_post_to_feed(fg: FeedGen, post: Post, site_url: str) -> None:
         site_url: Base URL of the site
     """
     fe = fg.add_entry()
-    fe.id(f"{site_url}{post.url}")
+    # Use a fallback URL if site_url is empty
+    base_url = site_url if site_url else "https://example.com"
+    fe.id(f"{base_url}{post.url}")
     fe.title(post.title)
-    fe.link(href=f"{site_url}{post.url}")
+    fe.link(href=f"{base_url}{post.url}")
     fe.content(post.html_content, type="html")
 
     # Add publication date if available
