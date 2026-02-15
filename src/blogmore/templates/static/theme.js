@@ -93,8 +93,10 @@
         if (savedTheme) {
             // User has manually selected a theme
             applyTheme(savedTheme);
+        } else {
+            // No saved preference, apply system preference
+            applyTheme(getSystemTheme());
         }
-        // Otherwise, let CSS handle system preference via @media query
     }
     
     /**
@@ -125,7 +127,8 @@
             const savedTheme = getCookie(THEME_COOKIE_NAME);
             if (!savedTheme) {
                 // Only update if user hasn't manually set a preference
-                applyTheme(e.matches ? 'dark' : 'light');
+                const newTheme = e.matches ? 'dark' : 'light';
+                applyTheme(newTheme);
             }
         });
     }
