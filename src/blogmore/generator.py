@@ -526,22 +526,6 @@ class SiteGenerator:
         # Generate main index feeds
         feed_gen.generate_index_feeds(posts)
 
-        # Generate tag feeds
-        posts_by_tag = self._group_posts_by_tag(posts)
-        # Sort posts by date for each tag
-        for _tag_lower, (_tag_display, tag_posts) in posts_by_tag.items():
-
-            def get_sort_key(post: Post) -> float:
-                if post.date is None:
-                    return 0.0
-                if post.date.tzinfo:
-                    return post.date.timestamp()
-                return post.date.replace(tzinfo=dt.UTC).timestamp()
-
-            tag_posts.sort(key=get_sort_key, reverse=True)
-
-        feed_gen.generate_tag_feeds(posts_by_tag, self.TAG_DIR)
-
         # Generate category feeds
         posts_by_category = self._group_posts_by_category(posts)
         # Sort posts by date for each category
@@ -559,7 +543,7 @@ class SiteGenerator:
 
             category_posts.sort(key=get_sort_key, reverse=True)
 
-        feed_gen.generate_category_feeds(posts_by_category, self.CATEGORY_DIR)
+        feed_gen.generate_category_feeds(posts_by_category)
 
     def _copy_static_assets(self) -> None:
         """Copy static assets (CSS, JS, images) to output directory."""

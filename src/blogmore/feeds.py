@@ -7,6 +7,9 @@ from feedgen.feed import FeedGenerator as FeedGen  # type: ignore[import-untyped
 
 from blogmore.parser import Post
 
+# Directory for feed files (excluding main RSS feed which is at root)
+FEEDS_DIR = "feeds"
+
 
 def create_feed_generator(
     site_title: str,
@@ -80,7 +83,8 @@ def generate_feed(
     posts: list[Post],
     site_title: str,
     site_url: str,
-    feed_url: str,
+    rss_feed_url: str,
+    atom_feed_url: str,
     description: str | None = None,
     max_posts: int = 20,
 ) -> tuple[str, str]:
@@ -91,32 +95,41 @@ def generate_feed(
         posts: List of posts to include in the feed (should be sorted newest first)
         site_title: Title of the blog site
         site_url: Base URL of the site
-        feed_url: Full URL to this feed (used for RSS, Atom will use .atom extension)
+        rss_feed_url: Full URL to the RSS feed
+        atom_feed_url: Full URL to the Atom feed
         description: Optional description for the feed
         max_posts: Maximum number of posts to include (default: 20)
 
     Returns:
         Tuple of (rss_xml, atom_xml) strings
     """
-    # Create feed generator
-    fg = create_feed_generator(site_title, site_url, feed_url, description)
+    # Create two separate feed generators, one for each feed type
+    # This ensures each feed has the correct self-referencing URL
+    feed_generator_rss = create_feed_generator(
+        site_title, site_url, rss_feed_url, description
+    )
+    feed_generator_atom = create_feed_generator(
+        site_title, site_url, atom_feed_url, description
+    )
 
-    # Add posts (limit to max_posts)
+    # Add posts to both feeds in a single loop
     # NOTE: feedgen reverses the order of entries, so we add them in reverse
     # to get the correct chronological order (newest first) in the output
     for post in reversed(posts[:max_posts]):
-        add_post_to_feed(fg, post, site_url)
+        add_post_to_feed(feed_generator_rss, post, site_url)
+        add_post_to_feed(feed_generator_atom, post, site_url)
 
-    # Generate RSS and Atom feeds
-    rss_xml = fg.rss_str(pretty=True).decode("utf-8")
-    atom_xml = fg.atom_str(pretty=True).decode("utf-8")
-
-    return rss_xml, atom_xml
+    # Generate both feed formats and return
+    return (
+        feed_generator_rss.rss_str(pretty=True).decode("utf-8"),
+        feed_generator_atom.atom_str(pretty=True).decode("utf-8"),
+    )
 
 
 def write_feeds(
     output_dir: Path,
-    feed_path: str,
+    rss_path: str,
+    atom_path: str,
     rss_xml: str,
     atom_xml: str,
 ) -> None:
@@ -125,19 +138,20 @@ def write_feeds(
 
     Args:
         output_dir: Output directory for the site
-        feed_path: Path relative to output_dir (without extension)
+        rss_path: Path relative to output_dir for RSS feed (including extension)
+        atom_path: Path relative to output_dir for Atom feed (including extension)
         rss_xml: RSS feed XML content
         atom_xml: Atom feed XML content
     """
     # Write RSS feed
-    rss_path = output_dir / f"{feed_path}.rss"
-    rss_path.parent.mkdir(parents=True, exist_ok=True)
-    rss_path.write_text(rss_xml, encoding="utf-8")
+    rss_file = output_dir / rss_path
+    rss_file.parent.mkdir(parents=True, exist_ok=True)
+    rss_file.write_text(rss_xml, encoding="utf-8")
 
     # Write Atom feed
-    atom_path = output_dir / f"{feed_path}.atom"
-    atom_path.parent.mkdir(parents=True, exist_ok=True)
-    atom_path.write_text(atom_xml, encoding="utf-8")
+    atom_file = output_dir / atom_path
+    atom_file.parent.mkdir(parents=True, exist_ok=True)
+    atom_file.write_text(atom_xml, encoding="utf-8")
 
 
 class BlogFeedGenerator:
@@ -181,63 +195,38 @@ class BlogFeedGenerator:
             posts: List of all posts
         """
         base_url = self._get_base_url()
-        feed_url = f"{base_url}/feed.rss"
+
+        # Generate both RSS and Atom feeds with correct self-referencing URLs
+        rss_feed_url = f"{base_url}/feed.xml"
+        atom_feed_url = f"{base_url}/{FEEDS_DIR}/all.atom.xml"
+
         rss_xml, atom_xml = generate_feed(
             posts=posts,
             site_title=self.site_title,
             site_url=self.site_url,
-            feed_url=feed_url,
+            rss_feed_url=rss_feed_url,
+            atom_feed_url=atom_feed_url,
             description=f"Latest posts from {self.site_title}",
             max_posts=self.max_posts,
         )
-        write_feeds(self.output_dir, "feed", rss_xml, atom_xml)
 
-    def generate_tag_feeds(
-        self,
-        posts_by_tag: dict[str, tuple[str, list[Post]]],
-        tag_dir: str,
-    ) -> None:
-        """
-        Generate feeds for each tag.
-
-        Args:
-            posts_by_tag: Dictionary mapping tag (lowercase) to (display_name, posts)
-            tag_dir: Directory name for tag pages
-        """
-        base_url = self._get_base_url()
-        for tag_lower, (tag_display, tag_posts) in posts_by_tag.items():
-            # Sanitize tag for filename
-            from blogmore.generator import sanitize_for_url
-
-            safe_tag = sanitize_for_url(tag_lower)
-
-            feed_url = f"{base_url}/{tag_dir}/{safe_tag}/feed.rss"
-            rss_xml, atom_xml = generate_feed(
-                posts=tag_posts,
-                site_title=self.site_title,
-                site_url=self.site_url,
-                feed_url=feed_url,
-                description=f'Posts tagged with "{tag_display}" from {self.site_title}',
-                max_posts=self.max_posts,
-            )
-            write_feeds(
-                self.output_dir,
-                f"{tag_dir}/{safe_tag}/feed",
-                rss_xml,
-                atom_xml,
-            )
+        write_feeds(
+            self.output_dir,
+            "feed.xml",
+            f"{FEEDS_DIR}/all.atom.xml",
+            rss_xml,
+            atom_xml,
+        )
 
     def generate_category_feeds(
         self,
         posts_by_category: dict[str, tuple[str, list[Post]]],
-        category_dir: str,
     ) -> None:
         """
         Generate feeds for each category.
 
         Args:
             posts_by_category: Dictionary mapping category (lowercase) to (display_name, posts)
-            category_dir: Directory name for category pages
         """
         base_url = self._get_base_url()
         for category_lower, (
@@ -249,18 +238,24 @@ class BlogFeedGenerator:
 
             safe_category = sanitize_for_url(category_lower)
 
-            feed_url = f"{base_url}/{category_dir}/{safe_category}/feed.rss"
+            # Generate both RSS and Atom feeds with correct self-referencing URLs
+            rss_feed_url = f"{base_url}/{FEEDS_DIR}/{safe_category}.rss.xml"
+            atom_feed_url = f"{base_url}/{FEEDS_DIR}/{safe_category}.atom.xml"
+
             rss_xml, atom_xml = generate_feed(
                 posts=category_posts,
                 site_title=self.site_title,
                 site_url=self.site_url,
-                feed_url=feed_url,
+                rss_feed_url=rss_feed_url,
+                atom_feed_url=atom_feed_url,
                 description=f'Posts in category "{category_display}" from {self.site_title}',
                 max_posts=self.max_posts,
             )
+
             write_feeds(
                 self.output_dir,
-                f"{category_dir}/{safe_category}/feed",
+                f"{FEEDS_DIR}/{safe_category}.rss.xml",
+                f"{FEEDS_DIR}/{safe_category}.atom.xml",
                 rss_xml,
                 atom_xml,
             )
