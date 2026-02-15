@@ -263,9 +263,7 @@ class SiteGenerator:
         output_path = self.output_dir / "archive.html"
         output_path.write_text(html, encoding="utf-8")
 
-    def _generate_date_archives(
-        self, posts: list[Post], pages: list[Page]
-    ) -> None:
+    def _generate_date_archives(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate date-based archive pages (year, month, day) with pagination."""
         # Group posts by year, month, and day
         posts_by_year: dict[int, list[Post]] = defaultdict(list)
@@ -499,7 +497,9 @@ class SiteGenerator:
             safe_category = sanitize_for_url(category_lower)
 
             # Paginate posts
-            paginated_posts = paginate_posts(category_posts, self.POSTS_PER_PAGE_CATEGORY)
+            paginated_posts = paginate_posts(
+                category_posts, self.POSTS_PER_PAGE_CATEGORY
+            )
             total_pages = len(paginated_posts)
 
             context = self._get_global_context()
