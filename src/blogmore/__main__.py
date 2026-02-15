@@ -14,6 +14,16 @@ from watchdog.observers import Observer
 from blogmore.generator import SiteGenerator
 
 
+class ReusingTCPServer(socketserver.TCPServer):
+    """TCP server that allows address reuse.
+
+    This prevents "Address already in use" errors when restarting the server
+    quickly after it has been stopped.
+    """
+
+    allow_reuse_address = True
+
+
 class ContentChangeHandler(FileSystemEventHandler):
     """Handle file system events for content changes."""
 
@@ -176,11 +186,6 @@ def serve_site(
     http_handler = http.server.SimpleHTTPRequestHandler
 
     try:
-        # Create a TCP server with address reuse enabled
-        # This prevents "Address already in use" errors when restarting quickly
-        class ReusingTCPServer(socketserver.TCPServer):
-            allow_reuse_address = True
-
         with ReusingTCPServer(("", port), http_handler) as httpd:
             print(f"Serving site at http://localhost:{port}/")
             print("Press Ctrl+C to stop the server")
@@ -196,9 +201,6 @@ def serve_site(
         return 0
     except OSError as e:
         print(f"Error starting server: {e}", file=sys.stderr)
-        if observer is not None:
-            observer.stop()
-            observer.join()
         return 1
 
     # This should never be reached as serve_forever() blocks indefinitely
