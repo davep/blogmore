@@ -41,24 +41,6 @@ class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             # This is normal behavior and not an error condition.
             pass
 
-    def log_error(self, format: str, *args: object) -> None:
-        """Log an error.
-
-        Suppresses logging for broken pipe and connection reset errors
-        as these are expected when clients disconnect early.
-
-        Args:
-            format: Format string for the error message
-            *args: Arguments to format into the message
-        """
-        # Only suppress connection-related errors
-        if args and isinstance(args[0], str):
-            error_msg = str(args[0])
-            if "Broken pipe" in error_msg or "Connection reset" in error_msg:
-                # Silently ignore connection errors - they're normal
-                return
-        super().log_error(format, *args)
-
 
 class ContentChangeHandler(FileSystemEventHandler):
     """Handle file system events for content changes."""
