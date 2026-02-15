@@ -126,7 +126,14 @@ class PostParser:
                 "tables",
                 "toc",
                 "footnotes",
-            ]
+            ],
+            extension_configs={
+                "codehilite": {
+                    "css_class": "highlight",
+                    "guess_lang": False,
+                    "use_pygments": True,
+                }
+            },
         )
 
     def parse_file(self, path: Path) -> Post:
