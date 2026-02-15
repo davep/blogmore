@@ -151,6 +151,12 @@ article.post {
     height: auto;
 }
 
+/* Images with #centre on the end of the URL get centred. */
+img[src*="#centre"] {
+    display: block;
+    margin: auto;
+}
+
 .post-content blockquote {
     border-left: 4px solid #ddd;
     margin: 0;
