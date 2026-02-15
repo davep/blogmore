@@ -1,5 +1,6 @@
 """Static site generator for blog content."""
 
+import datetime as dt
 import re
 import shutil
 from collections import defaultdict
@@ -149,6 +150,16 @@ class SiteGenerator:
 
         # Generate a page for each tag
         for tag, tag_posts in posts_by_tag.items():
+            # Sort tag posts by date (newest first)
+            # Handle timezone-aware and naive datetimes
+            def get_sort_key(post: Post) -> float:
+                if post.date is None:
+                    return 0.0
+                if post.date.tzinfo:
+                    return post.date.timestamp()
+                return post.date.replace(tzinfo=dt.UTC).timestamp()
+
+            tag_posts.sort(key=get_sort_key, reverse=True)
             context = self._get_global_context()
             html = self.renderer.render_tag_page(tag, tag_posts, **context)
             # Sanitize tag for filename
@@ -170,6 +181,16 @@ class SiteGenerator:
 
         # Generate a page for each category
         for category, category_posts in posts_by_category.items():
+            # Sort category posts by date (newest first)
+            # Handle timezone-aware and naive datetimes
+            def get_sort_key(post: Post) -> float:
+                if post.date is None:
+                    return 0.0
+                if post.date.tzinfo:
+                    return post.date.timestamp()
+                return post.date.replace(tzinfo=dt.UTC).timestamp()
+
+            category_posts.sort(key=get_sort_key, reverse=True)
             context = self._get_global_context()
             html = self.renderer.render_category_page(
                 category, category_posts, **context

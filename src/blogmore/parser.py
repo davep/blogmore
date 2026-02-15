@@ -136,13 +136,29 @@ class PostParser:
                 # Convert date to datetime
                 date = dt.datetime.combine(date_value, dt.time())
             elif isinstance(date_value, str):
-                # Try to parse common date formats
-                for fmt in ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"]:
+                # Try to parse common date formats, including timezone-aware formats
+                date_formats = [
+                    "%Y-%m-%d %H:%M:%S%z",  # With timezone offset
+                    "%Y-%m-%dT%H:%M:%S%z",  # ISO format with timezone
+                    "%Y-%m-%d %H:%M:%S",  # Without timezone
+                    "%Y-%m-%dT%H:%M:%S",  # ISO format without timezone
+                    "%Y-%m-%d",  # Date only
+                ]
+                for fmt in date_formats:
                     try:
                         date = dt.datetime.strptime(date_value, fmt)
                         break
                     except ValueError:
                         continue
+
+                # If we still couldn't parse it, try with python-dateutil if available
+                if date is None:
+                    try:
+                        from dateutil import parser as dateutil_parser
+
+                        date = dateutil_parser.parse(date_value)
+                    except (ImportError, ValueError):
+                        pass
 
         # Extract category
         category = post_data.get("category")
@@ -202,5 +218,14 @@ class PostParser:
                 continue
 
         # Sort by date (newest first)
-        posts.sort(key=lambda p: p.date or dt.datetime.min, reverse=True)
+        # Handle timezone-aware and naive datetimes by converting to UTC timestamp
+        def get_sort_key(post: Post) -> float:
+            if post.date is None:
+                return 0.0  # Posts without dates sort to the end
+            # Convert to UTC timestamp for comparison
+            if post.date.tzinfo:
+                return post.date.timestamp()
+            return post.date.replace(tzinfo=dt.UTC).timestamp()
+
+        posts.sort(key=get_sort_key, reverse=True)
         return posts

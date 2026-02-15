@@ -11,7 +11,7 @@
         {% for post in posts %}
         <li>
             {% if post.date %}
-            <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date("%Y-%m-%d") }}</time>
+            <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>
             {% endif %}
             <a href="{{ site_url }}{{ post.url }}">{{ post.title }}</a>
             {% if post.tags %}

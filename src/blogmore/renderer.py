@@ -29,20 +29,37 @@ class TemplateRenderer:
         self.env.filters["format_date"] = self._format_date
 
     @staticmethod
-    def _format_date(date: dt.datetime | None, fmt: str = "%B %d, %Y") -> str:
+    def _format_date(date: dt.datetime | None, fmt: str = "%B %d, %Y %H:%M:%S") -> str:
         """
         Format a datetime object.
 
         Args:
             date: The datetime to format
-            fmt: The format string
+            fmt: The format string (default shows full date and time)
 
         Returns:
             Formatted date string or empty string if date is None
         """
         if date is None:
             return ""
-        return date.strftime(fmt)
+
+        # Format the datetime
+        formatted = date.strftime(fmt)
+
+        # Add timezone information if available
+        if date.tzinfo is not None:
+            # Get timezone name or offset
+            tz_str = date.strftime("%Z")
+            if tz_str:
+                formatted += f" {tz_str}"
+            else:
+                # If %Z doesn't work, use the offset
+                tz_offset = date.strftime("%z")
+                if tz_offset:
+                    # Format as UTC+HH:MM or UTC-HH:MM
+                    formatted += f" UTC{tz_offset[0]}{tz_offset[1:3]}:{tz_offset[3:5]}"
+
+        return formatted
 
     def render_post(self, post: Post, **context: Any) -> str:
         """
