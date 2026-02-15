@@ -658,9 +658,7 @@ class SiteGenerator:
                     output_path = self.output_dir / relative_path
 
                     # Check if file already exists
-                    if output_path.exists():
-                        print(f"Overriding existing file: {relative_path}")
-                        override_count += 1
+                    file_exists = output_path.exists()
 
                     # Create parent directories if they don't exist
                     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -668,6 +666,11 @@ class SiteGenerator:
                     # Copy file preserving metadata
                     shutil.copy2(file_path, output_path)
                     extras_count += 1
+
+                    # Print message if we overrode an existing file
+                    if file_exists:
+                        print(f"Overriding existing file: {relative_path}")
+                        override_count += 1
                 except (OSError, PermissionError) as e:
                     print(f"Warning: Failed to copy extra file {file_path}: {e}")
                     failed_count += 1
