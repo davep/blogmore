@@ -80,6 +80,10 @@ class SiteGenerator:
         print("Generating tag pages...")
         self._generate_tag_pages(posts)
 
+        # Generate category pages
+        print("Generating category pages...")
+        self._generate_category_pages(posts)
+
         # Copy static assets if they exist
         self._copy_static_assets()
 
@@ -126,6 +130,27 @@ class SiteGenerator:
             context = self._get_global_context()
             html = self.renderer.render_tag_page(tag, tag_posts, **context)
             output_path = tag_dir / f"{tag}.html"
+            output_path.write_text(html, encoding="utf-8")
+
+    def _generate_category_pages(self, posts: list[Post]) -> None:
+        """Generate pages for each category."""
+        # Group posts by category
+        posts_by_category: dict[str, list[Post]] = defaultdict(list)
+        for post in posts:
+            if post.category:
+                posts_by_category[post.category].append(post)
+
+        # Create category directory
+        category_dir = self.output_dir / "category"
+        category_dir.mkdir(exist_ok=True)
+
+        # Generate a page for each category
+        for category, category_posts in posts_by_category.items():
+            context = self._get_global_context()
+            html = self.renderer.render_category_page(
+                category, category_posts, **context
+            )
+            output_path = category_dir / f"{category}.html"
             output_path.write_text(html, encoding="utf-8")
 
     def _copy_static_assets(self) -> None:

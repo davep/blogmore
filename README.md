@@ -88,6 +88,7 @@ Required:
 
 Optional:
 - `date` - Publication date (YYYY-MM-DD format)
+- `category` - Post category (e.g., "python", "webdev")
 - `tags` - List of tags or comma-separated string
 - `draft` - Set to `true` to mark as draft
 
@@ -97,10 +98,19 @@ Example:
 ---
 title: My Blog Post
 date: 2024-01-15
+category: python
 tags: [python, webdev, tutorial]
 draft: false
 ---
 ```
+
+### Categories vs Tags
+
+**Categories** allow you to organize posts into distinct sections or "sub-blogs" within your site. Each post can have one category, and visitors can view all posts in a category at `/category/{category-name}.html`.
+
+**Tags** are for cross-categorization and can be applied multiple times per post. They're useful for topics that span multiple categories.
+
+For example, a blog might use categories like "python", "javascript", "devops" to separate major topics, while using tags like "tutorial", "advanced", "beginner" to indicate post type.
 
 ## Templates
 

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Category: {{ category }} - {{ site_title }}{% endblock %}
+
+{% block content %}
+<div class="category-page">
+    <h1>Posts in category "{{ category }}"</h1>
+    
+    {% if posts %}
+    <ul class="post-list">
+        {% for post in posts %}
+        <li>
+            {% if post.date %}
+            <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date("%Y-%m-%d") }}</time>
+            {% endif %}
+            <a href="{{ site_url }}{{ post.url }}">{{ post.title }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No posts in this category.</p>
+    {% endif %}
+    
+    <p><a href="{{ site_url }}/">← Back to home</a></p>
+</div>
+{% endblock %}

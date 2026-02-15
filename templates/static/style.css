@@ -76,6 +76,26 @@ article.post {
     font-size: 0.9em;
 }
 
+.category {
+    margin-top: 10px;
+}
+
+.category-link {
+    display: inline-block;
+    background: #e8f4f8;
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    text-decoration: none;
+    color: #0066cc;
+    font-weight: 600;
+}
+
+.category-link:hover {
+    background: #d0e8f2;
+    color: #0052a3;
+}
+
 .tags {
     margin-top: 10px;
 }

@@ -9,6 +9,11 @@
         {% if post.date %}
         <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>
         {% endif %}
+        {% if post.category %}
+        <div class="category">
+            <a href="{{ site_url }}/category/{{ post.category }}.html" class="category-link">{{ post.category }}</a>
+        </div>
+        {% endif %}
         {% if post.tags %}
         <div class="tags">
             {% for tag in post.tags %}

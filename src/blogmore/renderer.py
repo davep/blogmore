@@ -101,6 +101,23 @@ class TemplateRenderer:
         template = self.env.get_template("tag.html")
         return template.render(tag=tag, posts=posts, **context)
 
+    def render_category_page(
+        self, category: str, posts: list[Post], **context: Any
+    ) -> str:
+        """
+        Render a category page showing posts in a specific category.
+
+        Args:
+            category: The category to display posts for
+            posts: List of Post objects in this category
+            **context: Additional context variables
+
+        Returns:
+            Rendered HTML string
+        """
+        template = self.env.get_template("category.html")
+        return template.render(category=category, posts=posts, **context)
+
     def render_template(self, template_name: str, **context: Any) -> str:
         """
         Render an arbitrary template.

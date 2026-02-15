@@ -18,6 +18,7 @@ class Post:
     content: str
     html_content: str
     date: dt.datetime | None = None
+    category: str | None = None
     tags: list[str] | None = None
     draft: bool = False
     metadata: dict[str, Any] | None = None
@@ -91,6 +92,11 @@ class PostParser:
                     except ValueError:
                         continue
 
+        # Extract category
+        category = post_data.get("category")
+        if category and isinstance(category, str):
+            category = category.strip()
+
         # Extract tags
         tags = post_data.get("tags", [])
         if isinstance(tags, str):
@@ -111,6 +117,7 @@ class PostParser:
             content=post_data.content,
             html_content=html_content,
             date=date,
+            category=category,
             tags=tags,
             draft=draft,
             metadata=dict(post_data.metadata),
