@@ -8,6 +8,7 @@ from typing import Any
 
 import frontmatter  # type: ignore[import-untyped]
 import markdown
+import yaml
 
 
 def sanitize_for_url(value: str) -> str:
@@ -96,13 +97,28 @@ class PostParser:
 
         Raises:
             FileNotFoundError: If the file doesn't exist
-            ValueError: If required metadata is missing
+            ValueError: If required metadata is missing or YAML is malformed
         """
         if not path.exists():
             raise FileNotFoundError(f"Post file not found: {path}")
 
         # Parse frontmatter
-        post_data = frontmatter.load(path)
+        try:
+            post_data = frontmatter.load(path)
+        except yaml.scanner.ScannerError as e:
+            # Provide a helpful error message for YAML syntax errors
+            raise ValueError(
+                f"YAML syntax error in frontmatter of {path}:\n"
+                f"  {e}\n\n"
+                f"Common causes:\n"
+                f"  - Unquoted colons in values (e.g., 'title: My post: the sequel')\n"
+                f"  - Missing quotes around special characters\n"
+                f"  - Incorrect indentation\n\n"
+                f"Fix: Wrap values containing colons or special characters in quotes:\n"
+                f'  title: "My post: the sequel"'
+            ) from e
+        except Exception as e:
+            raise ValueError(f"Error parsing frontmatter in {path}: {e}") from e
 
         # Extract metadata
         title = post_data.get("title")
