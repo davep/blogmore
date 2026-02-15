@@ -170,9 +170,7 @@ def serve_site(
             # Watch templates directory if custom templates are provided
             if templates_dir is not None:
                 observer.schedule(handler, str(templates_dir), recursive=True)
-                print(
-                    f"Watching for changes in {content_dir} and {templates_dir}..."
-                )
+                print(f"Watching for changes in {content_dir} and {templates_dir}...")
             else:
                 print(f"Watching for changes in {content_dir}...")
 
