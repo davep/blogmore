@@ -13,6 +13,9 @@ wheels/
 output/
 site/
 
+# Example files (for development)
+example/
+
 # IDE
 .vscode/
 .idea/
