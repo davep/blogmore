@@ -32,6 +32,19 @@ def sanitize_for_url(value: str) -> str:
     return sanitized or "unnamed"
 
 
+def remove_date_prefix(slug: str) -> str:
+    """
+    Remove YYYY-MM-DD- date prefix from a slug if present.
+
+    Args:
+        slug: The slug potentially containing a date prefix
+
+    Returns:
+        The slug without the date prefix
+    """
+    return re.sub(r"^\d{4}-\d{2}-\d{2}-", "", slug)
+
+
 @dataclass
 class Post:
     """Represents a blog post with metadata and content."""
@@ -54,6 +67,15 @@ class Post:
     @property
     def url(self) -> str:
         """Generate the URL path for the post."""
+        if self.date:
+            # Extract date components
+            year = self.date.year
+            month = f"{self.date.month:02d}"
+            day = f"{self.date.day:02d}"
+            # Remove date prefix from slug if present
+            slug = remove_date_prefix(self.slug)
+            return f"/{year}/{month}/{day}/{slug}.html"
+        # Fallback for posts without dates
         return f"/{self.slug}.html"
 
     @property
