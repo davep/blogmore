@@ -104,14 +104,14 @@ def generate_feed(
     # This ensures each feed has the correct self-referencing URL
     fg_rss = create_feed_generator(site_title, site_url, rss_feed_url, description)
     fg_atom = create_feed_generator(site_title, site_url, atom_feed_url, description)
-    
+
     # Add posts to both feeds in a single loop
     # NOTE: feedgen reverses the order of entries, so we add them in reverse
     # to get the correct chronological order (newest first) in the output
     for post in reversed(posts[:max_posts]):
         add_post_to_feed(fg_rss, post, site_url)
         add_post_to_feed(fg_atom, post, site_url)
-    
+
     # Generate both feed formats
     rss_xml = fg_rss.rss_str(pretty=True).decode("utf-8")
     atom_xml = fg_atom.atom_str(pretty=True).decode("utf-8")
@@ -188,11 +188,11 @@ class BlogFeedGenerator:
             posts: List of all posts
         """
         base_url = self._get_base_url()
-        
+
         # Generate both RSS and Atom feeds with correct self-referencing URLs
         rss_feed_url = f"{base_url}/feed.xml"
         atom_feed_url = f"{base_url}/feeds/all.atom.xml"
-        
+
         rss_xml, atom_xml = generate_feed(
             posts=posts,
             site_title=self.site_title,
@@ -202,7 +202,7 @@ class BlogFeedGenerator:
             description=f"Latest posts from {self.site_title}",
             max_posts=self.max_posts,
         )
-        
+
         write_feeds(
             self.output_dir,
             "feed.xml",
@@ -234,7 +234,7 @@ class BlogFeedGenerator:
             # Generate both RSS and Atom feeds with correct self-referencing URLs
             rss_feed_url = f"{base_url}/feeds/{safe_category}.rss.xml"
             atom_feed_url = f"{base_url}/feeds/{safe_category}.atom.xml"
-            
+
             rss_xml, atom_xml = generate_feed(
                 posts=category_posts,
                 site_title=self.site_title,
@@ -244,7 +244,7 @@ class BlogFeedGenerator:
                 description=f'Posts in category "{category_display}" from {self.site_title}',
                 max_posts=self.max_posts,
             )
-            
+
             write_feeds(
                 self.output_dir,
                 f"feeds/{safe_category}.rss.xml",
