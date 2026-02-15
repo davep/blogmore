@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Tag: {{ tag }} - {{ site_title }}{% endblock %}
+
+{% block content %}
+<div class="tag-page">
+    <h1>Posts tagged with "{{ tag }}"</h1>
+    
+    {% if posts %}
+    <ul class="post-list">
+        {% for post in posts %}
+        <li>
+            {% if post.date %}
+            <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date("%Y-%m-%d") }}</time>
+            {% endif %}
+            <a href="{{ site_url }}{{ post.url }}">{{ post.title }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No posts with this tag.</p>
+    {% endif %}
+    
+    <p><a href="{{ site_url }}/">← Back to home</a></p>
+</div>
+{% endblock %}

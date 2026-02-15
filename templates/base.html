@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ site_title }}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ site_url }}/static/style.css">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav>
+            <h1><a href="{{ site_url }}/">{{ site_title }}</a></h1>
+            <ul>
+                <li><a href="{{ site_url }}/">Home</a></li>
+                <li><a href="{{ site_url }}/archive.html">Archive</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>Generated with <a href="https://github.com/davep/blogmore">Blogmore</a></p>
+    </footer>
+</body>
+</html>

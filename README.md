@@ -1,1 +1,140 @@
-# blogmore
+# Blogmore
+
+A blog-oriented static site generation engine built in Python.
+
+## Features
+
+- Write everything in Markdown
+- All metadata comes from frontmatter
+- Uses Jinja2 for templating
+- Simple and clean design
+- Automatic tag pages and archive generation
+
+## Installation
+
+### Using uv (recommended)
+
+```bash
+uv tool install blogmore
+```
+
+### Using pipx
+
+```bash
+pipx install blogmore
+```
+
+### From source
+
+```bash
+git clone https://github.com/davep/blogmore.git
+cd blogmore
+uv sync
+```
+
+## Usage
+
+### Basic Usage
+
+Create a directory with your markdown posts:
+
+```bash
+mkdir posts
+```
+
+Create a markdown file with frontmatter:
+
+```markdown
+---
+title: My First Post
+date: 2024-01-15
+tags: [python, blog]
+---
+
+This is my first blog post!
+```
+
+Generate your site:
+
+```bash
+blogmore posts/
+```
+
+This will generate your site in the `output/` directory.
+
+### Custom Options
+
+```bash
+blogmore posts/ \
+  --templates my-templates/ \
+  --output my-site/ \
+  --site-title "My Awesome Blog" \
+  --site-url "https://example.com"
+```
+
+### Command Line Options
+
+- `content_dir` - Directory containing markdown posts (required)
+- `-t, --templates` - Templates directory (default: `templates/`)
+- `-o, --output` - Output directory (default: `output/`)
+- `--site-title` - Site title (default: "My Blog")
+- `--site-url` - Base URL of the site
+- `--include-drafts` - Include posts marked as drafts
+
+## Frontmatter Fields
+
+Required:
+- `title` - Post title
+
+Optional:
+- `date` - Publication date (YYYY-MM-DD format)
+- `tags` - List of tags or comma-separated string
+- `draft` - Set to `true` to mark as draft
+
+Example:
+
+```yaml
+---
+title: My Blog Post
+date: 2024-01-15
+tags: [python, webdev, tutorial]
+draft: false
+---
+```
+
+## Templates
+
+Blogmore uses Jinja2 templates. The default templates are included, but you can customize them:
+
+- `base.html` - Base template
+- `index.html` - Homepage listing
+- `post.html` - Individual post page
+- `archive.html` - Archive page
+- `tag.html` - Tag page
+- `static/style.css` - Stylesheet
+
+## Development
+
+### Setup
+
+```bash
+make setup
+```
+
+### Run Checks
+
+```bash
+make checkall  # Run all checks (lint, format, typecheck, spell)
+make lint      # Check linting
+make typecheck # Type checking with mypy
+```
+
+### Format Code
+
+```bash
+make tidy  # Fix formatting and linting issues
+```
+
+## License
+
+GPL-3.0-or-later
