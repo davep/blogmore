@@ -1,12 +1,34 @@
 """Markdown parser with frontmatter support for blog posts."""
 
 import datetime as dt
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import frontmatter  # type: ignore[import-untyped]
 import markdown
+
+
+def sanitize_for_url(value: str) -> str:
+    """
+    Sanitize a string for safe use in URLs and filenames.
+
+    Args:
+        value: The string to sanitize
+
+    Returns:
+        A sanitized string safe for URLs and filenames
+    """
+    # Remove or replace dangerous characters
+    # Allow only alphanumeric, dash, underscore
+    sanitized = re.sub(r"[^\w\-]", "-", value.lower())
+    # Remove multiple consecutive dashes
+    sanitized = re.sub(r"-+", "-", sanitized)
+    # Remove leading/trailing dashes
+    sanitized = sanitized.strip("-")
+    # Ensure it's not empty
+    return sanitized or "unnamed"
 
 
 @dataclass
@@ -32,6 +54,19 @@ class Post:
     def url(self) -> str:
         """Generate the URL path for the post."""
         return f"/{self.slug}.html"
+
+    @property
+    def safe_category(self) -> str | None:
+        """Get the category sanitized for use in URLs and filenames."""
+        if self.category:
+            return sanitize_for_url(self.category)
+        return None
+
+    def safe_tags(self) -> list[str]:
+        """Get tags sanitized for use in URLs and filenames."""
+        if self.tags:
+            return [sanitize_for_url(tag) for tag in self.tags]
+        return []
 
 
 class PostParser:

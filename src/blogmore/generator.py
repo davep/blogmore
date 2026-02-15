@@ -1,5 +1,6 @@
 """Static site generator for blog content."""
 
+import re
 import shutil
 from collections import defaultdict
 from pathlib import Path
@@ -7,6 +8,27 @@ from typing import Any
 
 from blogmore.parser import Post, PostParser
 from blogmore.renderer import TemplateRenderer
+
+
+def sanitize_for_url(value: str) -> str:
+    """
+    Sanitize a string for safe use in URLs and filenames.
+
+    Args:
+        value: The string to sanitize
+
+    Returns:
+        A sanitized string safe for URLs and filenames
+    """
+    # Remove or replace dangerous characters
+    # Allow only alphanumeric, dash, underscore
+    sanitized = re.sub(r"[^\w\-]", "-", value.lower())
+    # Remove multiple consecutive dashes
+    sanitized = re.sub(r"-+", "-", sanitized)
+    # Remove leading/trailing dashes
+    sanitized = sanitized.strip("-")
+    # Ensure it's not empty
+    return sanitized or "unnamed"
 
 
 class SiteGenerator:
@@ -129,7 +151,9 @@ class SiteGenerator:
         for tag, tag_posts in posts_by_tag.items():
             context = self._get_global_context()
             html = self.renderer.render_tag_page(tag, tag_posts, **context)
-            output_path = tag_dir / f"{tag}.html"
+            # Sanitize tag for filename
+            safe_tag = sanitize_for_url(tag)
+            output_path = tag_dir / f"{safe_tag}.html"
             output_path.write_text(html, encoding="utf-8")
 
     def _generate_category_pages(self, posts: list[Post]) -> None:
@@ -150,7 +174,9 @@ class SiteGenerator:
             html = self.renderer.render_category_page(
                 category, category_posts, **context
             )
-            output_path = category_dir / f"{category}.html"
+            # Sanitize category for filename
+            safe_category = sanitize_for_url(category)
+            output_path = category_dir / f"{safe_category}.html"
             output_path.write_text(html, encoding="utf-8")
 
     def _copy_static_assets(self) -> None:
