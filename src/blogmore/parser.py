@@ -92,6 +92,27 @@ class Post:
         return []
 
 
+@dataclass
+class Page:
+    """Represents a static page with metadata and content."""
+
+    path: Path
+    title: str
+    content: str
+    html_content: str
+    metadata: dict[str, Any] | None = None
+
+    @property
+    def slug(self) -> str:
+        """Generate a URL slug from the page filename."""
+        return self.path.stem
+
+    @property
+    def url(self) -> str:
+        """Generate the URL path for the page."""
+        return f"/{self.slug}.html"
+
+
 class PostParser:
     """Parse markdown files with frontmatter into Post objects."""
 
@@ -251,3 +272,83 @@ class PostParser:
 
         posts.sort(key=get_sort_key, reverse=True)
         return posts
+
+    def parse_page(self, path: Path) -> Page:
+        """
+        Parse a markdown file as a static page.
+
+        Args:
+            path: Path to the markdown file
+
+        Returns:
+            A Page object with parsed metadata and content
+
+        Raises:
+            FileNotFoundError: If the file doesn't exist
+            ValueError: If required metadata is missing or YAML is malformed
+        """
+        if not path.exists():
+            raise FileNotFoundError(f"Page file not found: {path}")
+
+        # Parse frontmatter
+        try:
+            page_data = frontmatter.load(path)
+        except yaml.scanner.ScannerError as e:
+            # Provide a helpful error message for YAML syntax errors
+            raise ValueError(
+                f"YAML syntax error in frontmatter of {path}:\n"
+                f"  {e}\n\n"
+                f"Common causes:\n"
+                f"  - Unquoted colons in values (e.g., 'title: My page: the sequel')\n"
+                f"  - Missing quotes around special characters\n"
+                f"  - Incorrect indentation\n\n"
+                f"Fix: Wrap values containing colons or special characters in quotes:\n"
+                f'  title: "My page: the sequel"'
+            ) from e
+        except Exception as e:
+            raise ValueError(f"Error parsing frontmatter in {path}: {e}") from e
+
+        # Extract metadata
+        title = page_data.get("title")
+        if not title:
+            raise ValueError(f"Page missing required 'title' in frontmatter: {path}")
+
+        # Convert markdown to HTML
+        html_content = self.markdown.convert(page_data.content)
+
+        # Reset markdown parser for next use
+        self.markdown.reset()
+
+        return Page(
+            path=path,
+            title=title,
+            content=page_data.content,
+            html_content=html_content,
+            metadata=dict(page_data.metadata),
+        )
+
+    def parse_pages_directory(self, directory: Path) -> list[Page]:
+        """
+        Parse all markdown files in a pages directory.
+
+        Args:
+            directory: Directory containing page markdown files
+
+        Returns:
+            List of Page objects sorted by title (alphabetically)
+        """
+        if not directory.exists():
+            return []
+
+        pages = []
+        for md_file in directory.glob("*.md"):
+            try:
+                page = self.parse_page(md_file)
+                pages.append(page)
+            except (ValueError, FileNotFoundError) as e:
+                print(f"Warning: Skipping {md_file}: {e}")
+                continue
+
+        # Sort by title (alphabetically)
+        pages.sort(key=lambda page: page.title.lower())
+        return pages

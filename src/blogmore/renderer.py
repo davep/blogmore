@@ -13,7 +13,7 @@ from jinja2 import (
     select_autoescape,
 )
 
-from blogmore.parser import Post
+from blogmore.parser import Page, Post
 
 
 class TemplateRenderer:
@@ -98,6 +98,22 @@ class TemplateRenderer:
         template = self.env.get_template("post.html")
         return template.render(
             post=post, extra_stylesheets=self.extra_stylesheets, **context
+        )
+
+    def render_page(self, page: Page, **context: Any) -> str:
+        """
+        Render a single static page.
+
+        Args:
+            page: The Page object to render
+            **context: Additional context variables
+
+        Returns:
+            Rendered HTML string
+        """
+        template = self.env.get_template("page.html")
+        return template.render(
+            page=page, extra_stylesheets=self.extra_stylesheets, **context
         )
 
     def render_index(
