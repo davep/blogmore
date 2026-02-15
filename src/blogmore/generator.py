@@ -216,10 +216,12 @@ class SiteGenerator:
     def _copy_attachments(self) -> None:
         """Copy post attachments (images, files, etc.) from content directory to output directory."""
         if not self.content_dir.exists():
+            print(f"Warning: Content directory does not exist: {self.content_dir}")
             return
 
         # Count how many attachments we copy
         attachment_count = 0
+        failed_count = 0
 
         # Recursively copy all non-markdown files from the content directory
         for file_path in self.content_dir.rglob("*"):
@@ -238,7 +240,13 @@ class SiteGenerator:
                     attachment_count += 1
                 except (OSError, PermissionError) as e:
                     print(f"Warning: Failed to copy attachment {file_path}: {e}")
+                    failed_count += 1
                     continue
 
         if attachment_count > 0:
             print(f"Copied {attachment_count} attachment(s) from {self.content_dir}")
+        else:
+            print(f"No attachments found in {self.content_dir}")
+        
+        if failed_count > 0:
+            print(f"Warning: Failed to copy {failed_count} attachment(s)")
