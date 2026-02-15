@@ -191,7 +191,6 @@ def serve_site(
                 if observer is not None:
                     observer.stop()
                     observer.join()
-            return 0  # This line is never reached but needed for type checking
     except KeyboardInterrupt:
         print("\nServer stopped")
         return 0
@@ -201,6 +200,9 @@ def serve_site(
             observer.stop()
             observer.join()
         return 1
+
+    # This should never be reached as serve_forever() blocks indefinitely
+    return 0
 
 
 def main() -> int:
