@@ -178,7 +178,11 @@ class TemplateRenderer:
         """
         template = self.env.get_template("category.html")
         return template.render(
-            category=category, posts=posts, page=page, total_pages=total_pages, **context
+            category=category,
+            posts=posts,
+            page=page,
+            total_pages=total_pages,
+            **context,
         )
 
     def render_template(self, template_name: str, **context: Any) -> str:
