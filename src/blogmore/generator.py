@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from blogmore.feeds import BlogFeedGenerator
-from blogmore.parser import Post, PostParser, remove_date_prefix
+from blogmore.parser import Page, Post, PostParser, remove_date_prefix
 from blogmore.renderer import TemplateRenderer
 
 
@@ -128,33 +128,45 @@ class SiteGenerator:
         )
         print(f"Found {len(posts)} posts")
 
+        # Parse all pages from the pages subdirectory
+        pages_dir = self.content_dir / "pages"
+        pages = self.parser.parse_pages_directory(pages_dir)
+        if pages:
+            print(f"Found {len(pages)} pages")
+
         # Create output directory
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         # Generate individual post pages
         print("Generating post pages...")
         for post in posts:
-            self._generate_post_page(post, posts)
+            self._generate_post_page(post, posts, pages)
+
+        # Generate static pages
+        if pages:
+            print("Generating static pages...")
+            for page in pages:
+                self._generate_page(page, pages)
 
         # Generate index page
         print("Generating index page...")
-        self._generate_index_page(posts)
+        self._generate_index_page(posts, pages)
 
         # Generate archive page
         print("Generating archive page...")
-        self._generate_archive_page(posts)
+        self._generate_archive_page(posts, pages)
 
         # Generate date-based archive pages
         print("Generating date-based archive pages...")
-        self._generate_date_archives(posts)
+        self._generate_date_archives(posts, pages)
 
         # Generate tag pages
         print("Generating tag pages...")
-        self._generate_tag_pages(posts)
+        self._generate_tag_pages(posts, pages)
 
         # Generate category pages
         print("Generating category pages...")
-        self._generate_category_pages(posts)
+        self._generate_category_pages(posts, pages)
 
         # Generate feeds
         print("Generating RSS and Atom feeds...")
@@ -171,10 +183,13 @@ class SiteGenerator:
 
         print(f"Site generation complete! Output: {self.output_dir}")
 
-    def _generate_post_page(self, post: Post, all_posts: list[Post]) -> None:
+    def _generate_post_page(
+        self, post: Post, all_posts: list[Post], pages: list[Page]
+    ) -> None:
         """Generate a single post page."""
         context = self._get_global_context()
         context["all_posts"] = all_posts
+        context["pages"] = pages
 
         html = self.renderer.render_post(post, **context)
 
@@ -198,19 +213,31 @@ class SiteGenerator:
 
         output_path.write_text(html, encoding="utf-8")
 
-    def _generate_index_page(self, posts: list[Post]) -> None:
+    def _generate_page(self, page: Page, pages: list[Page]) -> None:
+        """Generate a single static page."""
+        context = self._get_global_context()
+        context["pages"] = pages
+
+        html = self.renderer.render_page(page, **context)
+
+        # Output to root of site
+        output_path = self.output_dir / f"{page.slug}.html"
+        output_path.write_text(html, encoding="utf-8")
+
+    def _generate_index_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the main index page with pagination."""
         context = self._get_global_context()
+        context["pages"] = pages
 
         # Paginate posts
-        pages = paginate_posts(posts, self.POSTS_PER_PAGE_INDEX)
-        if not pages:
-            pages = [[]]  # Empty page if no posts
+        paginated_posts = paginate_posts(posts, self.POSTS_PER_PAGE_INDEX)
+        if not paginated_posts:
+            paginated_posts = [[]]  # Empty page if no posts
 
-        total_pages = len(pages)
+        total_pages = len(paginated_posts)
 
         # Generate each page
-        for page_num, page_posts in enumerate(pages, start=1):
+        for page_num, page_posts in enumerate(paginated_posts, start=1):
             html = self.renderer.render_index(
                 page_posts, page=page_num, total_pages=total_pages, **context
             )
@@ -226,16 +253,17 @@ class SiteGenerator:
 
             output_path.write_text(html, encoding="utf-8")
 
-    def _generate_archive_page(self, posts: list[Post]) -> None:
+    def _generate_archive_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the archive page."""
         context = self._get_global_context()
+        context["pages"] = pages
         html = self.renderer.render_archive(
             posts, page=1, total_pages=1, base_path="/archive", **context
         )
         output_path = self.output_dir / "archive.html"
         output_path.write_text(html, encoding="utf-8")
 
-    def _generate_date_archives(self, posts: list[Post]) -> None:
+    def _generate_date_archives(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate date-based archive pages (year, month, day) with pagination."""
         # Group posts by year, month, and day
         posts_by_year: dict[int, list[Post]] = defaultdict(list)
@@ -253,6 +281,7 @@ class SiteGenerator:
                 posts_by_day[(year, month, day)].append(post)
 
         context = self._get_global_context()
+        context["pages"] = pages
 
         # Generate year archives with pagination
         for year, year_posts in posts_by_year.items():
@@ -260,11 +289,11 @@ class SiteGenerator:
             year_dir.mkdir(parents=True, exist_ok=True)
 
             # Paginate posts
-            pages = paginate_posts(year_posts, self.POSTS_PER_PAGE_ARCHIVE)
-            total_pages = len(pages)
+            paginated_posts = paginate_posts(year_posts, self.POSTS_PER_PAGE_ARCHIVE)
+            total_pages = len(paginated_posts)
 
             # Generate each page
-            for page_num, page_posts in enumerate(pages, start=1):
+            for page_num, page_posts in enumerate(paginated_posts, start=1):
                 # Base path for pagination links
                 base_path = f"/{year}"
 
@@ -296,11 +325,11 @@ class SiteGenerator:
             month_name = dt.datetime(year, month, 1).strftime("%B %Y")
 
             # Paginate posts
-            pages = paginate_posts(month_posts, self.POSTS_PER_PAGE_ARCHIVE)
-            total_pages = len(pages)
+            paginated_posts = paginate_posts(month_posts, self.POSTS_PER_PAGE_ARCHIVE)
+            total_pages = len(paginated_posts)
 
             # Generate each page
-            for page_num, page_posts in enumerate(pages, start=1):
+            for page_num, page_posts in enumerate(paginated_posts, start=1):
                 # Base path for pagination links
                 base_path = f"/{year}/{month:02d}"
 
@@ -332,11 +361,11 @@ class SiteGenerator:
             date_str = dt.datetime(year, month, day).strftime("%B %d, %Y")
 
             # Paginate posts
-            pages = paginate_posts(day_posts, self.POSTS_PER_PAGE_ARCHIVE)
-            total_pages = len(pages)
+            paginated_posts = paginate_posts(day_posts, self.POSTS_PER_PAGE_ARCHIVE)
+            total_pages = len(paginated_posts)
 
             # Generate each page
-            for page_num, page_posts in enumerate(pages, start=1):
+            for page_num, page_posts in enumerate(paginated_posts, start=1):
                 # Base path for pagination links
                 base_path = f"/{year}/{month:02d}/{day:02d}"
 
@@ -360,7 +389,7 @@ class SiteGenerator:
 
                 output_path.write_text(html, encoding="utf-8")
 
-    def _generate_tag_pages(self, posts: list[Post]) -> None:
+    def _generate_tag_pages(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate pages for each tag with pagination."""
         # Group posts by tag (case-insensitive)
         # Key is lowercase tag, value is (display_name, posts)
@@ -387,13 +416,14 @@ class SiteGenerator:
             safe_tag = sanitize_for_url(tag_lower)
 
             # Paginate posts
-            pages = paginate_posts(tag_posts, self.POSTS_PER_PAGE_TAG)
-            total_pages = len(pages)
+            paginated_posts = paginate_posts(tag_posts, self.POSTS_PER_PAGE_TAG)
+            total_pages = len(paginated_posts)
 
             context = self._get_global_context()
+            context["pages"] = pages
 
             # Generate each page
-            for page_num, page_posts in enumerate(pages, start=1):
+            for page_num, page_posts in enumerate(paginated_posts, start=1):
                 html = self.renderer.render_tag_page(
                     tag_display,  # Use display name for rendering
                     page_posts,
@@ -437,7 +467,7 @@ class SiteGenerator:
                     posts_by_tag[tag_lower][1].append(post)
         return posts_by_tag
 
-    def _generate_category_pages(self, posts: list[Post]) -> None:
+    def _generate_category_pages(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate pages for each category with pagination."""
         # Group posts by category (case-insensitive)
         # Key is lowercase category, value is (display_name, posts)
@@ -467,13 +497,16 @@ class SiteGenerator:
             safe_category = sanitize_for_url(category_lower)
 
             # Paginate posts
-            pages = paginate_posts(category_posts, self.POSTS_PER_PAGE_CATEGORY)
-            total_pages = len(pages)
+            paginated_posts = paginate_posts(
+                category_posts, self.POSTS_PER_PAGE_CATEGORY
+            )
+            total_pages = len(paginated_posts)
 
             context = self._get_global_context()
+            context["pages"] = pages
 
             # Generate each page
-            for page_num, page_posts in enumerate(pages, start=1):
+            for page_num, page_posts in enumerate(paginated_posts, start=1):
                 html = self.renderer.render_category_page(
                     category_display,  # Use display name for rendering
                     page_posts,
