@@ -94,6 +94,7 @@ def serve_site(
     include_drafts: bool = False,
     watch: bool = True,
     posts_per_feed: int = 20,
+    extra_stylesheets: list[str] | None = None,
 ) -> int:
     """
     Serve the generated site locally using a simple HTTP server.
@@ -102,12 +103,14 @@ def serve_site(
         output_dir: Directory containing the generated site
         port: Port to serve on (default: 8000)
         content_dir: Directory containing markdown posts (optional, for generation)
-        templates_dir: Directory containing templates (optional, for generation)
+        templates_dir: Optional directory containing custom templates.
+                      If not provided, uses bundled templates.
         site_title: Title of the blog site
         site_url: Base URL of the site
         include_drafts: Whether to include drafts
         watch: Whether to watch for changes and regenerate (default: True)
         posts_per_feed: Maximum number of posts to include in feeds (default: 20)
+        extra_stylesheets: Optional list of URLs for additional stylesheets
 
     Returns:
         Exit code
@@ -125,12 +128,8 @@ def serve_site(
             )
             return 1
 
-        # Set templates directory default if not provided
-        if templates_dir is None:
-            templates_dir = Path("templates")
-
-        # Validate templates directory
-        if not templates_dir.exists():
+        # Validate templates directory if provided
+        if templates_dir is not None and not templates_dir.exists():
             print(
                 f"Error: Templates directory not found: {templates_dir}",
                 file=sys.stderr,
@@ -139,7 +138,8 @@ def serve_site(
 
         # Convert to absolute paths before changing directory
         content_dir = content_dir.resolve()
-        templates_dir = templates_dir.resolve()
+        if templates_dir is not None:
+            templates_dir = templates_dir.resolve()
         output_dir = output_dir.resolve()
 
         # Generate the site
@@ -152,6 +152,7 @@ def serve_site(
                 site_title=site_title,
                 site_url=site_url,
                 posts_per_feed=posts_per_feed,
+                extra_stylesheets=extra_stylesheets,
             )
             generator.generate(include_drafts=include_drafts)
         except Exception as e:
@@ -166,11 +167,16 @@ def serve_site(
             # Watch content directory
             observer.schedule(handler, str(content_dir), recursive=True)
 
-            # Watch templates directory
-            observer.schedule(handler, str(templates_dir), recursive=True)
+            # Watch templates directory if custom templates are provided
+            if templates_dir is not None:
+                observer.schedule(handler, str(templates_dir), recursive=True)
+                print(
+                    f"Watching for changes in {content_dir} and {templates_dir}..."
+                )
+            else:
+                print(f"Watching for changes in {content_dir}...")
 
             observer.start()
-            print(f"Watching for changes in {content_dir} and {templates_dir}...")
     elif not output_dir.exists():
         print(
             f"Error: Output directory not found: {output_dir}\n"
@@ -241,8 +247,8 @@ def main() -> int:
             "-t",
             "--templates",
             type=Path,
-            default=Path("templates"),
-            help="Directory containing Jinja2 templates (default: templates)",
+            default=None,
+            help="Optional directory containing custom Jinja2 templates (uses bundled templates by default)",
         )
 
         parser.add_argument(
@@ -279,6 +285,13 @@ def main() -> int:
         )
 
         parser.add_argument(
+            "--extra-stylesheet",
+            action="append",
+            dest="extra_stylesheets",
+            help="URL of an additional stylesheet to include (can be used multiple times)",
+        )
+
+        parser.add_argument(
             "--version",
             action="version",
             version="blogmore 0.1.0",
@@ -294,7 +307,8 @@ def main() -> int:
             )
             return 1
 
-        if not args.templates.exists():
+        # Validate templates directory if provided
+        if args.templates is not None and not args.templates.exists():
             print(
                 f"Error: Templates directory not found: {args.templates}",
                 file=sys.stderr,
@@ -310,6 +324,7 @@ def main() -> int:
                 site_title=args.site_title,
                 site_url=args.site_url,
                 posts_per_feed=args.posts_per_feed,
+                extra_stylesheets=args.extra_stylesheets,
             )
             generator.generate(include_drafts=args.include_drafts)
             return 0
@@ -343,8 +358,8 @@ def main() -> int:
         "-t",
         "--templates",
         type=Path,
-        default=Path("templates"),
-        help="Directory containing Jinja2 templates (default: templates)",
+        default=None,
+        help="Optional directory containing custom Jinja2 templates (uses bundled templates by default)",
     )
 
     gen_parser.add_argument(
@@ -380,6 +395,13 @@ def main() -> int:
         help="Maximum number of posts to include in feeds (default: 20)",
     )
 
+    gen_parser.add_argument(
+        "--extra-stylesheet",
+        action="append",
+        dest="extra_stylesheets",
+        help="URL of an additional stylesheet to include (can be used multiple times)",
+    )
+
     # Serve command
     serve_parser = subparsers.add_parser(
         "serve",
@@ -397,8 +419,8 @@ def main() -> int:
         "-t",
         "--templates",
         type=Path,
-        default=Path("templates"),
-        help="Directory containing Jinja2 templates (default: templates)",
+        default=None,
+        help="Optional directory containing custom Jinja2 templates (uses bundled templates by default)",
     )
 
     serve_parser.add_argument(
@@ -443,6 +465,13 @@ def main() -> int:
     )
 
     serve_parser.add_argument(
+        "--extra-stylesheet",
+        action="append",
+        dest="extra_stylesheets",
+        help="URL of an additional stylesheet to include (can be used multiple times)",
+    )
+
+    serve_parser.add_argument(
         "--no-watch",
         action="store_true",
         help="Disable watching for changes (default: watch enabled)",
@@ -468,6 +497,7 @@ def main() -> int:
             include_drafts=args.include_drafts,
             watch=not args.no_watch,
             posts_per_feed=args.posts_per_feed,
+            extra_stylesheets=args.extra_stylesheets,
         )
 
     # Handle generate command
@@ -480,7 +510,8 @@ def main() -> int:
             )
             return 1
 
-        if not args.templates.exists():
+        # Validate templates directory if provided
+        if args.templates is not None and not args.templates.exists():
             print(
                 f"Error: Templates directory not found: {args.templates}",
                 file=sys.stderr,
@@ -496,6 +527,7 @@ def main() -> int:
                 site_title=args.site_title,
                 site_url=args.site_url,
                 posts_per_feed=args.posts_per_feed,
+                extra_stylesheets=args.extra_stylesheets,
             )
             generator.generate(include_drafts=args.include_drafts)
             return 0
