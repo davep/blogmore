@@ -31,8 +31,10 @@ def create_feed_generator(
     base_url = site_url if site_url else "https://example.com"
     fg.id(base_url)
     fg.title(site_title)
-    fg.link(href=base_url, rel="alternate")
+    # IMPORTANT: Order matters! The last link becomes the channel <link> in RSS.
+    # Add self link first, then alternate link (which becomes the channel link).
     fg.link(href=feed_url if feed_url else f"{base_url}/feed.rss", rel="self")
+    fg.link(href=base_url, rel="alternate")
     fg.description(description or f"Latest posts from {site_title}")
     fg.language("en")
     return fg
