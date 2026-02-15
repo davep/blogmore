@@ -21,7 +21,7 @@
     --blockquote-border: #ddd;
 }
 
-/* Dark mode colors */
+/* Dark mode colors - applied by system preference */
 @media (prefers-color-scheme: dark) {
     :root {
         --bg-color: #1a1a1a;
@@ -44,7 +44,27 @@
     }
 }
 
-/* Override system preference when user manually selects dark theme */
+/* Manual theme overrides - these override system preference */
+[data-theme="light"] {
+    --bg-color: #fff;
+    --text-color: #333;
+    --text-secondary: #666;
+    --border-color: #eee;
+    --border-color-light: #f0f0f0;
+    --link-color: #0066cc;
+    --link-hover-color: #0052a3;
+    --link-visited-color: #551a8b;
+    --hover-color: #0066cc;
+    --hover-color-dark: #0052a3;
+    --code-bg: #f5f5f5;
+    --tag-bg: #f0f0f0;
+    --tag-hover-bg: #e0e0e0;
+    --category-bg: #e8f4f8;
+    --category-hover-bg: #d0e8f2;
+    --category-text: #0066cc;
+    --blockquote-border: #ddd;
+}
+
 [data-theme="dark"] {
     --bg-color: #1a1a1a;
     --text-color: #e0e0e0;
