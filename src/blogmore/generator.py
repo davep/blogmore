@@ -586,23 +586,26 @@ class SiteGenerator:
                 print(f"Copied custom static assets from {custom_static_dir}")
 
     def _copy_attachments(self) -> None:
-        """Copy post attachments (images, files, etc.) from content directory to output directory."""
-        if not self.content_dir.exists():
-            print(f"Warning: Content directory does not exist: {self.content_dir}")
+        """Copy post attachments (images, files, etc.) from the attachments directory to output directory."""
+        attachments_dir = self.content_dir / "attachments"
+
+        if not attachments_dir.exists():
+            print(f"No attachments directory found in {self.content_dir}")
             return
 
         # Count how many attachments we copy
         attachment_count = 0
         failed_count = 0
 
-        # Recursively copy all non-markdown files from the content directory
-        for file_path in self.content_dir.rglob("*"):
-            # Skip markdown files and directories
-            if file_path.is_file() and file_path.suffix.lower() != ".md":
+        # Recursively copy all files from the attachments directory
+        for file_path in attachments_dir.rglob("*"):
+            # Skip directories
+            if file_path.is_file():
                 try:
-                    # Calculate relative path to preserve directory structure
-                    relative_path = file_path.relative_to(self.content_dir)
-                    output_path = self.output_dir / relative_path
+                    # Calculate relative path from attachments directory to preserve structure
+                    relative_path = file_path.relative_to(attachments_dir)
+                    # Copy to output_dir/attachments/... to preserve the attachments directory structure
+                    output_path = self.output_dir / "attachments" / relative_path
 
                     # Create parent directories if they don't exist
                     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -616,9 +619,9 @@ class SiteGenerator:
                     continue
 
         if attachment_count > 0:
-            print(f"Copied {attachment_count} attachment(s) from {self.content_dir}")
+            print(f"Copied {attachment_count} attachment(s) from {attachments_dir}")
         else:
-            print(f"No attachments found in {self.content_dir}")
+            print(f"No attachments found in {attachments_dir}")
 
         if failed_count > 0:
             print(f"Warning: Failed to copy {failed_count} attachment(s)")
