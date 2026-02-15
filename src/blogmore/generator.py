@@ -344,19 +344,24 @@ class SiteGenerator:
 
     def _generate_tag_pages(self, posts: list[Post]) -> None:
         """Generate pages for each tag with pagination."""
-        # Group posts by tag
-        posts_by_tag: dict[str, list[Post]] = defaultdict(list)
+        # Group posts by tag (case-insensitive)
+        # Key is lowercase tag, value is (display_name, posts)
+        posts_by_tag: dict[str, tuple[str, list[Post]]] = {}
         for post in posts:
             if post.tags:
                 for tag in post.tags:
-                    posts_by_tag[tag].append(post)
+                    tag_lower = tag.lower()
+                    if tag_lower not in posts_by_tag:
+                        # Store the first occurrence as the display name
+                        posts_by_tag[tag_lower] = (tag, [])
+                    posts_by_tag[tag_lower][1].append(post)
 
         # Create tag directory
         tag_dir = self.output_dir / self.TAG_DIR
         tag_dir.mkdir(exist_ok=True)
 
         # Generate paginated pages for each tag
-        for tag, tag_posts in posts_by_tag.items():
+        for tag_lower, (tag_display, tag_posts) in posts_by_tag.items():
             # Sort tag posts by date (newest first)
             # Handle timezone-aware and naive datetimes
             def get_sort_key(post: Post) -> float:
@@ -368,8 +373,8 @@ class SiteGenerator:
 
             tag_posts.sort(key=get_sort_key, reverse=True)
 
-            # Sanitize tag for filename
-            safe_tag = sanitize_for_url(tag)
+            # Sanitize tag for filename (use lowercase version)
+            safe_tag = sanitize_for_url(tag_lower)
 
             # Paginate posts
             pages = paginate_posts(tag_posts, self.POSTS_PER_PAGE_TAG)
@@ -380,7 +385,7 @@ class SiteGenerator:
             # Generate each page
             for page_num, page_posts in enumerate(pages, start=1):
                 html = self.renderer.render_tag_page(
-                    tag,
+                    tag_display,  # Use display name for rendering
                     page_posts,
                     page=page_num,
                     total_pages=total_pages,
@@ -401,18 +406,26 @@ class SiteGenerator:
 
     def _generate_category_pages(self, posts: list[Post]) -> None:
         """Generate pages for each category with pagination."""
-        # Group posts by category
-        posts_by_category: dict[str, list[Post]] = defaultdict(list)
+        # Group posts by category (case-insensitive)
+        # Key is lowercase category, value is (display_name, posts)
+        posts_by_category: dict[str, tuple[str, list[Post]]] = {}
         for post in posts:
             if post.category:
-                posts_by_category[post.category].append(post)
+                category_lower = post.category.lower()
+                if category_lower not in posts_by_category:
+                    # Store the first occurrence as the display name
+                    posts_by_category[category_lower] = (post.category, [])
+                posts_by_category[category_lower][1].append(post)
 
         # Create category directory
         category_dir = self.output_dir / self.CATEGORY_DIR
         category_dir.mkdir(exist_ok=True)
 
         # Generate paginated pages for each category
-        for category, category_posts in posts_by_category.items():
+        for category_lower, (
+            category_display,
+            category_posts,
+        ) in posts_by_category.items():
             # Sort category posts by date (newest first)
             # Handle timezone-aware and naive datetimes
             def get_sort_key(post: Post) -> float:
@@ -424,8 +437,8 @@ class SiteGenerator:
 
             category_posts.sort(key=get_sort_key, reverse=True)
 
-            # Sanitize category for filename
-            safe_category = sanitize_for_url(category)
+            # Sanitize category for filename (use lowercase version)
+            safe_category = sanitize_for_url(category_lower)
 
             # Paginate posts
             pages = paginate_posts(category_posts, self.POSTS_PER_PAGE_CATEGORY)
@@ -436,7 +449,7 @@ class SiteGenerator:
             # Generate each page
             for page_num, page_posts in enumerate(pages, start=1):
                 html = self.renderer.render_category_page(
-                    category,
+                    category_display,  # Use display name for rendering
                     page_posts,
                     page=page_num,
                     total_pages=total_pages,
