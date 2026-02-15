@@ -482,7 +482,7 @@ class SiteGenerator:
 
         # Calculate tag counts and prepare data
         tag_data: list[dict[str, Any]] = []
-        min_count = float("inf")
+        min_count: int | None = None
         max_count = 0
 
         for tag_lower, (tag_display, tag_posts) in posts_by_tag.items():
@@ -496,7 +496,8 @@ class SiteGenerator:
                     "tag_lower": tag_lower,
                 }
             )
-            min_count = min(min_count, count)
+            if min_count is None or count < min_count:
+                min_count = count
             max_count = max(max_count, count)
 
         # Sort alphabetically by display name
@@ -507,11 +508,14 @@ class SiteGenerator:
         min_font_size = 1.0
         max_font_size = 2.5
 
+        # min_count is guaranteed to be set since posts_by_tag is non-empty
+        assert min_count is not None
+
         if max_count > min_count:
             # Scale based on count
             for tag_info in tag_data:
                 # Linear interpolation between min and max font size
-                ratio = (float(tag_info["count"]) - min_count) / (max_count - min_count)
+                ratio = (tag_info["count"] - min_count) / (max_count - min_count)
                 tag_info["font_size"] = min_font_size + ratio * (
                     max_font_size - min_font_size
                 )
