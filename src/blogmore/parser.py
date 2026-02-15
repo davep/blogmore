@@ -1,11 +1,11 @@
 """Markdown parser with frontmatter support for blog posts."""
 
+import datetime as dt
 from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-import frontmatter
+import frontmatter  # type: ignore[import-untyped]
 import markdown
 
 
@@ -17,7 +17,7 @@ class Post:
     title: str
     content: str
     html_content: str
-    date: datetime | None = None
+    date: dt.datetime | None = None
     tags: list[str] | None = None
     draft: bool = False
     metadata: dict[str, Any] | None = None
@@ -77,13 +77,16 @@ class PostParser:
         date = None
         if "date" in post_data:
             date_value = post_data["date"]
-            if isinstance(date_value, datetime):
+            if isinstance(date_value, dt.datetime):
                 date = date_value
+            elif isinstance(date_value, dt.date):
+                # Convert date to datetime
+                date = dt.datetime.combine(date_value, dt.time())
             elif isinstance(date_value, str):
                 # Try to parse common date formats
                 for fmt in ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"]:
                     try:
-                        date = datetime.strptime(date_value, fmt)
+                        date = dt.datetime.strptime(date_value, fmt)
                         break
                     except ValueError:
                         continue
@@ -113,7 +116,9 @@ class PostParser:
             metadata=dict(post_data.metadata),
         )
 
-    def parse_directory(self, directory: Path, include_drafts: bool = False) -> list[Post]:
+    def parse_directory(
+        self, directory: Path, include_drafts: bool = False
+    ) -> list[Post]:
         """
         Parse all markdown files in a directory.
 
@@ -138,5 +143,5 @@ class PostParser:
                 continue
 
         # Sort by date (newest first)
-        posts.sort(key=lambda p: p.date or datetime.min, reverse=True)
+        posts.sort(key=lambda p: p.date or dt.datetime.min, reverse=True)
         return posts

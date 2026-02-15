@@ -3,6 +3,7 @@
 import shutil
 from collections import defaultdict
 from pathlib import Path
+from typing import Any
 
 from blogmore.parser import Post, PostParser
 from blogmore.renderer import TemplateRenderer
@@ -38,7 +39,7 @@ class SiteGenerator:
         self.parser = PostParser()
         self.renderer = TemplateRenderer(templates_dir)
 
-    def _get_global_context(self) -> dict[str, str]:
+    def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
         return {
             "site_title": self.site_title,
@@ -54,7 +55,9 @@ class SiteGenerator:
         """
         # Parse all posts
         print(f"Parsing posts from {self.content_dir}...")
-        posts = self.parser.parse_directory(self.content_dir, include_drafts=include_drafts)
+        posts = self.parser.parse_directory(
+            self.content_dir, include_drafts=include_drafts
+        )
         print(f"Found {len(posts)} posts")
 
         # Create output directory

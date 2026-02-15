@@ -1,6 +1,6 @@
 """Template rendering using Jinja2."""
 
-from datetime import datetime
+import datetime as dt
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +29,7 @@ class TemplateRenderer:
         self.env.filters["format_date"] = self._format_date
 
     @staticmethod
-    def _format_date(date: datetime | None, fmt: str = "%B %d, %Y") -> str:
+    def _format_date(date: dt.datetime | None, fmt: str = "%B %d, %Y") -> str:
         """
         Format a datetime object.
 

@@ -64,11 +64,15 @@ def main() -> int:
 
     # Validate inputs
     if not args.content_dir.exists():
-        print(f"Error: Content directory not found: {args.content_dir}", file=sys.stderr)
+        print(
+            f"Error: Content directory not found: {args.content_dir}", file=sys.stderr
+        )
         return 1
 
     if not args.templates.exists():
-        print(f"Error: Templates directory not found: {args.templates}", file=sys.stderr)
+        print(
+            f"Error: Templates directory not found: {args.templates}", file=sys.stderr
+        )
         return 1
 
     # Generate the site
