@@ -75,22 +75,37 @@ class TemplateRenderer:
         template = self.env.get_template("post.html")
         return template.render(post=post, **context)
 
-    def render_index(self, posts: list[Post], **context: Any) -> str:
+    def render_index(
+        self,
+        posts: list[Post],
+        page: int = 1,
+        total_pages: int = 1,
+        **context: Any,
+    ) -> str:
         """
         Render the blog index/home page.
 
         Args:
             posts: List of Post objects to display
+            page: Current page number (1-indexed)
+            total_pages: Total number of pages
             **context: Additional context variables
 
         Returns:
             Rendered HTML string
         """
         template = self.env.get_template("index.html")
-        return template.render(posts=posts, **context)
+        return template.render(
+            posts=posts, page=page, total_pages=total_pages, **context
+        )
 
     def render_archive(
-        self, posts: list[Post], archive_title: str | None = None, **context: Any
+        self,
+        posts: list[Post],
+        archive_title: str | None = None,
+        page: int = 1,
+        total_pages: int = 1,
+        **context: Any,
     ) -> str:
         """
         Render the blog archive page.
@@ -98,31 +113,55 @@ class TemplateRenderer:
         Args:
             posts: List of Post objects to display
             archive_title: Optional title for the archive (e.g., "Posts from 2023")
+            page: Current page number (1-indexed)
+            total_pages: Total number of pages
             **context: Additional context variables
 
         Returns:
             Rendered HTML string
         """
         template = self.env.get_template("archive.html")
-        return template.render(posts=posts, archive_title=archive_title, **context)
+        return template.render(
+            posts=posts,
+            archive_title=archive_title,
+            page=page,
+            total_pages=total_pages,
+            **context,
+        )
 
-    def render_tag_page(self, tag: str, posts: list[Post], **context: Any) -> str:
+    def render_tag_page(
+        self,
+        tag: str,
+        posts: list[Post],
+        page: int = 1,
+        total_pages: int = 1,
+        **context: Any,
+    ) -> str:
         """
         Render a tag page showing posts with a specific tag.
 
         Args:
             tag: The tag to display posts for
             posts: List of Post objects with this tag
+            page: Current page number (1-indexed)
+            total_pages: Total number of pages
             **context: Additional context variables
 
         Returns:
             Rendered HTML string
         """
         template = self.env.get_template("tag.html")
-        return template.render(tag=tag, posts=posts, **context)
+        return template.render(
+            tag=tag, posts=posts, page=page, total_pages=total_pages, **context
+        )
 
     def render_category_page(
-        self, category: str, posts: list[Post], **context: Any
+        self,
+        category: str,
+        posts: list[Post],
+        page: int = 1,
+        total_pages: int = 1,
+        **context: Any,
     ) -> str:
         """
         Render a category page showing posts in a specific category.
@@ -130,13 +169,17 @@ class TemplateRenderer:
         Args:
             category: The category to display posts for
             posts: List of Post objects in this category
+            page: Current page number (1-indexed)
+            total_pages: Total number of pages
             **context: Additional context variables
 
         Returns:
             Rendered HTML string
         """
         template = self.env.get_template("category.html")
-        return template.render(category=category, posts=posts, **context)
+        return template.render(
+            category=category, posts=posts, page=page, total_pages=total_pages, **context
+        )
 
     def render_template(self, template_name: str, **context: Any) -> str:
         """
