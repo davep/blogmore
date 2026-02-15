@@ -2,9 +2,19 @@
 
 {% block title %}Category: {{ category }} - {{ site_title }}{% endblock %}
 
+{% block feed_links %}
+<link rel="alternate" type="application/rss+xml" title="{{ site_title }} - {{ category }} - RSS Feed" href="{{ site_url }}/{{ category_dir }}/{{ safe_category }}/feed.rss">
+<link rel="alternate" type="application/atom+xml" title="{{ site_title }} - {{ category }} - Atom Feed" href="{{ site_url }}/{{ category_dir }}/{{ safe_category }}/feed.atom">
+{% endblock %}
+
 {% block content %}
 <div class="category-page">
     <h1>Posts in category "{{ category }}"</h1>
+    
+    <div class="feed-links">
+        <a href="{{ site_url }}/{{ category_dir }}/{{ safe_category }}/feed.rss" class="feed-link rss-link">RSS Feed</a>
+        <a href="{{ site_url }}/{{ category_dir }}/{{ safe_category }}/feed.atom" class="feed-link atom-link">Atom Feed</a>
+    </div>
     
     {% if posts %}
     {% for post in posts %}
