@@ -166,6 +166,9 @@ class SiteGenerator:
         # Copy post attachments from content directory
         self._copy_attachments()
 
+        # Copy extra files from extras directory
+        self._copy_extras()
+
         print(f"Site generation complete! Output: {self.output_dir}")
 
     def _generate_post_page(self, post: Post, all_posts: list[Post]) -> None:
@@ -625,3 +628,57 @@ class SiteGenerator:
 
         if failed_count > 0:
             print(f"Warning: Failed to copy {failed_count} attachment(s)")
+
+    def _copy_extras(self) -> None:
+        """
+        Copy extra files from the extras directory to the output directory.
+
+        Files in the extras directory are copied to the output root, preserving
+        directory structure relative to the extras directory. If a file would
+        override an existing file, it is allowed but a message is printed.
+        """
+        extras_dir = self.content_dir / "extras"
+
+        if not extras_dir.exists():
+            return
+
+        # Count how many extras we copy
+        extras_count = 0
+        override_count = 0
+        failed_count = 0
+
+        # Recursively copy all files from the extras directory
+        for file_path in extras_dir.rglob("*"):
+            # Skip directories
+            if file_path.is_file():
+                try:
+                    # Calculate relative path from extras directory to preserve structure
+                    relative_path = file_path.relative_to(extras_dir)
+                    # Copy to output_dir root, preserving directory structure
+                    output_path = self.output_dir / relative_path
+
+                    # Check if file already exists
+                    file_exists = output_path.exists()
+
+                    # Create parent directories if they don't exist
+                    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+                    # Copy file preserving metadata
+                    shutil.copy2(file_path, output_path)
+                    extras_count += 1
+
+                    # Print message if we overrode an existing file
+                    if file_exists:
+                        print(f"Overriding existing file: {relative_path}")
+                        override_count += 1
+                except (OSError, PermissionError) as e:
+                    print(f"Warning: Failed to copy extra file {file_path}: {e}")
+                    failed_count += 1
+                    continue
+
+        if extras_count > 0:
+            print(f"Copied {extras_count} extra file(s) from {extras_dir}")
+        if override_count > 0:
+            print(f"Overrode {override_count} existing file(s)")
+        if failed_count > 0:
+            print(f"Warning: Failed to copy {failed_count} extra file(s)")
