@@ -24,6 +24,24 @@ class ReusingTCPServer(socketserver.TCPServer):
     allow_reuse_address = True
 
 
+class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+    """HTTP request handler that gracefully handles client disconnections.
+
+    This handler catches BrokenPipeError and ConnectionResetError exceptions
+    that occur when clients disconnect before the server finishes sending data.
+    This is common behavior in web servers and should not produce error traces.
+    """
+
+    def handle(self) -> None:
+        """Handle a single HTTP request, catching connection errors."""
+        try:
+            super().handle()
+        except (BrokenPipeError, ConnectionResetError):
+            # Client disconnected before we finished sending data.
+            # This is normal behavior and not an error condition.
+            pass
+
+
 class ContentChangeHandler(FileSystemEventHandler):
     """Handle file system events for content changes."""
 
@@ -189,8 +207,8 @@ def serve_site(
 
     os.chdir(output_dir)
 
-    # Create a simple HTTP server
-    http_handler = http.server.SimpleHTTPRequestHandler
+    # Create a simple HTTP server with our custom handler
+    http_handler = QuietHTTPRequestHandler
 
     try:
         with ReusingTCPServer(("", port), http_handler) as httpd:
