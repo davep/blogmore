@@ -7,7 +7,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from blogmore.parser import Post, PostParser
+from blogmore.parser import Post, PostParser, remove_date_prefix
 from blogmore.renderer import TemplateRenderer
 
 
@@ -140,8 +140,7 @@ class SiteGenerator:
             day = f"{post.date.day:02d}"
             
             # Remove date prefix from slug if present
-            slug = post.slug
-            slug = re.sub(r'^\d{4}-\d{2}-\d{2}-', '', slug)
+            slug = remove_date_prefix(post.slug)
             
             # Create directory structure
             post_dir = self.output_dir / str(year) / month / day
