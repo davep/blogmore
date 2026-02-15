@@ -164,6 +164,15 @@ class BlogFeedGenerator:
         self.site_url = site_url
         self.max_posts = max_posts
 
+    def _get_base_url(self) -> str:
+        """
+        Get the effective base URL, using fallback if site_url is empty.
+
+        Returns:
+            Base URL (either site_url or fallback)
+        """
+        return self.site_url if self.site_url else "https://example.com"
+
     def generate_index_feeds(self, posts: list[Post]) -> None:
         """
         Generate main index feeds.
@@ -171,7 +180,8 @@ class BlogFeedGenerator:
         Args:
             posts: List of all posts
         """
-        feed_url = f"{self.site_url}/feed.rss"
+        base_url = self._get_base_url()
+        feed_url = f"{base_url}/feed.rss"
         rss_xml, atom_xml = generate_feed(
             posts=posts,
             site_title=self.site_title,
@@ -194,13 +204,14 @@ class BlogFeedGenerator:
             posts_by_tag: Dictionary mapping tag (lowercase) to (display_name, posts)
             tag_dir: Directory name for tag pages
         """
+        base_url = self._get_base_url()
         for tag_lower, (tag_display, tag_posts) in posts_by_tag.items():
             # Sanitize tag for filename
             from blogmore.generator import sanitize_for_url
 
             safe_tag = sanitize_for_url(tag_lower)
 
-            feed_url = f"{self.site_url}/{tag_dir}/{safe_tag}/feed.rss"
+            feed_url = f"{base_url}/{tag_dir}/{safe_tag}/feed.rss"
             rss_xml, atom_xml = generate_feed(
                 posts=tag_posts,
                 site_title=self.site_title,
@@ -228,6 +239,7 @@ class BlogFeedGenerator:
             posts_by_category: Dictionary mapping category (lowercase) to (display_name, posts)
             category_dir: Directory name for category pages
         """
+        base_url = self._get_base_url()
         for category_lower, (
             category_display,
             category_posts,
@@ -237,7 +249,7 @@ class BlogFeedGenerator:
 
             safe_category = sanitize_for_url(category_lower)
 
-            feed_url = f"{self.site_url}/{category_dir}/{safe_category}/feed.rss"
+            feed_url = f"{base_url}/{category_dir}/{safe_category}/feed.rss"
             rss_xml, atom_xml = generate_feed(
                 posts=category_posts,
                 site_title=self.site_title,
