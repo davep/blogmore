@@ -23,7 +23,7 @@
 
 /* Dark mode colors - applied by system preference */
 @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme]) {
         --bg-color: #1a1a1a;
         --text-color: #e0e0e0;
         --text-secondary: #a0a0a0;
@@ -45,7 +45,7 @@
 }
 
 /* Manual theme overrides - these override system preference */
-[data-theme="light"] {
+:root[data-theme="light"] {
     --bg-color: #fff;
     --text-color: #333;
     --text-secondary: #666;
@@ -65,7 +65,7 @@
     --blockquote-border: #ddd;
 }
 
-[data-theme="dark"] {
+:root[data-theme="dark"] {
     --bg-color: #1a1a1a;
     --text-color: #e0e0e0;
     --text-secondary: #a0a0a0;
