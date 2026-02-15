@@ -176,19 +176,30 @@ def serve_site(
     http_handler = http.server.SimpleHTTPRequestHandler
 
     try:
-        with socketserver.TCPServer(("", port), http_handler) as httpd:
+        # Create a TCP server with address reuse enabled
+        # This prevents "Address already in use" errors when restarting quickly
+        class ReusingTCPServer(socketserver.TCPServer):
+            allow_reuse_address = True
+
+        with ReusingTCPServer(("", port), http_handler) as httpd:
             print(f"Serving site at http://localhost:{port}/")
             print("Press Ctrl+C to stop the server")
-            httpd.serve_forever()
+            try:
+                httpd.serve_forever()
+            finally:
+                # Ensure cleanup happens regardless of how we exit
+                if observer is not None:
+                    observer.stop()
+                    observer.join()
             return 0  # This line is never reached but needed for type checking
     except KeyboardInterrupt:
         print("\nServer stopped")
-        if observer is not None:
-            observer.stop()
-            observer.join()
         return 0
     except OSError as e:
         print(f"Error starting server: {e}", file=sys.stderr)
+        if observer is not None:
+            observer.stop()
+            observer.join()
         return 1
 
 
