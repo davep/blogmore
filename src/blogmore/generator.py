@@ -211,7 +211,9 @@ class SiteGenerator:
     def _generate_archive_page(self, posts: list[Post]) -> None:
         """Generate the archive page."""
         context = self._get_global_context()
-        html = self.renderer.render_archive(posts, **context)
+        html = self.renderer.render_archive(
+            posts, page=1, total_pages=1, base_path="/archive", **context
+        )
         output_path = self.output_dir / "archive.html"
         output_path.write_text(html, encoding="utf-8")
 
