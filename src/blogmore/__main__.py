@@ -14,6 +14,16 @@ from watchdog.observers import Observer
 from blogmore.generator import SiteGenerator
 
 
+class ReusingTCPServer(socketserver.TCPServer):
+    """TCP server that allows address reuse.
+
+    This prevents "Address already in use" errors when restarting the server
+    quickly after it has been stopped.
+    """
+
+    allow_reuse_address = True
+
+
 class ContentChangeHandler(FileSystemEventHandler):
     """Handle file system events for content changes."""
 
@@ -176,20 +186,23 @@ def serve_site(
     http_handler = http.server.SimpleHTTPRequestHandler
 
     try:
-        with socketserver.TCPServer(("", port), http_handler) as httpd:
+        with ReusingTCPServer(("", port), http_handler) as httpd:
             print(f"Serving site at http://localhost:{port}/")
             print("Press Ctrl+C to stop the server")
-            httpd.serve_forever()
-            return 0  # This line is never reached but needed for type checking
+            try:
+                httpd.serve_forever()
+            finally:
+                # Ensure cleanup happens regardless of how we exit
+                if observer is not None:
+                    observer.stop()
+                    observer.join()
     except KeyboardInterrupt:
         print("\nServer stopped")
-        if observer is not None:
-            observer.stop()
-            observer.join()
-        return 0
     except OSError as e:
         print(f"Error starting server: {e}", file=sys.stderr)
         return 1
+
+    return 0
 
 
 def main() -> int:
