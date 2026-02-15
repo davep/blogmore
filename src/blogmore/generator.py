@@ -110,6 +110,9 @@ class SiteGenerator:
         # Copy static assets if they exist
         self._copy_static_assets()
 
+        # Copy post attachments from content directory
+        self._copy_attachments()
+
         print(f"Site generation complete! Output: {self.output_dir}")
 
     def _generate_post_page(self, post: Post, all_posts: list[Post]) -> None:
@@ -209,3 +212,41 @@ class SiteGenerator:
                 shutil.rmtree(output_static)
             shutil.copytree(static_dir, output_static)
             print(f"Copied static assets from {static_dir}")
+
+    def _copy_attachments(self) -> None:
+        """Copy post attachments (images, files, etc.) from content directory to output directory."""
+        if not self.content_dir.exists():
+            print(f"Warning: Content directory does not exist: {self.content_dir}")
+            return
+
+        # Count how many attachments we copy
+        attachment_count = 0
+        failed_count = 0
+
+        # Recursively copy all non-markdown files from the content directory
+        for file_path in self.content_dir.rglob("*"):
+            # Skip markdown files and directories
+            if file_path.is_file() and file_path.suffix.lower() != ".md":
+                try:
+                    # Calculate relative path to preserve directory structure
+                    relative_path = file_path.relative_to(self.content_dir)
+                    output_path = self.output_dir / relative_path
+                    
+                    # Create parent directories if they don't exist
+                    output_path.parent.mkdir(parents=True, exist_ok=True)
+                    
+                    # Copy file preserving metadata
+                    shutil.copy2(file_path, output_path)
+                    attachment_count += 1
+                except (OSError, PermissionError) as e:
+                    print(f"Warning: Failed to copy attachment {file_path}: {e}")
+                    failed_count += 1
+                    continue
+
+        if attachment_count > 0:
+            print(f"Copied {attachment_count} attachment(s) from {self.content_dir}")
+        else:
+            print(f"No attachments found in {self.content_dir}")
+        
+        if failed_count > 0:
+            print(f"Warning: Failed to copy {failed_count} attachment(s)")
