@@ -93,6 +93,7 @@ def serve_site(
     site_url: str = "",
     include_drafts: bool = False,
     watch: bool = True,
+    posts_per_feed: int = 20,
 ) -> int:
     """
     Serve the generated site locally using a simple HTTP server.
@@ -106,6 +107,7 @@ def serve_site(
         site_url: Base URL of the site
         include_drafts: Whether to include drafts
         watch: Whether to watch for changes and regenerate (default: True)
+        posts_per_feed: Maximum number of posts to include in feeds (default: 20)
 
     Returns:
         Exit code
@@ -149,6 +151,7 @@ def serve_site(
                 output_dir=output_dir,
                 site_title=site_title,
                 site_url=site_url,
+                posts_per_feed=posts_per_feed,
             )
             generator.generate(include_drafts=include_drafts)
         except Exception as e:
@@ -269,6 +272,13 @@ def main() -> int:
         )
 
         parser.add_argument(
+            "--posts-per-feed",
+            type=int,
+            default=20,
+            help="Maximum number of posts to include in feeds (default: 20)",
+        )
+
+        parser.add_argument(
             "--version",
             action="version",
             version="blogmore 0.1.0",
@@ -299,6 +309,7 @@ def main() -> int:
                 output_dir=args.output,
                 site_title=args.site_title,
                 site_url=args.site_url,
+                posts_per_feed=args.posts_per_feed,
             )
             generator.generate(include_drafts=args.include_drafts)
             return 0
@@ -362,6 +373,13 @@ def main() -> int:
         help="Include posts marked as drafts",
     )
 
+    gen_parser.add_argument(
+        "--posts-per-feed",
+        type=int,
+        default=20,
+        help="Maximum number of posts to include in feeds (default: 20)",
+    )
+
     # Serve command
     serve_parser = subparsers.add_parser(
         "serve",
@@ -418,6 +436,13 @@ def main() -> int:
     )
 
     serve_parser.add_argument(
+        "--posts-per-feed",
+        type=int,
+        default=20,
+        help="Maximum number of posts to include in feeds (default: 20)",
+    )
+
+    serve_parser.add_argument(
         "--no-watch",
         action="store_true",
         help="Disable watching for changes (default: watch enabled)",
@@ -442,6 +467,7 @@ def main() -> int:
             site_url=args.site_url,
             include_drafts=args.include_drafts,
             watch=not args.no_watch,
+            posts_per_feed=args.posts_per_feed,
         )
 
     # Handle generate command
@@ -469,6 +495,7 @@ def main() -> int:
                 output_dir=args.output,
                 site_title=args.site_title,
                 site_url=args.site_url,
+                posts_per_feed=args.posts_per_feed,
             )
             generator.generate(include_drafts=args.include_drafts)
             return 0

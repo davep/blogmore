@@ -7,6 +7,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+from blogmore.feeds import BlogFeedGenerator
 from blogmore.parser import Post, PostParser, remove_date_prefix
 from blogmore.renderer import TemplateRenderer
 
@@ -67,6 +68,9 @@ class SiteGenerator:
     POSTS_PER_PAGE_CATEGORY = 10
     POSTS_PER_PAGE_ARCHIVE = 10
 
+    # Feed constants - posts per feed
+    POSTS_PER_FEED = 20
+
     def __init__(
         self,
         content_dir: Path,
@@ -74,6 +78,7 @@ class SiteGenerator:
         output_dir: Path,
         site_title: str = "My Blog",
         site_url: str = "",
+        posts_per_feed: int = 20,
     ) -> None:
         """
         Initialize the site generator.
@@ -84,12 +89,14 @@ class SiteGenerator:
             output_dir: Directory where generated site will be written
             site_title: Title of the blog site
             site_url: Base URL of the site
+            posts_per_feed: Maximum number of posts to include in feeds (default: 20)
         """
         self.content_dir = content_dir
         self.templates_dir = templates_dir
         self.output_dir = output_dir
         self.site_title = site_title
         self.site_url = site_url
+        self.posts_per_feed = posts_per_feed
 
         self.parser = PostParser()
         self.renderer = TemplateRenderer(templates_dir)
@@ -144,6 +151,10 @@ class SiteGenerator:
         # Generate category pages
         print("Generating category pages...")
         self._generate_category_pages(posts)
+
+        # Generate feeds
+        print("Generating RSS and Atom feeds...")
+        self._generate_feeds(posts)
 
         # Copy static assets if they exist
         self._copy_static_assets()
@@ -346,15 +357,7 @@ class SiteGenerator:
         """Generate pages for each tag with pagination."""
         # Group posts by tag (case-insensitive)
         # Key is lowercase tag, value is (display_name, posts)
-        posts_by_tag: dict[str, tuple[str, list[Post]]] = {}
-        for post in posts:
-            if post.tags:
-                for tag in post.tags:
-                    tag_lower = tag.lower()
-                    if tag_lower not in posts_by_tag:
-                        # Store the first occurrence as the display name
-                        posts_by_tag[tag_lower] = (tag, [])
-                    posts_by_tag[tag_lower][1].append(post)
+        posts_by_tag = self._group_posts_by_tag(posts)
 
         # Create tag directory
         tag_dir = self.output_dir / self.TAG_DIR
@@ -404,18 +407,34 @@ class SiteGenerator:
 
                 output_path.write_text(html, encoding="utf-8")
 
+    def _group_posts_by_tag(
+        self, posts: list[Post]
+    ) -> dict[str, tuple[str, list[Post]]]:
+        """
+        Group posts by tag (case-insensitive).
+
+        Args:
+            posts: List of posts to group
+
+        Returns:
+            Dictionary mapping lowercase tag to (display_name, posts)
+        """
+        posts_by_tag: dict[str, tuple[str, list[Post]]] = {}
+        for post in posts:
+            if post.tags:
+                for tag in post.tags:
+                    tag_lower = tag.lower()
+                    if tag_lower not in posts_by_tag:
+                        # Store the first occurrence as the display name
+                        posts_by_tag[tag_lower] = (tag, [])
+                    posts_by_tag[tag_lower][1].append(post)
+        return posts_by_tag
+
     def _generate_category_pages(self, posts: list[Post]) -> None:
         """Generate pages for each category with pagination."""
         # Group posts by category (case-insensitive)
         # Key is lowercase category, value is (display_name, posts)
-        posts_by_category: dict[str, tuple[str, list[Post]]] = {}
-        for post in posts:
-            if post.category:
-                category_lower = post.category.lower()
-                if category_lower not in posts_by_category:
-                    # Store the first occurrence as the display name
-                    posts_by_category[category_lower] = (post.category, [])
-                posts_by_category[category_lower][1].append(post)
+        posts_by_category = self._group_posts_by_category(posts)
 
         # Create category directory
         category_dir = self.output_dir / self.CATEGORY_DIR
@@ -467,6 +486,80 @@ class SiteGenerator:
                     output_path = category_page_dir / f"{page_num}.html"
 
                 output_path.write_text(html, encoding="utf-8")
+
+    def _group_posts_by_category(
+        self, posts: list[Post]
+    ) -> dict[str, tuple[str, list[Post]]]:
+        """
+        Group posts by category (case-insensitive).
+
+        Args:
+            posts: List of posts to group
+
+        Returns:
+            Dictionary mapping lowercase category to (display_name, posts)
+        """
+        posts_by_category: dict[str, tuple[str, list[Post]]] = {}
+        for post in posts:
+            if post.category:
+                category_lower = post.category.lower()
+                if category_lower not in posts_by_category:
+                    # Store the first occurrence as the display name
+                    posts_by_category[category_lower] = (post.category, [])
+                posts_by_category[category_lower][1].append(post)
+        return posts_by_category
+
+    def _generate_feeds(self, posts: list[Post]) -> None:
+        """
+        Generate RSS and Atom feeds.
+
+        Args:
+            posts: List of all posts
+        """
+        feed_gen = BlogFeedGenerator(
+            output_dir=self.output_dir,
+            site_title=self.site_title,
+            site_url=self.site_url,
+            max_posts=self.posts_per_feed,
+        )
+
+        # Generate main index feeds
+        feed_gen.generate_index_feeds(posts)
+
+        # Generate tag feeds
+        posts_by_tag = self._group_posts_by_tag(posts)
+        # Sort posts by date for each tag
+        for _tag_lower, (_tag_display, tag_posts) in posts_by_tag.items():
+
+            def get_sort_key(post: Post) -> float:
+                if post.date is None:
+                    return 0.0
+                if post.date.tzinfo:
+                    return post.date.timestamp()
+                return post.date.replace(tzinfo=dt.UTC).timestamp()
+
+            tag_posts.sort(key=get_sort_key, reverse=True)
+
+        feed_gen.generate_tag_feeds(posts_by_tag, self.TAG_DIR)
+
+        # Generate category feeds
+        posts_by_category = self._group_posts_by_category(posts)
+        # Sort posts by date for each category
+        for _category_lower, (
+            _category_display,
+            category_posts,
+        ) in posts_by_category.items():
+
+            def get_sort_key(post: Post) -> float:
+                if post.date is None:
+                    return 0.0
+                if post.date.tzinfo:
+                    return post.date.timestamp()
+                return post.date.replace(tzinfo=dt.UTC).timestamp()
+
+            category_posts.sort(key=get_sort_key, reverse=True)
+
+        feed_gen.generate_category_feeds(posts_by_category, self.CATEGORY_DIR)
 
     def _copy_static_assets(self) -> None:
         """Copy static assets (CSS, JS, images) to output directory."""
