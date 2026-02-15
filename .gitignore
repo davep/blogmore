@@ -16,6 +16,11 @@ site/
 # Example files (for development)
 example/
 
+# Cache directories
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
 # IDE
 .vscode/
 .idea/
