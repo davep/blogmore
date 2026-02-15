@@ -13,6 +13,11 @@
         {% if post.date %}
         <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>
         {% endif %}
+        {% if post.category %}
+        <div class="category">
+            <a href="{{ site_url }}/category/{{ post.safe_category }}.html" class="category-link">{{ post.category }}</a>
+        </div>
+        {% endif %}
         {% if post.tags %}
         <div class="tags">
             {% for tag in post.tags %}
@@ -20,6 +25,9 @@
             {% endfor %}
         </div>
         {% endif %}
+        <div class="post-content">
+            {{ post.html_content|safe }}
+        </div>
     </article>
     {% endfor %}
     {% else %}

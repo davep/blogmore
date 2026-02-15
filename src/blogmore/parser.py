@@ -82,6 +82,7 @@ class PostParser:
                 "codehilite",
                 "tables",
                 "toc",
+                "footnotes",
             ]
         )
 

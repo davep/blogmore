@@ -62,6 +62,25 @@ blogmore posts/
 
 This will generate your site in the `output/` directory.
 
+### Serve the Site Locally
+
+To preview your generated site locally:
+
+```bash
+blogmore serve
+```
+
+This starts a local HTTP server on port 8000. Open http://localhost:8000/ in your browser.
+
+Options:
+- `-o, --output` - Output directory to serve (default: `output/`)
+- `-p, --port` - Port to serve on (default: 8000)
+
+Example:
+```bash
+blogmore serve --port 3000 --output my-site/
+```
+
 ### Custom Options
 
 ```bash
@@ -117,11 +136,32 @@ For example, a blog might use categories like "python", "javascript", "devops" t
 Blogmore uses Jinja2 templates. The default templates are included, but you can customize them:
 
 - `base.html` - Base template
-- `index.html` - Homepage listing
+- `index.html` - Homepage listing (shows full post content)
 - `post.html` - Individual post page
 - `archive.html` - Archive page
 - `tag.html` - Tag page
+- `category.html` - Category page
 - `static/style.css` - Stylesheet
+
+## Markdown Features
+
+Blogmore supports all standard Markdown features plus:
+
+- **Fenced code blocks** with syntax highlighting
+- **Tables**
+- **Table of contents** generation
+- **Footnotes** - Use `[^1]` in text and `[^1]: Footnote text` at the bottom
+
+Example with footnote:
+```markdown
+---
+title: My Post
+---
+
+This is a post with a footnote[^1].
+
+[^1]: This is the footnote content.
+```
 
 ## Development
 
