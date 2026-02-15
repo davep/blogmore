@@ -102,17 +102,18 @@ def generate_feed(
     """
     # Create two separate feed generators, one for each feed type
     # This ensures each feed has the correct self-referencing URL
-    
-    # RSS feed
     fg_rss = create_feed_generator(site_title, site_url, rss_feed_url, description)
+    fg_atom = create_feed_generator(site_title, site_url, atom_feed_url, description)
+    
+    # Add posts to both feeds in a single loop
+    # NOTE: feedgen reverses the order of entries, so we add them in reverse
+    # to get the correct chronological order (newest first) in the output
     for post in reversed(posts[:max_posts]):
         add_post_to_feed(fg_rss, post, site_url)
-    rss_xml = fg_rss.rss_str(pretty=True).decode("utf-8")
-    
-    # Atom feed
-    fg_atom = create_feed_generator(site_title, site_url, atom_feed_url, description)
-    for post in reversed(posts[:max_posts]):
         add_post_to_feed(fg_atom, post, site_url)
+    
+    # Generate both feed formats
+    rss_xml = fg_rss.rss_str(pretty=True).decode("utf-8")
     atom_xml = fg_atom.atom_str(pretty=True).decode("utf-8")
 
     return rss_xml, atom_xml
