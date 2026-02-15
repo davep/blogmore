@@ -80,7 +80,8 @@ def generate_feed(
     posts: list[Post],
     site_title: str,
     site_url: str,
-    feed_url: str,
+    rss_feed_url: str,
+    atom_feed_url: str,
     description: str | None = None,
     max_posts: int = 20,
 ) -> tuple[str, str]:
@@ -91,25 +92,28 @@ def generate_feed(
         posts: List of posts to include in the feed (should be sorted newest first)
         site_title: Title of the blog site
         site_url: Base URL of the site
-        feed_url: Full URL to this feed (used for RSS, Atom will use .atom extension)
+        rss_feed_url: Full URL to the RSS feed
+        atom_feed_url: Full URL to the Atom feed
         description: Optional description for the feed
         max_posts: Maximum number of posts to include (default: 20)
 
     Returns:
         Tuple of (rss_xml, atom_xml) strings
     """
-    # Create feed generator
-    fg = create_feed_generator(site_title, site_url, feed_url, description)
-
-    # Add posts (limit to max_posts)
-    # NOTE: feedgen reverses the order of entries, so we add them in reverse
-    # to get the correct chronological order (newest first) in the output
+    # Create two separate feed generators, one for each feed type
+    # This ensures each feed has the correct self-referencing URL
+    
+    # RSS feed
+    fg_rss = create_feed_generator(site_title, site_url, rss_feed_url, description)
     for post in reversed(posts[:max_posts]):
-        add_post_to_feed(fg, post, site_url)
-
-    # Generate RSS and Atom feeds
-    rss_xml = fg.rss_str(pretty=True).decode("utf-8")
-    atom_xml = fg.atom_str(pretty=True).decode("utf-8")
+        add_post_to_feed(fg_rss, post, site_url)
+    rss_xml = fg_rss.rss_str(pretty=True).decode("utf-8")
+    
+    # Atom feed
+    fg_atom = create_feed_generator(site_title, site_url, atom_feed_url, description)
+    for post in reversed(posts[:max_posts]):
+        add_post_to_feed(fg_atom, post, site_url)
+    atom_xml = fg_atom.atom_str(pretty=True).decode("utf-8")
 
     return rss_xml, atom_xml
 
@@ -184,24 +188,16 @@ class BlogFeedGenerator:
         """
         base_url = self._get_base_url()
         
-        # Generate RSS feed at /feed.xml
+        # Generate both RSS and Atom feeds with correct self-referencing URLs
         rss_feed_url = f"{base_url}/feed.xml"
-        rss_xml, _ = generate_feed(
-            posts=posts,
-            site_title=self.site_title,
-            site_url=self.site_url,
-            feed_url=rss_feed_url,
-            description=f"Latest posts from {self.site_title}",
-            max_posts=self.max_posts,
-        )
-        
-        # Generate Atom feed at /feeds/all.atom.xml
         atom_feed_url = f"{base_url}/feeds/all.atom.xml"
-        _, atom_xml = generate_feed(
+        
+        rss_xml, atom_xml = generate_feed(
             posts=posts,
             site_title=self.site_title,
             site_url=self.site_url,
-            feed_url=atom_feed_url,
+            rss_feed_url=rss_feed_url,
+            atom_feed_url=atom_feed_url,
             description=f"Latest posts from {self.site_title}",
             max_posts=self.max_posts,
         )
@@ -234,24 +230,16 @@ class BlogFeedGenerator:
 
             safe_category = sanitize_for_url(category_lower)
 
-            # Generate RSS feed
+            # Generate both RSS and Atom feeds with correct self-referencing URLs
             rss_feed_url = f"{base_url}/feeds/{safe_category}.rss.xml"
-            rss_xml, _ = generate_feed(
-                posts=category_posts,
-                site_title=self.site_title,
-                site_url=self.site_url,
-                feed_url=rss_feed_url,
-                description=f'Posts in category "{category_display}" from {self.site_title}',
-                max_posts=self.max_posts,
-            )
-            
-            # Generate Atom feed
             atom_feed_url = f"{base_url}/feeds/{safe_category}.atom.xml"
-            _, atom_xml = generate_feed(
+            
+            rss_xml, atom_xml = generate_feed(
                 posts=category_posts,
                 site_title=self.site_title,
                 site_url=self.site_url,
-                feed_url=atom_feed_url,
+                rss_feed_url=rss_feed_url,
+                atom_feed_url=atom_feed_url,
                 description=f'Posts in category "{category_display}" from {self.site_title}',
                 max_posts=self.max_posts,
             )
