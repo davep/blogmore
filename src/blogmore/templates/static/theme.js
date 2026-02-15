@@ -118,6 +118,8 @@
     }
     
     // Listen for system theme changes when no manual preference is set
+    // Note: Event listener persists for the lifetime of the page, which is acceptable
+    // for a static site where pages are regenerated on each navigation
     if (window.matchMedia) {
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
             const savedTheme = getCookie(THEME_COOKIE_NAME);
