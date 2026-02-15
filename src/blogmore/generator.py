@@ -230,14 +230,14 @@ class SiteGenerator:
         context["pages"] = pages
 
         # Paginate posts
-        post_pages = paginate_posts(posts, self.POSTS_PER_PAGE_INDEX)
-        if not post_pages:
-            post_pages = [[]]  # Empty page if no posts
+        paginated_posts = paginate_posts(posts, self.POSTS_PER_PAGE_INDEX)
+        if not paginated_posts:
+            paginated_posts = [[]]  # Empty page if no posts
 
-        total_pages = len(post_pages)
+        total_pages = len(paginated_posts)
 
         # Generate each page
-        for page_num, page_posts in enumerate(post_pages, start=1):
+        for page_num, page_posts in enumerate(paginated_posts, start=1):
             html = self.renderer.render_index(
                 page_posts, page=page_num, total_pages=total_pages, **context
             )
@@ -291,11 +291,11 @@ class SiteGenerator:
             year_dir.mkdir(parents=True, exist_ok=True)
 
             # Paginate posts
-            post_pages = paginate_posts(year_posts, self.POSTS_PER_PAGE_ARCHIVE)
-            total_pages = len(post_pages)
+            paginated_posts = paginate_posts(year_posts, self.POSTS_PER_PAGE_ARCHIVE)
+            total_pages = len(paginated_posts)
 
             # Generate each page
-            for page_num, page_posts in enumerate(post_pages, start=1):
+            for page_num, page_posts in enumerate(paginated_posts, start=1):
                 # Base path for pagination links
                 base_path = f"/{year}"
 
@@ -327,11 +327,11 @@ class SiteGenerator:
             month_name = dt.datetime(year, month, 1).strftime("%B %Y")
 
             # Paginate posts
-            post_pages = paginate_posts(month_posts, self.POSTS_PER_PAGE_ARCHIVE)
-            total_pages = len(post_pages)
+            paginated_posts = paginate_posts(month_posts, self.POSTS_PER_PAGE_ARCHIVE)
+            total_pages = len(paginated_posts)
 
             # Generate each page
-            for page_num, page_posts in enumerate(post_pages, start=1):
+            for page_num, page_posts in enumerate(paginated_posts, start=1):
                 # Base path for pagination links
                 base_path = f"/{year}/{month:02d}"
 
@@ -363,11 +363,11 @@ class SiteGenerator:
             date_str = dt.datetime(year, month, day).strftime("%B %d, %Y")
 
             # Paginate posts
-            post_pages = paginate_posts(day_posts, self.POSTS_PER_PAGE_ARCHIVE)
-            total_pages = len(post_pages)
+            paginated_posts = paginate_posts(day_posts, self.POSTS_PER_PAGE_ARCHIVE)
+            total_pages = len(paginated_posts)
 
             # Generate each page
-            for page_num, page_posts in enumerate(post_pages, start=1):
+            for page_num, page_posts in enumerate(paginated_posts, start=1):
                 # Base path for pagination links
                 base_path = f"/{year}/{month:02d}/{day:02d}"
 
@@ -418,14 +418,14 @@ class SiteGenerator:
             safe_tag = sanitize_for_url(tag_lower)
 
             # Paginate posts
-            post_pages = paginate_posts(tag_posts, self.POSTS_PER_PAGE_TAG)
-            total_pages = len(post_pages)
+            paginated_posts = paginate_posts(tag_posts, self.POSTS_PER_PAGE_TAG)
+            total_pages = len(paginated_posts)
 
             context = self._get_global_context()
             context["pages"] = pages
 
             # Generate each page
-            for page_num, page_posts in enumerate(post_pages, start=1):
+            for page_num, page_posts in enumerate(paginated_posts, start=1):
                 html = self.renderer.render_tag_page(
                     tag_display,  # Use display name for rendering
                     page_posts,
@@ -499,14 +499,14 @@ class SiteGenerator:
             safe_category = sanitize_for_url(category_lower)
 
             # Paginate posts
-            post_pages = paginate_posts(category_posts, self.POSTS_PER_PAGE_CATEGORY)
-            total_pages = len(post_pages)
+            paginated_posts = paginate_posts(category_posts, self.POSTS_PER_PAGE_CATEGORY)
+            total_pages = len(paginated_posts)
 
             context = self._get_global_context()
             context["pages"] = pages
 
             # Generate each page
-            for page_num, page_posts in enumerate(post_pages, start=1):
+            for page_num, page_posts in enumerate(paginated_posts, start=1):
                 html = self.renderer.render_category_page(
                     category_display,  # Use display name for rendering
                     page_posts,
