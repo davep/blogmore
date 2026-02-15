@@ -231,10 +231,10 @@ class SiteGenerator:
                     # Calculate relative path to preserve directory structure
                     relative_path = file_path.relative_to(self.content_dir)
                     output_path = self.output_dir / relative_path
-                    
+
                     # Create parent directories if they don't exist
                     output_path.parent.mkdir(parents=True, exist_ok=True)
-                    
+
                     # Copy file preserving metadata
                     shutil.copy2(file_path, output_path)
                     attachment_count += 1
@@ -247,6 +247,6 @@ class SiteGenerator:
             print(f"Copied {attachment_count} attachment(s) from {self.content_dir}")
         else:
             print(f"No attachments found in {self.content_dir}")
-        
+
         if failed_count > 0:
             print(f"Warning: Failed to copy {failed_count} attachment(s)")

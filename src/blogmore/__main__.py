@@ -50,7 +50,10 @@ class ContentChangeHandler(FileSystemEventHandler):
             return
 
         # Ignore hidden files and common temporary files
-        path = Path(event.src_path)
+        src_path = event.src_path
+        if isinstance(src_path, bytes):
+            src_path = src_path.decode("utf-8")
+        path = Path(src_path)
         if path.name.startswith(".") or path.name.endswith(
             ("~", ".swp", ".tmp", ".pyc")
         ):
@@ -170,10 +173,10 @@ def serve_site(
     os.chdir(output_dir)
 
     # Create a simple HTTP server
-    handler = http.server.SimpleHTTPRequestHandler
+    http_handler = http.server.SimpleHTTPRequestHandler
 
     try:
-        with socketserver.TCPServer(("", port), handler) as httpd:
+        with socketserver.TCPServer(("", port), http_handler) as httpd:
             print(f"Serving site at http://localhost:{port}/")
             print("Press Ctrl+C to stop the server")
             httpd.serve_forever()
@@ -348,7 +351,8 @@ def main() -> int:
 
     # Serve command
     serve_parser = subparsers.add_parser(
-        "serve", help="Generate (if needed) and serve the site locally, watching for changes"
+        "serve",
+        help="Generate (if needed) and serve the site locally, watching for changes",
     )
 
     serve_parser.add_argument(
