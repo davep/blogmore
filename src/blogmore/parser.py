@@ -54,6 +54,18 @@ class Post:
     @property
     def url(self) -> str:
         """Generate the URL path for the post."""
+        if self.date:
+            # Extract date components
+            year = self.date.year
+            month = f"{self.date.month:02d}"
+            day = f"{self.date.day:02d}"
+            # Remove date prefix from slug if present
+            slug = self.slug
+            # Remove YYYY-MM-DD- prefix if it exists
+            import re
+            slug = re.sub(r'^\d{4}-\d{2}-\d{2}-', '', slug)
+            return f"/{year}/{month}/{day}/{slug}.html"
+        # Fallback for posts without dates
         return f"/{self.slug}.html"
 
     @property

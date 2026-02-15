@@ -89,19 +89,20 @@ class TemplateRenderer:
         template = self.env.get_template("index.html")
         return template.render(posts=posts, **context)
 
-    def render_archive(self, posts: list[Post], **context: Any) -> str:
+    def render_archive(self, posts: list[Post], archive_title: str | None = None, **context: Any) -> str:
         """
         Render the blog archive page.
 
         Args:
             posts: List of Post objects to display
+            archive_title: Optional title for the archive (e.g., "Posts from 2023")
             **context: Additional context variables
 
         Returns:
             Rendered HTML string
         """
         template = self.env.get_template("archive.html")
-        return template.render(posts=posts, **context)
+        return template.render(posts=posts, archive_title=archive_title, **context)
 
     def render_tag_page(self, tag: str, posts: list[Post], **context: Any) -> str:
         """

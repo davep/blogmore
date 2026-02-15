@@ -105,6 +105,10 @@ class SiteGenerator:
         print("Generating archive page...")
         self._generate_archive_page(posts)
 
+        # Generate date-based archive pages
+        print("Generating date-based archive pages...")
+        self._generate_date_archives(posts)
+
         # Generate tag pages
         print("Generating tag pages...")
         self._generate_tag_pages(posts)
@@ -127,7 +131,26 @@ class SiteGenerator:
         context["all_posts"] = all_posts
 
         html = self.renderer.render_post(post, **context)
-        output_path = self.output_dir / f"{post.slug}.html"
+        
+        # Determine output path based on date
+        if post.date:
+            # Create year/month/day directory structure
+            year = post.date.year
+            month = f"{post.date.month:02d}"
+            day = f"{post.date.day:02d}"
+            
+            # Remove date prefix from slug if present
+            slug = post.slug
+            slug = re.sub(r'^\d{4}-\d{2}-\d{2}-', '', slug)
+            
+            # Create directory structure
+            post_dir = self.output_dir / str(year) / month / day
+            post_dir.mkdir(parents=True, exist_ok=True)
+            output_path = post_dir / f"{slug}.html"
+        else:
+            # Fallback for posts without dates
+            output_path = self.output_dir / f"{post.slug}.html"
+        
         output_path.write_text(html, encoding="utf-8")
 
     def _generate_index_page(self, posts: list[Post]) -> None:
@@ -143,6 +166,66 @@ class SiteGenerator:
         html = self.renderer.render_archive(posts, **context)
         output_path = self.output_dir / "archive.html"
         output_path.write_text(html, encoding="utf-8")
+
+    def _generate_date_archives(self, posts: list[Post]) -> None:
+        """Generate date-based archive pages (year, month, day)."""
+        # Group posts by year, month, and day
+        posts_by_year: dict[int, list[Post]] = defaultdict(list)
+        posts_by_month: dict[tuple[int, int], list[Post]] = defaultdict(list)
+        posts_by_day: dict[tuple[int, int, int], list[Post]] = defaultdict(list)
+
+        for post in posts:
+            if post.date:
+                year = post.date.year
+                month = post.date.month
+                day = post.date.day
+
+                posts_by_year[year].append(post)
+                posts_by_month[(year, month)].append(post)
+                posts_by_day[(year, month, day)].append(post)
+
+        context = self._get_global_context()
+
+        # Generate year archives
+        for year, year_posts in posts_by_year.items():
+            year_dir = self.output_dir / str(year)
+            year_dir.mkdir(parents=True, exist_ok=True)
+            
+            html = self.renderer.render_archive(
+                year_posts, 
+                archive_title=f"Posts from {year}",
+                **context
+            )
+            output_path = year_dir / "index.html"
+            output_path.write_text(html, encoding="utf-8")
+
+        # Generate month archives
+        for (year, month), month_posts in posts_by_month.items():
+            month_dir = self.output_dir / str(year) / f"{month:02d}"
+            month_dir.mkdir(parents=True, exist_ok=True)
+            
+            month_name = dt.datetime(year, month, 1).strftime("%B %Y")
+            html = self.renderer.render_archive(
+                month_posts,
+                archive_title=f"Posts from {month_name}",
+                **context
+            )
+            output_path = month_dir / "index.html"
+            output_path.write_text(html, encoding="utf-8")
+
+        # Generate day archives
+        for (year, month, day), day_posts in posts_by_day.items():
+            day_dir = self.output_dir / str(year) / f"{month:02d}" / f"{day:02d}"
+            day_dir.mkdir(parents=True, exist_ok=True)
+            
+            date_str = dt.datetime(year, month, day).strftime("%B %d, %Y")
+            html = self.renderer.render_archive(
+                day_posts,
+                archive_title=f"Posts from {date_str}",
+                **context
+            )
+            output_path = day_dir / "index.html"
+            output_path.write_text(html, encoding="utf-8")
 
     def _generate_tag_pages(self, posts: list[Post]) -> None:
         """Generate pages for each tag."""
