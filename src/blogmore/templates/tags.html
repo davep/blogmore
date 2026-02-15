@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}All Tags - {{ site_title }}{% endblock %}
+
+{% block content %}
+<div class="tags-page">
+    <h1>All Tags</h1>
+    
+    {% if tags %}
+    <div class="tag-cloud">
+        {% for tag_info in tags %}
+        <a href="{{ site_url }}/{{ tag_dir }}/{{ tag_info.safe_tag }}.html" 
+           class="tag-cloud-item" 
+           style="font-size: {{ tag_info.font_size }}em;"
+           title="{{ tag_info.count }} post{% if tag_info.count != 1 %}s{% endif %}">
+            {{ tag_info.display_name }}
+            <span class="tag-count">({{ tag_info.count }})</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No tags yet.</p>
+    {% endif %}
+    
+    <p><a href="{{ site_url }}/">← Back to home</a></p>
+</div>
+{% endblock %}
