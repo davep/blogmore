@@ -57,48 +57,78 @@ This is my first blog post!
 Generate your site:
 
 ```bash
-blogmore posts/
+blogmore build posts/
 ```
 
 This will generate your site in the `output/` directory.
 
 ### Serve the Site Locally
 
-To preview your generated site locally:
+To serve an existing site:
 
 ```bash
-blogmore serve
+blogmore serve -o output/
 ```
 
-This starts a local HTTP server on port 8000. Open http://localhost:8000/ in your browser.
+Or generate and serve with auto-reload on changes:
+
+```bash
+blogmore serve posts/ -o output/
+```
+
+This starts a local HTTP server on port 8000 and watches for changes. Open http://localhost:8000/ in your browser.
 
 Options:
 - `-o, --output` - Output directory to serve (default: `output/`)
 - `-p, --port` - Port to serve on (default: 8000)
+- `--no-watch` - Disable watching for changes
 
 Example:
 ```bash
-blogmore serve --port 3000 --output my-site/
+blogmore serve posts/ --port 3000 --output my-site/
 ```
 
 ### Custom Options
 
 ```bash
-blogmore posts/ \
+blogmore build posts/ \
   --templates my-templates/ \
   --output my-site/ \
   --site-title "My Awesome Blog" \
   --site-url "https://example.com"
 ```
 
-### Command Line Options
+### Commands
 
-- `content_dir` - Directory containing markdown posts (required)
-- `-t, --templates` - Templates directory (default: `templates/`)
+**Build** (`build`, `generate`, `gen`)
+Generate the static site from markdown posts:
+```bash
+blogmore build posts/ [options]
+```
+
+**Serve** (`serve`, `test`)
+Serve the site locally with optional generation and auto-reload:
+```bash
+blogmore serve [posts/] [options]
+```
+
+### Common Options
+
+Available for both `build` and `serve` commands:
+
+- `content_dir` - Directory containing markdown posts (required for `build`, optional for `serve`)
+- `-t, --templates` - Custom templates directory (default: uses bundled templates)
 - `-o, --output` - Output directory (default: `output/`)
 - `--site-title` - Site title (default: "My Blog")
 - `--site-url` - Base URL of the site
 - `--include-drafts` - Include posts marked as drafts
+- `--posts-per-feed` - Maximum posts in feeds (default: 20)
+- `--extra-stylesheet` - Additional stylesheet URL (can be used multiple times)
+
+### Serve-Specific Options
+
+- `-p, --port` - Port to serve on (default: 8000)
+- `--no-watch` - Disable watching for changes
 
 ## Frontmatter Fields
 
