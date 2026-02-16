@@ -7,6 +7,11 @@
 <link rel="alternate" type="application/atom+xml" title="{{ site_title }} - {{ category }} - Atom Feed" href="{{ site_url }}/feeds/{{ safe_category }}.atom.xml">
 {% endblock %}
 
+{% block feed_nav_links %}
+<li><a href="/feeds/{{ safe_category }}.rss.xml" title="Subscribe to {{ category }} via RSS feed">RSS</a></li>
+<li><a href="/feeds/{{ safe_category }}.atom.xml" title="Subscribe to {{ category }} via Atom feed">Atom</a></li>
+{% endblock %}
+
 {% block content %}
 <div class="category-page">
     <h1>Posts in category "{{ category }}"</h1>
