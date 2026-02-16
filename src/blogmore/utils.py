@@ -37,13 +37,13 @@ def calculate_reading_time(content: str, words_per_minute: int = 200) -> int:
     content = re.sub(r"<[^>]+>", "", content)
 
     # Remove markdown formatting characters
-    content = re.sub(r"[*_~`#\-]", " ", content)
+    content = re.sub(r"[*_~`#-]", " ", content)
 
     # Count words (split by whitespace and filter out empty strings)
     words = [word for word in content.split() if word]
     word_count = len(words)
 
-    # Calculate minutes, rounding up to at least 1 minute
+    # Calculate minutes, rounding to the nearest minute with a minimum of 1
     minutes = max(1, round(word_count / words_per_minute))
 
     return minutes
