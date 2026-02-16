@@ -16,4 +16,13 @@
   tidy, keep it up to date.
 - Always ensure that `uv.lock` is up to date.
 
+## Testing
+
+- When making any changes, always run the tests afterwards to be sure that
+  there is no regression in behaviour.
+- If changes in functionality require changes in tests, make those changes.
+- Do not change tests purely to make them pass, only make changes to tests
+  when a change demands it.
+- Any new functionality requires associated tests.
+
 [//]: # (copilot-instructions.md ends here)
