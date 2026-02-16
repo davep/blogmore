@@ -129,6 +129,7 @@ header nav {
 header h1 {
     margin: 0;
     font-size: 1.8em;
+    line-height: 1;
 }
 
 header h1 a {
