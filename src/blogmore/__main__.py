@@ -13,6 +13,16 @@ def main() -> int:
     parser = create_parser()
     args = parser.parse_args()
 
+    # Expand user home directory in path arguments from CLI
+    if hasattr(args, "content_dir") and args.content_dir is not None:
+        args.content_dir = args.content_dir.expanduser()
+    if hasattr(args, "templates") and args.templates is not None:
+        args.templates = args.templates.expanduser()
+    if hasattr(args, "output") and args.output is not None:
+        args.output = args.output.expanduser()
+    if hasattr(args, "config") and args.config is not None:
+        args.config = args.config.expanduser()
+
     # Load configuration file if specified or search for default
     try:
         config = load_config(args.config if hasattr(args, "config") else None)

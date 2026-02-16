@@ -702,3 +702,77 @@ class TestConfigFileIntegration:
                 assert call_kwargs["port"] == 9000
                 assert call_kwargs["site_title"] == "Serve Config Blog"
                 assert call_kwargs["output_dir"] == temp_output_dir
+
+    def test_main_with_tilde_in_config_paths(
+        self, posts_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Test that tilde paths in config file are properly expanded."""
+        # Create a work directory with config
+        work_dir = tmp_path / "work"
+        work_dir.mkdir()
+        monkeypatch.chdir(work_dir)
+
+        # Create temp directory in home for testing
+        import os
+        home_temp = Path.home() / ".blogmore-test-temp"
+        home_temp.mkdir(exist_ok=True)
+        output_dir = home_temp / "output"
+
+        try:
+            # Create config with tilde paths
+            config_file = work_dir / "blogmore.yaml"
+            config = {
+                "output": f"~/.blogmore-test-temp/output",
+            }
+            with open(config_file, "w") as f:
+                yaml.dump(config, f)
+
+            with patch.object(
+                sys,
+                "argv",
+                ["blogmore", "build", str(posts_dir)],
+            ):
+                result = main()
+                assert result == 0
+                
+                # Verify output was created in expanded path
+                assert output_dir.exists()
+                assert (output_dir / "index.html").exists()
+        finally:
+            # Cleanup
+            import shutil
+            if home_temp.exists():
+                shutil.rmtree(home_temp)
+
+    def test_main_with_tilde_in_cli_path(
+        self, posts_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that tilde paths from CLI are properly expanded."""
+        import os
+        home_temp = Path.home() / ".blogmore-test-temp2"
+        home_temp.mkdir(exist_ok=True)
+        output_dir = home_temp / "output"
+
+        try:
+            with patch.object(
+                sys,
+                "argv",
+                [
+                    "blogmore",
+                    "build",
+                    str(posts_dir),
+                    "-o",
+                    "~/.blogmore-test-temp2/output",
+                ],
+            ):
+                result = main()
+                assert result == 0
+                
+                # Verify output was created in expanded path
+                assert output_dir.exists()
+                assert (output_dir / "index.html").exists()
+        finally:
+            # Cleanup
+            import shutil
+            if home_temp.exists():
+                shutil.rmtree(home_temp)

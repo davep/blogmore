@@ -99,9 +99,9 @@ def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
 
         # Check if the argument is still at its default value
         if arg_value == default_value:
-            # Convert path strings to Path objects
+            # Convert path strings to Path objects and expand user home directory
             if config_key in ("content_dir", "templates", "output"):
-                setattr(args, config_key, Path(config_value))
+                setattr(args, config_key, Path(config_value).expanduser())
             # Handle extra_stylesheets specially
             elif config_key == "extra_stylesheets":
                 if isinstance(config_value, list):

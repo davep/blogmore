@@ -335,3 +335,66 @@ class TestDefaultConfigFiles:
         """Test that default config files are defined correctly."""
         assert DEFAULT_CONFIG_FILES == ["blogmore.yaml", "blogmore.yml"]
         assert len(DEFAULT_CONFIG_FILES) == 2
+
+
+class TestPathExpansion:
+    """Test path expansion with tilde (~) for user home directory."""
+
+    def test_config_expands_tilde_in_content_dir(self, tmp_path: Path) -> None:
+        """Test that tilde in content_dir from config is expanded."""
+        from unittest.mock import Mock
+
+        config = {"content_dir": "~/test-content"}
+        args = Mock()
+        args.content_dir = None
+
+        merge_config_with_args(config, args)
+
+        # Should expand to absolute path
+        assert args.content_dir.is_absolute()
+        assert str(args.content_dir).startswith("/")
+        assert "~" not in str(args.content_dir)
+
+    def test_config_expands_tilde_in_output(self, tmp_path: Path) -> None:
+        """Test that tilde in output from config is expanded."""
+        from unittest.mock import Mock
+
+        config = {"output": "~/test-output"}
+        args = Mock()
+        args.output = Path("output")
+
+        merge_config_with_args(config, args)
+
+        # Should expand to absolute path
+        assert args.output.is_absolute()
+        assert str(args.output).startswith("/")
+        assert "~" not in str(args.output)
+
+    def test_config_expands_tilde_in_templates(self, tmp_path: Path) -> None:
+        """Test that tilde in templates from config is expanded."""
+        from unittest.mock import Mock
+
+        config = {"templates": "~/test-templates"}
+        args = Mock()
+        args.templates = None
+
+        merge_config_with_args(config, args)
+
+        # Should expand to absolute path
+        assert args.templates.is_absolute()
+        assert str(args.templates).startswith("/")
+        assert "~" not in str(args.templates)
+
+    def test_config_without_tilde_works(self, tmp_path: Path) -> None:
+        """Test that paths without tilde still work correctly."""
+        from unittest.mock import Mock
+
+        config = {"content_dir": "posts", "output": "site"}
+        args = Mock()
+        args.content_dir = None
+        args.output = Path("output")
+
+        merge_config_with_args(config, args)
+
+        assert args.content_dir == Path("posts")
+        assert args.output == Path("site")
