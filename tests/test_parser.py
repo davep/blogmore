@@ -242,6 +242,53 @@ class TestPost:
         )
         assert post.description == "This is the first paragraph."
 
+    def test_reading_time_short_post(self) -> None:
+        """Test reading time calculation for a short post."""
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content="Hello world, this is a short post.",
+            html_content="<p>Hello world, this is a short post.</p>",
+        )
+        assert post.reading_time == 1
+
+    def test_reading_time_medium_post(self) -> None:
+        """Test reading time calculation for a medium post."""
+        # 400 words at 200 WPM = 2 minutes
+        content = " ".join(["word"] * 400)
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content=content,
+            html_content=f"<p>{content}</p>",
+        )
+        assert post.reading_time == 2
+
+    def test_reading_time_with_markdown(self) -> None:
+        """Test reading time calculation with markdown content."""
+        content = """
+        # Heading
+        
+        This is a **bold** paragraph with *italic* text and `code`.
+        
+        Here is a [link](https://example.com) and some more text.
+        
+        ```python
+        def hello():
+            print("This code should not be counted")
+        ```
+        
+        And some final thoughts.
+        """
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content=content,
+            html_content="<p>Test</p>",
+        )
+        # Reading time should be calculated from the actual text content
+        assert post.reading_time >= 1
+
 
 class TestPage:
     """Test the Page dataclass."""

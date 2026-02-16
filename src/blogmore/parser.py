@@ -10,6 +10,8 @@ import frontmatter  # type: ignore[import-untyped]
 import markdown
 import yaml
 
+from blogmore.utils import calculate_reading_time
+
 
 def sanitize_for_url(value: str) -> str:
     """
@@ -171,6 +173,16 @@ class Post:
         if self.metadata and self.metadata.get("description"):
             return str(self.metadata.get("description"))
         return extract_first_paragraph(self.content)
+
+    @property
+    def reading_time(self) -> int:
+        """
+        Calculate the estimated reading time for this post in whole minutes.
+
+        Returns:
+            Estimated reading time in minutes (minimum 1 minute)
+        """
+        return calculate_reading_time(self.content)
 
 
 @dataclass

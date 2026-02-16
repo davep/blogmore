@@ -23,6 +23,7 @@
         {% if post.date %}
         <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>
         {% endif %}
+        <div class="reading-time">{{ post.reading_time }} min read</div>
         <div class="post-content">
             {{ post.html_content|safe }}
         </div>

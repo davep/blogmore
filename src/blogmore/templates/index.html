@@ -13,6 +13,7 @@
         {% if post.date %}
         <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>
         {% endif %}
+        <div class="reading-time">{{ post.reading_time }} min read</div>
         {% if post.category %}
         <div class="category">
             <a href="/{{ category_dir }}/{{ post.safe_category }}.html" class="category-link">{{ post.category }}</a>
