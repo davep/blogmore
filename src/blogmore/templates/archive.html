@@ -74,7 +74,7 @@
                     {% if post.tags %}
                     <span class="archive-metadata">
                         {% for tag in post.tags %}
-                        <a href="/{{ tag_dir }}/{{ safe_tags[loop.index0] }}.html" class="tag">{{ tag }}</a>{% if not loop.last %}, {% endif %}
+                        <a href="/{{ tag_dir }}/{{ safe_tags[loop.index0] }}.html" class="tag">{{ tag }}</a>
                         {% endfor %}
                     </span>
                     {% endif %}
