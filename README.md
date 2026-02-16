@@ -174,9 +174,10 @@ make setup
 ### Run Checks
 
 ```bash
-make checkall  # Run all checks (lint, format, typecheck, spell)
+make checkall  # Run all checks (lint, format, typecheck, spell, tests)
 make lint      # Check linting
 make typecheck # Type checking with mypy
+make test      # Run test suite
 ```
 
 ### Format Code
@@ -184,6 +185,18 @@ make typecheck # Type checking with mypy
 ```bash
 make tidy  # Fix formatting and linting issues
 ```
+
+## Testing
+
+Blogmore has a comprehensive test suite with 143 tests achieving 84% code coverage.
+
+```bash
+make test              # Run all tests
+make test-verbose      # Run with verbose output
+make test-coverage     # Run with detailed coverage report
+```
+
+For more information, see the [tests README](tests/README.md).
 
 ## License
 

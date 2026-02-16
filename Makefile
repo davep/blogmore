@@ -1,7 +1,8 @@
 app     := blogmore
 src     := src/
+reports := .reports
 run     := uv run
-sync    := uv sync
+sync    := uv sync --group dev --group test
 build   := uv build
 publish := uv publish --username=__token__ --keyring-provider=subprocess
 python  := $(run) python
@@ -10,6 +11,8 @@ lint    := $(ruff) check
 fmt     := $(ruff) format
 mypy    := $(run) mypy
 spell   := $(run) codespell
+test    := $(run) pytest --verbose --cov
+coverage := $(test) --cov-report html:$(reports)/html
 
 ##############################################################################
 # Setup/update packages the system requires.
@@ -31,6 +34,23 @@ resetup: realclean		# Recreate the virtual environment from scratch
 
 ##############################################################################
 # Checking/testing/linting/etc.
+.PHONY: test
+test:				# Run the test suite
+	$(test)
+
+.PHONY: test-verbose
+test-verbose:			# Run tests with verbose output
+	$(test) -v
+
+.PHONY: coverage
+coverage:			# Produce a test coverage report
+	$(coverage)
+	open $(reports)/html/index.html
+
+.PHONY: test-watch
+test-watch:			# Run tests in watch mode
+	$(test) -f
+
 .PHONY: lint
 lint:				# Check the code for linting issues
 	$(lint) $(src)
@@ -52,7 +72,7 @@ spellcheck:			# Spell check the code
 	$(spell) *.md $(src)
 
 .PHONY: checkall
-checkall: spellcheck codestyle lint stricttypecheck # Check all the things
+checkall: spellcheck codestyle lint stricttypecheck test # Check all the things
 
 ##############################################################################
 # Package/publish.
@@ -95,7 +115,7 @@ clean-packaging:		# Clean the package building files
 
 .PHONY: clean
 clean: clean-packaging # Clean the build directories
-	rm -rf output
+	rm -rf output $(reports)
 
 .PHONY: realclean
 realclean: clean		# Clean the venv and build directories

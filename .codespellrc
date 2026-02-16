@@ -1,0 +1,2 @@
+[codespell]
+skip = *.css,*.lock,.reports,.coverage
