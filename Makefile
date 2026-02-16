@@ -1,7 +1,7 @@
 app     := blogmore
 src     := src/
 run     := uv run
-sync    := uv sync
+sync    := uv sync --group dev --group test
 build   := uv build
 publish := uv publish --username=__token__ --keyring-provider=subprocess
 python  := $(run) python
