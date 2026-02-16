@@ -98,6 +98,69 @@ blogmore build posts/ \
   --site-url "https://example.com"
 ```
 
+### Configuration File
+
+Blogmore supports configuration files to avoid repetitive command-line arguments. Create a `blogmore.yaml` or `blogmore.yml` file in your project directory:
+
+```yaml
+# blogmore.yaml
+content_dir: posts
+output: my-site
+templates: my-templates
+site_title: "My Awesome Blog"
+site_url: "https://example.com"
+include_drafts: false
+posts_per_feed: 30
+extra_stylesheets:
+  - https://example.com/custom.css
+  - /assets/extra.css
+
+# Serve-specific options
+port: 3000
+no_watch: false
+```
+
+#### Using Configuration Files
+
+**Automatic Discovery:**
+Blogmore automatically searches for `blogmore.yaml` or `blogmore.yml` in the current directory (`.yaml` takes precedence):
+
+```bash
+blogmore build  # Uses blogmore.yaml if found
+```
+
+**Specify a Config File:**
+Use the `-c` or `--config` flag to specify a custom config file:
+
+```bash
+blogmore build --config my-config.yaml
+```
+
+**Override Config with CLI:**
+Command-line arguments always take precedence over configuration file values:
+
+```bash
+# Uses blogmore.yaml but overrides site_title
+blogmore build --site-title "Different Title"
+```
+
+#### Configuration Options
+
+All command-line options can be configured in the YAML file:
+
+- `content_dir` - Directory containing markdown posts
+- `templates` - Custom templates directory
+- `output` - Output directory (default: `output/`)
+- `site_title` - Site title (default: "My Blog")
+- `site_url` - Base URL of the site
+- `include_drafts` - Include posts marked as drafts (default: `false`)
+- `posts_per_feed` - Maximum posts in feeds (default: `20`)
+- `extra_stylesheets` - List of additional stylesheet URLs
+- `port` - Port for serve command (default: `8000`)
+- `no_watch` - Disable file watching in serve mode (default: `false`)
+
+**Note:** The `--config` option itself cannot be set in a configuration file.
+
 ### Commands
 
 **Build** (`build`, `generate`, `gen`)
@@ -117,6 +180,7 @@ blogmore serve [posts/] [options]
 Available for both `build` and `serve` commands:
 
 - `content_dir` - Directory containing markdown posts (required for `build`, optional for `serve`)
+- `-c, --config` - Path to configuration file (default: searches for `blogmore.yaml` or `blogmore.yml`)
 - `-t, --templates` - Custom templates directory (default: uses bundled templates)
 - `-o, --output` - Output directory (default: `output/`)
 - `--site-title` - Site title (default: "My Blog")

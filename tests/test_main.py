@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+import yaml
 
 from blogmore.__main__ import main
 from blogmore.server import ContentChangeHandler, serve_site
@@ -482,3 +483,294 @@ class TestMainCLI:
             # Check that watch was disabled
             call_kwargs = mock_serve.call_args[1]
             assert call_kwargs["watch"] is False
+
+
+class TestConfigFileIntegration:
+    """Test CLI integration with configuration files."""
+
+    def test_main_with_default_config_file(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Test that default blogmore.yaml is automatically loaded."""
+        # Change to a temporary directory
+        work_dir = tmp_path / "work"
+        work_dir.mkdir()
+        monkeypatch.chdir(work_dir)
+
+        # Create a config file
+        config_file = work_dir / "blogmore.yaml"
+        config = {
+            "site_title": "Config Blog",
+            "output": str(temp_output_dir),
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(posts_dir)],
+        ):
+            result = main()
+            assert result == 0
+            assert (temp_output_dir / "index.html").exists()
+
+            # Verify that config was used by checking the output
+            with open(temp_output_dir / "index.html") as f:
+                content = f.read()
+                assert "Config Blog" in content
+
+    def test_main_with_explicit_config_file(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test using --config to specify a config file."""
+        config_file = tmp_path / "custom.yaml"
+        config = {
+            "site_title": "Custom Config Blog",
+            "output": str(temp_output_dir),
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "blogmore",
+                "build",
+                str(posts_dir),
+                "--config",
+                str(config_file),
+            ],
+        ):
+            result = main()
+            assert result == 0
+            assert (temp_output_dir / "index.html").exists()
+
+            # Verify that config was used
+            with open(temp_output_dir / "index.html") as f:
+                content = f.read()
+                assert "Custom Config Blog" in content
+
+    def test_main_cli_overrides_config(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that CLI arguments override config file values."""
+        config_file = tmp_path / "config.yaml"
+        config = {
+            "site_title": "Config Title",
+            "output": str(tmp_path / "config-output"),
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "blogmore",
+                "build",
+                str(posts_dir),
+                "--config",
+                str(config_file),
+                "--site-title",
+                "CLI Title",
+                "-o",
+                str(temp_output_dir),
+            ],
+        ):
+            result = main()
+            assert result == 0
+
+            # Output should be in temp_output_dir, not config-output
+            assert (temp_output_dir / "index.html").exists()
+            assert not (tmp_path / "config-output" / "index.html").exists()
+
+            # Title should be from CLI
+            with open(temp_output_dir / "index.html") as f:
+                content = f.read()
+                assert "CLI Title" in content
+                assert "Config Title" not in content
+
+    def test_main_with_nonexistent_config_file(self, posts_dir: Path) -> None:
+        """Test that specifying a nonexistent config file produces an error."""
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "blogmore",
+                "build",
+                str(posts_dir),
+                "--config",
+                "nonexistent.yaml",
+            ],
+        ):
+            result = main()
+            assert result == 1  # Should return error code
+
+    def test_main_with_invalid_yaml_config(
+        self, posts_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that an invalid YAML config file produces an error."""
+        config_file = tmp_path / "invalid.yaml"
+        config_file.write_text("- not\n- a\n- dict\n")
+
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "blogmore",
+                "build",
+                str(posts_dir),
+                "--config",
+                str(config_file),
+            ],
+        ):
+            result = main()
+            assert result == 1  # Should return error code
+
+    def test_main_config_with_all_options(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test config file with all supported options."""
+        config_file = tmp_path / "full.yaml"
+        config = {
+            "output": str(temp_output_dir),
+            "site_title": "Full Config Blog",
+            "site_url": "https://example.com",
+            "include_drafts": True,
+            "posts_per_feed": 30,
+            "extra_stylesheets": ["https://example.com/style.css"],
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "blogmore",
+                "build",
+                str(posts_dir),
+                "--config",
+                str(config_file),
+            ],
+        ):
+            result = main()
+            assert result == 0
+            assert (temp_output_dir / "index.html").exists()
+
+            # Verify config values were used
+            with open(temp_output_dir / "index.html") as f:
+                content = f.read()
+                assert "Full Config Blog" in content
+                assert "https://example.com/style.css" in content
+
+    def test_main_serve_with_config(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test serve command with config file."""
+        config_file = tmp_path / "serve-config.yaml"
+        config = {
+            "output": str(temp_output_dir),
+            "port": 9000,
+            "site_title": "Serve Config Blog",
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch("blogmore.__main__.serve_site") as mock_serve:
+            mock_serve.return_value = 0
+
+            with patch.object(
+                sys,
+                "argv",
+                [
+                    "blogmore",
+                    "serve",
+                    str(posts_dir),
+                    "--config",
+                    str(config_file),
+                    "--no-watch",
+                ],
+            ):
+                result = main()
+                assert result == 0
+
+                # Verify serve was called with config values
+                call_kwargs = mock_serve.call_args[1]
+                assert call_kwargs["port"] == 9000
+                assert call_kwargs["site_title"] == "Serve Config Blog"
+                assert call_kwargs["output_dir"] == temp_output_dir
+
+    def test_main_with_tilde_in_config_paths(
+        self, posts_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Test that tilde paths in config file are properly expanded."""
+        # Create a work directory with config
+        work_dir = tmp_path / "work"
+        work_dir.mkdir()
+        monkeypatch.chdir(work_dir)
+
+        # Create temp directory in home for testing
+        home_temp = Path.home() / ".blogmore-test-temp"
+        home_temp.mkdir(exist_ok=True)
+        output_dir = home_temp / "output"
+
+        try:
+            # Create config with tilde paths
+            config_file = work_dir / "blogmore.yaml"
+            config = {
+                "output": f"~/.blogmore-test-temp/output",
+            }
+            with open(config_file, "w") as f:
+                yaml.dump(config, f)
+
+            with patch.object(
+                sys,
+                "argv",
+                ["blogmore", "build", str(posts_dir)],
+            ):
+                result = main()
+                assert result == 0
+                
+                # Verify output was created in expanded path
+                assert output_dir.exists()
+                assert (output_dir / "index.html").exists()
+        finally:
+            # Cleanup
+            import shutil
+            if home_temp.exists():
+                shutil.rmtree(home_temp)
+
+    def test_main_with_tilde_in_cli_path(
+        self, posts_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that tilde paths from CLI are properly expanded."""
+        home_temp = Path.home() / ".blogmore-test-temp2"
+        home_temp.mkdir(exist_ok=True)
+        output_dir = home_temp / "output"
+
+        try:
+            with patch.object(
+                sys,
+                "argv",
+                [
+                    "blogmore",
+                    "build",
+                    str(posts_dir),
+                    "-o",
+                    "~/.blogmore-test-temp2/output",
+                ],
+            ):
+                result = main()
+                assert result == 0
+                
+                # Verify output was created in expanded path
+                assert output_dir.exists()
+                assert (output_dir / "index.html").exists()
+        finally:
+            # Cleanup
+            import shutil
+            if home_temp.exists():
+                shutil.rmtree(home_temp)

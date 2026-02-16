@@ -1,0 +1,36 @@
+# Example Blogmore Configuration File
+# Copy this to blogmore.yaml or blogmore.yml to use
+
+# Required: Directory containing your markdown posts
+content_dir: posts
+
+# Optional: Output directory for generated site (default: output)
+output: output
+
+# Optional: Custom templates directory (default: uses bundled templates)
+# templates: my-templates
+
+# Optional: Site title (default: "My Blog")
+site_title: "My Blog"
+
+# Optional: Base URL of your site (used for RSS feeds and canonical URLs)
+site_url: "https://example.com"
+
+# Optional: Include posts marked as drafts (default: false)
+include_drafts: false
+
+# Optional: Maximum number of posts in RSS/Atom feeds (default: 20)
+posts_per_feed: 20
+
+# Optional: Additional stylesheets to include (can be URLs or relative paths)
+# extra_stylesheets:
+#   - https://example.com/custom.css
+#   - /assets/extra.css
+
+# Serve-specific options (only used with 'blogmore serve' command)
+
+# Optional: Port for local server (default: 8000)
+port: 8000
+
+# Optional: Disable file watching (default: false)
+no_watch: false

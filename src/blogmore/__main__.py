@@ -3,6 +3,7 @@
 import sys
 
 from blogmore.cli import create_parser
+from blogmore.config import load_config, merge_config_with_args
 from blogmore.generator import SiteGenerator
 from blogmore.server import serve_site
 
@@ -11,6 +12,27 @@ def main() -> int:
     """Main entry point for the blogmore CLI."""
     parser = create_parser()
     args = parser.parse_args()
+
+    # Expand user home directory in path arguments from CLI
+    if hasattr(args, "content_dir") and args.content_dir is not None:
+        args.content_dir = args.content_dir.expanduser()
+    if hasattr(args, "templates") and args.templates is not None:
+        args.templates = args.templates.expanduser()
+    if hasattr(args, "output") and args.output is not None:
+        args.output = args.output.expanduser()
+    if hasattr(args, "config") and args.config is not None:
+        args.config = args.config.expanduser()
+
+    # Load configuration file if specified or search for default
+    try:
+        config = load_config(args.config if hasattr(args, "config") else None)
+        merge_config_with_args(config, args)
+    except FileNotFoundError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
+    except ValueError as e:
+        print(f"Error: Invalid configuration file: {e}", file=sys.stderr)
+        return 1
 
     # Handle serve command
     if args.command in ("serve", "test"):

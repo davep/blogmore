@@ -12,6 +12,14 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
         parser: The argument parser to add arguments to
     """
     parser.add_argument(
+        "-c",
+        "--config",
+        type=Path,
+        default=None,
+        help="Path to configuration file (default: searches for blogmore.yaml or blogmore.yml)",
+    )
+
+    parser.add_argument(
         "-t",
         "--templates",
         type=Path,

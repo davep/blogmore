@@ -28,3 +28,7 @@ example/
 # IDE
 .vscode/
 .idea/
+
+# Configuration files (users should create their own)
+blogmore.yaml
+blogmore.yml
