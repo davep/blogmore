@@ -172,6 +172,18 @@ class Post:
             return str(self.metadata.get("description"))
         return extract_first_paragraph(self.content)
 
+    @property
+    def reading_time(self) -> int:
+        """
+        Calculate the estimated reading time for this post in whole minutes.
+
+        Returns:
+            Estimated reading time in minutes (minimum 1 minute)
+        """
+        from blogmore.utils import calculate_reading_time
+
+        return calculate_reading_time(self.content)
+
 
 @dataclass
 class Page:
