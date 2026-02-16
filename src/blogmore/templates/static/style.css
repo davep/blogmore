@@ -691,3 +691,104 @@ footer a:hover {
     color: var(--text-secondary);
     margin-left: 2px;
 }
+
+/* Archive page styles */
+.archive h1 {
+    margin-bottom: 40px;
+}
+
+.archive-year {
+    margin-bottom: 40px;
+}
+
+.archive-year > h2 {
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.archive-year > h2 a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.archive-year > h2 a:hover {
+    color: var(--hover-color);
+}
+
+.archive-month {
+    margin-bottom: 30px;
+    margin-left: 20px;
+}
+
+.archive-month > h3 {
+    margin-bottom: 15px;
+    font-size: 1.4em;
+}
+
+.archive-month > h3 a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.archive-month > h3 a:hover {
+    color: var(--hover-color);
+}
+
+.archive-post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0 20px;
+}
+
+.archive-post-list li {
+    margin-bottom: 12px;
+    line-height: 1.6;
+}
+
+.archive-post-list .post-title {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.archive-post-list .post-title:hover {
+    color: var(--hover-color);
+    text-decoration: underline;
+}
+
+.archive-post-list .archive-metadata {
+    margin-left: 8px;
+}
+
+.archive-post-list .category-link {
+    display: inline-block;
+    background: var(--category-bg);
+    padding: 2px 10px;
+    border-radius: 3px;
+    font-size: 0.85em;
+    text-decoration: none;
+    color: var(--category-text);
+    font-weight: 600;
+}
+
+.archive-post-list .category-link:hover {
+    background: var(--category-hover-bg);
+    color: var(--hover-color-dark);
+}
+
+.archive-post-list .tag {
+    display: inline-block;
+    background: var(--tag-bg);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 0.8em;
+    text-decoration: none;
+    color: var(--text-secondary);
+}
+
+.archive-post-list .tag:hover {
+    background: var(--tag-hover-bg);
+    color: var(--text-color);
+}
