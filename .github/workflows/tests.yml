@@ -52,7 +52,7 @@ jobs:
 
     - name: Run tests with coverage
       run: |
-        uv run pytest tests/ -v --cov=blogmore --cov-report=xml:.reports/coverage.xml --cov-report=term-missing
+        uv run pytest tests/ -v --cov --cov-report=xml:.reports/coverage.xml --cov-report=term-missing
 
     - name: Upload coverage to Codecov
       if: matrix.python-version == '3.12'

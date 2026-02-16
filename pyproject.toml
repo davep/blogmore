@@ -106,7 +106,7 @@ python_functions = ["test_*"]
 addopts = [
     "--strict-markers",
     "--strict-config",
-    "--cov=blogmore",
+    "--cov",
     "--cov-report=term-missing",
     "--cov-report=html:.reports/html",
     "--cov-report=xml:.reports/coverage.xml",

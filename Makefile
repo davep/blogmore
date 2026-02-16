@@ -11,7 +11,7 @@ lint    := $(ruff) check
 fmt     := $(ruff) format
 mypy    := $(run) mypy
 spell   := $(run) codespell
-test    := $(run) pytest --verbose --cov=$(app)
+test    := $(run) pytest --verbose --cov
 coverage := $(test) --cov-report html:$(reports)/html
 
 ##############################################################################
