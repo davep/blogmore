@@ -21,6 +21,11 @@ example/
 .ruff_cache/
 .pytest_cache/
 
+# Coverage reports
+.coverage
+coverage.xml
+htmlcov/
+
 # IDE
 .vscode/
 .idea/
