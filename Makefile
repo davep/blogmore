@@ -1,5 +1,7 @@
 app     := blogmore
 src     := src/
+lib     := blogmore
+reports := .reports
 run     := uv run
 sync    := uv sync --group dev --group test
 build   := uv build
@@ -10,7 +12,8 @@ lint    := $(ruff) check
 fmt     := $(ruff) format
 mypy    := $(run) mypy
 spell   := $(run) codespell
-test    := $(run) pytest
+test    := $(run) pytest --verbose --cov=$(lib)
+coverage := $(test) --cov-report html:$(reports)
 
 ##############################################################################
 # Setup/update packages the system requires.
@@ -40,9 +43,10 @@ test:				# Run the test suite
 test-verbose:			# Run tests with verbose output
 	$(test) -v
 
-.PHONY: test-coverage
-test-coverage:			# Run tests with coverage report
-	$(test) --cov-report=term-missing
+.PHONY: coverage
+coverage:			# Produce a test coverage report
+	$(coverage)
+	open $(reports)/index.html
 
 .PHONY: test-watch
 test-watch:			# Run tests in watch mode
@@ -112,7 +116,7 @@ clean-packaging:		# Clean the package building files
 
 .PHONY: clean
 clean: clean-packaging # Clean the build directories
-	rm -rf output
+	rm -rf output $(reports)
 
 .PHONY: realclean
 realclean: clean		# Clean the venv and build directories
