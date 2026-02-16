@@ -2,6 +2,14 @@
 
 {% block title %}{{ page.title }} - {{ site_title }}{% endblock %}
 
+{% block meta_tags %}
+    {% set item = page %}
+    {% set content_type = "website" %}
+    {% set include_keywords = false %}
+    {% set include_article_tags = false %}
+    {% include "meta_tags.html" %}
+{% endblock %}
+
 {% block content %}
 <article class="page">
     <header class="page-header">

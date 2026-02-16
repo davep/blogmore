@@ -2,6 +2,14 @@
 
 {% block title %}{{ post.title }} - {{ site_title }}{% endblock %}
 
+{% block meta_tags %}
+    {% set item = post %}
+    {% set content_type = "article" %}
+    {% set include_keywords = true %}
+    {% set include_article_tags = true %}
+    {% include "meta_tags.html" %}
+{% endblock %}
+
 {% block content %}
 <article class="post">
     <header class="post-header">

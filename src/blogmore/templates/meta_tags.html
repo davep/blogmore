@@ -1,0 +1,89 @@
+{# 
+    Reusable meta tags include for SEO and social media.
+    
+    Parameters:
+    - item: The content object (post or page)
+    - content_type: "article" or "website"
+    - include_keywords: Boolean to include keywords meta tag (default: false)
+    - include_article_tags: Boolean to include article-specific OG tags (default: false)
+#}
+
+{# Set default values for optional parameters #}
+{% set include_keywords = include_keywords | default(false) %}
+{% set include_article_tags = include_article_tags | default(false) %}
+
+{# Standard SEO meta tags #}
+{% if item.metadata and item.metadata.get('author') %}
+<meta name="author" content="{{ item.metadata.get('author') }}">
+{% endif %}
+{% if item.metadata and item.metadata.get('description') %}
+<meta name="description" content="{{ item.metadata.get('description') }}">
+{% endif %}
+{% if include_keywords and item.tags %}
+<meta name="keywords" content="{{ item.tags|join(', ') }}">
+{% endif %}
+
+{# Open Graph meta tags #}
+<meta property="og:title" content="{{ item.title }}">
+<meta property="og:type" content="{{ content_type }}">
+<meta property="og:url" content="{{ site_url }}{{ item.url }}">
+{% if item.metadata and item.metadata.get('description') %}
+<meta property="og:description" content="{{ item.metadata.get('description') }}">
+{% endif %}
+<meta property="og:site_name" content="{{ site_title }}">
+{% if item.metadata and item.metadata.get('cover') %}
+{% set cover_url = item.metadata.get('cover') %}
+{% if cover_url.startswith('http://') or cover_url.startswith('https://') %}
+<meta property="og:image" content="{{ cover_url }}">
+{% elif cover_url.startswith('/') %}
+<meta property="og:image" content="{{ site_url }}{{ cover_url }}">
+{% else %}
+<meta property="og:image" content="{{ site_url }}/{{ cover_url }}">
+{% endif %}
+{% endif %}
+
+{# Article-specific Open Graph tags #}
+{% if include_article_tags %}
+{% if item.date %}
+<meta property="article:published_time" content="{{ item.date.isoformat() }}">
+{% endif %}
+{% if item.metadata and item.metadata.get('modified') %}
+<meta property="article:modified_time" content="{{ item.metadata.get('modified') }}">
+{% elif item.date %}
+<meta property="article:modified_time" content="{{ item.date.isoformat() }}">
+{% endif %}
+{% if item.metadata and item.metadata.get('author') %}
+<meta property="article:author" content="{{ item.metadata.get('author') }}">
+{% endif %}
+{% if item.category %}
+<meta property="article:section" content="{{ item.category }}">
+{% endif %}
+{% if item.tags %}
+{% for tag in item.tags %}
+<meta property="article:tag" content="{{ tag }}">
+{% endfor %}
+{% endif %}
+{% endif %}
+
+{# Twitter Card meta tags #}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ item.title }}">
+{% if item.metadata and item.metadata.get('description') %}
+<meta name="twitter:description" content="{{ item.metadata.get('description') }}">
+{% endif %}
+{% if item.metadata and item.metadata.get('cover') %}
+{% set cover_url = item.metadata.get('cover') %}
+{% if cover_url.startswith('http://') or cover_url.startswith('https://') %}
+<meta name="twitter:image" content="{{ cover_url }}">
+{% elif cover_url.startswith('/') %}
+<meta name="twitter:image" content="{{ site_url }}{{ cover_url }}">
+{% else %}
+<meta name="twitter:image" content="{{ site_url }}/{{ cover_url }}">
+{% endif %}
+{% endif %}
+{% if item.metadata and item.metadata.get('twitter_creator') %}
+<meta name="twitter:creator" content="{{ item.metadata.get('twitter_creator') }}">
+{% endif %}
+{% if item.metadata and item.metadata.get('twitter_site') %}
+<meta name="twitter:site" content="{{ item.metadata.get('twitter_site') }}">
+{% endif %}
