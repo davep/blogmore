@@ -95,6 +95,7 @@ def create_parser() -> argparse.ArgumentParser:
     build_parser.add_argument(
         "content_dir",
         type=Path,
+        nargs="?",
         help="Directory containing markdown blog posts",
     )
 

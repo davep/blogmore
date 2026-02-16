@@ -77,7 +77,9 @@ class TestExtractFirstParagraph:
 
     def test_extract_multiline_paragraph(self) -> None:
         """Test extracting a paragraph that spans multiple lines."""
-        content = "This is the first line.\nThis is the second line.\n\nSecond paragraph."
+        content = (
+            "This is the first line.\nThis is the second line.\n\nSecond paragraph."
+        )
         assert (
             extract_first_paragraph(content)
             == "This is the first line. This is the second line."

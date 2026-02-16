@@ -141,9 +141,7 @@ class TestSiteGenerator:
         assert (temp_output_dir / "static").exists()
         assert (temp_output_dir / "static" / "style.css").exists()
 
-    def test_generate_with_drafts(
-        self, posts_dir: Path, temp_output_dir: Path
-    ) -> None:
+    def test_generate_with_drafts(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """Test generating site including drafts."""
         generator = SiteGenerator(
             content_dir=posts_dir,
@@ -364,7 +362,9 @@ class TestSiteGenerator:
         # Old file should be preserved (generator doesn't clear the directory)
         assert old_file.exists()
 
-    def test_generate_with_no_posts(self, temp_output_dir: Path, tmp_path: Path) -> None:
+    def test_generate_with_no_posts(
+        self, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
         """Test generating with an empty content directory."""
         empty_dir = tmp_path / "empty"
         empty_dir.mkdir()

@@ -239,9 +239,7 @@ class TestEndToEndWorkflow:
         # Verify footnotes
         assert "footnote" in complex_post.lower()
 
-    def test_feeds_workflow(
-        self, posts_dir: Path, temp_output_dir: Path
-    ) -> None:
+    def test_feeds_workflow(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """Test complete feed generation workflow."""
         from blogmore.generator import SiteGenerator
 
@@ -284,11 +282,11 @@ class TestEndToEndWorkflow:
 
         # Create 15 posts (more than one page worth)
         for i in range(15):
-            post_file = many_posts_dir / f"2024-01-{i+1:02d}-post-{i}.md"
+            post_file = many_posts_dir / f"2024-01-{i + 1:02d}-post-{i}.md"
             post_file.write_text(
                 f"""---
 title: Post {i}
-date: 2024-01-{i+1:02d}
+date: 2024-01-{i + 1:02d}
 category: test
 tags: [test]
 ---

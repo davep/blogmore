@@ -310,9 +310,7 @@ class TestBlogFeedGenerator:
         rss_content = (output_dir / "feed.xml").read_text()
         assert "Test Post" in rss_content
 
-    def test_generate_category_feeds(
-        self, tmp_path: Path, sample_post: Post
-    ) -> None:
+    def test_generate_category_feeds(self, tmp_path: Path, sample_post: Post) -> None:
         """Test generating category feeds."""
         output_dir = tmp_path / "output"
         output_dir.mkdir()
@@ -365,9 +363,7 @@ class TestBlogFeedGenerator:
         # Should use fallback
         assert generator._get_base_url() == "https://example.com"
 
-    def test_generate_feeds_with_timezone_aware_dates(
-        self, tmp_path: Path
-    ) -> None:
+    def test_generate_feeds_with_timezone_aware_dates(self, tmp_path: Path) -> None:
         """Test generating feeds with timezone-aware dates."""
         output_dir = tmp_path / "output"
         output_dir.mkdir()

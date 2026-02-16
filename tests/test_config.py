@@ -34,7 +34,9 @@ class TestLoadConfig:
         with pytest.raises(FileNotFoundError, match="Config file not found"):
             load_config(config_file)
 
-    def test_load_default_blogmore_yaml(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_load_default_blogmore_yaml(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Test loading default blogmore.yaml file."""
         monkeypatch.chdir(tmp_path)
         config_file = tmp_path / "blogmore.yaml"
@@ -46,7 +48,9 @@ class TestLoadConfig:
 
         assert result == config_data
 
-    def test_load_default_blogmore_yml(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_load_default_blogmore_yml(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Test loading default blogmore.yml file when .yaml doesn't exist."""
         monkeypatch.chdir(tmp_path)
         config_file = tmp_path / "blogmore.yml"
@@ -58,10 +62,12 @@ class TestLoadConfig:
 
         assert result == config_data
 
-    def test_yaml_takes_precedence_over_yml(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_yaml_takes_precedence_over_yml(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Test that blogmore.yaml takes precedence over blogmore.yml."""
         monkeypatch.chdir(tmp_path)
-        
+
         yaml_file = tmp_path / "blogmore.yaml"
         yaml_data = {"site_title": "YAML Config"}
         with open(yaml_file, "w") as f:
@@ -76,7 +82,9 @@ class TestLoadConfig:
 
         assert result == yaml_data
 
-    def test_no_default_config_file(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_no_default_config_file(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Test that an empty dict is returned when no config file is found."""
         monkeypatch.chdir(tmp_path)
 

@@ -117,6 +117,4 @@ class TestNormalizeSiteUrl:
 
     def test_normalize_https_url(self) -> None:
         """Test normalizing HTTPS URL with trailing slash."""
-        assert (
-            normalize_site_url("https://blog.davep.org/") == "https://blog.davep.org"
-        )
+        assert normalize_site_url("https://blog.davep.org/") == "https://blog.davep.org"

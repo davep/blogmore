@@ -66,9 +66,7 @@ class TestTemplateRenderer:
 
     def test_render_post_with_extra_stylesheets(self, sample_post: Post) -> None:
         """Test rendering post with extra stylesheets."""
-        renderer = TemplateRenderer(
-            extra_stylesheets=["https://example.com/style.css"]
-        )
+        renderer = TemplateRenderer(extra_stylesheets=["https://example.com/style.css"])
         html = renderer.render_post(sample_post)
         assert "https://example.com/style.css" in html
 
@@ -247,7 +245,9 @@ class TestTemplateRenderer:
         # Should contain formatted date
         assert "2024" in html
 
-    def test_custom_templates_precedence(self, tmp_path: Path, sample_post: Post) -> None:
+    def test_custom_templates_precedence(
+        self, tmp_path: Path, sample_post: Post
+    ) -> None:
         """Test that custom templates take precedence over bundled ones."""
         # Create a custom template directory with a custom post template
         templates_dir = tmp_path / "templates"
@@ -316,13 +316,10 @@ class TestTemplateRenderer:
             '<meta property="og:url" content="https://example.com/2024/03/01/test.html">'
             in html
         )
-        assert (
-            '<meta property="og:description" content="A test post for SEO">' in html
-        )
+        assert '<meta property="og:description" content="A test post for SEO">' in html
         assert '<meta property="og:site_name" content="Test Blog">' in html
         assert (
-            '<meta property="og:image" content="https://example.com/cover.jpg">'
-            in html
+            '<meta property="og:image" content="https://example.com/cover.jpg">' in html
         )
 
         # Check article-specific Open Graph tags
@@ -336,9 +333,7 @@ class TestTemplateRenderer:
         # Check Twitter Card meta tags
         assert '<meta name="twitter:card" content="summary_large_image">' in html
         assert '<meta name="twitter:title" content="SEO Test Post">' in html
-        assert (
-            '<meta name="twitter:description" content="A test post for SEO">' in html
-        )
+        assert '<meta name="twitter:description" content="A test post for SEO">' in html
         assert (
             '<meta name="twitter:image" content="https://example.com/cover.jpg">'
             in html
@@ -433,8 +428,7 @@ class TestTemplateRenderer:
         assert '<meta property="og:title" content="About Page">' in html
         assert '<meta property="og:type" content="website">' in html
         assert (
-            '<meta property="og:url" content="https://example.com/about.html">'
-            in html
+            '<meta property="og:url" content="https://example.com/about.html">' in html
         )
         assert '<meta property="og:description" content="About this site">' in html
         assert (

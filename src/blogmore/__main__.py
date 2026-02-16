@@ -51,6 +51,14 @@ def main() -> int:
 
     # Handle build command (and its aliases: generate, gen)
     if args.command in ("build", "generate", "gen"):
+        # Validate that content_dir is provided
+        if args.content_dir is None:
+            print(
+                "Error: content_dir is required. Specify it on the command line or in the config file.",
+                file=sys.stderr,
+            )
+            return 1
+
         # Validate inputs
         if not args.content_dir.exists():
             print(
