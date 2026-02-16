@@ -4,8 +4,37 @@ from pathlib import Path
 
 import pytest
 
-from blogmore.generator import SiteGenerator, paginate_posts, sanitize_for_url
+from blogmore.generator import (
+    SiteGenerator,
+    normalize_site_url,
+    paginate_posts,
+    sanitize_for_url,
+)
 from blogmore.parser import Post
+
+
+class TestNormalizeSiteUrl:
+    """Test the normalize_site_url function."""
+
+    def test_normalize_no_trailing_slash(self) -> None:
+        """Test normalizing URL without trailing slash."""
+        assert normalize_site_url("https://example.com") == "https://example.com"
+
+    def test_normalize_with_trailing_slash(self) -> None:
+        """Test normalizing URL with trailing slash."""
+        assert normalize_site_url("https://example.com/") == "https://example.com"
+
+    def test_normalize_multiple_trailing_slashes(self) -> None:
+        """Test normalizing URL with multiple trailing slashes."""
+        assert normalize_site_url("https://example.com///") == "https://example.com"
+
+    def test_normalize_empty_string(self) -> None:
+        """Test normalizing empty string."""
+        assert normalize_site_url("") == ""
+
+    def test_normalize_just_slash(self) -> None:
+        """Test normalizing just a slash."""
+        assert normalize_site_url("/") == ""
 
 
 class TestSanitizeForUrl:
@@ -91,6 +120,21 @@ class TestSiteGenerator:
         assert generator.content_dir == posts_dir
         assert generator.output_dir == temp_output_dir
         assert generator.site_title == "Test Blog"
+        assert generator.site_url == "https://example.com"
+
+    def test_init_normalizes_trailing_slash(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that SiteGenerator normalizes site_url with trailing slash."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_title="Test Blog",
+            site_url="https://example.com/",
+        )
+
+        # Trailing slash should be removed
         assert generator.site_url == "https://example.com"
 
     def test_init_with_custom_templates(

@@ -11,6 +11,19 @@ from blogmore.parser import Post
 FEEDS_DIR = "feeds"
 
 
+def normalize_site_url(site_url: str) -> str:
+    """
+    Normalize a site URL by removing trailing slashes.
+
+    Args:
+        site_url: The site URL to normalize
+
+    Returns:
+        The normalized site URL without trailing slash, or empty string if empty
+    """
+    return site_url.rstrip("/") if site_url else ""
+
+
 def create_feed_generator(
     site_title: str,
     site_url: str,
@@ -22,7 +35,7 @@ def create_feed_generator(
 
     Args:
         site_title: Title of the blog site
-        site_url: Base URL of the site
+        site_url: Base URL of the site (will be normalized to remove trailing slash)
         feed_url: Full URL to this feed
         description: Optional description for the feed
 
@@ -30,6 +43,8 @@ def create_feed_generator(
         Configured FeedGenerator instance
     """
     fg = FeedGen()
+    # Normalize site_url to remove trailing slash
+    site_url = normalize_site_url(site_url)
     # Use a fallback URL if site_url is empty
     base_url = site_url if site_url else "https://example.com"
     fg.id(base_url)
@@ -50,9 +65,11 @@ def add_post_to_feed(fg: FeedGen, post: Post, site_url: str) -> None:
     Args:
         fg: FeedGenerator instance
         post: Post to add to the feed
-        site_url: Base URL of the site
+        site_url: Base URL of the site (will be normalized to remove trailing slash)
     """
     fe = fg.add_entry()
+    # Normalize site_url to remove trailing slash
+    site_url = normalize_site_url(site_url)
     # Use a fallback URL if site_url is empty
     base_url = site_url if site_url else "https://example.com"
     fe.id(f"{base_url}{post.url}")
@@ -170,12 +187,12 @@ class BlogFeedGenerator:
         Args:
             output_dir: Directory where feeds will be written
             site_title: Title of the blog site
-            site_url: Base URL of the site
+            site_url: Base URL of the site (will be normalized to remove trailing slash)
             max_posts: Maximum number of posts per feed (default: 20)
         """
         self.output_dir = output_dir
         self.site_title = site_title
-        self.site_url = site_url
+        self.site_url = normalize_site_url(site_url)
         self.max_posts = max_posts
 
     def _get_base_url(self) -> str:

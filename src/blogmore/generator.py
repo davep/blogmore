@@ -13,6 +13,19 @@ from blogmore.parser import Page, Post, PostParser, remove_date_prefix
 from blogmore.renderer import TemplateRenderer
 
 
+def normalize_site_url(site_url: str) -> str:
+    """
+    Normalize a site URL by removing trailing slashes.
+
+    Args:
+        site_url: The site URL to normalize
+
+    Returns:
+        The normalized site URL without trailing slash, or empty string if empty
+    """
+    return site_url.rstrip("/") if site_url else ""
+
+
 def sanitize_for_url(value: str) -> str:
     """
     Sanitize a string for safe use in URLs and filenames.
@@ -99,7 +112,7 @@ class SiteGenerator:
         self.templates_dir = templates_dir
         self.output_dir = output_dir
         self.site_title = site_title
-        self.site_url = site_url
+        self.site_url = normalize_site_url(site_url)
         self.posts_per_feed = posts_per_feed
 
         self.parser = PostParser()
