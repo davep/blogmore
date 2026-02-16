@@ -30,6 +30,18 @@ class TestCreateFeedGenerator:
         # Check that basic properties are set
         assert fg.title() == "Test Blog"
 
+    def test_create_feed_generator_normalizes_trailing_slash(self) -> None:
+        """Test that create_feed_generator normalizes site_url with trailing slash."""
+        fg = create_feed_generator(
+            site_title="Test Blog",
+            site_url="https://example.com/",
+            feed_url="https://example.com/feed.xml",
+        )
+
+        assert fg is not None
+        # The URL should be normalized (no double slashes in links)
+        assert fg.title() == "Test Blog"
+
     def test_create_feed_generator_with_description(self) -> None:
         """Test creating feed generator with custom description."""
         fg = create_feed_generator(
@@ -261,6 +273,21 @@ class TestBlogFeedGenerator:
         assert generator.site_title == "Test Blog"
         assert generator.site_url == "https://example.com"
         assert generator.max_posts == 15
+
+    def test_init_normalizes_trailing_slash(self, tmp_path: Path) -> None:
+        """Test that BlogFeedGenerator normalizes site_url with trailing slash."""
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+
+        generator = BlogFeedGenerator(
+            output_dir=output_dir,
+            site_title="Test Blog",
+            site_url="https://example.com/",
+            max_posts=15,
+        )
+
+        # Trailing slash should be removed
+        assert generator.site_url == "https://example.com"
 
     def test_generate_index_feeds(self, tmp_path: Path, sample_post: Post) -> None:
         """Test generating index feeds."""

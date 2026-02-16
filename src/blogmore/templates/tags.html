@@ -9,7 +9,7 @@
     {% if tags %}
     <div class="tag-cloud">
         {% for tag_info in tags %}
-        <a href="{{ site_url }}/{{ tag_dir }}/{{ tag_info.safe_tag }}.html" 
+        <a href="/{{ tag_dir }}/{{ tag_info.safe_tag }}.html" 
            class="tag-cloud-item" 
            style="font-size: {{ tag_info.font_size }}em;"
            title="{{ tag_info.count }} post{% if tag_info.count != 1 %}s{% endif %}">

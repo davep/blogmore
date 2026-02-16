@@ -11,6 +11,7 @@ from typing import Any
 from blogmore.feeds import BlogFeedGenerator
 from blogmore.parser import Page, Post, PostParser, remove_date_prefix
 from blogmore.renderer import TemplateRenderer
+from blogmore.utils import normalize_site_url
 
 
 def sanitize_for_url(value: str) -> str:
@@ -99,7 +100,7 @@ class SiteGenerator:
         self.templates_dir = templates_dir
         self.output_dir = output_dir
         self.site_title = site_title
-        self.site_url = site_url
+        self.site_url = normalize_site_url(site_url)
         self.posts_per_feed = posts_per_feed
 
         self.parser = PostParser()

@@ -6,6 +6,7 @@ from pathlib import Path
 from feedgen.feed import FeedGenerator as FeedGen  # type: ignore[import-untyped]
 
 from blogmore.parser import Post
+from blogmore.utils import normalize_site_url
 
 # Directory for feed files (excluding main RSS feed which is at root)
 FEEDS_DIR = "feeds"
@@ -22,16 +23,23 @@ def create_feed_generator(
 
     Args:
         site_title: Title of the blog site
-        site_url: Base URL of the site
+        site_url: Base URL of the site (will be normalized to remove trailing slash)
         feed_url: Full URL to this feed
         description: Optional description for the feed
 
     Returns:
         Configured FeedGenerator instance
+
+    Note:
+        This function normalizes site_url internally for defense in depth,
+        even though callers like SiteGenerator and BlogFeedGenerator already
+        normalize it. This ensures correct behavior when called directly.
     """
     fg = FeedGen()
+    # Normalize site_url to remove trailing slash (defense in depth)
+    normalized_site_url = normalize_site_url(site_url)
     # Use a fallback URL if site_url is empty
-    base_url = site_url if site_url else "https://example.com"
+    base_url = normalized_site_url if normalized_site_url else "https://example.com"
     fg.id(base_url)
     fg.title(site_title)
     # IMPORTANT: Order matters! The last link becomes the channel <link> in RSS.
@@ -50,11 +58,18 @@ def add_post_to_feed(fg: FeedGen, post: Post, site_url: str) -> None:
     Args:
         fg: FeedGenerator instance
         post: Post to add to the feed
-        site_url: Base URL of the site
+        site_url: Base URL of the site (will be normalized to remove trailing slash)
+
+    Note:
+        This function normalizes site_url internally for defense in depth,
+        even though callers like BlogFeedGenerator already normalize it.
+        This ensures correct behavior when called directly.
     """
     fe = fg.add_entry()
+    # Normalize site_url to remove trailing slash (defense in depth)
+    normalized_site_url = normalize_site_url(site_url)
     # Use a fallback URL if site_url is empty
-    base_url = site_url if site_url else "https://example.com"
+    base_url = normalized_site_url if normalized_site_url else "https://example.com"
     fe.id(f"{base_url}{post.url}")
     fe.title(post.title)
     fe.link(href=f"{base_url}{post.url}")
@@ -170,12 +185,12 @@ class BlogFeedGenerator:
         Args:
             output_dir: Directory where feeds will be written
             site_title: Title of the blog site
-            site_url: Base URL of the site
+            site_url: Base URL of the site (will be normalized to remove trailing slash)
             max_posts: Maximum number of posts per feed (default: 20)
         """
         self.output_dir = output_dir
         self.site_title = site_title
-        self.site_url = site_url
+        self.site_url = normalize_site_url(site_url)
         self.max_posts = max_posts
 
     def _get_base_url(self) -> str:

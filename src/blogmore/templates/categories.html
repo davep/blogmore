@@ -9,7 +9,7 @@
     {% if categories %}
     <div class="tag-cloud">
         {% for category_info in categories %}
-        <a href="{{ site_url }}/{{ category_dir }}/{{ category_info.safe_category }}.html" 
+        <a href="/{{ category_dir }}/{{ category_info.safe_category }}.html" 
            class="tag-cloud-item" 
            style="font-size: {{ category_info.font_size }}em;"
            title="{{ category_info.count }} post{% if category_info.count != 1 %}s{% endif %}">

@@ -93,6 +93,21 @@ class TestSiteGenerator:
         assert generator.site_title == "Test Blog"
         assert generator.site_url == "https://example.com"
 
+    def test_init_normalizes_trailing_slash(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that SiteGenerator normalizes site_url with trailing slash."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_title="Test Blog",
+            site_url="https://example.com/",
+        )
+
+        # Trailing slash should be removed
+        assert generator.site_url == "https://example.com"
+
     def test_init_with_custom_templates(
         self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
     ) -> None:
