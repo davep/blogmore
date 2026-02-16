@@ -713,7 +713,6 @@ class TestConfigFileIntegration:
         monkeypatch.chdir(work_dir)
 
         # Create temp directory in home for testing
-        import os
         home_temp = Path.home() / ".blogmore-test-temp"
         home_temp.mkdir(exist_ok=True)
         output_dir = home_temp / "output"
@@ -748,7 +747,6 @@ class TestConfigFileIntegration:
         self, posts_dir: Path, tmp_path: Path
     ) -> None:
         """Test that tilde paths from CLI are properly expanded."""
-        import os
         home_temp = Path.home() / ".blogmore-test-temp2"
         home_temp.mkdir(exist_ok=True)
         output_dir = home_temp / "output"
