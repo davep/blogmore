@@ -8,6 +8,10 @@
     - include_article_tags: Boolean to include article-specific OG tags (default: false)
 #}
 
+{# Set default values for optional parameters #}
+{% set include_keywords = include_keywords | default(false) %}
+{% set include_article_tags = include_article_tags | default(false) %}
+
 {# Standard SEO meta tags #}
 {% if item.metadata and item.metadata.get('author') %}
 <meta name="author" content="{{ item.metadata.get('author') }}">
