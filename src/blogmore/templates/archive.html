@@ -41,16 +41,15 @@
             {% set year = post.date.year %}
             {% set month = post.date.month %}
             {% set month_name = post.date.strftime('%B') %}
-            {% set year_key = year|string %}
             {% set month_key = '%02d'|format(month) %}
             
-            {% if year_key not in ns.years %}
-                {% set _ = ns.years.update({year_key: {}}) %}
+            {% if year not in ns.years %}
+                {% set _ = ns.years.update({year: {}}) %}
             {% endif %}
-            {% if month_key not in ns.years[year_key] %}
-                {% set _ = ns.years[year_key].update({month_key: {'name': month_name, 'posts': []}}) %}
+            {% if month_key not in ns.years[year] %}
+                {% set _ = ns.years[year].update({month_key: {'name': month_name, 'posts': []}}) %}
             {% endif %}
-            {% set _ = ns.years[year_key][month_key]['posts'].append(post) %}
+            {% set _ = ns.years[year][month_key]['posts'].append(post) %}
         {% endif %}
     {% endfor %}
     
@@ -64,6 +63,7 @@
             
             <ul class="archive-post-list">
             {% for post in ns.years[year][month_key]['posts'] %}
+                {% set safe_tags = post.safe_tags() %}
                 <li>
                     <a href="{{ post.url }}" class="post-title">{{ post.title }}</a>
                     {% if post.category %}
@@ -74,7 +74,7 @@
                     {% if post.tags %}
                     <span class="archive-metadata">
                         {% for tag in post.tags %}
-                        <a href="/{{ tag_dir }}/{{ post.safe_tags()[loop.index0] }}.html" class="tag">{{ tag }}</a>{% if not loop.last %}, {% endif %}
+                        <a href="/{{ tag_dir }}/{{ safe_tags[loop.index0] }}.html" class="tag">{{ tag }}</a>{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     </span>
                     {% endif %}
