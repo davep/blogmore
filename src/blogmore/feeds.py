@@ -29,9 +29,14 @@ def create_feed_generator(
 
     Returns:
         Configured FeedGenerator instance
+
+    Note:
+        This function normalizes site_url internally for defense in depth,
+        even though callers like SiteGenerator and BlogFeedGenerator already
+        normalize it. This ensures correct behavior when called directly.
     """
     fg = FeedGen()
-    # Normalize site_url to remove trailing slash
+    # Normalize site_url to remove trailing slash (defense in depth)
     normalized_site_url = normalize_site_url(site_url)
     # Use a fallback URL if site_url is empty
     base_url = normalized_site_url if normalized_site_url else "https://example.com"
@@ -54,9 +59,14 @@ def add_post_to_feed(fg: FeedGen, post: Post, site_url: str) -> None:
         fg: FeedGenerator instance
         post: Post to add to the feed
         site_url: Base URL of the site (will be normalized to remove trailing slash)
+
+    Note:
+        This function normalizes site_url internally for defense in depth,
+        even though callers like BlogFeedGenerator already normalize it.
+        This ensures correct behavior when called directly.
     """
     fe = fg.add_entry()
-    # Normalize site_url to remove trailing slash
+    # Normalize site_url to remove trailing slash (defense in depth)
     normalized_site_url = normalize_site_url(site_url)
     # Use a fallback URL if site_url is empty
     base_url = normalized_site_url if normalized_site_url else "https://example.com"
