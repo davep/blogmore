@@ -10,6 +10,8 @@ import frontmatter  # type: ignore[import-untyped]
 import markdown
 import yaml
 
+from blogmore.utils import calculate_reading_time
+
 
 def sanitize_for_url(value: str) -> str:
     """
@@ -180,8 +182,6 @@ class Post:
         Returns:
             Estimated reading time in minutes (minimum 1 minute)
         """
-        from blogmore.utils import calculate_reading_time
-
         return calculate_reading_time(self.content)
 
 
