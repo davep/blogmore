@@ -58,7 +58,7 @@ def main() -> int:
                 file=sys.stderr,
             )
             return 1
-        
+
         # Validate inputs
         if not args.content_dir.exists():
             print(
