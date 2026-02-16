@@ -9,6 +9,7 @@ from blogmore.parser import (
     Page,
     Post,
     PostParser,
+    extract_first_paragraph,
     remove_date_prefix,
     sanitize_for_url,
 )
@@ -64,6 +65,70 @@ class TestRemoveDatePrefix:
     def test_remove_date_prefix_partial_date(self) -> None:
         """Test that partial dates don't match."""
         assert remove_date_prefix("2024-01-my-post") == "2024-01-my-post"
+
+
+class TestExtractFirstParagraph:
+    """Test the extract_first_paragraph function."""
+
+    def test_extract_simple_paragraph(self) -> None:
+        """Test extracting a simple paragraph."""
+        content = "This is the first paragraph.\n\nThis is the second paragraph."
+        assert extract_first_paragraph(content) == "This is the first paragraph."
+
+    def test_extract_multiline_paragraph(self) -> None:
+        """Test extracting a paragraph that spans multiple lines."""
+        content = "This is the first line.\nThis is the second line.\n\nSecond paragraph."
+        assert (
+            extract_first_paragraph(content)
+            == "This is the first line. This is the second line."
+        )
+
+    def test_skip_image_markdown(self) -> None:
+        """Test that markdown images are skipped."""
+        content = "![Alt text](image.jpg)\n\nThis is the first paragraph."
+        assert extract_first_paragraph(content) == "This is the first paragraph."
+
+    def test_skip_image_html(self) -> None:
+        """Test that HTML img tags are skipped."""
+        content = '<img src="image.jpg">\n\nThis is the first paragraph.'
+        assert extract_first_paragraph(content) == "This is the first paragraph."
+
+    def test_skip_heading(self) -> None:
+        """Test that headings are skipped."""
+        content = "# Main Heading\n\nThis is the first paragraph."
+        assert extract_first_paragraph(content) == "This is the first paragraph."
+
+    def test_remove_markdown_formatting(self) -> None:
+        """Test that markdown formatting is removed."""
+        content = "This is **bold** and *italic* and `code` and [link](url)."
+        assert (
+            extract_first_paragraph(content)
+            == "This is bold and italic and code and link."
+        )
+
+    def test_stop_at_heading(self) -> None:
+        """Test that extraction stops at a heading after paragraph."""
+        content = "First paragraph.\n\n## Second Heading\n\nSecond paragraph."
+        assert extract_first_paragraph(content) == "First paragraph."
+
+    def test_empty_content(self) -> None:
+        """Test with empty content."""
+        assert extract_first_paragraph("") == ""
+
+    def test_only_images(self) -> None:
+        """Test with only images."""
+        content = "![Image 1](img1.jpg)\n![Image 2](img2.jpg)"
+        assert extract_first_paragraph(content) == ""
+
+    def test_paragraph_after_multiple_images(self) -> None:
+        """Test extracting paragraph after multiple images."""
+        content = "![Image 1](img1.jpg)\n![Image 2](img2.jpg)\n\nFirst paragraph here."
+        assert extract_first_paragraph(content) == "First paragraph here."
+
+    def test_code_block_stops_extraction(self) -> None:
+        """Test that code blocks stop extraction if we have content."""
+        content = "First paragraph.\n\n```python\ncode here\n```"
+        assert extract_first_paragraph(content) == "First paragraph."
 
 
 class TestPost:
@@ -133,6 +198,50 @@ class TestPost:
         )
         assert post.safe_tags() == ["c", "web-dev"]
 
+    def test_description_from_metadata(self) -> None:
+        """Test that description from metadata is used when present."""
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content="This is the first paragraph of content.",
+            html_content="<p>This is the first paragraph of content.</p>",
+            metadata={"description": "Custom description from frontmatter"},
+        )
+        assert post.description == "Custom description from frontmatter"
+
+    def test_description_from_content(self) -> None:
+        """Test that first paragraph is used when no description in metadata."""
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content="This is the first paragraph.\n\nThis is the second paragraph.",
+            html_content="<p>Test</p>",
+            metadata={},
+        )
+        assert post.description == "This is the first paragraph."
+
+    def test_description_from_content_no_metadata(self) -> None:
+        """Test that first paragraph is used when metadata is None."""
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content="First paragraph here.\n\nSecond paragraph.",
+            html_content="<p>Test</p>",
+            metadata=None,
+        )
+        assert post.description == "First paragraph here."
+
+    def test_description_skips_images(self) -> None:
+        """Test that description extraction skips images."""
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content="![Image](img.jpg)\n\nThis is the first paragraph.",
+            html_content="<p>Test</p>",
+            metadata={},
+        )
+        assert post.description == "This is the first paragraph."
+
 
 class TestPage:
     """Test the Page dataclass."""
@@ -144,6 +253,28 @@ class TestPage:
     def test_page_url(self, sample_page: Page) -> None:
         """Test URL generation for page."""
         assert sample_page.url == "/about.html"
+
+    def test_description_from_metadata(self) -> None:
+        """Test that description from metadata is used when present."""
+        page = Page(
+            path=Path("test.md"),
+            title="Test",
+            content="This is the first paragraph of content.",
+            html_content="<p>This is the first paragraph of content.</p>",
+            metadata={"description": "Custom description from frontmatter"},
+        )
+        assert page.description == "Custom description from frontmatter"
+
+    def test_description_from_content(self) -> None:
+        """Test that first paragraph is used when no description in metadata."""
+        page = Page(
+            path=Path("test.md"),
+            title="Test",
+            content="This is the first paragraph.\n\nThis is the second paragraph.",
+            html_content="<p>Test</p>",
+            metadata={},
+        )
+        assert page.description == "This is the first paragraph."
 
 
 class TestPostParser:

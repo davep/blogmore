@@ -45,6 +45,72 @@ def remove_date_prefix(slug: str) -> str:
     return re.sub(r"^\d{4}-\d{2}-\d{2}-", "", slug)
 
 
+def extract_first_paragraph(content: str) -> str:
+    """
+    Extract the first paragraph from markdown content.
+
+    Skips images and empty lines to find the first text paragraph.
+    Removes markdown formatting for a clean description.
+
+    Args:
+        content: The markdown content to extract from
+
+    Returns:
+        The first paragraph as plain text, or empty string if none found
+    """
+    lines = content.strip().split("\n")
+    paragraph_lines: list[str] = []
+    in_paragraph = False
+
+    for line in lines:
+        stripped = line.strip()
+
+        # Skip empty lines before we start collecting
+        if not in_paragraph and not stripped:
+            continue
+
+        # Skip markdown image syntax
+        if stripped.startswith("!["):
+            continue
+
+        # Skip HTML img tags
+        if stripped.startswith("<img"):
+            continue
+
+        # If we hit a heading, code block, or other special syntax, stop if we have content
+        if (
+            stripped.startswith("#")
+            or stripped.startswith("```")
+            or stripped.startswith("---")
+        ):
+            if paragraph_lines:
+                break
+            continue
+
+        # If we have an empty line and we're in a paragraph, we've reached the end
+        if not stripped and in_paragraph:
+            break
+
+        # If we have content, add it
+        if stripped:
+            in_paragraph = True
+            paragraph_lines.append(stripped)
+
+    # Join the lines and clean up markdown formatting
+    paragraph = " ".join(paragraph_lines)
+
+    # Remove common markdown formatting
+    # Remove links but keep text: [text](url) -> text
+    paragraph = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", paragraph)
+    # Remove bold/italic: **text** or *text* -> text
+    paragraph = re.sub(r"\*\*([^\*]+)\*\*", r"\1", paragraph)
+    paragraph = re.sub(r"\*([^\*]+)\*", r"\1", paragraph)
+    # Remove inline code: `code` -> code
+    paragraph = re.sub(r"`([^`]+)`", r"\1", paragraph)
+
+    return paragraph.strip()
+
+
 @dataclass
 class Post:
     """Represents a blog post with metadata and content."""
@@ -91,6 +157,21 @@ class Post:
             return [sanitize_for_url(tag) for tag in self.tags]
         return []
 
+    @property
+    def description(self) -> str:
+        """
+        Get the description for the post.
+
+        Returns the description from metadata if present, otherwise
+        extracts and returns the first paragraph from the content.
+
+        Returns:
+            The post description as a string
+        """
+        if self.metadata and self.metadata.get("description"):
+            return str(self.metadata.get("description"))
+        return extract_first_paragraph(self.content)
+
 
 @dataclass
 class Page:
@@ -111,6 +192,21 @@ class Page:
     def url(self) -> str:
         """Generate the URL path for the page."""
         return f"/{self.slug}.html"
+
+    @property
+    def description(self) -> str:
+        """
+        Get the description for the page.
+
+        Returns the description from metadata if present, otherwise
+        extracts and returns the first paragraph from the content.
+
+        Returns:
+            The page description as a string
+        """
+        if self.metadata and self.metadata.get("description"):
+            return str(self.metadata.get("description"))
+        return extract_first_paragraph(self.content)
 
 
 class PostParser:
