@@ -366,10 +366,44 @@ class TestTemplateRenderer:
         assert '<meta property="og:title" content="Minimal Post">' in html
         assert '<meta property="og:type" content="article">' in html
 
+        # Description should be auto-generated from content
+        assert '<meta name="description" content="Test content">' in html
+        assert '<meta property="og:description" content="Test content">' in html
+        assert '<meta name="twitter:description" content="Test content">' in html
+
         # Should not have optional tags
         assert '<meta name="author"' not in html
-        assert '<meta name="description"' not in html
         assert '<meta property="og:image"' not in html
+
+    def test_render_post_auto_description_from_content(self) -> None:
+        """Test that description is auto-generated from post content."""
+        renderer = TemplateRenderer()
+        post = Post(
+            path=Path("test.md"),
+            title="Test Post",
+            content="![Image](cover.jpg)\n\nThis is the first paragraph with some **bold** text.\n\nThis is the second paragraph.",
+            html_content="<p>Test content</p>",
+            date=dt.datetime(2024, 3, 1, 10, 0, 0, tzinfo=dt.UTC),
+            metadata={},
+        )
+
+        html = renderer.render_post(
+            post, site_title="Test Blog", site_url="https://example.com"
+        )
+
+        # Description should skip image and extract first paragraph with formatting removed
+        assert (
+            '<meta name="description" content="This is the first paragraph with some bold text.">'
+            in html
+        )
+        assert (
+            '<meta property="og:description" content="This is the first paragraph with some bold text.">'
+            in html
+        )
+        assert (
+            '<meta name="twitter:description" content="This is the first paragraph with some bold text.">'
+            in html
+        )
 
     def test_render_page_seo_meta_tags(self) -> None:
         """Test that SEO meta tags are rendered correctly for pages."""
