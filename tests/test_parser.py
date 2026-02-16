@@ -221,22 +221,24 @@ class TestPostParser:
         parser = PostParser()
         posts = parser.parse_directory(posts_dir, include_drafts=False)
 
-        # Should have 4 posts (excluding draft)
-        assert len(posts) == 4
+        # Should have 6 posts (excluding draft)
+        assert len(posts) == 6
         # Posts should be sorted by date (newest first)
-        assert posts[0].title == "SEO Test Post"  # 2024-03-01
-        assert posts[1].title == "My First Post"  # 2024-01-15
-        assert posts[2].title == "Complex Post with Many Features"  # 2024-01-10
+        assert posts[0].title == "Test Post with Relative Cover No Slash"  # 2024-04-02
+        assert posts[1].title == "Test Post with Relative Cover"  # 2024-04-01
+        assert posts[2].title == "SEO Test Post"  # 2024-03-01
+        assert posts[3].title == "My First Post"  # 2024-01-15
+        assert posts[4].title == "Complex Post with Many Features"  # 2024-01-10
         # Post without date should be last
-        assert posts[3].title == "Post Without Date"
+        assert posts[5].title == "Post Without Date"
 
     def test_parse_directory_include_drafts(self, posts_dir: Path) -> None:
         """Test parsing directory including drafts."""
         parser = PostParser()
         posts = parser.parse_directory(posts_dir, include_drafts=True)
 
-        # Should have 5 posts (including draft)
-        assert len(posts) == 5
+        # Should have 7 posts (including draft)
+        assert len(posts) == 7
 
     def test_parse_directory_not_found(self) -> None:
         """Test parsing non-existent directory raises FileNotFoundError."""

@@ -373,3 +373,87 @@ class TestTemplateRenderer:
         assert '<meta name="twitter:card" content="summary_large_image">' in html
         assert '<meta name="twitter:title" content="About Page">' in html
         assert '<meta name="twitter:creator" content="@janesmith">' in html
+
+    def test_render_post_with_relative_cover_absolute_path(self) -> None:
+        """Test that posts with relative cover paths (starting with /) are rendered with site_url."""
+        renderer = TemplateRenderer()
+        post = Post(
+            path=Path("test.md"),
+            title="Test Post",
+            content="Test content",
+            html_content="<p>Test content</p>",
+            date=dt.datetime(2024, 3, 1, 10, 0, 0, tzinfo=dt.UTC),
+            metadata={
+                "cover": "/images/cover.jpg",
+            },
+        )
+
+        html = renderer.render_post(
+            post, site_title="Test Blog", site_url="https://example.com"
+        )
+
+        # Check that site_url is prepended to relative path
+        assert (
+            '<meta property="og:image" content="https://example.com/images/cover.jpg">'
+            in html
+        )
+        assert (
+            '<meta name="twitter:image" content="https://example.com/images/cover.jpg">'
+            in html
+        )
+
+    def test_render_post_with_relative_cover_no_slash(self) -> None:
+        """Test that posts with relative cover paths (no leading /) are rendered with site_url/."""
+        renderer = TemplateRenderer()
+        post = Post(
+            path=Path("test.md"),
+            title="Test Post",
+            content="Test content",
+            html_content="<p>Test content</p>",
+            date=dt.datetime(2024, 3, 1, 10, 0, 0, tzinfo=dt.UTC),
+            metadata={
+                "cover": "images/cover.jpg",
+            },
+        )
+
+        html = renderer.render_post(
+            post, site_title="Test Blog", site_url="https://example.com"
+        )
+
+        # Check that site_url/ is prepended to relative path
+        assert (
+            '<meta property="og:image" content="https://example.com/images/cover.jpg">'
+            in html
+        )
+        assert (
+            '<meta name="twitter:image" content="https://example.com/images/cover.jpg">'
+            in html
+        )
+
+    def test_render_post_with_fully_qualified_cover(self) -> None:
+        """Test that posts with fully-qualified cover URLs are used as-is."""
+        renderer = TemplateRenderer()
+        post = Post(
+            path=Path("test.md"),
+            title="Test Post",
+            content="Test content",
+            html_content="<p>Test content</p>",
+            date=dt.datetime(2024, 3, 1, 10, 0, 0, tzinfo=dt.UTC),
+            metadata={
+                "cover": "https://cdn.example.com/images/cover.jpg",
+            },
+        )
+
+        html = renderer.render_post(
+            post, site_title="Test Blog", site_url="https://example.com"
+        )
+
+        # Check that fully-qualified URL is used as-is
+        assert (
+            '<meta property="og:image" content="https://cdn.example.com/images/cover.jpg">'
+            in html
+        )
+        assert (
+            '<meta name="twitter:image" content="https://cdn.example.com/images/cover.jpg">'
+            in html
+        )
