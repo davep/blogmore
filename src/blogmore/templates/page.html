@@ -3,41 +3,11 @@
 {% block title %}{{ page.title }} - {{ site_title }}{% endblock %}
 
 {% block meta_tags %}
-    {# Standard SEO meta tags #}
-    {% if page.metadata and page.metadata.get('author') %}
-    <meta name="author" content="{{ page.metadata.get('author') }}">
-    {% endif %}
-    {% if page.metadata and page.metadata.get('description') %}
-    <meta name="description" content="{{ page.metadata.get('description') }}">
-    {% endif %}
-
-    {# Open Graph meta tags #}
-    <meta property="og:title" content="{{ page.title }}">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ site_url }}{{ page.url }}">
-    {% if page.metadata and page.metadata.get('description') %}
-    <meta property="og:description" content="{{ page.metadata.get('description') }}">
-    {% endif %}
-    <meta property="og:site_name" content="{{ site_title }}">
-    {% if page.metadata and page.metadata.get('cover') %}
-    <meta property="og:image" content="{{ page.metadata.get('cover') }}">
-    {% endif %}
-
-    {# Twitter Card meta tags #}
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ page.title }}">
-    {% if page.metadata and page.metadata.get('description') %}
-    <meta name="twitter:description" content="{{ page.metadata.get('description') }}">
-    {% endif %}
-    {% if page.metadata and page.metadata.get('cover') %}
-    <meta name="twitter:image" content="{{ page.metadata.get('cover') }}">
-    {% endif %}
-    {% if page.metadata and page.metadata.get('twitter_creator') %}
-    <meta name="twitter:creator" content="{{ page.metadata.get('twitter_creator') }}">
-    {% endif %}
-    {% if page.metadata and page.metadata.get('twitter_site') %}
-    <meta name="twitter:site" content="{{ page.metadata.get('twitter_site') }}">
-    {% endif %}
+    {% set item = page %}
+    {% set content_type = "website" %}
+    {% set include_keywords = false %}
+    {% set include_article_tags = false %}
+    {% include "meta_tags.html" %}
 {% endblock %}
 
 {% block content %}
