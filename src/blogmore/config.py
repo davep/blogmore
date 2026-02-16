@@ -1,0 +1,112 @@
+"""Configuration file loading and merging for blogmore."""
+
+from pathlib import Path
+from typing import Any
+
+import yaml
+
+
+DEFAULT_CONFIG_FILES = ["blogmore.yaml", "blogmore.yml"]
+
+
+def load_config(config_path: Path | None = None) -> dict[str, Any]:
+    """
+    Load configuration from a YAML file.
+
+    If no config_path is provided, searches for default config files
+    (blogmore.yaml, blogmore.yml) in the current directory.
+
+    Args:
+        config_path: Optional path to a specific configuration file
+
+    Returns:
+        Dictionary containing configuration values, or empty dict if no config found
+    """
+    # If a specific config file is provided, use it
+    if config_path is not None:
+        if not config_path.exists():
+            raise FileNotFoundError(f"Config file not found: {config_path}")
+        return _load_yaml_file(config_path)
+
+    # Otherwise, search for default config files
+    for config_file in DEFAULT_CONFIG_FILES:
+        config_file_path = Path(config_file)
+        if config_file_path.exists():
+            return _load_yaml_file(config_file_path)
+
+    # No config file found
+    return {}
+
+
+def _load_yaml_file(path: Path) -> dict[str, Any]:
+    """
+    Load and parse a YAML file.
+
+    Args:
+        path: Path to the YAML file
+
+    Returns:
+        Dictionary containing the parsed YAML content
+    """
+    with open(path, "r") as f:
+        content = yaml.safe_load(f)
+        # Handle empty files or files with only comments
+        if content is None:
+            return {}
+        if not isinstance(content, dict):
+            raise ValueError(f"Config file must contain a YAML dictionary, got {type(content).__name__}")
+        return content
+
+
+def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
+    """
+    Merge configuration file values with command-line arguments.
+
+    Command-line arguments take precedence over configuration file values.
+    Updates the args namespace in-place with values from config where
+    CLI arguments have their default values.
+
+    Args:
+        config: Dictionary containing configuration file values
+        args: argparse Namespace containing command-line arguments
+    """
+    # Define defaults for each argument to determine if CLI value was explicitly set
+    defaults = {
+        "site_title": "My Blog",
+        "site_url": "",
+        "output": Path("output"),
+        "templates": None,
+        "include_drafts": False,
+        "posts_per_feed": 20,
+        "extra_stylesheets": None,
+        "port": 8000,
+        "no_watch": False,
+        "content_dir": None,
+    }
+
+    # For each config key, update args if the arg value is still at its default
+    for config_key, config_value in config.items():
+        # Skip if this isn't a recognized config key
+        if config_key not in defaults:
+            continue
+
+        # Skip if args doesn't have this attribute (e.g., port not in build command)
+        if not hasattr(args, config_key):
+            continue
+
+        arg_value = getattr(args, config_key)
+        default_value = defaults[config_key]
+
+        # Check if the argument is still at its default value
+        if arg_value == default_value:
+            # Convert path strings to Path objects
+            if config_key in ("content_dir", "templates", "output"):
+                setattr(args, config_key, Path(config_value))
+            # Handle extra_stylesheets specially
+            elif config_key == "extra_stylesheets":
+                if isinstance(config_value, list):
+                    setattr(args, config_key, config_value)
+                elif isinstance(config_value, str):
+                    setattr(args, config_key, [config_value])
+            else:
+                setattr(args, config_key, config_value)
