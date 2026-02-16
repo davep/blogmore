@@ -5,7 +5,6 @@ from typing import Any
 
 import yaml
 
-
 DEFAULT_CONFIG_FILES = ["blogmore.yaml", "blogmore.yml"]
 
 
@@ -48,13 +47,15 @@ def _load_yaml_file(path: Path) -> dict[str, Any]:
     Returns:
         Dictionary containing the parsed YAML content
     """
-    with open(path, "r") as f:
+    with open(path) as f:
         content = yaml.safe_load(f)
         # Handle empty files or files with only comments
         if content is None:
             return {}
         if not isinstance(content, dict):
-            raise ValueError(f"Config file must contain a YAML dictionary, got {type(content).__name__}")
+            raise ValueError(
+                f"Config file must contain a YAML dictionary, got {type(content).__name__}"
+            )
         return content
 
 
