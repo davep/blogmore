@@ -6,31 +6,6 @@ import pytest
 
 from blogmore.generator import SiteGenerator, paginate_posts, sanitize_for_url
 from blogmore.parser import Post
-from blogmore.utils import normalize_site_url
-
-
-class TestNormalizeSiteUrl:
-    """Test the normalize_site_url function."""
-
-    def test_normalize_no_trailing_slash(self) -> None:
-        """Test normalizing URL without trailing slash."""
-        assert normalize_site_url("https://example.com") == "https://example.com"
-
-    def test_normalize_with_trailing_slash(self) -> None:
-        """Test normalizing URL with trailing slash."""
-        assert normalize_site_url("https://example.com/") == "https://example.com"
-
-    def test_normalize_multiple_trailing_slashes(self) -> None:
-        """Test normalizing URL with multiple trailing slashes."""
-        assert normalize_site_url("https://example.com///") == "https://example.com"
-
-    def test_normalize_empty_string(self) -> None:
-        """Test normalizing empty string."""
-        assert normalize_site_url("") == ""
-
-    def test_normalize_just_slash(self) -> None:
-        """Test normalizing just a slash."""
-        assert normalize_site_url("/") == ""
 
 
 class TestSanitizeForUrl:

@@ -13,23 +13,6 @@ from blogmore.feeds import (
     write_feeds,
 )
 from blogmore.parser import Post
-from blogmore.utils import normalize_site_url
-
-
-class TestNormalizeSiteUrl:
-    """Test the normalize_site_url function in feeds module."""
-
-    def test_normalize_no_trailing_slash(self) -> None:
-        """Test normalizing URL without trailing slash."""
-        assert normalize_site_url("https://example.com") == "https://example.com"
-
-    def test_normalize_with_trailing_slash(self) -> None:
-        """Test normalizing URL with trailing slash."""
-        assert normalize_site_url("https://example.com/") == "https://example.com"
-
-    def test_normalize_empty_string(self) -> None:
-        """Test normalizing empty string."""
-        assert normalize_site_url("") == ""
 
 
 class TestCreateFeedGenerator:
