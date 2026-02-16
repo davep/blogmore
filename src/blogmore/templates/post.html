@@ -2,6 +2,68 @@
 
 {% block title %}{{ post.title }} - {{ site_title }}{% endblock %}
 
+{% block meta_tags %}
+    {# Standard SEO meta tags #}
+    {% if post.metadata and post.metadata.get('author') %}
+    <meta name="author" content="{{ post.metadata.get('author') }}">
+    {% endif %}
+    {% if post.metadata and post.metadata.get('description') %}
+    <meta name="description" content="{{ post.metadata.get('description') }}">
+    {% endif %}
+    {% if post.tags %}
+    <meta name="keywords" content="{{ post.tags|join(', ') }}">
+    {% endif %}
+
+    {# Open Graph meta tags #}
+    <meta property="og:title" content="{{ post.title }}">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{ site_url }}{{ post.url }}">
+    {% if post.metadata and post.metadata.get('description') %}
+    <meta property="og:description" content="{{ post.metadata.get('description') }}">
+    {% endif %}
+    <meta property="og:site_name" content="{{ site_title }}">
+    {% if post.metadata and post.metadata.get('cover') %}
+    <meta property="og:image" content="{{ post.metadata.get('cover') }}">
+    {% endif %}
+
+    {# Article-specific Open Graph tags #}
+    {% if post.date %}
+    <meta property="article:published_time" content="{{ post.date.isoformat() }}">
+    {% endif %}
+    {% if post.metadata and post.metadata.get('modified') %}
+    <meta property="article:modified_time" content="{{ post.metadata.get('modified') }}">
+    {% elif post.date %}
+    <meta property="article:modified_time" content="{{ post.date.isoformat() }}">
+    {% endif %}
+    {% if post.metadata and post.metadata.get('author') %}
+    <meta property="article:author" content="{{ post.metadata.get('author') }}">
+    {% endif %}
+    {% if post.category %}
+    <meta property="article:section" content="{{ post.category }}">
+    {% endif %}
+    {% if post.tags %}
+    {% for tag in post.tags %}
+    <meta property="article:tag" content="{{ tag }}">
+    {% endfor %}
+    {% endif %}
+
+    {# Twitter Card meta tags #}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ post.title }}">
+    {% if post.metadata and post.metadata.get('description') %}
+    <meta name="twitter:description" content="{{ post.metadata.get('description') }}">
+    {% endif %}
+    {% if post.metadata and post.metadata.get('cover') %}
+    <meta name="twitter:image" content="{{ post.metadata.get('cover') }}">
+    {% endif %}
+    {% if post.metadata and post.metadata.get('twitter_creator') %}
+    <meta name="twitter:creator" content="{{ post.metadata.get('twitter_creator') }}">
+    {% endif %}
+    {% if post.metadata and post.metadata.get('twitter_site') %}
+    <meta name="twitter:site" content="{{ post.metadata.get('twitter_site') }}">
+    {% endif %}
+{% endblock %}
+
 {% block content %}
 <article class="post">
     <header class="post-header">

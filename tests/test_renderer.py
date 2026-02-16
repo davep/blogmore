@@ -239,3 +239,137 @@ class TestTemplateRenderer:
         html = renderer.render_post(sample_post, site_title="Test Blog")
 
         assert sample_post.title in html
+
+    def test_render_post_seo_meta_tags(self) -> None:
+        """Test that SEO meta tags are rendered correctly for posts."""
+        renderer = TemplateRenderer()
+        post = Post(
+            path=Path("test.md"),
+            title="SEO Test Post",
+            content="Test content",
+            html_content="<p>Test content</p>",
+            date=dt.datetime(2024, 3, 1, 10, 0, 0, tzinfo=dt.UTC),
+            category="testing",
+            tags=["seo", "meta-tags"],
+            metadata={
+                "author": "John Doe",
+                "description": "A test post for SEO",
+                "cover": "https://example.com/cover.jpg",
+                "modified": "2024-03-02T15:30:00+00:00",
+                "twitter_creator": "@johndoe",
+                "twitter_site": "@myblog",
+            },
+        )
+
+        html = renderer.render_post(
+            post, site_title="Test Blog", site_url="https://example.com"
+        )
+
+        # Check standard SEO meta tags
+        assert '<meta name="author" content="John Doe">' in html
+        assert '<meta name="description" content="A test post for SEO">' in html
+        assert '<meta name="keywords" content="seo, meta-tags">' in html
+
+        # Check Open Graph meta tags
+        assert '<meta property="og:title" content="SEO Test Post">' in html
+        assert '<meta property="og:type" content="article">' in html
+        assert (
+            '<meta property="og:url" content="https://example.com/2024/03/01/test.html">'
+            in html
+        )
+        assert (
+            '<meta property="og:description" content="A test post for SEO">' in html
+        )
+        assert '<meta property="og:site_name" content="Test Blog">' in html
+        assert (
+            '<meta property="og:image" content="https://example.com/cover.jpg">'
+            in html
+        )
+
+        # Check article-specific Open Graph tags
+        assert '<meta property="article:published_time"' in html
+        assert '<meta property="article:modified_time"' in html
+        assert '<meta property="article:author" content="John Doe">' in html
+        assert '<meta property="article:section" content="testing">' in html
+        assert '<meta property="article:tag" content="seo">' in html
+        assert '<meta property="article:tag" content="meta-tags">' in html
+
+        # Check Twitter Card meta tags
+        assert '<meta name="twitter:card" content="summary_large_image">' in html
+        assert '<meta name="twitter:title" content="SEO Test Post">' in html
+        assert (
+            '<meta name="twitter:description" content="A test post for SEO">' in html
+        )
+        assert (
+            '<meta name="twitter:image" content="https://example.com/cover.jpg">'
+            in html
+        )
+        assert '<meta name="twitter:creator" content="@johndoe">' in html
+        assert '<meta name="twitter:site" content="@myblog">' in html
+
+    def test_render_post_minimal_meta_tags(self) -> None:
+        """Test that posts without optional metadata still render correctly."""
+        renderer = TemplateRenderer()
+        post = Post(
+            path=Path("minimal.md"),
+            title="Minimal Post",
+            content="Test content",
+            html_content="<p>Test content</p>",
+            date=dt.datetime(2024, 3, 1, 10, 0, 0, tzinfo=dt.UTC),
+            metadata={},
+        )
+
+        html = renderer.render_post(
+            post, site_title="Test Blog", site_url="https://example.com"
+        )
+
+        # Should still have basic Open Graph tags
+        assert '<meta property="og:title" content="Minimal Post">' in html
+        assert '<meta property="og:type" content="article">' in html
+
+        # Should not have optional tags
+        assert '<meta name="author"' not in html
+        assert '<meta name="description"' not in html
+        assert '<meta property="og:image"' not in html
+
+    def test_render_page_seo_meta_tags(self) -> None:
+        """Test that SEO meta tags are rendered correctly for pages."""
+        renderer = TemplateRenderer()
+        page = Page(
+            path=Path("about.md"),
+            title="About Page",
+            content="Test content",
+            html_content="<p>Test content</p>",
+            metadata={
+                "author": "Jane Smith",
+                "description": "About this site",
+                "cover": "https://example.com/page-cover.jpg",
+                "twitter_creator": "@janesmith",
+            },
+        )
+
+        html = renderer.render_page(
+            page, site_title="Test Blog", site_url="https://example.com"
+        )
+
+        # Check standard SEO meta tags
+        assert '<meta name="author" content="Jane Smith">' in html
+        assert '<meta name="description" content="About this site">' in html
+
+        # Check Open Graph meta tags
+        assert '<meta property="og:title" content="About Page">' in html
+        assert '<meta property="og:type" content="website">' in html
+        assert (
+            '<meta property="og:url" content="https://example.com/about.html">'
+            in html
+        )
+        assert '<meta property="og:description" content="About this site">' in html
+        assert (
+            '<meta property="og:image" content="https://example.com/page-cover.jpg">'
+            in html
+        )
+
+        # Check Twitter Card meta tags
+        assert '<meta name="twitter:card" content="summary_large_image">' in html
+        assert '<meta name="twitter:title" content="About Page">' in html
+        assert '<meta name="twitter:creator" content="@janesmith">' in html

@@ -221,21 +221,22 @@ class TestPostParser:
         parser = PostParser()
         posts = parser.parse_directory(posts_dir, include_drafts=False)
 
-        # Should have 3 posts (excluding draft)
-        assert len(posts) == 3
+        # Should have 4 posts (excluding draft)
+        assert len(posts) == 4
         # Posts should be sorted by date (newest first)
-        assert posts[0].title == "My First Post"  # 2024-01-15
-        assert posts[1].title == "Complex Post with Many Features"  # 2024-01-10
+        assert posts[0].title == "SEO Test Post"  # 2024-03-01
+        assert posts[1].title == "My First Post"  # 2024-01-15
+        assert posts[2].title == "Complex Post with Many Features"  # 2024-01-10
         # Post without date should be last
-        assert posts[2].title == "Post Without Date"
+        assert posts[3].title == "Post Without Date"
 
     def test_parse_directory_include_drafts(self, posts_dir: Path) -> None:
         """Test parsing directory including drafts."""
         parser = PostParser()
         posts = parser.parse_directory(posts_dir, include_drafts=True)
 
-        # Should have 4 posts (including draft)
-        assert len(posts) == 4
+        # Should have 5 posts (including draft)
+        assert len(posts) == 5
 
     def test_parse_directory_not_found(self) -> None:
         """Test parsing non-existent directory raises FileNotFoundError."""
@@ -272,8 +273,10 @@ class TestPostParser:
         parser = PostParser()
         pages = parser.parse_pages_directory(pages_dir)
 
-        assert len(pages) == 1
+        assert len(pages) == 2
+        # Pages should be sorted alphabetically
         assert pages[0].title == "About Me"
+        assert pages[1].title == "SEO Test Page"
 
     def test_parse_pages_directory_not_found(self) -> None:
         """Test parsing non-existent pages directory returns empty list."""
