@@ -1,6 +1,5 @@
 app     := blogmore
 src     := src/
-lib     := blogmore
 reports := .reports
 run     := uv run
 sync    := uv sync --group dev --group test
@@ -12,7 +11,7 @@ lint    := $(ruff) check
 fmt     := $(ruff) format
 mypy    := $(run) mypy
 spell   := $(run) codespell
-test    := $(run) pytest --verbose --cov=$(lib)
+test    := $(run) pytest --verbose --cov=$(app)
 coverage := $(test) --cov-report html:$(reports)/html
 
 ##############################################################################
