@@ -10,6 +10,7 @@ lint    := $(ruff) check
 fmt     := $(ruff) format
 mypy    := $(run) mypy
 spell   := $(run) codespell
+test    := $(run) pytest
 
 ##############################################################################
 # Setup/update packages the system requires.
@@ -31,6 +32,22 @@ resetup: realclean		# Recreate the virtual environment from scratch
 
 ##############################################################################
 # Checking/testing/linting/etc.
+.PHONY: test
+test:				# Run the test suite
+	$(test)
+
+.PHONY: test-verbose
+test-verbose:			# Run tests with verbose output
+	$(test) -v
+
+.PHONY: test-coverage
+test-coverage:			# Run tests with coverage report
+	$(test) --cov-report=term-missing
+
+.PHONY: test-watch
+test-watch:			# Run tests in watch mode
+	$(test) -f
+
 .PHONY: lint
 lint:				# Check the code for linting issues
 	$(lint) $(src)
@@ -52,7 +69,7 @@ spellcheck:			# Spell check the code
 	$(spell) *.md $(src)
 
 .PHONY: checkall
-checkall: spellcheck codestyle lint stricttypecheck # Check all the things
+checkall: spellcheck codestyle lint stricttypecheck test # Check all the things
 
 ##############################################################################
 # Package/publish.
