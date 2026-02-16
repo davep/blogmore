@@ -4,13 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from blogmore.generator import (
-    SiteGenerator,
-    normalize_site_url,
-    paginate_posts,
-    sanitize_for_url,
-)
+from blogmore.generator import SiteGenerator, paginate_posts, sanitize_for_url
 from blogmore.parser import Post
+from blogmore.utils import normalize_site_url
 
 
 class TestNormalizeSiteUrl:

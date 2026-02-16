@@ -11,19 +11,7 @@ from typing import Any
 from blogmore.feeds import BlogFeedGenerator
 from blogmore.parser import Page, Post, PostParser, remove_date_prefix
 from blogmore.renderer import TemplateRenderer
-
-
-def normalize_site_url(site_url: str) -> str:
-    """
-    Normalize a site URL by removing trailing slashes.
-
-    Args:
-        site_url: The site URL to normalize
-
-    Returns:
-        The normalized site URL without trailing slash, or empty string if empty
-    """
-    return site_url.rstrip("/") if site_url else ""
+from blogmore.utils import normalize_site_url
 
 
 def sanitize_for_url(value: str) -> str:

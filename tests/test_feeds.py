@@ -10,10 +10,10 @@ from blogmore.feeds import (
     add_post_to_feed,
     create_feed_generator,
     generate_feed,
-    normalize_site_url,
     write_feeds,
 )
 from blogmore.parser import Post
+from blogmore.utils import normalize_site_url
 
 
 class TestNormalizeSiteUrl:

@@ -6,22 +6,10 @@ from pathlib import Path
 from feedgen.feed import FeedGenerator as FeedGen  # type: ignore[import-untyped]
 
 from blogmore.parser import Post
+from blogmore.utils import normalize_site_url
 
 # Directory for feed files (excluding main RSS feed which is at root)
 FEEDS_DIR = "feeds"
-
-
-def normalize_site_url(site_url: str) -> str:
-    """
-    Normalize a site URL by removing trailing slashes.
-
-    Args:
-        site_url: The site URL to normalize
-
-    Returns:
-        The normalized site URL without trailing slash, or empty string if empty
-    """
-    return site_url.rstrip("/") if site_url else ""
 
 
 def create_feed_generator(
@@ -44,9 +32,9 @@ def create_feed_generator(
     """
     fg = FeedGen()
     # Normalize site_url to remove trailing slash
-    site_url = normalize_site_url(site_url)
+    normalized_site_url = normalize_site_url(site_url)
     # Use a fallback URL if site_url is empty
-    base_url = site_url if site_url else "https://example.com"
+    base_url = normalized_site_url if normalized_site_url else "https://example.com"
     fg.id(base_url)
     fg.title(site_title)
     # IMPORTANT: Order matters! The last link becomes the channel <link> in RSS.
@@ -69,9 +57,9 @@ def add_post_to_feed(fg: FeedGen, post: Post, site_url: str) -> None:
     """
     fe = fg.add_entry()
     # Normalize site_url to remove trailing slash
-    site_url = normalize_site_url(site_url)
+    normalized_site_url = normalize_site_url(site_url)
     # Use a fallback URL if site_url is empty
-    base_url = site_url if site_url else "https://example.com"
+    base_url = normalized_site_url if normalized_site_url else "https://example.com"
     fe.id(f"{base_url}{post.url}")
     fe.title(post.title)
     fe.link(href=f"{base_url}{post.url}")
