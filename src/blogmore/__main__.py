@@ -1,6 +1,5 @@
 """Command-line interface for blogmore."""
 
-import argparse
 import http.server
 import socketserver
 import sys
@@ -11,6 +10,7 @@ from pathlib import Path
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
+from blogmore.cli import create_parser
 from blogmore.generator import SiteGenerator
 
 
@@ -232,277 +232,11 @@ def serve_site(
 
 def main() -> int:
     """Main entry point for the blogmore CLI."""
-    # Check if first argument looks like a subcommand
-    import sys as sys_module
-
-    has_subcommand = len(sys_module.argv) > 1 and sys_module.argv[1] in (
-        "generate",
-        "gen",
-        "build",
-        "serve",
-        "-h",
-        "--help",
-        "--version",
-    )
-
-    if not has_subcommand:
-        # Legacy mode: assume direct path to content directory
-        parser = argparse.ArgumentParser(
-            description="Blogmore - A blog-oriented static site generation engine",
-            formatter_class=argparse.RawDescriptionHelpFormatter,
-            epilog="For more options, use: blogmore generate --help",
-        )
-
-        parser.add_argument(
-            "content_dir",
-            type=Path,
-            help="Directory containing markdown blog posts",
-        )
-
-        parser.add_argument(
-            "-t",
-            "--templates",
-            type=Path,
-            default=None,
-            help="Optional directory containing custom Jinja2 templates (uses bundled templates by default)",
-        )
-
-        parser.add_argument(
-            "-o",
-            "--output",
-            type=Path,
-            default=Path("output"),
-            help="Output directory for generated site (default: output)",
-        )
-
-        parser.add_argument(
-            "--site-title",
-            default="My Blog",
-            help="Title of the blog site (default: My Blog)",
-        )
-
-        parser.add_argument(
-            "--site-url",
-            default="",
-            help="Base URL of the site (optional)",
-        )
-
-        parser.add_argument(
-            "--include-drafts",
-            action="store_true",
-            help="Include posts marked as drafts",
-        )
-
-        parser.add_argument(
-            "--posts-per-feed",
-            type=int,
-            default=20,
-            help="Maximum number of posts to include in feeds (default: 20)",
-        )
-
-        parser.add_argument(
-            "--extra-stylesheet",
-            action="append",
-            dest="extra_stylesheets",
-            help="URL of an additional stylesheet to include (can be used multiple times)",
-        )
-
-        parser.add_argument(
-            "--version",
-            action="version",
-            version="blogmore 0.1.0",
-        )
-
-        args = parser.parse_args()
-
-        # Validate inputs
-        if not args.content_dir.exists():
-            print(
-                f"Error: Content directory not found: {args.content_dir}",
-                file=sys.stderr,
-            )
-            return 1
-
-        # Validate templates directory if provided
-        if args.templates is not None and not args.templates.exists():
-            print(
-                f"Error: Templates directory not found: {args.templates}",
-                file=sys.stderr,
-            )
-            return 1
-
-        # Generate the site
-        try:
-            generator = SiteGenerator(
-                content_dir=args.content_dir,
-                templates_dir=args.templates,
-                output_dir=args.output,
-                site_title=args.site_title,
-                site_url=args.site_url,
-                posts_per_feed=args.posts_per_feed,
-                extra_stylesheets=args.extra_stylesheets,
-            )
-            generator.generate(include_drafts=args.include_drafts)
-            return 0
-        except Exception as e:
-            print(f"Error generating site: {e}", file=sys.stderr)
-            return 1
-
-    # Subcommand mode
-    parser = argparse.ArgumentParser(
-        description="Blogmore - A blog-oriented static site generation engine",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-
-    # Add subparsers for different commands
-    subparsers = parser.add_subparsers(
-        dest="command", help="Command to run", required=True
-    )
-
-    # Generate command (default)
-    gen_parser = subparsers.add_parser(
-        "generate", help="Generate the static site (default)", aliases=["gen", "build"]
-    )
-
-    gen_parser.add_argument(
-        "content_dir",
-        type=Path,
-        help="Directory containing markdown blog posts",
-    )
-
-    gen_parser.add_argument(
-        "-t",
-        "--templates",
-        type=Path,
-        default=None,
-        help="Optional directory containing custom Jinja2 templates (uses bundled templates by default)",
-    )
-
-    gen_parser.add_argument(
-        "-o",
-        "--output",
-        type=Path,
-        default=Path("output"),
-        help="Output directory for generated site (default: output)",
-    )
-
-    gen_parser.add_argument(
-        "--site-title",
-        default="My Blog",
-        help="Title of the blog site (default: My Blog)",
-    )
-
-    gen_parser.add_argument(
-        "--site-url",
-        default="",
-        help="Base URL of the site (optional)",
-    )
-
-    gen_parser.add_argument(
-        "--include-drafts",
-        action="store_true",
-        help="Include posts marked as drafts",
-    )
-
-    gen_parser.add_argument(
-        "--posts-per-feed",
-        type=int,
-        default=20,
-        help="Maximum number of posts to include in feeds (default: 20)",
-    )
-
-    gen_parser.add_argument(
-        "--extra-stylesheet",
-        action="append",
-        dest="extra_stylesheets",
-        help="URL of an additional stylesheet to include (can be used multiple times)",
-    )
-
-    # Serve command
-    serve_parser = subparsers.add_parser(
-        "serve",
-        help="Generate (if needed) and serve the site locally, watching for changes",
-    )
-
-    serve_parser.add_argument(
-        "content_dir",
-        type=Path,
-        nargs="?",
-        help="Directory containing markdown blog posts (optional, triggers generation)",
-    )
-
-    serve_parser.add_argument(
-        "-t",
-        "--templates",
-        type=Path,
-        default=None,
-        help="Optional directory containing custom Jinja2 templates (uses bundled templates by default)",
-    )
-
-    serve_parser.add_argument(
-        "-o",
-        "--output",
-        type=Path,
-        default=Path("output"),
-        help="Output directory with generated site (default: output)",
-    )
-
-    serve_parser.add_argument(
-        "-p",
-        "--port",
-        type=int,
-        default=8000,
-        help="Port to serve on (default: 8000)",
-    )
-
-    serve_parser.add_argument(
-        "--site-title",
-        default="My Blog",
-        help="Title of the blog site (default: My Blog)",
-    )
-
-    serve_parser.add_argument(
-        "--site-url",
-        default="",
-        help="Base URL of the site (optional)",
-    )
-
-    serve_parser.add_argument(
-        "--include-drafts",
-        action="store_true",
-        help="Include posts marked as drafts",
-    )
-
-    serve_parser.add_argument(
-        "--posts-per-feed",
-        type=int,
-        default=20,
-        help="Maximum number of posts to include in feeds (default: 20)",
-    )
-
-    serve_parser.add_argument(
-        "--extra-stylesheet",
-        action="append",
-        dest="extra_stylesheets",
-        help="URL of an additional stylesheet to include (can be used multiple times)",
-    )
-
-    serve_parser.add_argument(
-        "--no-watch",
-        action="store_true",
-        help="Disable watching for changes (default: watch enabled)",
-    )
-
-    parser.add_argument(
-        "--version",
-        action="version",
-        version="blogmore 0.1.0",
-    )
-
+    parser = create_parser()
     args = parser.parse_args()
 
     # Handle serve command
-    if args.command == "serve":
+    if args.command in ("serve", "test"):
         return serve_site(
             output_dir=args.output,
             port=args.port,
@@ -516,8 +250,8 @@ def main() -> int:
             extra_stylesheets=args.extra_stylesheets,
         )
 
-    # Handle generate command
-    if args.command in ("generate", "gen", "build"):
+    # Handle build command (and its aliases: generate, gen)
+    if args.command in ("build", "generate", "gen"):
         # Validate inputs
         if not args.content_dir.exists():
             print(
