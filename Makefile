@@ -13,7 +13,7 @@ fmt     := $(ruff) format
 mypy    := $(run) mypy
 spell   := $(run) codespell
 test    := $(run) pytest --verbose --cov=$(lib)
-coverage := $(test) --cov-report html:$(reports)
+coverage := $(test) --cov-report html:$(reports)/html
 
 ##############################################################################
 # Setup/update packages the system requires.
@@ -46,7 +46,7 @@ test-verbose:			# Run tests with verbose output
 .PHONY: coverage
 coverage:			# Produce a test coverage report
 	$(coverage)
-	open $(reports)/index.html
+	open $(reports)/html/index.html
 
 .PHONY: test-watch
 test-watch:			# Run tests in watch mode

@@ -108,7 +108,7 @@ addopts = [
     "--strict-config",
     "--cov=blogmore",
     "--cov-report=term-missing",
-    "--cov-report=html:.reports",
+    "--cov-report=html:.reports/html",
     "--cov-report=xml:.reports/coverage.xml",
 ]
 
