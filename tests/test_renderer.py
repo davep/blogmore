@@ -94,6 +94,24 @@ class TestTemplateRenderer:
         assert sample_post.title in html
         assert "Test Blog" in html
 
+    def test_render_index_default_feed_links(self, sample_post: Post) -> None:
+        """Test that index page has default RSS and Atom links."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=1,
+            total_pages=1,
+            site_title="Test Blog",
+            site_url="https://example.com",
+        )
+
+        # Check navigation links point to default feeds
+        assert 'href="/feed.xml"' in html
+        assert 'href="/feeds/all.atom.xml"' in html
+        # Check <link> tags in <head> also point to default feeds
+        assert 'href="https://example.com/feed.xml"' in html
+        assert 'href="https://example.com/feeds/all.atom.xml"' in html
+
     def test_render_index_with_pagination(self, sample_post: Post) -> None:
         """Test rendering index with pagination."""
         renderer = TemplateRenderer()
@@ -143,6 +161,27 @@ class TestTemplateRenderer:
 
         assert "python" in html
         assert sample_post.title in html
+
+    def test_render_category_page_feed_links(self, sample_post: Post) -> None:
+        """Test that category pages have category-specific RSS and Atom links."""
+        renderer = TemplateRenderer()
+        html = renderer.render_category_page(
+            category="Python",
+            posts=[sample_post],
+            site_title="Test Blog",
+            site_url="https://example.com",
+            safe_category="python",
+        )
+
+        # Check navigation links point to category feeds
+        assert 'href="/feeds/python.rss.xml"' in html
+        assert 'href="/feeds/python.atom.xml"' in html
+        # Check <link> tags in <head> also point to category feeds
+        assert 'href="https://example.com/feeds/python.rss.xml"' in html
+        assert 'href="https://example.com/feeds/python.atom.xml"' in html
+        # Make sure default feed links are NOT present
+        assert 'href="/feed.xml"' not in html
+        assert 'href="/feeds/all.atom.xml"' not in html
 
     def test_render_tags_page(self) -> None:
         """Test rendering the tags overview page."""
