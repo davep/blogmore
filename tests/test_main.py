@@ -6,11 +6,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from blogmore.__main__ import (
-    ContentChangeHandler,
-    main,
-    serve_site,
-)
+from blogmore.__main__ import main
+from blogmore.server import ContentChangeHandler, serve_site
 
 
 class TestContentChangeHandler:
@@ -102,8 +99,8 @@ class TestContentChangeHandler:
 class TestServeSite:
     """Test the serve_site function."""
 
-    @patch("blogmore.__main__.ReusingTCPServer")
-    @patch("blogmore.__main__.Observer")
+    @patch("blogmore.server.ReusingTCPServer")
+    @patch("blogmore.server.Observer")
     def test_serve_existing_output(
         self, mock_observer: MagicMock, mock_server: MagicMock, temp_output_dir: Path
     ) -> None:
@@ -125,8 +122,8 @@ class TestServeSite:
 
         assert result == 0
 
-    @patch("blogmore.__main__.ReusingTCPServer")
-    @patch("blogmore.__main__.Observer")
+    @patch("blogmore.server.ReusingTCPServer")
+    @patch("blogmore.server.Observer")
     def test_serve_with_generation(
         self,
         mock_observer: MagicMock,
@@ -173,7 +170,7 @@ class TestServeSite:
 
         assert result == 1
 
-    @patch("blogmore.__main__.ReusingTCPServer")
+    @patch("blogmore.server.ReusingTCPServer")
     def test_serve_port_in_use(
         self, mock_server: MagicMock, temp_output_dir: Path
     ) -> None:
