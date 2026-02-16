@@ -774,3 +774,65 @@ class TestConfigFileIntegration:
             import shutil
             if home_temp.exists():
                 shutil.rmtree(home_temp)
+
+    def test_main_build_with_content_dir_from_config_only(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Test build command with content_dir specified only in config file."""
+        # Create a work directory with config
+        work_dir = tmp_path / "work"
+        work_dir.mkdir()
+        monkeypatch.chdir(work_dir)
+
+        # Create config file with content_dir
+        config_file = work_dir / "blogmore.yaml"
+        config = {
+            "content_dir": str(posts_dir),
+            "output": str(temp_output_dir),
+            "site_title": "davep.org",
+            "site_url": "https://blog.davep.org",
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        # Run build command WITHOUT content_dir on command line
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build"],
+        ):
+            result = main()
+            assert result == 0
+            assert (temp_output_dir / "index.html").exists()
+            
+            # Verify that config was used by checking the output
+            with open(temp_output_dir / "index.html") as f:
+                content = f.read()
+                assert "davep.org" in content
+
+    def test_main_build_without_content_dir_fails(
+        self, temp_output_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Test that build command fails when content_dir is not provided."""
+        # Create a work directory with config
+        work_dir = tmp_path / "work"
+        work_dir.mkdir()
+        monkeypatch.chdir(work_dir)
+
+        # Create config file WITHOUT content_dir
+        config_file = work_dir / "blogmore.yaml"
+        config = {
+            "output": str(temp_output_dir),
+            "site_title": "Test Blog",
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        # Run build command WITHOUT content_dir
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build"],
+        ):
+            result = main()
+            assert result == 1  # Should fail
