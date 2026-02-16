@@ -258,21 +258,25 @@ class TestMainCLI:
             result = main()
             assert result == 0
 
-    def test_main_legacy_mode(self, posts_dir: Path, temp_output_dir: Path) -> None:
-        """Test legacy mode (direct path without subcommand)."""
-        with patch.object(
-            sys,
-            "argv",
-            [
-                "blogmore",
-                str(posts_dir),
-                "-o",
-                str(temp_output_dir),
-            ],
-        ):
-            result = main()
-            assert result == 0
-            assert (temp_output_dir / "index.html").exists()
+    def test_main_test_alias(self, posts_dir: Path, temp_output_dir: Path) -> None:
+        """Test 'test' alias for serve command."""
+        with patch("blogmore.__main__.serve_site") as mock_serve:
+            mock_serve.return_value = 0
+
+            with patch.object(
+                sys,
+                "argv",
+                [
+                    "blogmore",
+                    "test",
+                    str(posts_dir),
+                    "-o",
+                    str(temp_output_dir),
+                ],
+            ):
+                result = main()
+                assert result == 0
+                assert mock_serve.called
 
     def test_main_content_dir_not_found(self, temp_output_dir: Path) -> None:
         """Test with non-existent content directory."""
