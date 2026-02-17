@@ -5,8 +5,7 @@ from pathlib import Path
 
 
 def add_common_arguments(parser: argparse.ArgumentParser) -> None:
-    """
-    Add common arguments to a parser.
+    """Add common arguments to a parser.
 
     Args:
         parser: The argument parser to add arguments to
@@ -69,8 +68,7 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
 
 
 def create_parser() -> argparse.ArgumentParser:
-    """
-    Create and configure the argument parser for blogmore.
+    """Create and configure the argument parser for blogmore.
 
     Returns:
         Configured argument parser
