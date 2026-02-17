@@ -131,7 +131,7 @@ class SiteGenerator:
         # Apply default author to posts that don't have one
         if self.default_author:
             for post in posts:
-                if post.metadata and "author" not in post.metadata:
+                if post.metadata is not None and "author" not in post.metadata:
                     post.metadata["author"] = self.default_author
 
         # Parse all pages from the pages subdirectory

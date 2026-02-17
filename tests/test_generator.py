@@ -481,3 +481,37 @@ class TestSiteGenerator:
         content = post_file.read_text()
         assert '<meta name="author" content="John Doe">' in content
         assert "Default Author Name" not in content
+
+    def test_default_author_with_empty_metadata(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that default_author works with posts that have empty metadata dict."""
+        import datetime as dt
+
+        from blogmore.parser import Post
+
+        # Create a temporary content directory
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Create a markdown file
+        post_file = content_dir / "test.md"
+        post_file.write_text(
+            "---\ntitle: Test\ndate: 2024-01-01\n---\n\nContent"
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            default_author="Default Author",
+        )
+
+        # Generate and verify
+        generator.generate(include_drafts=False)
+
+        # Check that the post got the default author
+        output_file = temp_output_dir / "2024" / "01" / "01" / "test.html"
+        assert output_file.exists()
+        content = output_file.read_text()
+        assert '<meta name="author" content="Default Author">' in content
