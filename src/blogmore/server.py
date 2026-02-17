@@ -30,7 +30,15 @@ class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     This handler catches BrokenPipeError and ConnectionResetError exceptions
     that occur when clients disconnect before the server finishes sending data.
     This is common behavior in web servers and should not produce error traces.
+
+    Uses HTTP/1.1 to enable keep-alive connections, which significantly improves
+    performance in browsers like Safari that make many parallel requests.
     """
+
+    # Enable HTTP/1.1 for persistent connections (keep-alive)
+    # This prevents Safari from having to establish new TCP connections
+    # for every resource request, which was causing severe slowdowns.
+    protocol_version = "HTTP/1.1"
 
     def handle(self) -> None:
         """Handle a single HTTP request, catching connection errors."""
