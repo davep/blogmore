@@ -106,7 +106,7 @@ class SiteGenerator:
         self.default_author = default_author
         self.sidebar_config = sidebar_config or {}
 
-        self.parser = PostParser()
+        self.parser = PostParser(site_url=self.site_url)
         self.renderer = TemplateRenderer(templates_dir, extra_stylesheets)
 
     def _detect_favicon(self) -> str | None:

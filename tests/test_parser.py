@@ -512,3 +512,48 @@ class TestPostParser:
         assert "<p>" in post2.html_content
         # And they should be different
         assert post1.html_content != post2.html_content
+
+    def test_external_links_open_in_new_tab(self, tmp_path: Path) -> None:
+        """Test that external links get target='_blank' attribute."""
+        parser = PostParser(site_url="https://example.com")
+        post_file = tmp_path / "test-links.md"
+        post_file.write_text("""---
+title: Test Links
+---
+
+This post has [an external link](https://external.com) and 
+[an internal link](/posts/my-post) and 
+[an anchor link](#section).
+""")
+        post = parser.parse_file(post_file)
+
+        # External link should have target="_blank"
+        assert 'href="https://external.com"' in post.html_content
+        assert 'target="_blank"' in post.html_content
+        assert 'rel="noopener noreferrer"' in post.html_content
+
+        # Internal links should not have target="_blank"
+        assert 'href="/posts/my-post"' in post.html_content
+        assert post.html_content.count('target="_blank"') == 1  # Only external link
+
+    def test_external_links_without_site_url(self, tmp_path: Path) -> None:
+        """Test that external links work even without site_url configured."""
+        parser = PostParser()  # No site_url
+        post_file = tmp_path / "test-links.md"
+        post_file.write_text("""---
+title: Test Links
+---
+
+This post has [an external link](https://external.com) and 
+[a relative link](/posts/my-post).
+""")
+        post = parser.parse_file(post_file)
+
+        # External link should have target="_blank"
+        assert 'href="https://external.com"' in post.html_content
+        assert 'target="_blank"' in post.html_content
+
+        # Relative link should not have target="_blank"
+        assert 'href="/posts/my-post"' in post.html_content
+        # Only the external link should have target="_blank"
+        assert post.html_content.count('target="_blank"') == 1

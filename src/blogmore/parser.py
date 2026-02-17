@@ -10,6 +10,7 @@ import frontmatter  # type: ignore[import-untyped]
 import markdown
 import yaml
 
+from blogmore.external_links import ExternalLinksExtension
 from blogmore.utils import calculate_reading_time
 
 
@@ -218,8 +219,15 @@ class Page:
 class PostParser:
     """Parse markdown files with frontmatter into Post objects."""
 
-    def __init__(self) -> None:
-        """Initialize the parser with markdown extensions."""
+    def __init__(self, site_url: str | None = None) -> None:
+        """Initialize the parser with markdown extensions.
+
+        Args:
+            site_url: Optional base URL of the site for determining internal vs external links
+        """
+        # Create external links extension instance
+        external_links_ext = ExternalLinksExtension(site_url=site_url or "")
+
         self.markdown = markdown.Markdown(
             extensions=[
                 "meta",
@@ -228,6 +236,7 @@ class PostParser:
                 "tables",
                 "toc",
                 "footnotes",
+                external_links_ext,
             ],
             extension_configs={
                 "codehilite": {
