@@ -6,7 +6,12 @@ from unittest.mock import Mock
 import pytest
 import yaml
 
-from blogmore.config import DEFAULT_CONFIG_FILES, load_config, merge_config_with_args
+from blogmore.config import (
+    DEFAULT_CONFIG_FILES,
+    get_sidebar_config,
+    load_config,
+    merge_config_with_args,
+)
 
 
 class TestLoadConfig:
@@ -430,3 +435,79 @@ class TestPathExpansion:
         merge_config_with_args(config, args)
 
         assert args.default_author == "CLI Author"
+
+
+
+class TestGetSidebarConfig:
+    """Test the get_sidebar_config function."""
+
+    def test_extract_site_logo(self) -> None:
+        """Test extracting site_logo from config."""
+        config = {"site_logo": "/images/logo.png", "site_title": "My Blog"}
+        result = get_sidebar_config(config)
+        assert result == {"site_logo": "/images/logo.png"}
+
+    def test_extract_links(self) -> None:
+        """Test extracting links from config."""
+        config = {
+            "links": [
+                {"title": "GitHub", "url": "https://github.com"},
+                {"title": "Twitter", "url": "https://twitter.com"},
+            ]
+        }
+        result = get_sidebar_config(config)
+        assert result == {
+            "links": [
+                {"title": "GitHub", "url": "https://github.com"},
+                {"title": "Twitter", "url": "https://twitter.com"},
+            ]
+        }
+
+    def test_extract_socials(self) -> None:
+        """Test extracting socials from config."""
+        config = {
+            "socials": [
+                {"site": "mastodon", "url": "https://fosstodon.org/@user"},
+                {"site": "github", "url": "https://github.com/user"},
+            ]
+        }
+        result = get_sidebar_config(config)
+        assert result == {
+            "socials": [
+                {"site": "mastodon", "url": "https://fosstodon.org/@user"},
+                {"site": "github", "url": "https://github.com/user"},
+            ]
+        }
+
+    def test_extract_all_sidebar_options(self) -> None:
+        """Test extracting all sidebar options from config."""
+        config = {
+            "site_logo": "/images/logo.png",
+            "links": [{"title": "Home", "url": "/"}],
+            "socials": [{"site": "github", "url": "https://github.com"}],
+            "site_title": "My Blog",
+        }
+        result = get_sidebar_config(config)
+        assert result == {
+            "site_logo": "/images/logo.png",
+            "links": [{"title": "Home", "url": "/"}],
+            "socials": [{"site": "github", "url": "https://github.com"}],
+        }
+
+    def test_extract_from_empty_config(self) -> None:
+        """Test extracting from empty config returns empty dict."""
+        config = {}
+        result = get_sidebar_config(config)
+        assert result == {}
+
+    def test_extract_ignores_non_sidebar_options(self) -> None:
+        """Test that non-sidebar options are not included."""
+        config = {
+            "site_title": "My Blog",
+            "site_url": "https://example.com",
+            "site_logo": "/logo.png",
+        }
+        result = get_sidebar_config(config)
+        assert result == {"site_logo": "/logo.png"}
+        assert "site_title" not in result
+        assert "site_url" not in result

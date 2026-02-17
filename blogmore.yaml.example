@@ -30,6 +30,27 @@ posts_per_feed: 20
 #   - https://example.com/custom.css
 #   - /assets/extra.css
 
+# Optional: Site logo displayed in the sidebar (requires sidebar configuration)
+# site_logo: /images/logo.png
+
+# Optional: Links section in sidebar
+# links:
+#   - title: About
+#     url: /about.html
+#   - title: GitHub
+#     url: https://github.com/username
+#   - title: Contact
+#     url: /contact.html
+
+# Optional: Social media links in sidebar (displayed as Font Awesome brand icons)
+# socials:
+#   - site: mastodon
+#     url: https://fosstodon.org/@username
+#   - site: github
+#     url: https://github.com/username
+#   - site: lastfm
+#     url: https://www.last.fm/user/username
+
 # Serve-specific options (only used with 'blogmore serve' command)
 
 # Optional: Port for local server (default: 8000)
