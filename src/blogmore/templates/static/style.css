@@ -216,14 +216,23 @@ body {
 .main-wrapper {
     flex: 1;
     margin-left: 280px;
-    max-width: 800px;
+    max-width: calc(100vw - 280px - 40px);
+    width: 100%;
     padding: 20px;
+}
+
+/* Optimal width for main content when there's enough space */
+@media (min-width: 1120px) {
+    .main-wrapper {
+        max-width: 800px;
+    }
 }
 
 /* When no sidebar, use original layout */
 .site-container:not(:has(.sidebar)) .main-wrapper {
     margin-left: auto;
     margin-right: auto;
+    max-width: 800px;
 }
 
 /* Mobile layout */
