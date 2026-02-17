@@ -47,6 +47,7 @@ def main() -> int:
             watch=not args.no_watch,
             posts_per_feed=args.posts_per_feed,
             extra_stylesheets=args.extra_stylesheets,
+            default_author=args.default_author,
         )
 
     # Handle build command (and its aliases: generate, gen)
@@ -85,6 +86,7 @@ def main() -> int:
                 site_url=args.site_url,
                 posts_per_feed=args.posts_per_feed,
                 extra_stylesheets=args.extra_stylesheets,
+                default_author=args.default_author,
             )
             generator.generate(include_drafts=args.include_drafts)
             return 0

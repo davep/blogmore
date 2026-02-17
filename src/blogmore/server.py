@@ -111,6 +111,7 @@ def serve_site(
     watch: bool = True,
     posts_per_feed: int = 20,
     extra_stylesheets: list[str] | None = None,
+    default_author: str | None = None,
 ) -> int:
     """Serve the generated site locally using a simple HTTP server.
 
@@ -126,6 +127,7 @@ def serve_site(
         watch: Whether to watch for changes and regenerate (default: True)
         posts_per_feed: Maximum number of posts to include in feeds (default: 20)
         extra_stylesheets: Optional list of URLs for additional stylesheets
+        default_author: Default author name for posts without author in frontmatter
 
     Returns:
         Exit code
@@ -168,6 +170,7 @@ def serve_site(
                 site_url=site_url,
                 posts_per_feed=posts_per_feed,
                 extra_stylesheets=extra_stylesheets,
+                default_author=default_author,
             )
             generator.generate(include_drafts=include_drafts)
         except Exception as e:

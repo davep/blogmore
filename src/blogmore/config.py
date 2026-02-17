@@ -80,6 +80,7 @@ def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
         "port": 8000,
         "no_watch": False,
         "content_dir": None,
+        "default_author": None,
     }
 
     # For each config key, update args if the arg value is still at its default

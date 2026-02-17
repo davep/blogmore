@@ -406,3 +406,27 @@ class TestPathExpansion:
 
         assert args.content_dir == Path("posts")
         assert args.output == Path("site")
+
+    def test_merge_default_author_from_config(self) -> None:
+        """Test merging default_author from config file."""
+        from unittest.mock import Mock
+
+        config = {"default_author": "Jane Smith"}
+        args = Mock()
+        args.default_author = None
+
+        merge_config_with_args(config, args)
+
+        assert args.default_author == "Jane Smith"
+
+    def test_cli_default_author_overrides_config(self) -> None:
+        """Test that CLI default_author takes precedence over config."""
+        from unittest.mock import Mock
+
+        config = {"default_author": "Config Author"}
+        args = Mock()
+        args.default_author = "CLI Author"
+
+        merge_config_with_args(config, args)
+
+        assert args.default_author == "CLI Author"

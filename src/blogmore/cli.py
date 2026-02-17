@@ -66,6 +66,12 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
         help="URL of an additional stylesheet to include (can be used multiple times)",
     )
 
+    parser.add_argument(
+        "--default-author",
+        default=None,
+        help="Default author name for posts that don't specify an author",
+    )
+
 
 def create_parser() -> argparse.ArgumentParser:
     """Create and configure the argument parser for blogmore.
