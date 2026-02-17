@@ -2,6 +2,19 @@
 
 A blog-oriented static site generation engine built in Python.
 
+> [!IMPORTANT]
+
+> This project is built almost 100% using GitHub Copilot. Every other Python
+> project you will find in my repository is good old human-built code. This
+> project is the complete opposite: as much as possible I'm trying to write
+> no code at all as an experiment in getting to know how this process works,
+> how to recognise such code, and to understand those who use this process
+> every day to, in future, better guide them.
+>
+> If "AI written" is a huge red flag for you I suggest you avoid this
+> project; you'll find [plenty of other pure-davep-built projects via my
+> profile](https://github.com/davep).
+
 ## Features
 
 - Write everything in Markdown
