@@ -14,8 +14,7 @@ from blogmore.utils import calculate_reading_time
 
 
 def sanitize_for_url(value: str) -> str:
-    """
-    Sanitize a string for safe use in URLs and filenames.
+    """Sanitize a string for safe use in URLs and filenames.
 
     Args:
         value: The string to sanitize
@@ -35,8 +34,7 @@ def sanitize_for_url(value: str) -> str:
 
 
 def remove_date_prefix(slug: str) -> str:
-    """
-    Remove YYYY-MM-DD- date prefix from a slug if present.
+    """Remove YYYY-MM-DD- date prefix from a slug if present.
 
     Args:
         slug: The slug potentially containing a date prefix
@@ -48,8 +46,7 @@ def remove_date_prefix(slug: str) -> str:
 
 
 def extract_first_paragraph(content: str) -> str:
-    """
-    Extract the first paragraph from markdown content.
+    """Extract the first paragraph from markdown content.
 
     Skips images and empty lines to find the first text paragraph.
     Removes markdown formatting for a clean description.
@@ -161,8 +158,7 @@ class Post:
 
     @property
     def description(self) -> str:
-        """
-        Get the description for the post.
+        """Get the description for the post.
 
         Returns the description from metadata if present, otherwise
         extracts and returns the first paragraph from the content.
@@ -176,8 +172,7 @@ class Post:
 
     @property
     def reading_time(self) -> int:
-        """
-        Calculate the estimated reading time for this post in whole minutes.
+        """Calculate the estimated reading time for this post in whole minutes.
 
         Returns:
             Estimated reading time in minutes (minimum 1 minute)
@@ -207,8 +202,7 @@ class Page:
 
     @property
     def description(self) -> str:
-        """
-        Get the description for the page.
+        """Get the description for the page.
 
         Returns the description from metadata if present, otherwise
         extracts and returns the first paragraph from the content.
@@ -245,8 +239,7 @@ class PostParser:
         )
 
     def parse_file(self, path: Path) -> Post:
-        """
-        Parse a markdown file with frontmatter.
+        """Parse a markdown file with frontmatter.
 
         Args:
             path: Path to the markdown file
@@ -352,8 +345,7 @@ class PostParser:
     def parse_directory(
         self, directory: Path, include_drafts: bool = False
     ) -> list[Post]:
-        """
-        Parse all markdown files in a directory.
+        """Parse all markdown files in a directory.
 
         Args:
             directory: Directory containing markdown files
@@ -389,8 +381,7 @@ class PostParser:
         return posts
 
     def parse_page(self, path: Path) -> Page:
-        """
-        Parse a markdown file as a static page.
+        """Parse a markdown file as a static page.
 
         Args:
             path: Path to the markdown file
@@ -443,8 +434,7 @@ class PostParser:
         )
 
     def parse_pages_directory(self, directory: Path) -> list[Page]:
-        """
-        Parse all markdown files in a pages directory.
+        """Parse all markdown files in a pages directory.
 
         Args:
             directory: Directory containing page markdown files

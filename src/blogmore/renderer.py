@@ -24,8 +24,7 @@ class TemplateRenderer:
         templates_dir: Path | None = None,
         extra_stylesheets: list[str] | None = None,
     ) -> None:
-        """
-        Initialize the renderer with a templates directory.
+        """Initialize the renderer with a templates directory.
 
         Args:
             templates_dir: Optional path to a directory containing custom Jinja2 templates.
@@ -52,13 +51,14 @@ class TemplateRenderer:
         self.env.filters["format_date"] = self._format_date
 
     @staticmethod
-    def _format_date(date: dt.datetime | None, fmt: str = "%B %d, %Y %H:%M:%S") -> str:
-        """
-        Format a datetime object.
+    def _format_date(
+        date: dt.datetime | None, format_string: str = "%B %d, %Y %H:%M:%S"
+    ) -> str:
+        """Format a datetime object.
 
         Args:
             date: The datetime to format
-            fmt: The format string (default shows full date and time)
+            format_string: The format string (default shows full date and time)
 
         Returns:
             Formatted date string or empty string if date is None
@@ -67,7 +67,7 @@ class TemplateRenderer:
             return ""
 
         # Format the datetime
-        formatted = date.strftime(fmt)
+        formatted = date.strftime(format_string)
 
         # Add timezone information if available
         if date.tzinfo is not None:
@@ -85,8 +85,7 @@ class TemplateRenderer:
         return formatted
 
     def render_post(self, post: Post, **context: Any) -> str:
-        """
-        Render a single blog post.
+        """Render a single blog post.
 
         Args:
             post: The Post object to render
@@ -101,8 +100,7 @@ class TemplateRenderer:
         )
 
     def render_page(self, page: Page, **context: Any) -> str:
-        """
-        Render a single static page.
+        """Render a single static page.
 
         Args:
             page: The Page object to render
@@ -123,8 +121,7 @@ class TemplateRenderer:
         total_pages: int = 1,
         **context: Any,
     ) -> str:
-        """
-        Render the blog index/home page.
+        """Render the blog index/home page.
 
         Args:
             posts: List of Post objects to display
@@ -152,8 +149,7 @@ class TemplateRenderer:
         total_pages: int = 1,
         **context: Any,
     ) -> str:
-        """
-        Render the blog archive page.
+        """Render the blog archive page.
 
         Args:
             posts: List of Post objects to display
@@ -183,8 +179,7 @@ class TemplateRenderer:
         total_pages: int = 1,
         **context: Any,
     ) -> str:
-        """
-        Render a tag page showing posts with a specific tag.
+        """Render a tag page showing posts with a specific tag.
 
         Args:
             tag: The tag to display posts for
@@ -214,8 +209,7 @@ class TemplateRenderer:
         total_pages: int = 1,
         **context: Any,
     ) -> str:
-        """
-        Render a category page showing posts in a specific category.
+        """Render a category page showing posts in a specific category.
 
         Args:
             category: The category to display posts for
@@ -242,15 +236,10 @@ class TemplateRenderer:
         tags: list[dict[str, Any]],
         **context: Any,
     ) -> str:
-        """
-        Render the tags page showing all tags as a word cloud.
+        """Render the tags page showing all tags as a word cloud.
 
         Args:
-            tags: List of tag dictionaries with keys:
-                  - display_name: The tag display name
-                  - safe_tag: URL-safe version of the tag
-                  - count: Number of posts with this tag
-                  - font_size: Font size for word cloud effect
+            tags: List of tag dictionaries
             **context: Additional context variables
 
         Returns:
@@ -268,15 +257,10 @@ class TemplateRenderer:
         categories: list[dict[str, Any]],
         **context: Any,
     ) -> str:
-        """
-        Render the categories page showing all categories as a word cloud.
+        """Render the categories page showing all categories as a word cloud.
 
         Args:
-            categories: List of category dictionaries with keys:
-                  - display_name: The category display name
-                  - safe_category: URL-safe version of the category
-                  - count: Number of posts with this category
-                  - font_size: Font size for word cloud effect
+            categories: List of category dictionaries
             **context: Additional context variables
 
         Returns:
@@ -290,8 +274,7 @@ class TemplateRenderer:
         )
 
     def render_template(self, template_name: str, **context: Any) -> str:
-        """
-        Render an arbitrary template.
+        """Render an arbitrary template.
 
         Args:
             template_name: Name of the template file

@@ -52,7 +52,7 @@ class TestTemplateRenderer:
     def test_format_date_custom_format(self) -> None:
         """Test formatting with custom format string."""
         date = dt.datetime(2024, 1, 15, 14, 30, 0, tzinfo=dt.UTC)
-        formatted = TemplateRenderer._format_date(date, fmt="%Y-%m-%d")
+        formatted = TemplateRenderer._format_date(date, format_string="%Y-%m-%d")
         assert formatted.startswith("2024-01-15")
 
     def test_render_post(self, sample_post: Post) -> None:

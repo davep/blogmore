@@ -15,8 +15,7 @@ from blogmore.utils import normalize_site_url
 
 
 def sanitize_for_url(value: str) -> str:
-    """
-    Sanitize a string for safe use in URLs and filenames.
+    """Sanitize a string for safe use in URLs and filenames.
 
     Args:
         value: The string to sanitize
@@ -36,8 +35,7 @@ def sanitize_for_url(value: str) -> str:
 
 
 def paginate_posts(posts: list[Post], posts_per_page: int) -> list[list[Post]]:
-    """
-    Split a list of posts into pages.
+    """Split a list of posts into pages.
 
     Args:
         posts: List of posts to paginate
@@ -83,8 +81,7 @@ class SiteGenerator:
         posts_per_feed: int = 20,
         extra_stylesheets: list[str] | None = None,
     ) -> None:
-        """
-        Initialize the site generator.
+        """Initialize the site generator.
 
         Args:
             content_dir: Directory containing markdown posts
@@ -116,8 +113,7 @@ class SiteGenerator:
         }
 
     def generate(self, include_drafts: bool = False) -> None:
-        """
-        Generate the complete static site.
+        """Generate the complete static site.
 
         Args:
             include_drafts: Whether to include posts marked as drafts
@@ -456,8 +452,7 @@ class SiteGenerator:
     def _group_posts_by_tag(
         self, posts: list[Post]
     ) -> dict[str, tuple[str, list[Post]]]:
-        """
-        Group posts by tag (case-insensitive).
+        """Group posts by tag (case-insensitive).
 
         Args:
             posts: List of posts to group
@@ -672,8 +667,7 @@ class SiteGenerator:
     def _group_posts_by_category(
         self, posts: list[Post]
     ) -> dict[str, tuple[str, list[Post]]]:
-        """
-        Group posts by category (case-insensitive).
+        """Group posts by category (case-insensitive).
 
         Args:
             posts: List of posts to group
@@ -692,8 +686,7 @@ class SiteGenerator:
         return posts_by_category
 
     def _generate_feeds(self, posts: list[Post]) -> None:
-        """
-        Generate RSS and Atom feeds.
+        """Generate RSS and Atom feeds.
 
         Args:
             posts: List of all posts
@@ -805,8 +798,7 @@ class SiteGenerator:
             print(f"Warning: Failed to copy {failed_count} attachment(s)")
 
     def _copy_extras(self) -> None:
-        """
-        Copy extra files from the extras directory to the output directory.
+        """Copy extra files from the extras directory to the output directory.
 
         Files in the extras directory are copied to the output root, preserving
         directory structure relative to the extras directory. If a file would

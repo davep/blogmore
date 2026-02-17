@@ -9,8 +9,7 @@ DEFAULT_CONFIG_FILES = ["blogmore.yaml", "blogmore.yml"]
 
 
 def load_config(config_path: Path | None = None) -> dict[str, Any]:
-    """
-    Load configuration from a YAML file.
+    """Load configuration from a YAML file.
 
     If no config_path is provided, searches for default config files
     (blogmore.yaml, blogmore.yml) in the current directory.
@@ -38,8 +37,7 @@ def load_config(config_path: Path | None = None) -> dict[str, Any]:
 
 
 def _load_yaml_file(path: Path) -> dict[str, Any]:
-    """
-    Load and parse a YAML file.
+    """Load and parse a YAML file.
 
     Args:
         path: Path to the YAML file
@@ -60,8 +58,7 @@ def _load_yaml_file(path: Path) -> dict[str, Any]:
 
 
 def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
-    """
-    Merge configuration file values with command-line arguments.
+    """Merge configuration file values with command-line arguments.
 
     Command-line arguments take precedence over configuration file values.
     Updates the args namespace in-place with values from config where

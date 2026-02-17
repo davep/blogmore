@@ -4,8 +4,7 @@ import re
 
 
 def calculate_reading_time(content: str, words_per_minute: int = 200) -> int:
-    """
-    Calculate the estimated reading time for content in whole minutes.
+    """Calculate the estimated reading time for content in whole minutes.
 
     Uses the standard reading speed of 200 words per minute. Strips markdown
     formatting and counts only actual words to provide an accurate estimate.
@@ -50,8 +49,7 @@ def calculate_reading_time(content: str, words_per_minute: int = 200) -> int:
 
 
 def normalize_site_url(site_url: str) -> str:
-    """
-    Normalize a site URL by removing trailing slashes.
+    """Normalize a site URL by removing trailing slashes.
 
     This function ensures consistent URL handling by stripping trailing slashes
     from site URLs. This prevents double slashes in generated URLs when paths

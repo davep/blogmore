@@ -51,8 +51,7 @@ class ContentChangeHandler(FileSystemEventHandler):
         include_drafts: bool = False,
         debounce_seconds: float = 0.5,
     ) -> None:
-        """
-        Initialize the content change handler.
+        """Initialize the content change handler.
 
         Args:
             generator: The site generator to use for regeneration
@@ -67,8 +66,7 @@ class ContentChangeHandler(FileSystemEventHandler):
         self._regenerate_lock = threading.Lock()
 
     def on_any_event(self, event: FileSystemEvent) -> None:
-        """
-        Handle any file system event.
+        """Handle any file system event.
 
         Args:
             event: The file system event
@@ -114,8 +112,7 @@ def serve_site(
     posts_per_feed: int = 20,
     extra_stylesheets: list[str] | None = None,
 ) -> int:
-    """
-    Serve the generated site locally using a simple HTTP server.
+    """Serve the generated site locally using a simple HTTP server.
 
     Args:
         output_dir: Directory containing the generated site
