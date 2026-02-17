@@ -51,6 +51,12 @@ blogmore = "blogmore.__main__:main"
 requires = ["uv_build>=0.9.4"]
 build-backend = "uv_build"
 
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
+
 [tool.uv]
 package = true
 
