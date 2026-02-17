@@ -3,7 +3,7 @@
 import sys
 
 from blogmore.cli import create_parser
-from blogmore.config import load_config, merge_config_with_args
+from blogmore.config import get_sidebar_config, load_config, merge_config_with_args
 from blogmore.generator import SiteGenerator
 from blogmore.server import serve_site
 
@@ -27,6 +27,7 @@ def main() -> int:
     try:
         config = load_config(args.config if hasattr(args, "config") else None)
         merge_config_with_args(config, args)
+        sidebar_config = get_sidebar_config(config)
     except FileNotFoundError as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1
@@ -48,6 +49,7 @@ def main() -> int:
             posts_per_feed=args.posts_per_feed,
             extra_stylesheets=args.extra_stylesheets,
             default_author=args.default_author,
+            sidebar_config=sidebar_config,
         )
 
     # Handle build command (and its aliases: generate, gen)
@@ -87,6 +89,7 @@ def main() -> int:
                 posts_per_feed=args.posts_per_feed,
                 extra_stylesheets=args.extra_stylesheets,
                 default_author=args.default_author,
+                sidebar_config=sidebar_config,
             )
             generator.generate(include_drafts=args.include_drafts)
             return 0
