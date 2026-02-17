@@ -140,6 +140,7 @@ header h1 a {
 header ul {
     list-style: none;
     display: flex;
+    align-items: center;
     gap: 20px;
     margin: 0;
     padding: 0;
