@@ -14,14 +14,19 @@ from watchdog.observers import Observer
 from blogmore.generator import SiteGenerator
 
 
-class ReusingTCPServer(socketserver.TCPServer):
-    """TCP server that allows address reuse.
+class ReusingTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    """Multi-threaded TCP server that allows address reuse.
 
     This prevents "Address already in use" errors when restarting the server
     quickly after it has been stopped.
+
+    ThreadingMixIn enables the server to handle multiple connections concurrently,
+    which is essential for HTTP/1.1 keep-alive connections. Without threading,
+    the server would block on each connection, severely degrading performance.
     """
 
     allow_reuse_address = True
+    daemon_threads = True  # Allow daemon threads for clean shutdown
 
 
 class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -30,7 +35,15 @@ class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     This handler catches BrokenPipeError and ConnectionResetError exceptions
     that occur when clients disconnect before the server finishes sending data.
     This is common behavior in web servers and should not produce error traces.
+
+    Uses HTTP/1.1 to enable keep-alive connections, which significantly improves
+    performance in browsers like Safari that make many parallel requests.
     """
+
+    # Enable HTTP/1.1 for persistent connections (keep-alive)
+    # This prevents Safari from having to establish new TCP connections
+    # for every resource request, which was causing severe slowdowns.
+    protocol_version = "HTTP/1.1"
 
     def handle(self) -> None:
         """Handle a single HTTP request, catching connection errors."""
