@@ -22,6 +22,9 @@ include_drafts: false
 # Optional: Maximum number of posts in RSS/Atom feeds (default: 20)
 posts_per_feed: 20
 
+# Optional: Default author name for posts without author in frontmatter
+# default_author: "Your Name"
+
 # Optional: Additional stylesheets to include (can be URLs or relative paths)
 # extra_stylesheets:
 #   - https://example.com/custom.css

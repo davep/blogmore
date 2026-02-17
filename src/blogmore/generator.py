@@ -80,6 +80,7 @@ class SiteGenerator:
         site_url: str = "",
         posts_per_feed: int = 20,
         extra_stylesheets: list[str] | None = None,
+        default_author: str | None = None,
     ) -> None:
         """Initialize the site generator.
 
@@ -92,6 +93,7 @@ class SiteGenerator:
             site_url: Base URL of the site
             posts_per_feed: Maximum number of posts to include in feeds (default: 20)
             extra_stylesheets: Optional list of URLs for additional stylesheets
+            default_author: Default author name for posts without author in frontmatter
         """
         self.content_dir = content_dir
         self.templates_dir = templates_dir
@@ -99,6 +101,7 @@ class SiteGenerator:
         self.site_title = site_title
         self.site_url = normalize_site_url(site_url)
         self.posts_per_feed = posts_per_feed
+        self.default_author = default_author
 
         self.parser = PostParser()
         self.renderer = TemplateRenderer(templates_dir, extra_stylesheets)
@@ -124,6 +127,12 @@ class SiteGenerator:
             self.content_dir, include_drafts=include_drafts
         )
         print(f"Found {len(posts)} posts")
+
+        # Apply default author to posts that don't have one
+        if self.default_author:
+            for post in posts:
+                if post.metadata and "author" not in post.metadata:
+                    post.metadata["author"] = self.default_author
 
         # Parse all pages from the pages subdirectory
         pages_dir = self.content_dir / "pages"

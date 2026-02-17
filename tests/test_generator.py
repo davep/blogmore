@@ -418,3 +418,66 @@ class TestSiteGenerator:
         # Check content
         content = (temp_output_dir / "categories.html").read_text()
         assert "python" in content.lower()
+
+    def test_generate_with_default_author(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that default_author is applied to posts without author."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            default_author="Default Author Name",
+        )
+
+        generator.generate(include_drafts=False)
+
+        # The first-post.md fixture doesn't have an author, so it should get the default
+        post_file = temp_output_dir / "2024" / "01" / "15" / "first-post.html"
+        assert post_file.exists()
+
+        # Check that the author meta tag is present with default author
+        content = post_file.read_text()
+        assert '<meta name="author" content="Default Author Name">' in content
+
+    def test_generate_without_default_author(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that posts without author remain without author when no default is set."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator.generate(include_drafts=False)
+
+        # The first-post.md fixture doesn't have an author
+        post_file = temp_output_dir / "2024" / "01" / "15" / "first-post.html"
+        assert post_file.exists()
+
+        # Check that no author meta tag is present
+        content = post_file.read_text()
+        assert '<meta name="author"' not in content
+
+    def test_default_author_does_not_override_existing(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that default_author doesn't override existing author in post."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            default_author="Default Author Name",
+        )
+
+        generator.generate(include_drafts=False)
+
+        # The seo-test-post.md fixture has an existing author "John Doe"
+        post_file = temp_output_dir / "2024" / "03" / "01" / "seo-test-post.html"
+        assert post_file.exists()
+
+        # Check that the original author is preserved
+        content = post_file.read_text()
+        assert '<meta name="author" content="John Doe">' in content
+        assert "Default Author Name" not in content
