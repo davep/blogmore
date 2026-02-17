@@ -106,6 +106,31 @@ class SiteGenerator:
         self.parser = PostParser()
         self.renderer = TemplateRenderer(templates_dir, extra_stylesheets)
 
+    def _detect_favicon(self) -> str | None:
+        """Detect if a favicon file exists in the extras directory.
+
+        Checks for favicon files with common extensions in priority order.
+        If multiple files exist, the first match is returned (e.g., .ico is
+        preferred over .png).
+
+        Returns:
+            The favicon URL (relative to site root) if found, None otherwise
+        """
+        extras_dir = self.content_dir / "extras"
+        if not extras_dir.exists():
+            return None
+
+        # Common favicon extensions in priority order
+        favicon_extensions = [".ico", ".png", ".svg", ".gif", ".jpg", ".jpeg"]
+
+        # Check for favicon files
+        for ext in favicon_extensions:
+            favicon_path = extras_dir / f"favicon{ext}"
+            if favicon_path.is_file():
+                return f"/favicon{ext}"
+
+        return None
+
     def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
         return {
@@ -113,6 +138,7 @@ class SiteGenerator:
             "site_url": self.site_url,
             "tag_dir": self.TAG_DIR,
             "category_dir": self.CATEGORY_DIR,
+            "favicon_url": self._detect_favicon(),
         }
 
     def generate(self, include_drafts: bool = False) -> None:

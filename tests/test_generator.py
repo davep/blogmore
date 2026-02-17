@@ -515,3 +515,170 @@ class TestSiteGenerator:
         assert output_file.exists()
         content = output_file.read_text()
         assert '<meta name="author" content="Default Author">' in content
+
+    def test_detect_favicon_ico(self, tmp_path: Path, temp_output_dir: Path) -> None:
+        """Test detecting favicon.ico file."""
+        # Create a content directory with extras/favicon.ico
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        extras_dir = content_dir / "extras"
+        extras_dir.mkdir()
+        favicon_file = extras_dir / "favicon.ico"
+        favicon_file.write_text("fake favicon content")
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        # Test the _detect_favicon method
+        assert generator._detect_favicon() == "/favicon.ico"
+
+    def test_detect_favicon_png(self, tmp_path: Path, temp_output_dir: Path) -> None:
+        """Test detecting favicon.png file."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        extras_dir = content_dir / "extras"
+        extras_dir.mkdir()
+        favicon_file = extras_dir / "favicon.png"
+        favicon_file.write_text("fake favicon content")
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        assert generator._detect_favicon() == "/favicon.png"
+
+    def test_detect_favicon_svg(self, tmp_path: Path, temp_output_dir: Path) -> None:
+        """Test detecting favicon.svg file."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        extras_dir = content_dir / "extras"
+        extras_dir.mkdir()
+        favicon_file = extras_dir / "favicon.svg"
+        favicon_file.write_text("fake favicon content")
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        assert generator._detect_favicon() == "/favicon.svg"
+
+    def test_detect_favicon_no_extras_dir(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that None is returned when extras directory doesn't exist."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        assert generator._detect_favicon() is None
+
+    def test_detect_favicon_no_favicon_file(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that None is returned when no favicon file exists."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        extras_dir = content_dir / "extras"
+        extras_dir.mkdir()
+        # Create a different file
+        (extras_dir / "robots.txt").write_text("User-agent: *")
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        assert generator._detect_favicon() is None
+
+    def test_detect_favicon_priority(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that .ico is preferred when multiple favicon files exist."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        extras_dir = content_dir / "extras"
+        extras_dir.mkdir()
+        # Create multiple favicon files
+        (extras_dir / "favicon.ico").write_text("ico")
+        (extras_dir / "favicon.png").write_text("png")
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        # .ico should be preferred (first in list)
+        assert generator._detect_favicon() == "/favicon.ico"
+
+    def test_favicon_in_generated_html(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that favicon link is included in generated HTML."""
+        # Create a content directory with extras/favicon.ico and a post
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        extras_dir = content_dir / "extras"
+        extras_dir.mkdir()
+        favicon_file = extras_dir / "favicon.ico"
+        favicon_file.write_text("fake favicon content")
+
+        # Create a post
+        post_file = content_dir / "test-post.md"
+        post_file.write_text(
+            "---\ntitle: Test Post\ndate: 2024-01-01\n---\n\nTest content"
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator.generate(include_drafts=False)
+
+        # Check that the index page has the favicon link
+        index_file = temp_output_dir / "index.html"
+        assert index_file.exists()
+        content = index_file.read_text()
+        assert '<link rel="icon" href="/favicon.ico">' in content
+
+    def test_no_favicon_in_generated_html_when_missing(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that no favicon link is included when no favicon exists."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Create a post but no favicon
+        post_file = content_dir / "test-post.md"
+        post_file.write_text(
+            "---\ntitle: Test Post\ndate: 2024-01-01\n---\n\nTest content"
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator.generate(include_drafts=False)
+
+        # Check that the index page does not have a favicon link
+        index_file = temp_output_dir / "index.html"
+        assert index_file.exists()
+        content = index_file.read_text()
+        assert '<link rel="icon"' not in content
