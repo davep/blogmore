@@ -18,8 +18,7 @@ def create_feed_generator(
     feed_url: str,
     description: str | None = None,
 ) -> FeedGen:
-    """
-    Create and configure a base FeedGenerator.
+    """Create and configure a base FeedGenerator.
 
     Args:
         site_title: Title of the blog site
@@ -54,8 +53,7 @@ def create_feed_generator(
 
 
 def add_post_to_feed(feed_generator: FeedGen, post: Post, site_url: str) -> None:
-    """
-    Add a post to a feed.
+    """Add a post to a feed.
 
     Args:
         feed_generator: FeedGenerator instance
@@ -105,8 +103,7 @@ def generate_feed(
     description: str | None = None,
     max_posts: int = 20,
 ) -> tuple[str, str]:
-    """
-    Generate RSS and Atom feeds for a list of posts.
+    """Generate RSS and Atom feeds for a list of posts.
 
     Args:
         posts: List of posts to include in the feed (should be sorted newest first)
@@ -150,8 +147,7 @@ def write_feeds(
     rss_xml: str,
     atom_xml: str,
 ) -> None:
-    """
-    Write RSS and Atom feeds to disk.
+    """Write RSS and Atom feeds to disk.
 
     Args:
         output_dir: Output directory for the site
@@ -181,8 +177,7 @@ class BlogFeedGenerator:
         site_url: str,
         max_posts: int = 20,
     ) -> None:
-        """
-        Initialize the feed generator.
+        """Initialize the feed generator.
 
         Args:
             output_dir: Directory where feeds will be written
@@ -196,8 +191,7 @@ class BlogFeedGenerator:
         self.max_posts = max_posts
 
     def _get_base_url(self) -> str:
-        """
-        Get the effective base URL, using fallback if site_url is empty.
+        """Get the effective base URL, using fallback if site_url is empty.
 
         Returns:
             Base URL (either site_url or fallback)
@@ -205,8 +199,7 @@ class BlogFeedGenerator:
         return self.site_url if self.site_url else "https://example.com"
 
     def generate_index_feeds(self, posts: list[Post]) -> None:
-        """
-        Generate main index feeds.
+        """Generate main index feeds.
 
         Args:
             posts: List of all posts
@@ -239,8 +232,7 @@ class BlogFeedGenerator:
         self,
         posts_by_category: dict[str, tuple[str, list[Post]]],
     ) -> None:
-        """
-        Generate feeds for each category.
+        """Generate feeds for each category.
 
         Args:
             posts_by_category: Dictionary mapping category (lowercase) to (display_name, posts)
