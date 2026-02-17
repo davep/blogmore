@@ -52,13 +52,15 @@ class TemplateRenderer:
         self.env.filters["format_date"] = self._format_date
 
     @staticmethod
-    def _format_date(date: dt.datetime | None, fmt: str = "%B %d, %Y %H:%M:%S") -> str:
+    def _format_date(
+        date: dt.datetime | None, format_string: str = "%B %d, %Y %H:%M:%S"
+    ) -> str:
         """
         Format a datetime object.
 
         Args:
             date: The datetime to format
-            fmt: The format string (default shows full date and time)
+            format_string: The format string (default shows full date and time)
 
         Returns:
             Formatted date string or empty string if date is None
@@ -67,7 +69,7 @@ class TemplateRenderer:
             return ""
 
         # Format the datetime
-        formatted = date.strftime(fmt)
+        formatted = date.strftime(format_string)
 
         # Add timezone information if available
         if date.tzinfo is not None:
@@ -246,11 +248,7 @@ class TemplateRenderer:
         Render the tags page showing all tags as a word cloud.
 
         Args:
-            tags: List of tag dictionaries with keys:
-                  - display_name: The tag display name
-                  - safe_tag: URL-safe version of the tag
-                  - count: Number of posts with this tag
-                  - font_size: Font size for word cloud effect
+            tags: List of tag dictionaries
             **context: Additional context variables
 
         Returns:
@@ -272,11 +270,7 @@ class TemplateRenderer:
         Render the categories page showing all categories as a word cloud.
 
         Args:
-            categories: List of category dictionaries with keys:
-                  - display_name: The category display name
-                  - safe_category: URL-safe version of the category
-                  - count: Number of posts with this category
-                  - font_size: Font size for word cloud effect
+            categories: List of category dictionaries
             **context: Additional context variables
 
         Returns:
