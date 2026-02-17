@@ -109,6 +109,10 @@ class SiteGenerator:
     def _detect_favicon(self) -> str | None:
         """Detect if a favicon file exists in the extras directory.
 
+        Checks for favicon files with common extensions in priority order.
+        If multiple files exist, the first match is returned (e.g., .ico is
+        preferred over .png).
+
         Returns:
             The favicon URL (relative to site root) if found, None otherwise
         """
@@ -116,16 +120,14 @@ class SiteGenerator:
         if not extras_dir.exists():
             return None
 
-        # Common favicon filenames and extensions
-        favicon_names = ["favicon"]
+        # Common favicon extensions in priority order
         favicon_extensions = [".ico", ".png", ".svg", ".gif", ".jpg", ".jpeg"]
 
         # Check for favicon files
-        for name in favicon_names:
-            for ext in favicon_extensions:
-                favicon_path = extras_dir / f"{name}{ext}"
-                if favicon_path.is_file():
-                    return f"/{name}{ext}"
+        for ext in favicon_extensions:
+            favicon_path = extras_dir / f"favicon{ext}"
+            if favicon_path.is_file():
+                return f"/favicon{ext}"
 
         return None
 
