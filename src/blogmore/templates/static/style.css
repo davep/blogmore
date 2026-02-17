@@ -146,7 +146,9 @@ body {
 }
 
 .sidebar-logo img {
-    max-width: 100%;
+    max-width: 140px;
+    max-height: 140px;
+    width: auto;
     height: auto;
     border-radius: 50%;
 }
@@ -249,7 +251,8 @@ body {
     }
 
     .sidebar-logo img {
-        max-width: 120px;
+        max-width: 140px;
+        max-height: 140px;
     }
 
     .sidebar-section {
@@ -549,7 +552,8 @@ footer a:hover {
     }
 
     .sidebar-logo img {
-        max-width: 120px;
+        max-width: 140px;
+        max-height: 140px;
     }
 
     .sidebar-section {
