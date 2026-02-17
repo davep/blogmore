@@ -14,14 +14,19 @@ from watchdog.observers import Observer
 from blogmore.generator import SiteGenerator
 
 
-class ReusingTCPServer(socketserver.TCPServer):
-    """TCP server that allows address reuse.
+class ReusingTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    """Multi-threaded TCP server that allows address reuse.
 
     This prevents "Address already in use" errors when restarting the server
     quickly after it has been stopped.
+
+    ThreadingMixIn enables the server to handle multiple connections concurrently,
+    which is essential for HTTP/1.1 keep-alive connections. Without threading,
+    the server would block on each connection, severely degrading performance.
     """
 
     allow_reuse_address = True
+    daemon_threads = True  # Allow daemon threads for clean shutdown
 
 
 class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
