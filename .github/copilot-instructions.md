@@ -8,6 +8,16 @@
   to go with it.
 - Always generate full Google-style docstrings for all methods, functions,
   classes, etc. Do *not* include type information in the docstrings.
+- Docstrings always start on the *same line* as the opening triple quote.
+  The closing triple quote is *always* on the line after the final line of
+  the docstring *iff* it's more than one line.
+- We are using Python 3.12 or later; always favour newer Python features
+  that exist in Python 3.12 or later.
+- Always use full names for variables, functions and classes; do not use
+  abbreviations when something can be written in full.
+- Always try and keep individual .py files as small as possible. If there's
+  a logical unit of work for some code, place it in a .py file that makes
+  for a logical unit and name that file appropriately.
 
 ## Repository tools
 
