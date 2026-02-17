@@ -198,6 +198,11 @@ body {
     font-size: 1.8em;
     transition: color 0.2s ease, transform 0.2s ease;
     display: inline-block;
+    text-decoration: none;
+}
+
+.sidebar-socials a i {
+    color: inherit;
 }
 
 .sidebar-socials a:hover {
