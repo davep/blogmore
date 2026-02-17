@@ -3,7 +3,6 @@
 A blog-oriented static site generation engine built in Python.
 
 > [!IMPORTANT]
-
 > This project is built almost 100% using GitHub Copilot. Every other Python
 > project you will find in my repository is good old human-built code. This
 > project is the complete opposite: as much as possible I'm trying to write
