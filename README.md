@@ -123,6 +123,7 @@ site_title: "My Awesome Blog"
 site_url: "https://example.com"
 include_drafts: false
 posts_per_feed: 30
+default_author: "Your Name"
 extra_stylesheets:
   - https://example.com/custom.css
   - /assets/extra.css
@@ -167,6 +168,7 @@ All command-line options can be configured in the YAML file:
 - `site_url` - Base URL of the site
 - `include_drafts` - Include posts marked as drafts (default: `false`)
 - `posts_per_feed` - Maximum posts in feeds (default: `20`)
+- `default_author` - Default author name for posts without author in frontmatter
 - `extra_stylesheets` - List of additional stylesheet URLs
 - `port` - Port for serve command (default: `8000`)
 - `no_watch` - Disable file watching in serve mode (default: `false`)
@@ -199,6 +201,7 @@ Available for both `build` and `serve` commands:
 - `--site-url` - Base URL of the site
 - `--include-drafts` - Include posts marked as drafts
 - `--posts-per-feed` - Maximum posts in feeds (default: 20)
+- `--default-author` - Default author name for posts without author in frontmatter
 - `--extra-stylesheet` - Additional stylesheet URL (can be used multiple times)
 
 ### Serve-Specific Options
@@ -216,6 +219,7 @@ Optional:
 - `category` - Post category (e.g., "python", "webdev")
 - `tags` - List of tags or comma-separated string
 - `draft` - Set to `true` to mark as draft
+- `author` - Author name (uses default_author if not specified)
 
 Example:
 
@@ -225,6 +229,7 @@ title: My Blog Post
 date: 2024-01-15
 category: python
 tags: [python, webdev, tutorial]
+author: Jane Smith
 draft: false
 ---
 ```
