@@ -92,12 +92,189 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     line-height: 1.6;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
+    margin: 0;
+    padding: 0;
     color: var(--text-color);
     background: var(--bg-color);
     transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Site container with sidebar layout */
+.site-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar styles */
+.sidebar {
+    width: 280px;
+    background: var(--bg-color);
+    border-right: 2px solid var(--border-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 30px 20px;
+    z-index: 100;
+}
+
+/* Hide scrollbar for sidebar but keep functionality */
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+.sidebar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.sidebar-logo {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-logo a {
+    display: block;
+}
+
+.sidebar-logo img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 50%;
+}
+
+.sidebar-section {
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-section:last-child {
+    border-bottom: none;
+}
+
+.sidebar-section h2 {
+    font-size: 1.2em;
+    margin: 0 0 15px 0;
+    color: var(--text-color);
+}
+
+.sidebar-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-links li {
+    margin-bottom: 10px;
+}
+
+.sidebar-links a {
+    color: var(--link-color);
+    text-decoration: none;
+    display: block;
+    transition: color 0.2s ease;
+}
+
+.sidebar-links a:hover {
+    color: var(--link-hover-color);
+}
+
+.sidebar-socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.sidebar-socials a {
+    color: var(--link-color);
+    font-size: 1.8em;
+    transition: color 0.2s ease, transform 0.2s ease;
+    display: inline-block;
+}
+
+.sidebar-socials a:hover {
+    color: var(--link-hover-color);
+    transform: scale(1.1);
+}
+
+/* Main wrapper - offset by sidebar width */
+.main-wrapper {
+    flex: 1;
+    margin-left: 280px;
+    max-width: 800px;
+    padding: 20px;
+}
+
+/* When no sidebar, use original layout */
+.site-container:not(:has(.sidebar)) .main-wrapper {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Mobile layout */
+@media (max-width: 768px) {
+    .site-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 2px solid var(--border-color);
+        padding: 20px;
+        order: -1;
+    }
+
+    .sidebar-content {
+        gap: 20px;
+    }
+
+    .sidebar-logo {
+        padding-bottom: 15px;
+    }
+
+    .sidebar-logo img {
+        max-width: 120px;
+    }
+
+    .sidebar-section {
+        padding-bottom: 15px;
+    }
+
+    .sidebar-section h2 {
+        font-size: 1em;
+        margin-bottom: 10px;
+    }
+
+    .sidebar-links li {
+        display: inline-block;
+        margin-right: 15px;
+        margin-bottom: 5px;
+    }
+
+    .sidebar-socials {
+        gap: 12px;
+    }
+
+    .sidebar-socials a {
+        font-size: 1.5em;
+    }
+
+    .main-wrapper {
+        margin-left: 0;
+        max-width: 100%;
+        padding: 15px;
+    }
 }
 
 /* General link styles for content */
@@ -344,7 +521,58 @@ footer a:hover {
 }
 
 @media (max-width: 768px) {
-    body {
+    .site-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 2px solid var(--border-color);
+        padding: 20px;
+        order: -1;
+    }
+
+    .sidebar-content {
+        gap: 20px;
+    }
+
+    .sidebar-logo {
+        padding-bottom: 15px;
+    }
+
+    .sidebar-logo img {
+        max-width: 120px;
+    }
+
+    .sidebar-section {
+        padding-bottom: 15px;
+    }
+
+    .sidebar-section h2 {
+        font-size: 1em;
+        margin-bottom: 10px;
+    }
+
+    .sidebar-links li {
+        display: inline-block;
+        margin-right: 15px;
+        margin-bottom: 5px;
+    }
+
+    .sidebar-socials {
+        gap: 12px;
+    }
+
+    .sidebar-socials a {
+        font-size: 1.5em;
+    }
+
+    .main-wrapper {
+        margin-left: 0;
+        max-width: 100%;
         padding: 15px;
     }
 

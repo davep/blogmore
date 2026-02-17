@@ -109,3 +109,32 @@ def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
                     setattr(args, config_key, [config_value])
             else:
                 setattr(args, config_key, config_value)
+
+
+def get_sidebar_config(config: dict[str, Any]) -> dict[str, Any]:
+    """Extract sidebar configuration from the config dictionary.
+
+    Returns sidebar configuration items (site_logo, links, socials) if they
+    exist in the configuration file.
+
+    Args:
+        config: Dictionary containing configuration values
+
+    Returns:
+        Dictionary containing sidebar configuration values
+    """
+    sidebar_config = {}
+
+    # Extract site_logo if present
+    if "site_logo" in config:
+        sidebar_config["site_logo"] = config["site_logo"]
+
+    # Extract links if present
+    if "links" in config:
+        sidebar_config["links"] = config["links"]
+
+    # Extract socials if present
+    if "socials" in config:
+        sidebar_config["socials"] = config["socials"]
+
+    return sidebar_config

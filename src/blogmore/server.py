@@ -7,6 +7,7 @@ import sys
 import threading
 import time
 from pathlib import Path
+from typing import Any
 
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
@@ -125,6 +126,7 @@ def serve_site(
     posts_per_feed: int = 20,
     extra_stylesheets: list[str] | None = None,
     default_author: str | None = None,
+    sidebar_config: dict[str, Any] | None = None,
 ) -> int:
     """Serve the generated site locally using a simple HTTP server.
 
@@ -141,6 +143,7 @@ def serve_site(
         posts_per_feed: Maximum number of posts to include in feeds (default: 20)
         extra_stylesheets: Optional list of URLs for additional stylesheets
         default_author: Default author name for posts without author in frontmatter
+        sidebar_config: Optional sidebar configuration (site_logo, links, socials)
 
     Returns:
         Exit code
@@ -184,6 +187,7 @@ def serve_site(
                 posts_per_feed=posts_per_feed,
                 extra_stylesheets=extra_stylesheets,
                 default_author=default_author,
+                sidebar_config=sidebar_config,
             )
             generator.generate(include_drafts=include_drafts)
         except Exception as e:
