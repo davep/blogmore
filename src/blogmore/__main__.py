@@ -13,6 +13,7 @@ from blogmore.config import (
     merge_config_with_args,
 )
 from blogmore.generator import SiteGenerator
+from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
 
 
@@ -117,6 +118,66 @@ def main() -> int:
             print(f"Error generating site: {e}", file=sys.stderr)
             return 1
 
+    # Handle publish command
+    if args.command == "publish":
+        # Validate that content_dir is provided
+        if args.content_dir is None:
+            print(
+                "Error: content_dir is required. Specify it on the command line or in the config file.",
+                file=sys.stderr,
+            )
+            return 1
+
+        # Validate inputs
+        if not args.content_dir.exists():
+            print(
+                f"Error: Content directory not found: {args.content_dir}",
+                file=sys.stderr,
+            )
+            return 1
+
+        # Validate templates directory if provided
+        if args.templates is not None and not args.templates.exists():
+            print(
+                f"Error: Templates directory not found: {args.templates}",
+                file=sys.stderr,
+            )
+            return 1
+
+        # Generate the site first
+        try:
+            print("Building site before publishing...")
+            generator = SiteGenerator(
+                content_dir=args.content_dir,
+                templates_dir=args.templates,
+                output_dir=args.output,
+                site_title=args.site_title,
+                site_subtitle=args.site_subtitle,
+                site_url=args.site_url,
+                posts_per_feed=args.posts_per_feed,
+                extra_stylesheets=args.extra_stylesheets,
+                default_author=args.default_author,
+                sidebar_config=sidebar_config,
+                clean_first=args.clean_first,
+            )
+            generator.generate(include_drafts=args.include_drafts)
+            print("Site built successfully")
+        except Exception as e:
+            print(f"Error generating site: {e}", file=sys.stderr)
+            return 1
+
+        # Publish the site
+        try:
+            publish_site(
+                output_dir=args.output,
+                branch=args.branch,
+                remote=args.remote,
+            )
+            return 0
+        except PublishError as e:
+            print(f"Error publishing site: {e}", file=sys.stderr)
+            return 1
+
     return 0
 
 
@@ -166,6 +227,8 @@ def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
         "content_dir": None,
         "default_author": None,
         "clean_first": False,
+        "branch": "gh-pages",
+        "remote": "origin",
     }
 
     overrides = {}
