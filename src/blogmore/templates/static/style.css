@@ -186,7 +186,6 @@ body {
 
 /* Sidebar pages section - no title, just links with separator below */
 .sidebar-pages {
-    padding-top: 12px;
     padding-bottom: 12px;
     border-bottom: 1px solid var(--border-color);
 }
@@ -303,7 +302,6 @@ body {
     }
 
     .sidebar-pages {
-        padding-top: 12px;
         padding-bottom: 12px;
     }
 
@@ -609,7 +607,6 @@ footer a:hover {
     }
 
     .sidebar-pages {
-        padding-top: 12px;
         padding-bottom: 12px;
     }
 
