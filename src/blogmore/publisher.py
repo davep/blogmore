@@ -2,7 +2,7 @@
 
 import shutil
 import subprocess
-import sys
+import tempfile
 from pathlib import Path
 
 
@@ -82,10 +82,11 @@ def publish_site(
     This function:
     1. Checks that git is available
     2. Checks that we're in a git repository
-    3. Creates/checks out the target branch
-    4. Copies the output directory contents to the branch
+    3. Uses a temporary git worktree to prepare the branch
+    4. Copies only the output directory contents to the worktree
     5. Commits the changes
     6. Pushes to the remote
+    7. Cleans up the worktree
 
     Args:
         output_dir: Directory containing the generated site
@@ -125,88 +126,100 @@ def publish_site(
             f"Output directory is empty: {output_dir}. Please build the site first."
         )
 
+    # Make output_dir absolute for copying
+    output_dir = output_dir.resolve()
+
     print(f"Publishing site to branch '{branch}' on remote '{remote}'...")
 
-    # Save current branch/commit
-    try:
-        result = subprocess.run(
-            ["git", "symbolic-ref", "--short", "HEAD"],
-            cwd=git_root,
-            capture_output=True,
-            check=False,
-            text=True,
-        )
-        if result.returncode == 0:
-            current_ref = result.stdout.strip()
-        else:
-            # Detached HEAD state
-            result = subprocess.run(
-                ["git", "rev-parse", "HEAD"],
-                cwd=git_root,
-                capture_output=True,
-                check=True,
-                text=True,
-            )
-            current_ref = result.stdout.strip()
-    except subprocess.CalledProcessError as e:
-        raise PublishError(f"Failed to determine current git ref: {e}") from e
+    # Create a temporary directory for the worktree
+    temp_dir = tempfile.mkdtemp(prefix="blogmore-publish-")
+    worktree_path = Path(temp_dir)
 
     try:
-        # Check if the branch exists locally
+        # Check if the branch exists (locally or remotely)
         branch_check_result = subprocess.run(
             ["git", "rev-parse", "--verify", branch],
             cwd=git_root,
             capture_output=True,
             check=False,
         )
-        branch_exists = branch_check_result.returncode == 0
+        branch_exists_locally = branch_check_result.returncode == 0
 
-        if branch_exists:
-            # Checkout existing branch
+        if not branch_exists_locally:
+            # Check if it exists on remote
+            remote_branch_check = subprocess.run(
+                ["git", "ls-remote", "--heads", remote, branch],
+                cwd=git_root,
+                capture_output=True,
+                check=False,
+                text=True,
+            )
+            branch_exists_remotely = bool(remote_branch_check.stdout.strip())
+
+            if branch_exists_remotely:
+                # Fetch the remote branch
+                subprocess.run(
+                    ["git", "fetch", remote, f"{branch}:{branch}"],
+                    cwd=git_root,
+                    check=True,
+                    capture_output=True,
+                )
+                print(f"Fetched existing branch '{branch}' from remote")
+                branch_exists_locally = True
+
+        if branch_exists_locally:
+            # Create worktree from existing branch
             subprocess.run(
-                ["git", "checkout", branch],
+                ["git", "worktree", "add", str(worktree_path), branch],
                 cwd=git_root,
                 check=True,
                 capture_output=True,
             )
-            print(f"Checked out existing branch '{branch}'")
+            print(f"Created worktree for existing branch '{branch}'")
 
-            # Remove all files from the branch (except .git)
-            subprocess.run(
-                ["git", "rm", "-rf", "."],
-                cwd=git_root,
-                check=True,
-                capture_output=True,
-            )
+            # Remove all files from worktree (but keep .git)
+            for item in worktree_path.iterdir():
+                if item.name != ".git":
+                    if item.is_file() or item.is_symlink():
+                        item.unlink()
+                    elif item.is_dir():
+                        shutil.rmtree(item)
         else:
-            # Create orphan branch
+            # Create worktree with new orphan branch
+            subprocess.run(
+                ["git", "worktree", "add", "--detach", str(worktree_path)],
+                cwd=git_root,
+                check=True,
+                capture_output=True,
+            )
+            # Create orphan branch in the worktree
             subprocess.run(
                 ["git", "checkout", "--orphan", branch],
-                cwd=git_root,
+                cwd=worktree_path,
                 check=True,
                 capture_output=True,
             )
-            print(f"Created new orphan branch '{branch}'")
-
             # Remove all files
             subprocess.run(
                 ["git", "rm", "-rf", "."],
-                cwd=git_root,
+                cwd=worktree_path,
                 check=False,
                 capture_output=True,
             )
+            print(f"Created worktree with new orphan branch '{branch}'")
 
-        # Copy all files from output directory to git root
+        # Copy all files from output directory to worktree
         for item in output_dir.iterdir():
+            dest = worktree_path / item.name
             if item.is_file():
-                shutil.copy2(item, git_root / item.name)
+                shutil.copy2(item, dest)
             elif item.is_dir():
-                shutil.copytree(item, git_root / item.name, dirs_exist_ok=True)
+                shutil.copytree(item, dest, dirs_exist_ok=True)
 
-        # Add all files
+        # Add all files in the worktree
         subprocess.run(
             ["git", "add", "-A"],
-            cwd=git_root,
+            cwd=worktree_path,
             check=True,
             capture_output=True,
         )
@@ -214,7 +227,7 @@ def publish_site(
         # Check if there are any changes to commit
         diff_result = subprocess.run(
             ["git", "diff", "--cached", "--quiet"],
-            cwd=git_root,
+            cwd=worktree_path,
             check=False,
         )
 
@@ -224,7 +237,7 @@ def publish_site(
             # Commit the changes
             subprocess.run(
                 ["git", "commit", "-m", "Publish site"],
-                cwd=git_root,
+                cwd=worktree_path,
                 check=True,
                 capture_output=True,
             )
@@ -233,7 +246,7 @@ def publish_site(
             # Push to remote
             subprocess.run(
                 ["git", "push", remote, branch],
-                cwd=git_root,
+                cwd=worktree_path,
                 check=True,
                 capture_output=True,
             )
@@ -244,26 +257,17 @@ def publish_site(
             f"Git command failed: {e.stderr.decode() if e.stderr else str(e)}"
         ) from e
     finally:
-        # Return to original branch/commit
+        # Clean up the worktree
         try:
-            if current_ref.startswith("refs/") or len(current_ref) == 40:
-                # It's a commit hash (detached HEAD)
-                subprocess.run(
-                    ["git", "checkout", current_ref],
-                    cwd=git_root,
-                    check=True,
-                    capture_output=True,
-                )
-            else:
-                # It's a branch name
-                subprocess.run(
-                    ["git", "checkout", current_ref],
-                    cwd=git_root,
-                    check=True,
-                    capture_output=True,
-                )
-        except subprocess.CalledProcessError:
-            print(
-                f"Warning: Failed to return to original branch/commit {current_ref}",
-                file=sys.stderr,
+            subprocess.run(
+                ["git", "worktree", "remove", str(worktree_path), "--force"],
+                cwd=git_root,
+                check=True,
+                capture_output=True,
             )
+        except subprocess.CalledProcessError:
+            # If worktree remove fails, try manual cleanup
+            try:
+                shutil.rmtree(worktree_path, ignore_errors=True)
+            except Exception:
+                pass
