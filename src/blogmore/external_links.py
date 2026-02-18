@@ -2,10 +2,10 @@
 
 from typing import Any
 from urllib.parse import urlparse
+from xml.etree.ElementTree import Element
 
 from markdown.extensions import Extension
 from markdown.treeprocessors import Treeprocessor
-from xml.etree.ElementTree import Element
 
 
 class ExternalLinksProcessor(Treeprocessor):
@@ -21,6 +21,7 @@ class ExternalLinksProcessor(Treeprocessor):
         super().__init__(md)
         self.site_url = site_url
         # Parse the site URL to get the domain
+        self.site_domain: str | None
         if site_url:
             parsed = urlparse(site_url)
             self.site_domain = parsed.netloc.lower()

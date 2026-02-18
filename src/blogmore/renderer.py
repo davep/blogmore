@@ -40,6 +40,7 @@ class TemplateRenderer:
         self.site_url = site_url
 
         # Parse the site URL to get the domain for link checking
+        self.site_domain: str | None
         if site_url:
             parsed = urlparse(site_url)
             self.site_domain = parsed.netloc.lower()
