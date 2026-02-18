@@ -43,6 +43,16 @@
                     </div>
                 </div>
 
+                {% if pages %}
+                <div class="sidebar-pages">
+                    <ul class="sidebar-links">
+                        {% for page in pages %}
+                        <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
                 {% if links %}
                 <section class="sidebar-section">
                     <h2>Links</h2>
@@ -73,11 +83,6 @@
             <header>
                 <nav>
                     <ul>
-                        {% if pages %}
-                        {% for page in pages %}
-                        <li><a href="{{ page.url }}">{{ page.title }}</a></li>
-                        {% endfor %}
-                        {% endif %}
                         <li><a href="/categories.html">Categories</a></li>
                         <li><a href="/tags.html">Tags</a></li>
                         <li><a href="/archive.html">Archive</a></li>

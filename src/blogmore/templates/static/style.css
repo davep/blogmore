@@ -137,7 +137,7 @@ body {
 
 .sidebar-header {
     text-align: center;
-    padding-bottom: 20px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -184,8 +184,14 @@ body {
     font-weight: normal;
 }
 
+/* Sidebar pages section - no title, just links with separator below */
+.sidebar-pages {
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
 .sidebar-section {
-    padding-bottom: 20px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -206,7 +212,7 @@ body {
 }
 
 .sidebar-links li {
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .sidebar-links a {
@@ -223,7 +229,7 @@ body {
 .sidebar-socials {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 10px;
 }
 
 .sidebar-socials a {
@@ -295,8 +301,12 @@ body {
         max-height: 140px;
     }
 
+    .sidebar-pages {
+        padding-bottom: 12px;
+    }
+
     .sidebar-section {
-        padding-bottom: 15px;
+        padding-bottom: 12px;
     }
 
     .sidebar-section h2 {
@@ -596,8 +606,12 @@ footer a:hover {
         max-height: 140px;
     }
 
+    .sidebar-pages {
+        padding-bottom: 12px;
+    }
+
     .sidebar-section {
-        padding-bottom: 15px;
+        padding-bottom: 12px;
     }
 
     .sidebar-section h2 {
