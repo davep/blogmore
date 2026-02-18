@@ -137,7 +137,7 @@ body {
 
 .sidebar-header {
     text-align: center;
-    padding-bottom: 20px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -186,13 +186,13 @@ body {
 
 /* Sidebar pages section - no title, just links with separator below */
 .sidebar-pages {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 12px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--border-color);
 }
 
 .sidebar-section {
-    padding-bottom: 20px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -303,12 +303,12 @@ body {
     }
 
     .sidebar-pages {
-        padding-top: 15px;
-        padding-bottom: 15px;
+        padding-top: 12px;
+        padding-bottom: 12px;
     }
 
     .sidebar-section {
-        padding-bottom: 15px;
+        padding-bottom: 12px;
     }
 
     .sidebar-section h2 {
@@ -609,12 +609,12 @@ footer a:hover {
     }
 
     .sidebar-pages {
-        padding-top: 15px;
-        padding-bottom: 15px;
+        padding-top: 12px;
+        padding-bottom: 12px;
     }
 
     .sidebar-section {
-        padding-bottom: 15px;
+        padding-bottom: 12px;
     }
 
     .sidebar-section h2 {
