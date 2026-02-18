@@ -170,22 +170,24 @@ class ConfigChangeHandler(FileSystemEventHandler):
                 return
             self._last_regenerate_time = current_time
 
-        print(f"\nDetected change in config file {self.config_path.name}, reloading and regenerating site...")
+        print(
+            f"\nDetected change in config file {self.config_path.name}, reloading and regenerating site..."
+        )
         try:
             # Reload the configuration
             config = load_config(self.config_path)
-            
+
             # Apply CLI overrides to the loaded config
             for key, value in self.cli_overrides.items():
                 if key in config:
                     config[key] = value
-            
+
             # Extract sidebar config
             sidebar_config = get_sidebar_config(config)
-            
+
             # Update the generator with new config values
             self._update_generator(config, sidebar_config)
-            
+
             # Regenerate the site
             self.generator.generate(include_drafts=self.include_drafts)
             print("Configuration reloaded and regeneration complete!")
@@ -218,7 +220,7 @@ class ConfigChangeHandler(FileSystemEventHandler):
                 self.generator.renderer.extra_stylesheets = stylesheets
         if "default_author" in config:
             self.generator.default_author = config["default_author"]
-        
+
         # Update sidebar config
         self.generator.sidebar_config = sidebar_config
 
@@ -334,7 +336,9 @@ def serve_site(
                     cli_overrides=cli_overrides or {},
                 )
                 # Watch the directory containing the config file
-                observer.schedule(config_handler, str(config_path.parent), recursive=False)
+                observer.schedule(
+                    config_handler, str(config_path.parent), recursive=False
+                )
                 print(f"Watching for changes in config file: {config_path}")
 
             observer.start()
