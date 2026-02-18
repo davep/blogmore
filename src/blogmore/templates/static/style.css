@@ -153,6 +153,35 @@ body {
     border-radius: 50%;
 }
 
+.sidebar-title {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-title h1 {
+    font-size: 1.8em;
+    margin: 0 0 10px 0;
+    color: var(--text-color);
+}
+
+.sidebar-title h1 a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.sidebar-title h1 a:hover {
+    color: var(--link-hover-color);
+}
+
+.sidebar-subtitle {
+    font-size: 0.95em;
+    color: var(--text-secondary);
+    margin: 0;
+    font-weight: normal;
+}
+
 .sidebar-section {
     padding-bottom: 20px;
     border-bottom: 1px solid var(--border-color);
