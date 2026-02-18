@@ -8,7 +8,7 @@ import pytest
 import yaml
 
 from blogmore.__main__ import main
-from blogmore.server import ContentChangeHandler, serve_site
+from blogmore.server import ConfigChangeHandler, ContentChangeHandler, serve_site
 
 
 class TestContentChangeHandler:
@@ -838,3 +838,332 @@ class TestConfigFileIntegration:
         ):
             result = main()
             assert result == 1  # Should fail
+
+
+class TestConfigChangeHandler:
+    """Test the ConfigChangeHandler class."""
+
+    def test_init(self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path) -> None:
+        """Test initializing ConfigChangeHandler."""
+        from blogmore.generator import SiteGenerator
+
+        config_file = tmp_path / "blogmore.yaml"
+        config_file.write_text("site_title: Test Blog\n")
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        cli_overrides = {"site_title": "CLI Title"}
+        handler = ConfigChangeHandler(
+            config_path=config_file,
+            generator=generator,
+            include_drafts=False,
+            cli_overrides=cli_overrides,
+            debounce_seconds=0.5,
+        )
+
+        assert handler.config_path == config_file.resolve()
+        assert handler.generator == generator
+        assert handler.include_drafts is False
+        assert handler.cli_overrides == cli_overrides
+        assert handler.debounce_seconds == 0.5
+
+    def test_on_any_event_ignores_directories(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that directory events are ignored."""
+        from blogmore.generator import SiteGenerator
+        from watchdog.events import DirCreatedEvent
+
+        config_file = tmp_path / "blogmore.yaml"
+        config_file.write_text("site_title: Test Blog\n")
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        handler = ConfigChangeHandler(
+            config_path=config_file,
+            generator=generator,
+            include_drafts=False,
+            cli_overrides={},
+        )
+
+        # Create a directory event
+        event = DirCreatedEvent(str(tmp_path / "newdir"))
+
+        # Should not raise any errors and should not trigger regeneration
+        handler.on_any_event(event)
+
+    def test_on_any_event_ignores_unrelated_files(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that events for unrelated files are ignored."""
+        from blogmore.generator import SiteGenerator
+        from watchdog.events import FileModifiedEvent
+
+        config_file = tmp_path / "blogmore.yaml"
+        config_file.write_text("site_title: Test Blog\n")
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        handler = ConfigChangeHandler(
+            config_path=config_file,
+            generator=generator,
+            include_drafts=False,
+            cli_overrides={},
+        )
+
+        # Create an event for a different file
+        other_file = tmp_path / "other.yaml"
+        event = FileModifiedEvent(str(other_file))
+
+        # Should not raise any errors
+        handler.on_any_event(event)
+
+    def test_on_any_event_reloads_config(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that config changes trigger reload and regeneration."""
+        from blogmore.generator import SiteGenerator
+        from watchdog.events import FileModifiedEvent
+
+        config_file = tmp_path / "blogmore.yaml"
+        config_data = {
+            "site_title": "Original Title",
+            "site_subtitle": "Original Subtitle",
+            "posts_per_feed": 30,
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config_data, f)
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        # Mock the generate method to verify it's called
+        with patch.object(generator, "generate") as mock_generate:
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                include_drafts=False,
+                cli_overrides={},
+            )
+
+            # Update the config file
+            new_config_data = {
+                "site_title": "Updated Title",
+                "site_subtitle": "Updated Subtitle",
+                "posts_per_feed": 50,
+            }
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            # Trigger the event
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+
+            # Verify generate was called
+            mock_generate.assert_called_once_with(include_drafts=False)
+
+            # Verify generator attributes were updated
+            assert generator.site_title == "Updated Title"
+            assert generator.site_subtitle == "Updated Subtitle"
+            assert generator.posts_per_feed == 50
+
+    def test_on_any_event_cli_overrides_preserved(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that CLI overrides are preserved when config is reloaded."""
+        from blogmore.generator import SiteGenerator
+        from watchdog.events import FileModifiedEvent
+
+        config_file = tmp_path / "blogmore.yaml"
+        config_data = {
+            "site_title": "Config Title",
+            "site_subtitle": "Config Subtitle",
+            "posts_per_feed": 30,
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config_data, f)
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_title="CLI Title",  # This should be preserved
+        )
+
+        cli_overrides = {"site_title": "CLI Title"}
+
+        with patch.object(generator, "generate") as mock_generate:
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                include_drafts=False,
+                cli_overrides=cli_overrides,
+            )
+
+            # Update the config file
+            new_config_data = {
+                "site_title": "Updated Config Title",
+                "site_subtitle": "Updated Subtitle",
+                "posts_per_feed": 50,
+            }
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            # Trigger the event
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+
+            # Verify generate was called
+            mock_generate.assert_called_once_with(include_drafts=False)
+
+            # Verify CLI override was preserved but config values were updated
+            assert generator.site_title == "CLI Title"  # CLI override preserved
+            assert generator.site_subtitle == "Updated Subtitle"  # Config updated
+            assert generator.posts_per_feed == 50  # Config updated
+
+    def test_on_any_event_updates_extra_stylesheets(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that extra_stylesheets are updated correctly."""
+        from blogmore.generator import SiteGenerator
+        from watchdog.events import FileModifiedEvent
+
+        config_file = tmp_path / "blogmore.yaml"
+        config_data = {
+            "extra_stylesheets": ["style1.css"],
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config_data, f)
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        with patch.object(generator, "generate") as mock_generate:
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                include_drafts=False,
+                cli_overrides={},
+            )
+
+            # Update config with new stylesheets
+            new_config_data = {
+                "extra_stylesheets": ["style1.css", "style2.css", "style3.css"],
+            }
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            # Trigger the event
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+
+            # Verify stylesheets were updated
+            assert generator.renderer.extra_stylesheets == [
+                "style1.css",
+                "style2.css",
+                "style3.css",
+            ]
+
+    def test_on_any_event_updates_sidebar_config(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that sidebar configuration is updated correctly."""
+        from blogmore.generator import SiteGenerator
+        from watchdog.events import FileModifiedEvent
+
+        config_file = tmp_path / "blogmore.yaml"
+        config_data = {
+            "site_logo": "/images/logo.png",
+            "links": [{"title": "Home", "url": "/"}],
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config_data, f)
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        with patch.object(generator, "generate") as mock_generate:
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                include_drafts=False,
+                cli_overrides={},
+            )
+
+            # Update config with new sidebar config
+            new_config_data = {
+                "site_logo": "/images/newlogo.png",
+                "links": [
+                    {"title": "Home", "url": "/"},
+                    {"title": "About", "url": "/about.html"},
+                ],
+                "socials": [{"site": "github", "url": "https://github.com/user"}],
+            }
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            # Trigger the event
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+
+            # Verify sidebar config was updated
+            assert generator.sidebar_config["site_logo"] == "/images/newlogo.png"
+            assert len(generator.sidebar_config["links"]) == 2
+            assert generator.sidebar_config["socials"] == [
+                {"site": "github", "url": "https://github.com/user"}
+            ]
+
+    def test_on_any_event_debouncing(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that rapid config changes are debounced."""
+        from blogmore.generator import SiteGenerator
+        from watchdog.events import FileModifiedEvent
+
+        config_file = tmp_path / "blogmore.yaml"
+        config_file.write_text("site_title: Test Blog\n")
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        with patch.object(generator, "generate") as mock_generate:
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                include_drafts=False,
+                cli_overrides={},
+                debounce_seconds=1.0,  # 1 second debounce
+            )
+
+            # Trigger multiple events rapidly
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            handler.on_any_event(event)
+            handler.on_any_event(event)
+
+            # Only one generation should occur due to debouncing
+            assert mock_generate.call_count == 1

@@ -1,9 +1,17 @@
 """Command-line interface for blogmore."""
 
+import argparse
 import sys
+from pathlib import Path
+from typing import Any
 
 from blogmore.cli import create_parser
-from blogmore.config import get_sidebar_config, load_config, merge_config_with_args
+from blogmore.config import (
+    DEFAULT_CONFIG_FILES,
+    get_sidebar_config,
+    load_config,
+    merge_config_with_args,
+)
 from blogmore.generator import SiteGenerator
 from blogmore.server import serve_site
 
@@ -23,9 +31,15 @@ def main() -> int:
     if hasattr(args, "config") and args.config is not None:
         args.config = args.config.expanduser()
 
+    # Store the original CLI argument values before merging with config
+    # This will be used to determine which CLI args should override config on reload
+    cli_overrides = _extract_cli_overrides(args)
+
     # Load configuration file if specified or search for default
+    config_path = None
     try:
-        config = load_config(args.config if hasattr(args, "config") else None)
+        config_path = _determine_config_path(args)
+        config = load_config(config_path)
         merge_config_with_args(config, args)
         sidebar_config = get_sidebar_config(config)
     except FileNotFoundError as e:
@@ -51,6 +65,8 @@ def main() -> int:
             extra_stylesheets=args.extra_stylesheets,
             default_author=args.default_author,
             sidebar_config=sidebar_config,
+            config_path=config_path,
+            cli_overrides=cli_overrides,
         )
 
     # Handle build command (and its aliases: generate, gen)
@@ -100,6 +116,69 @@ def main() -> int:
             return 1
 
     return 0
+
+
+def _determine_config_path(args: argparse.Namespace) -> Path | None:
+    """Determine which config file is being used.
+
+    Args:
+        args: Parsed command-line arguments
+
+    Returns:
+        Path to the config file being used, or None if no config file
+    """
+    # If a specific config file is provided, use it
+    if hasattr(args, "config") and args.config is not None:
+        return Path(args.config)
+
+    # Otherwise, search for default config files
+    for config_file in DEFAULT_CONFIG_FILES:
+        config_file_path = Path(config_file)
+        if config_file_path.exists():
+            return config_file_path
+
+    return None
+
+
+def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
+    """Extract CLI arguments that were explicitly set (not defaults).
+
+    Args:
+        args: Parsed command-line arguments
+
+    Returns:
+        Dictionary of argument names to values that were explicitly set
+    """
+    # Define defaults for each argument
+    defaults = {
+        "site_title": "My Blog",
+        "site_subtitle": "",
+        "site_url": "",
+        "output": Path("output"),
+        "templates": None,
+        "include_drafts": False,
+        "posts_per_feed": 20,
+        "extra_stylesheets": None,
+        "port": 8000,
+        "no_watch": False,
+        "content_dir": None,
+        "default_author": None,
+    }
+
+    overrides = {}
+
+    # Check each argument to see if it differs from the default
+    for arg_name, default_value in defaults.items():
+        if not hasattr(args, arg_name):
+            continue
+
+        arg_value = getattr(args, arg_name)
+
+        # If the value differs from default, it was explicitly set
+        if arg_value != default_value:
+            overrides[arg_name] = arg_value
+
+    return overrides
 
 
 if __name__ == "__main__":
