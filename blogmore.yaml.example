@@ -64,3 +64,11 @@ port: 8000
 
 # Optional: Disable file watching (default: false)
 no_watch: false
+
+# Publish-specific options (only used with 'blogmore publish' command)
+
+# Optional: Git branch to publish to (default: gh-pages)
+# branch: gh-pages
+
+# Optional: Git remote to push to (default: origin)
+# remote: origin

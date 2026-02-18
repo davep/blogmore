@@ -147,6 +147,33 @@ def create_parser() -> argparse.ArgumentParser:
 
     add_common_arguments(serve_parser)
 
+    # Publish command
+    publish_parser = subparsers.add_parser(
+        "publish",
+        help="Build the site and publish it to a git branch (e.g., gh-pages)",
+    )
+
+    publish_parser.add_argument(
+        "content_dir",
+        type=Path,
+        nargs="?",
+        help="Directory containing markdown blog posts",
+    )
+
+    publish_parser.add_argument(
+        "--branch",
+        default="gh-pages",
+        help="Git branch to publish to (default: gh-pages)",
+    )
+
+    publish_parser.add_argument(
+        "--remote",
+        default="origin",
+        help="Git remote to push to (default: origin)",
+    )
+
+    add_common_arguments(publish_parser)
+
     parser.add_argument(
         "--version",
         action="version",
