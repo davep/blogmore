@@ -513,3 +513,104 @@ class TestPublishSite:
             captured = capsys.readouterr()
             # Should not print creation message since file already exists
             assert "Created .nojekyll file" not in captured.out
+
+    @patch("blogmore.publisher.subprocess.run")
+    @patch("blogmore.publisher.shutil.rmtree")
+    @patch("blogmore.publisher.shutil.copy2")
+    @patch("blogmore.publisher.shutil.copytree")
+    @patch("blogmore.publisher.tempfile.mkdtemp")
+    @patch("blogmore.publisher.check_git_available", return_value=True)
+    @patch("blogmore.publisher.check_is_git_repository", return_value=True)
+    @patch("blogmore.publisher.get_git_root")
+    def test_nojekyll_committed_before_push(
+        self,
+        mock_get_git_root: MagicMock,
+        mock_check_is_git_repository: MagicMock,
+        mock_check_git_available: MagicMock,
+        mock_mkdtemp: MagicMock,
+        mock_copytree: MagicMock,
+        mock_copy2: MagicMock,
+        mock_rmtree: MagicMock,
+        mock_run: MagicMock,
+        tmp_path: Path,
+    ) -> None:
+        """Test that .nojekyll file is created and committed before push.
+
+        This test verifies the order of operations:
+        1. .nojekyll file is created (touch)
+        2. Files are added (git add)
+        3. Changes are committed (git commit)
+        4. Changes are pushed (git push)
+        """
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+        (output_dir / "index.html").write_text("<html></html>")
+
+        git_root = tmp_path / "repo"
+        git_root.mkdir()
+        mock_get_git_root.return_value = git_root
+
+        worktree_path = tmp_path / "worktree"
+        worktree_path.mkdir()
+        mock_mkdtemp.return_value = str(worktree_path)
+
+        # Track the order of git commands
+        git_commands: list[list[str]] = []
+
+        # Mock git commands
+        def run_side_effect(*args: object, **kwargs: object) -> MagicMock:
+            cmd = args[0] if args else []
+            if not isinstance(cmd, list):
+                return MagicMock(returncode=0, stdout="")
+
+            # Track git commands
+            if cmd[0] == "git":
+                git_commands.append(cmd)
+
+            if cmd[:3] == ["git", "rev-parse", "--verify"]:
+                # Branch doesn't exist locally
+                return MagicMock(returncode=1, stdout="")
+            elif cmd[:2] == ["git", "ls-remote"]:
+                # Branch doesn't exist remotely
+                return MagicMock(returncode=0, stdout="")
+            elif cmd[:2] == ["git", "diff"]:
+                # There are changes
+                return MagicMock(returncode=1, stdout="")
+            else:
+                return MagicMock(returncode=0, stdout="")
+
+        mock_run.side_effect = run_side_effect
+
+        publish_site(output_dir, branch="gh-pages", remote="origin")
+
+        # Verify .nojekyll file was created in the worktree
+        nojekyll_file = worktree_path / ".nojekyll"
+        assert nojekyll_file.exists()
+
+        # Find the indices of key git operations
+        add_index = None
+        commit_index = None
+        push_index = None
+
+        for i, cmd in enumerate(git_commands):
+            if cmd[:2] == ["git", "add"]:
+                add_index = i
+            elif cmd[:2] == ["git", "commit"]:
+                commit_index = i
+            elif cmd[:2] == ["git", "push"]:
+                push_index = i
+
+        # Verify all operations occurred
+        assert add_index is not None, "git add command not found"
+        assert commit_index is not None, "git commit command not found"
+        assert push_index is not None, "git push command not found"
+
+        # Verify the order: add < commit < push
+        assert add_index < commit_index, (
+            f"git add (index {add_index}) should occur before "
+            f"git commit (index {commit_index})"
+        )
+        assert commit_index < push_index, (
+            f"git commit (index {commit_index}) should occur before "
+            f"git push (index {push_index})"
+        )
