@@ -42,4 +42,10 @@
   when a change demands it.
 - Any new functionality requires associated tests.
 
+## Documentation
+
+- When adding new functionality that the user can interact with, especially
+  if it's configurable, ensure you update the README file to include details
+  of what the feature is, why you'd use it, an how you'd use it.
+
 [//]: # (copilot-instructions.md ends here)
