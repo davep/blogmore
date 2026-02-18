@@ -125,13 +125,15 @@ def _determine_config_path(args: Any) -> Path | None:
 
     # If a specific config file is provided, use it
     if hasattr(args, "config") and args.config is not None:
-        return args.config
+        return Path(args.config)
 
     # Otherwise, search for default config files
     for config_file in DEFAULT_CONFIG_FILES:
         config_file_path = Path(config_file)
         if config_file_path.exists():
             return config_file_path
+
+    return None
 
     return None
 
