@@ -24,7 +24,6 @@
 </head>
 <body>
     <div class="site-container">
-        {% if site_logo or links or socials %}
         <aside class="sidebar">
             <div class="sidebar-content">
                 {% if site_logo %}
@@ -34,6 +33,13 @@
                     </a>
                 </div>
                 {% endif %}
+
+                <div class="sidebar-title">
+                    <h1><a href="/">{{ site_title }}</a></h1>
+                    {% if site_subtitle %}
+                    <p class="sidebar-subtitle">{{ site_subtitle }}</p>
+                    {% endif %}
+                </div>
 
                 {% if links %}
                 <section class="sidebar-section">
@@ -60,12 +66,10 @@
                 {% endif %}
             </div>
         </aside>
-        {% endif %}
 
         <div class="main-wrapper">
             <header>
                 <nav>
-                    <h1><a href="/">{{ site_title }}</a></h1>
                     <ul>
                         {% if pages %}
                         {% for page in pages %}

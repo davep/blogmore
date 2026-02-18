@@ -41,6 +41,12 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     )
 
     parser.add_argument(
+        "--site-subtitle",
+        default="",
+        help="Subtitle of the blog site (optional)",
+    )
+
+    parser.add_argument(
         "--site-url",
         default="",
         help="Base URL of the site (optional)",

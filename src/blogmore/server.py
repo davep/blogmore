@@ -120,6 +120,7 @@ def serve_site(
     content_dir: Path | None = None,
     templates_dir: Path | None = None,
     site_title: str = "My Blog",
+    site_subtitle: str = "",
     site_url: str = "",
     include_drafts: bool = False,
     watch: bool = True,
@@ -137,6 +138,7 @@ def serve_site(
         templates_dir: Optional directory containing custom templates.
                       If not provided, uses bundled templates.
         site_title: Title of the blog site
+        site_subtitle: Subtitle of the blog site
         site_url: Base URL of the site
         include_drafts: Whether to include drafts
         watch: Whether to watch for changes and regenerate (default: True)
@@ -183,6 +185,7 @@ def serve_site(
                 templates_dir=templates_dir,
                 output_dir=output_dir,
                 site_title=site_title,
+                site_subtitle=site_subtitle,
                 site_url=site_url,
                 posts_per_feed=posts_per_feed,
                 extra_stylesheets=extra_stylesheets,

@@ -71,6 +71,7 @@ def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
     # Define defaults for each argument to determine if CLI value was explicitly set
     defaults = {
         "site_title": "My Blog",
+        "site_subtitle": "",
         "site_url": "",
         "output": Path("output"),
         "templates": None,

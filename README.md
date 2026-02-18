@@ -107,6 +107,7 @@ blogmore build posts/ \
   --templates my-templates/ \
   --output my-site/ \
   --site-title "My Awesome Blog" \
+  --site-subtitle "Thoughts on code and technology" \
   --site-url "https://example.com"
 ```
 
@@ -120,6 +121,7 @@ content_dir: posts
 output: my-site
 templates: my-templates
 site_title: "My Awesome Blog"
+site_subtitle: "Thoughts on code and technology"
 site_url: "https://example.com"
 include_drafts: false
 posts_per_feed: 30
@@ -165,6 +167,7 @@ All command-line options can be configured in the YAML file:
 - `templates` - Custom templates directory
 - `output` - Output directory (default: `output/`)
 - `site_title` - Site title (default: "My Blog")
+- `site_subtitle` - Site subtitle (optional)
 - `site_url` - Base URL of the site
 - `include_drafts` - Include posts marked as drafts (default: `false`)
 - `posts_per_feed` - Maximum posts in feeds (default: `20`)
@@ -198,6 +201,7 @@ Available for both `build` and `serve` commands:
 - `-t, --templates` - Custom templates directory (default: uses bundled templates)
 - `-o, --output` - Output directory (default: `output/`)
 - `--site-title` - Site title (default: "My Blog")
+- `--site-subtitle` - Site subtitle (optional)
 - `--site-url` - Base URL of the site
 - `--include-drafts` - Include posts marked as drafts
 - `--posts-per-feed` - Maximum posts in feeds (default: 20)
