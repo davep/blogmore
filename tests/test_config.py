@@ -233,6 +233,26 @@ class TestMergeConfigWithArgs:
 
         assert args.extra_stylesheets == ["cli.css"]
 
+    def test_site_subtitle_from_config(self) -> None:
+        """Test loading site_subtitle from config."""
+        config = {"site_subtitle": "My blog subtitle"}
+        args = Mock()
+        args.site_subtitle = ""  # default
+
+        merge_config_with_args(config, args)
+
+        assert args.site_subtitle == "My blog subtitle"
+
+    def test_cli_site_subtitle_overrides_config(self) -> None:
+        """Test that CLI site_subtitle overrides config."""
+        config = {"site_subtitle": "Config subtitle"}
+        args = Mock()
+        args.site_subtitle = "CLI subtitle"
+
+        merge_config_with_args(config, args)
+
+        assert args.site_subtitle == "CLI subtitle"
+
     def test_site_url_from_config(self) -> None:
         """Test loading site_url from config."""
         config = {"site_url": "https://example.com"}
