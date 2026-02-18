@@ -77,6 +77,7 @@ class SiteGenerator:
         templates_dir: Path | None,
         output_dir: Path,
         site_title: str = "My Blog",
+        site_subtitle: str = "",
         site_url: str = "",
         posts_per_feed: int = 20,
         extra_stylesheets: list[str] | None = None,
@@ -91,6 +92,7 @@ class SiteGenerator:
                           If not provided, uses bundled templates.
             output_dir: Directory where generated site will be written
             site_title: Title of the blog site
+            site_subtitle: Subtitle of the blog site
             site_url: Base URL of the site
             posts_per_feed: Maximum number of posts to include in feeds (default: 20)
             extra_stylesheets: Optional list of URLs for additional stylesheets
@@ -101,6 +103,7 @@ class SiteGenerator:
         self.templates_dir = templates_dir
         self.output_dir = output_dir
         self.site_title = site_title
+        self.site_subtitle = site_subtitle
         self.site_url = normalize_site_url(site_url)
         self.posts_per_feed = posts_per_feed
         self.default_author = default_author
@@ -140,6 +143,7 @@ class SiteGenerator:
         """Get the global context available to all templates."""
         context = {
             "site_title": self.site_title,
+            "site_subtitle": self.site_subtitle,
             "site_url": self.site_url,
             "tag_dir": self.TAG_DIR,
             "category_dir": self.CATEGORY_DIR,

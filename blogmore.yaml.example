@@ -13,6 +13,9 @@ output: output
 # Optional: Site title (default: "My Blog")
 site_title: "My Blog"
 
+# Optional: Site subtitle (optional)
+# site_subtitle: "A subtitle for my blog"
+
 # Optional: Base URL of your site (used for RSS feeds and canonical URLs)
 site_url: "https://example.com"
 
