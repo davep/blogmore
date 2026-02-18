@@ -217,6 +217,12 @@ def publish_site(
             elif item.is_dir():
                 shutil.copytree(item, dest, dirs_exist_ok=True)
 
+        # Ensure .nojekyll file exists in the root
+        nojekyll_file = worktree_path / ".nojekyll"
+        if not nojekyll_file.exists():
+            nojekyll_file.touch()
+            print("Created .nojekyll file")
+
         # Add all files in the worktree
         subprocess.run(
             ["git", "add", "-A"],
