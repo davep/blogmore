@@ -300,6 +300,47 @@ Blogmore supports all standard Markdown features plus:
 - **Tables**
 - **Table of contents** generation
 - **Footnotes** - Use `[^1]` in text and `[^1]: Footnote text` at the bottom
+- **GitHub-style admonitions** - Alert boxes for notes, tips, warnings, etc.
+
+### Admonitions (Alerts)
+
+Blogmore supports GitHub-style admonitions (also known as alerts) to highlight important information. These use the same syntax as GitHub Markdown:
+
+```markdown
+> [!NOTE]
+> Useful information that users should know, even when skimming content.
+
+> [!TIP]
+> Helpful advice for doing things better or more easily.
+
+> [!IMPORTANT]
+> Key information users need to know to achieve their goal.
+
+> [!WARNING]
+> Urgent info that needs immediate user attention to avoid problems.
+
+> [!CAUTION]
+> Advises about risks or negative outcomes of certain actions.
+```
+
+Each admonition type has its own color scheme and icon:
+- **Note** - Blue with ℹ️ icon
+- **Tip** - Green with 💡 icon
+- **Important** - Purple with ❗ icon
+- **Warning** - Orange with ⚠️ icon
+- **Caution** - Red with 🚨 icon
+
+Admonitions support all standard Markdown formatting within them, including **bold**, *italic*, `code`, [links](url), and multiple paragraphs.
+
+Example with formatting:
+```markdown
+> [!TIP]
+> You can use **bold**, *italic*, and `code` formatting.
+>
+> Multiple paragraphs work too!
+```
+
+### Footnotes Example
 
 Example with footnote:
 ```markdown

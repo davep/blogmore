@@ -37,9 +37,7 @@ class AdmonitionProcessor(BlockProcessor):
         """
         # Check if first line matches alert pattern
         lines = block.split("\n")
-        if lines and self.ALERT_RE.match(lines[0]):
-            return True
-        return False
+        return bool(lines and self.ALERT_RE.match(lines[0]))
 
     def run(self, parent: Element, blocks: list[str]) -> bool:
         """Process the GitHub alert block.
