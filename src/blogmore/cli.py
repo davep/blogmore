@@ -3,6 +3,8 @@
 import argparse
 from pathlib import Path
 
+from . import __version__
+
 
 def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     """Add common arguments to a parser.
@@ -177,7 +179,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--version",
         action="version",
-        version="blogmore 0.1.0",
+        version=f"blogmore {__version__}",
     )
 
     return parser
