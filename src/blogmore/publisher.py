@@ -1,5 +1,6 @@
 """Git publishing functionality for blogmore."""
 
+import datetime as dt
 import shutil
 import subprocess
 import tempfile
@@ -234,9 +235,11 @@ def publish_site(
         if diff_result.returncode == 0:
             print("No changes to publish")
         else:
-            # Commit the changes
+            # Commit the changes with UTC timestamp
+            timestamp = dt.datetime.now(dt.UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
+            commit_message = f"Publish site - {timestamp}"
             subprocess.run(
-                ["git", "commit", "-m", "Publish site"],
+                ["git", "commit", "-m", commit_message],
                 cwd=worktree_path,
                 check=True,
                 capture_output=True,
