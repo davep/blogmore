@@ -157,6 +157,20 @@ blogmore build posts/ \
   --extra-stylesheet "/assets/custom.css"
 ```
 
+#### `--icon-source <filename>`
+
+Filename of the source icon image in the `extras/` directory. BlogMore will generate favicons and platform-specific icons from this image.
+
+```bash
+blogmore build posts/ --icon-source "my-logo.png"
+```
+
+If not specified, BlogMore auto-detects common icon filenames: `icon.png`, `icon.jpg`, `source-icon.png`, `app-icon.png`.
+
+When a source icon is provided or detected, BlogMore generates 18 optimised icon files for iOS, Android, Windows, and standard favicons.
+
+See [Using BlogMore - Adding Site Icons](using.md#adding-site-icons) for detailed usage.
+
 ### Examples
 
 Basic site generation:
@@ -234,6 +248,7 @@ The serve command also accepts all the build command options:
 - `--posts-per-feed`
 - `--default-author`
 - `--extra-stylesheet`
+- `--icon-source`
 
 ### Examples
 
@@ -318,6 +333,7 @@ The publish command also accepts all the build command options:
 - `--posts-per-feed`
 - `--default-author`
 - `--extra-stylesheet`
+- `--icon-source`
 
 ### How It Works
 
