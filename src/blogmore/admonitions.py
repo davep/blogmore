@@ -21,7 +21,9 @@ class AdmonitionProcessor(BlockProcessor):
     }
 
     # Pattern to match GitHub alert syntax: > [!TYPE]
-    ALERT_RE = re.compile(r"^>\s*\[!(note|tip|important|warning|caution)\]\s*$", re.IGNORECASE)
+    ALERT_RE = re.compile(
+        r"^>\s*\[!(note|tip|important|warning|caution)\]\s*$", re.IGNORECASE
+    )
     # Pattern to match blockquote lines: > content
     BLOCKQUOTE_RE = re.compile(r"^>\s?(.*)$")
 
