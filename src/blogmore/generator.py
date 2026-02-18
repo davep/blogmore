@@ -259,10 +259,14 @@ class SiteGenerator:
             current_index = all_posts.index(post)
             # Previous post is older (higher index)
             context["prev_post"] = (
-                all_posts[current_index + 1] if current_index + 1 < len(all_posts) else None
+                all_posts[current_index + 1]
+                if current_index + 1 < len(all_posts)
+                else None
             )
             # Next post is newer (lower index)
-            context["next_post"] = all_posts[current_index - 1] if current_index > 0 else None
+            context["next_post"] = (
+                all_posts[current_index - 1] if current_index > 0 else None
+            )
         except ValueError:
             # Post not in list, no navigation
             context["prev_post"] = None
