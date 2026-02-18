@@ -573,3 +573,43 @@ class TestTemplateRenderer:
         result = template.render()
         assert "external" in result
         assert "internal" in result
+
+    def test_render_post_includes_generator_meta_tag(self, sample_post: Post) -> None:
+        """Test that rendered posts include generator meta tag with version."""
+        from blogmore import __version__
+
+        renderer = TemplateRenderer()
+        html = renderer.render_post(
+            sample_post, site_title="Test Blog", blogmore_version=__version__
+        )
+
+        # Check for the generator meta tag with version
+        assert f'<meta name="generator" content="blogmore v{__version__}">' in html
+
+    def test_render_page_includes_generator_meta_tag(self, sample_page: Page) -> None:
+        """Test that rendered pages include generator meta tag with version."""
+        from blogmore import __version__
+
+        renderer = TemplateRenderer()
+        html = renderer.render_page(
+            sample_page, site_title="Test Blog", blogmore_version=__version__
+        )
+
+        # Check for the generator meta tag with version
+        assert f'<meta name="generator" content="blogmore v{__version__}">' in html
+
+    def test_render_index_includes_generator_meta_tag(self, sample_post: Post) -> None:
+        """Test that rendered index includes generator meta tag with version."""
+        from blogmore import __version__
+
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=1,
+            total_pages=1,
+            site_title="Test Blog",
+            blogmore_version=__version__,
+        )
+
+        # Check for the generator meta tag with version
+        assert f'<meta name="generator" content="blogmore v{__version__}">' in html
