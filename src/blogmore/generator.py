@@ -155,6 +155,20 @@ class SiteGenerator:
 
         return None
 
+    def _detect_apple_touch_icons(self) -> bool:
+        """Detect if Apple touch icons exist in the icons directory.
+
+        Returns:
+            True if Apple touch icons exist, False otherwise
+        """
+        icons_dir = self.output_dir / "icons"
+        if not icons_dir.exists():
+            return False
+
+        # Check if the main Apple touch icon exists
+        apple_icon_path = icons_dir / "apple-touch-icon.png"
+        return apple_icon_path.is_file()
+
     def _generate_icons(self) -> None:
         """Generate icons from a source image if present."""
         extras_dir = self.content_dir / "extras"
@@ -187,6 +201,7 @@ class SiteGenerator:
             "tag_dir": self.TAG_DIR,
             "category_dir": self.CATEGORY_DIR,
             "favicon_url": self._detect_favicon(),
+            "has_apple_touch_icons": self._detect_apple_touch_icons(),
             "blogmore_version": __version__,
         }
         # Merge sidebar config into context
@@ -225,6 +240,10 @@ class SiteGenerator:
 
         # Create output directory
         self.output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Generate icons from source image BEFORE generating HTML pages
+        # so that the has_apple_touch_icons flag is correctly set
+        self._generate_icons()
 
         # Generate individual post pages
         print("Generating post pages...")
@@ -274,9 +293,6 @@ class SiteGenerator:
 
         # Copy post attachments from content directory
         self._copy_attachments()
-
-        # Generate icons from source image
-        self._generate_icons()
 
         # Copy extra files from extras directory
         self._copy_extras()

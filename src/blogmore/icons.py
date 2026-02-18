@@ -1,6 +1,8 @@
 """Icon generation from a single source image for blogmore."""
 
+import json
 from pathlib import Path
+from xml.etree import ElementTree as ET
 
 from PIL import Image
 
@@ -46,7 +48,7 @@ def detect_source_icon(
 
 
 class IconGenerator:
-    """Generate favicon and Apple touch icons from a single source image."""
+    """Generate favicon and platform-specific icons from a single source image."""
 
     def __init__(self, source_image: Path, output_dir: Path) -> None:
         """Initialize the icon generator.
@@ -77,10 +79,21 @@ class IconGenerator:
 
                 generated: dict[str, Path] = {}
 
-                # Generate favicon.ico
+                # Generate favicon.ico (multi-resolution)
                 favicon_path = self._generate_favicon(img)
                 if favicon_path:
                     generated["favicon.ico"] = favicon_path
+
+                # Generate standard favicon PNG sizes
+                favicon_sizes = [
+                    (16, "favicon-16x16.png"),
+                    (32, "favicon-32x32.png"),
+                    (96, "favicon-96x96.png"),
+                ]
+                for size, filename in favicon_sizes:
+                    icon_path = self._generate_png_icon(img, size, filename)
+                    if icon_path:
+                        generated[filename] = icon_path
 
                 # Generate Apple touch icons
                 apple_icons = [
@@ -90,11 +103,47 @@ class IconGenerator:
                     (167, "apple-touch-icon-167.png"),
                     (180, "apple-touch-icon-precomposed.png"),
                 ]
-
                 for size, filename in apple_icons:
-                    icon_path = self._generate_apple_icon(img, size, filename)
+                    icon_path = self._generate_png_icon(img, size, filename)
                     if icon_path:
                         generated[filename] = icon_path
+
+                # Generate Android/Chrome icons
+                android_icons = [
+                    (192, "android-chrome-192x192.png"),
+                    (512, "android-chrome-512x512.png"),
+                ]
+                for size, filename in android_icons:
+                    icon_path = self._generate_png_icon(img, size, filename)
+                    if icon_path:
+                        generated[filename] = icon_path
+
+                # Generate Windows/Microsoft tiles
+                windows_tiles = [
+                    (70, "mstile-70x70.png"),
+                    (144, "mstile-144x144.png"),
+                    (150, "mstile-150x150.png"),
+                    (310, "mstile-310x310.png"),
+                ]
+                for size, filename in windows_tiles:
+                    icon_path = self._generate_png_icon(img, size, filename)
+                    if icon_path:
+                        generated[filename] = icon_path
+
+                # Generate wide Windows tile (310x150)
+                wide_tile_path = self._generate_wide_tile(img)
+                if wide_tile_path:
+                    generated["mstile-310x150.png"] = wide_tile_path
+
+                # Generate web manifest for Android/PWA
+                manifest_path = self._generate_web_manifest()
+                if manifest_path:
+                    generated["site.webmanifest"] = manifest_path
+
+                # Generate browserconfig.xml for Windows tiles
+                browserconfig_path = self._generate_browserconfig()
+                if browserconfig_path:
+                    generated["browserconfig.xml"] = browserconfig_path
 
                 return generated
 
@@ -143,10 +192,10 @@ class IconGenerator:
             print(f"Error generating favicon: {e}")
             return None
 
-    def _generate_apple_icon(
+    def _generate_png_icon(
         self, img: Image.Image, size: int, filename: str
     ) -> Path | None:
-        """Generate an Apple touch icon at a specific size.
+        """Generate a PNG icon at a specific size.
 
         Args:
             img: Source PIL Image
@@ -170,3 +219,117 @@ class IconGenerator:
         except Exception as e:
             print(f"Error generating {filename}: {e}")
             return None
+
+    def _generate_wide_tile(self, img: Image.Image) -> Path | None:
+        """Generate a wide Windows tile (310x150).
+
+        Args:
+            img: Source PIL Image
+
+        Returns:
+            Path to the generated tile, or None on failure
+        """
+        try:
+            output_path = self.output_dir / "mstile-310x150.png"
+
+            # Create 310x150 image with centered icon
+            # Resize icon to fit within the tile
+            icon_size = 150  # Height of the tile
+            resized = img.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
+
+            # Create tile background
+            tile = Image.new("RGBA", (310, 150), (0, 0, 0, 0))
+
+            # Center the icon
+            x_offset = (310 - icon_size) // 2
+            y_offset = 0
+            tile.paste(resized, (x_offset, y_offset), resized if resized.mode == "RGBA" else None)
+
+            # Save as PNG
+            tile.save(output_path, format="PNG")
+
+            return output_path
+
+        except Exception as e:
+            print(f"Error generating wide tile: {e}")
+            return None
+
+    def _generate_web_manifest(self) -> Path | None:
+        """Generate a web manifest file for Android/PWA.
+
+        Returns:
+            Path to the generated manifest file, or None on failure
+        """
+        try:
+            output_path = self.output_dir / "site.webmanifest"
+
+            manifest = {
+                "name": "",
+                "short_name": "",
+                "icons": [
+                    {
+                        "src": "/icons/android-chrome-192x192.png",
+                        "sizes": "192x192",
+                        "type": "image/png",
+                    },
+                    {
+                        "src": "/icons/android-chrome-512x512.png",
+                        "sizes": "512x512",
+                        "type": "image/png",
+                    },
+                ],
+                "theme_color": "#ffffff",
+                "background_color": "#ffffff",
+                "display": "standalone",
+            }
+
+            with open(output_path, "w") as f:
+                json.dump(manifest, f, indent=2)
+
+            return output_path
+
+        except Exception as e:
+            print(f"Error generating web manifest: {e}")
+            return None
+
+    def _generate_browserconfig(self) -> Path | None:
+        """Generate browserconfig.xml for Windows tiles.
+
+        Returns:
+            Path to the generated browserconfig file, or None on failure
+        """
+        try:
+            output_path = self.output_dir / "browserconfig.xml"
+
+            # Create XML structure
+            browserconfig = ET.Element("browserconfig")
+            msapplication = ET.SubElement(browserconfig, "msapplication")
+            tile = ET.SubElement(msapplication, "tile")
+
+            # Add tile image references
+            tiles = [
+                ("square70x70logo", "/icons/mstile-70x70.png"),
+                ("square150x150logo", "/icons/mstile-150x150.png"),
+                ("wide310x150logo", "/icons/mstile-310x150.png"),
+                ("square310x310logo", "/icons/mstile-310x310.png"),
+            ]
+
+            for name, src in tiles:
+                element = ET.SubElement(tile, name)
+                element.set("src", src)
+
+            # Add tile color
+            tile_color = ET.SubElement(tile, "TileColor")
+            tile_color.text = "#ffffff"
+
+            # Write XML to file
+            tree = ET.ElementTree(browserconfig)
+            ET.indent(tree, space="  ")
+            tree.write(output_path, encoding="utf-8", xml_declaration=True)
+
+            return output_path
+
+        except Exception as e:
+            print(f"Error generating browserconfig: {e}")
+            return None
+
