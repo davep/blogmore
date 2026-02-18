@@ -19,6 +19,13 @@
   a logical unit of work for some code, place it in a .py file that makes
   for a logical unit and name that file appropriately.
 
+## Code quality
+
+- Before seeking review all code should pass `mypy` strict tests done with
+  `make stricttypecheck`.
+- Before seeking review all code should pass all `ruff` linting checks done
+  with `make lint`.
+
 ## Repository tools
 
 - We use `uv` to manage the repository.
