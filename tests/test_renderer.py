@@ -524,3 +524,52 @@ class TestTemplateRenderer:
             '<meta name="twitter:image" content="https://cdn.example.com/images/cover.jpg">'
             in html
         )
+
+    def test_init_with_site_url(self) -> None:
+        """Test initializing renderer with site_url."""
+        renderer = TemplateRenderer(site_url="https://example.com")
+        assert renderer.site_url == "https://example.com"
+        assert renderer.site_domain == "example.com"
+
+    def test_is_external_link_absolute_external(self) -> None:
+        """Test that absolute external URLs are identified correctly."""
+        renderer = TemplateRenderer(site_url="https://example.com")
+        assert renderer._is_external_link("https://external.com/page")
+        assert renderer._is_external_link("http://external.com/page")
+
+    def test_is_external_link_relative(self) -> None:
+        """Test that relative URLs are identified as internal."""
+        renderer = TemplateRenderer(site_url="https://example.com")
+        assert not renderer._is_external_link("/posts/my-post")
+        assert not renderer._is_external_link("posts/my-post")
+
+    def test_is_external_link_anchor(self) -> None:
+        """Test that anchor links are identified as internal."""
+        renderer = TemplateRenderer(site_url="https://example.com")
+        assert not renderer._is_external_link("#section")
+
+    def test_is_external_link_same_domain(self) -> None:
+        """Test that links to the same domain are identified as internal."""
+        renderer = TemplateRenderer(site_url="https://example.com")
+        assert not renderer._is_external_link("https://example.com/page")
+        assert not renderer._is_external_link("https://www.example.com/page")
+
+    def test_is_external_link_no_site_url(self) -> None:
+        """Test external link detection when no site URL is configured."""
+        renderer = TemplateRenderer()
+        # With no site URL, all absolute URLs are considered external
+        assert renderer._is_external_link("https://example.com/page")
+        # Relative links are still internal
+        assert not renderer._is_external_link("/page")
+
+    def test_is_external_link_filter_in_template(self) -> None:
+        """Test that is_external_link filter works in templates."""
+        renderer = TemplateRenderer(site_url="https://example.com")
+        template_str = """
+        {% if "https://github.com"|is_external_link %}external{% else %}internal{% endif %}
+        {% if "/about.html"|is_external_link %}external{% else %}internal{% endif %}
+        """
+        template = renderer.env.from_string(template_str)
+        result = template.render()
+        assert "external" in result
+        assert "internal" in result

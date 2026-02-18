@@ -40,7 +40,7 @@
                     <h2>Links</h2>
                     <ul class="sidebar-links">
                         {% for link in links %}
-                        <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                        <li><a href="{{ link.url }}"{% if link.url|is_external_link %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.title }}</a></li>
                         {% endfor %}
                     </ul>
                 </section>
@@ -51,7 +51,7 @@
                     <h2>Social</h2>
                     <div class="sidebar-socials">
                         {% for social in socials %}
-                        <a href="{{ social.url }}" title="{{ social.site }}" aria-label="{{ social.site }}">
+                        <a href="{{ social.url }}" title="{{ social.site }}" aria-label="{{ social.site }}"{% if social.url|is_external_link %} target="_blank" rel="noopener noreferrer"{% endif %}>
                             <i class="fa-brands fa-{{ social.site }}"></i>
                         </a>
                         {% endfor %}
