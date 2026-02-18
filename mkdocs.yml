@@ -3,7 +3,7 @@ docs_dir: docs
 repo_url: https://github.com/davep/blogmore
 
 nav:
-  - OldNews:
+  - BlogMore:
       - index.md
       - getting_started.md
       - using.md
