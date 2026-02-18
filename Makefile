@@ -1,18 +1,19 @@
-app     := blogmore
-src     := src/
-reports := .reports
-run     := uv run
-sync    := uv sync --group dev --group test
-build   := uv build
-publish := uv publish --username=__token__ --keyring-provider=subprocess
-python  := $(run) python
-ruff    := $(run) ruff
-lint    := $(ruff) check
-fmt     := $(ruff) format
-mypy    := $(run) mypy
-spell   := $(run) codespell
-test    := $(run) pytest --verbose --cov
+app      := blogmore
+src      := src/
+reports  := .reports
+run      := uv run
+sync     := uv sync --group dev --group test
+build    := uv build
+publish  := uv publish --username=__token__ --keyring-provider=subprocess
+python   := $(run) python
+ruff     := $(run) ruff
+lint     := $(ruff) check
+fmt      := $(ruff) format
+mypy     := $(run) mypy
+spell    := $(run) codespell
+test     := $(run) pytest --verbose --cov
 coverage := $(test) --cov-report html:$(reports)/html
+mkdocs   := $(run) mkdocs
 
 ##############################################################################
 # Setup/update packages the system requires.
@@ -73,6 +74,20 @@ spellcheck:			# Spell check the code
 
 .PHONY: checkall
 checkall: spellcheck codestyle lint stricttypecheck test # Check all the things
+
+##############################################################################
+# Documentation.
+.PHONY: docs
+docs:                           # Generate the system documentation
+	$(mkdocs) build
+
+.PHONY: rtfm
+rtfm:                           # Locally read the library documentation
+	$(mkdocs) serve --livereload
+
+.PHONY: publishdocs
+publishdocs:			# Set up the docs for publishing
+	$(mkdocs) gh-deploy
 
 ##############################################################################
 # Package/publish.
