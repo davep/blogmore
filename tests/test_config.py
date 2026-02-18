@@ -531,3 +531,37 @@ class TestGetSidebarConfig:
         assert result == {"site_logo": "/logo.png"}
         assert "site_title" not in result
         assert "site_url" not in result
+
+
+class TestCleanFirstConfig:
+    """Test the clean_first configuration option."""
+
+    def test_clean_first_from_config(self) -> None:
+        """Test loading clean_first from config."""
+        config = {"clean_first": True}
+        args = Mock()
+        args.clean_first = False  # default
+
+        merge_config_with_args(config, args)
+
+        assert args.clean_first is True
+
+    def test_cli_clean_first_overrides_config(self) -> None:
+        """Test that CLI clean_first overrides config."""
+        config = {"clean_first": False}
+        args = Mock()
+        args.clean_first = True
+
+        merge_config_with_args(config, args)
+
+        assert args.clean_first is True
+
+    def test_clean_first_defaults_to_false(self) -> None:
+        """Test that clean_first defaults to False when not in config."""
+        config = {}
+        args = Mock()
+        args.clean_first = False  # default
+
+        merge_config_with_args(config, args)
+
+        assert args.clean_first is False

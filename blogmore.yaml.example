@@ -22,6 +22,9 @@ site_url: "https://example.com"
 # Optional: Include posts marked as drafts (default: false)
 include_drafts: false
 
+# Optional: Remove the output directory before generating the site (default: false)
+clean_first: false
+
 # Optional: Maximum number of posts in RSS/Atom feeds (default: 20)
 posts_per_feed: 20
 

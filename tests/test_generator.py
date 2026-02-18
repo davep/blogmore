@@ -682,3 +682,75 @@ class TestSiteGenerator:
         assert index_file.exists()
         content = index_file.read_text()
         assert '<link rel="icon"' not in content
+
+    def test_clean_first_removes_output_directory(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that clean_first removes the output directory before generation."""
+        # Create output directory with some existing files
+        temp_output_dir.mkdir(parents=True, exist_ok=True)
+        old_file = temp_output_dir / "old_file.html"
+        old_file.write_text("<html>Old content</html>")
+
+        # Generate with clean_first=True
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            clean_first=True,
+        )
+
+        generator.generate(include_drafts=False)
+
+        # The old file should not exist
+        assert not old_file.exists()
+
+        # But the new generated files should exist
+        assert (temp_output_dir / "index.html").exists()
+
+    def test_clean_first_false_preserves_existing_files(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that clean_first=False preserves existing files in output directory."""
+        # Create output directory with some existing files
+        temp_output_dir.mkdir(parents=True, exist_ok=True)
+        old_file = temp_output_dir / "old_file.html"
+        old_file.write_text("<html>Old content</html>")
+
+        # Generate with clean_first=False (default)
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            clean_first=False,
+        )
+
+        generator.generate(include_drafts=False)
+
+        # The old file should still exist
+        assert old_file.exists()
+        assert old_file.read_text() == "<html>Old content</html>"
+
+        # And the new generated files should also exist
+        assert (temp_output_dir / "index.html").exists()
+
+    def test_clean_first_with_nonexistent_output(
+        self, posts_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that clean_first works correctly when output directory doesn't exist."""
+        output_dir = tmp_path / "nonexistent_output"
+
+        # Generate with clean_first=True on non-existent directory
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=output_dir,
+            clean_first=True,
+        )
+
+        # Should not raise an error
+        generator.generate(include_drafts=False)
+
+        # The output directory should be created with generated files
+        assert output_dir.exists()
+        assert (output_dir / "index.html").exists()

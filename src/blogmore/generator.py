@@ -83,6 +83,7 @@ class SiteGenerator:
         extra_stylesheets: list[str] | None = None,
         default_author: str | None = None,
         sidebar_config: dict[str, Any] | None = None,
+        clean_first: bool = False,
     ) -> None:
         """Initialize the site generator.
 
@@ -98,6 +99,7 @@ class SiteGenerator:
             extra_stylesheets: Optional list of URLs for additional stylesheets
             default_author: Default author name for posts without author in frontmatter
             sidebar_config: Optional sidebar configuration (site_logo, links, socials)
+            clean_first: Whether to remove the output directory before generating
         """
         self.content_dir = content_dir
         self.templates_dir = templates_dir
@@ -108,6 +110,7 @@ class SiteGenerator:
         self.posts_per_feed = posts_per_feed
         self.default_author = default_author
         self.sidebar_config = sidebar_config or {}
+        self.clean_first = clean_first
 
         self.parser = PostParser(site_url=self.site_url)
         self.renderer = TemplateRenderer(
@@ -159,6 +162,11 @@ class SiteGenerator:
         Args:
             include_drafts: Whether to include posts marked as drafts
         """
+        # Clean output directory if requested
+        if self.clean_first and self.output_dir.exists():
+            print(f"Removing output directory: {self.output_dir}")
+            shutil.rmtree(self.output_dir)
+
         # Parse all posts
         print(f"Parsing posts from {self.content_dir}...")
         posts = self.parser.parse_directory(

@@ -67,6 +67,7 @@ def main() -> int:
             sidebar_config=sidebar_config,
             config_path=config_path,
             cli_overrides=cli_overrides,
+            clean_first=args.clean_first,
         )
 
     # Handle build command (and its aliases: generate, gen)
@@ -108,6 +109,7 @@ def main() -> int:
                 extra_stylesheets=args.extra_stylesheets,
                 default_author=args.default_author,
                 sidebar_config=sidebar_config,
+                clean_first=args.clean_first,
             )
             generator.generate(include_drafts=args.include_drafts)
             return 0
@@ -163,6 +165,7 @@ def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
         "no_watch": False,
         "content_dir": None,
         "default_author": None,
+        "clean_first": False,
     }
 
     overrides = {}

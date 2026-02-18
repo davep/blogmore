@@ -241,6 +241,7 @@ def serve_site(
     sidebar_config: dict[str, Any] | None = None,
     config_path: Path | None = None,
     cli_overrides: dict[str, Any] | None = None,
+    clean_first: bool = False,
 ) -> int:
     """Serve the generated site locally using a simple HTTP server.
 
@@ -261,6 +262,7 @@ def serve_site(
         sidebar_config: Optional sidebar configuration (site_logo, links, socials)
         config_path: Path to the configuration file being used (if any)
         cli_overrides: Dictionary of CLI arguments that override config values
+        clean_first: Whether to remove the output directory before generating
 
     Returns:
         Exit code
@@ -306,6 +308,7 @@ def serve_site(
                 extra_stylesheets=extra_stylesheets,
                 default_author=default_author,
                 sidebar_config=sidebar_config,
+                clean_first=clean_first,
             )
             generator.generate(include_drafts=include_drafts)
         except Exception as e:

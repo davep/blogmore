@@ -78,6 +78,12 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
         help="Default author name for posts that don't specify an author",
     )
 
+    parser.add_argument(
+        "--clean-first",
+        action="store_true",
+        help="Remove the output directory before generating the site",
+    )
+
 
 def create_parser() -> argparse.ArgumentParser:
     """Create and configure the argument parser for blogmore.
