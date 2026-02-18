@@ -754,3 +754,21 @@ class TestSiteGenerator:
         # The output directory should be created with generated files
         assert output_dir.exists()
         assert (output_dir / "index.html").exists()
+
+    def test_global_context_includes_version(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the global context includes the blogmore version."""
+        from blogmore import __version__
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_title="Test Blog",
+        )
+
+        context = generator._get_global_context()
+
+        assert "blogmore_version" in context
+        assert context["blogmore_version"] == __version__

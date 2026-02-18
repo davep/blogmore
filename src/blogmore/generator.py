@@ -8,6 +8,7 @@ from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
+from blogmore import __version__
 from blogmore.feeds import BlogFeedGenerator
 from blogmore.parser import Page, Post, PostParser, remove_date_prefix
 from blogmore.renderer import TemplateRenderer
@@ -151,6 +152,7 @@ class SiteGenerator:
             "tag_dir": self.TAG_DIR,
             "category_dir": self.CATEGORY_DIR,
             "favicon_url": self._detect_favicon(),
+            "blogmore_version": __version__,
         }
         # Merge sidebar config into context
         context.update(self.sidebar_config)
