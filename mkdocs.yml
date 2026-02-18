@@ -18,6 +18,7 @@ watch:
 markdown_extensions:
   - admonition
   - pymdownx.snippets
+  - pymdownx.superfences:
 
 plugins:
   search:
