@@ -1,11 +1,17 @@
 """Command-line interface for blogmore."""
 
+import argparse
 import sys
 from pathlib import Path
 from typing import Any
 
 from blogmore.cli import create_parser
-from blogmore.config import get_sidebar_config, load_config, merge_config_with_args
+from blogmore.config import (
+    DEFAULT_CONFIG_FILES,
+    get_sidebar_config,
+    load_config,
+    merge_config_with_args,
+)
 from blogmore.generator import SiteGenerator
 from blogmore.server import serve_site
 
@@ -112,7 +118,7 @@ def main() -> int:
     return 0
 
 
-def _determine_config_path(args: Any) -> Path | None:
+def _determine_config_path(args: argparse.Namespace) -> Path | None:
     """Determine which config file is being used.
 
     Args:
@@ -121,8 +127,6 @@ def _determine_config_path(args: Any) -> Path | None:
     Returns:
         Path to the config file being used, or None if no config file
     """
-    from blogmore.config import DEFAULT_CONFIG_FILES
-
     # If a specific config file is provided, use it
     if hasattr(args, "config") and args.config is not None:
         return Path(args.config)
@@ -135,10 +139,8 @@ def _determine_config_path(args: Any) -> Path | None:
 
     return None
 
-    return None
 
-
-def _extract_cli_overrides(args: Any) -> dict[str, Any]:
+def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
     """Extract CLI arguments that were explicitly set (not defaults).
 
     Args:
