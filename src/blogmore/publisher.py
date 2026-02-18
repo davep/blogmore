@@ -85,9 +85,10 @@ def publish_site(
     2. Checks that we're in a git repository
     3. Uses a temporary git worktree to prepare the branch
     4. Copies only the output directory contents to the worktree
-    5. Commits the changes
-    6. Pushes to the remote
-    7. Cleans up the worktree
+    5. Ensures a .nojekyll file exists in the root (for GitHub Pages)
+    6. Commits the changes
+    7. Pushes to the remote
+    8. Cleans up the worktree
 
     Args:
         output_dir: Directory containing the generated site
