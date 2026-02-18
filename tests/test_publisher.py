@@ -379,3 +379,137 @@ class TestPublishSite:
             call[0][0][:2] == ["git", "push"]
             for call in mock_run.call_args_list
         )
+
+    @patch("blogmore.publisher.subprocess.run")
+    @patch("blogmore.publisher.shutil.rmtree")
+    @patch("blogmore.publisher.shutil.copy2")
+    @patch("blogmore.publisher.shutil.copytree")
+    @patch("blogmore.publisher.tempfile.mkdtemp")
+    @patch("blogmore.publisher.check_git_available", return_value=True)
+    @patch("blogmore.publisher.check_is_git_repository", return_value=True)
+    @patch("blogmore.publisher.get_git_root")
+    def test_publish_site_creates_nojekyll(
+        self,
+        mock_get_git_root: MagicMock,
+        mock_check_is_git_repository: MagicMock,
+        mock_check_git_available: MagicMock,
+        mock_mkdtemp: MagicMock,
+        mock_copytree: MagicMock,
+        mock_copy2: MagicMock,
+        mock_rmtree: MagicMock,
+        mock_run: MagicMock,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        """Test that .nojekyll file is created in the worktree."""
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+        (output_dir / "index.html").write_text("<html></html>")
+
+        git_root = tmp_path / "repo"
+        git_root.mkdir()
+        mock_get_git_root.return_value = git_root
+
+        worktree_path = tmp_path / "worktree"
+        worktree_path.mkdir()
+        mock_mkdtemp.return_value = str(worktree_path)
+
+        # Mock git commands
+        def run_side_effect(*args: object, **kwargs: object) -> MagicMock:
+            cmd = args[0] if args else []
+            if not isinstance(cmd, list):
+                return MagicMock(returncode=0, stdout="")
+
+            if cmd[:3] == ["git", "rev-parse", "--verify"]:
+                # Branch doesn't exist locally
+                return MagicMock(returncode=1, stdout="")
+            elif cmd[:2] == ["git", "ls-remote"]:
+                # Branch doesn't exist remotely
+                return MagicMock(returncode=0, stdout="")
+            elif cmd[:2] == ["git", "diff"]:
+                # There are changes
+                return MagicMock(returncode=1, stdout="")
+            else:
+                return MagicMock(returncode=0, stdout="")
+
+        mock_run.side_effect = run_side_effect
+
+        publish_site(output_dir, branch="gh-pages", remote="origin")
+
+        # Verify .nojekyll file was created
+        nojekyll_file = worktree_path / ".nojekyll"
+        assert nojekyll_file.exists()
+
+        captured = capsys.readouterr()
+        assert "Created .nojekyll file" in captured.out
+
+    @patch("blogmore.publisher.subprocess.run")
+    @patch("blogmore.publisher.shutil.rmtree")
+    @patch("blogmore.publisher.shutil.copytree")
+    @patch("blogmore.publisher.tempfile.mkdtemp")
+    @patch("blogmore.publisher.check_git_available", return_value=True)
+    @patch("blogmore.publisher.check_is_git_repository", return_value=True)
+    @patch("blogmore.publisher.get_git_root")
+    def test_publish_site_preserves_existing_nojekyll(
+        self,
+        mock_get_git_root: MagicMock,
+        mock_check_is_git_repository: MagicMock,
+        mock_check_git_available: MagicMock,
+        mock_mkdtemp: MagicMock,
+        mock_copytree: MagicMock,
+        mock_rmtree: MagicMock,
+        mock_run: MagicMock,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        """Test that existing .nojekyll file is preserved."""
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+        (output_dir / "index.html").write_text("<html></html>")
+        (output_dir / ".nojekyll").write_text("")
+
+        git_root = tmp_path / "repo"
+        git_root.mkdir()
+        mock_get_git_root.return_value = git_root
+
+        worktree_path = tmp_path / "worktree"
+        worktree_path.mkdir()
+        mock_mkdtemp.return_value = str(worktree_path)
+
+        # Mock copy2 to actually copy files
+        def mock_copy2_side_effect(src: Path, dest: Path) -> None:
+            """Mock copy2 that actually copies files."""
+            Path(dest).write_text(Path(src).read_text())
+
+        with patch(
+            "blogmore.publisher.shutil.copy2", side_effect=mock_copy2_side_effect
+        ):
+            # Mock git commands
+            def run_side_effect(*args: object, **kwargs: object) -> MagicMock:
+                cmd = args[0] if args else []
+                if not isinstance(cmd, list):
+                    return MagicMock(returncode=0, stdout="")
+
+                if cmd[:3] == ["git", "rev-parse", "--verify"]:
+                    # Branch doesn't exist locally
+                    return MagicMock(returncode=1, stdout="")
+                elif cmd[:2] == ["git", "ls-remote"]:
+                    # Branch doesn't exist remotely
+                    return MagicMock(returncode=0, stdout="")
+                elif cmd[:2] == ["git", "diff"]:
+                    # There are changes
+                    return MagicMock(returncode=1, stdout="")
+                else:
+                    return MagicMock(returncode=0, stdout="")
+
+            mock_run.side_effect = run_side_effect
+
+            publish_site(output_dir, branch="gh-pages", remote="origin")
+
+            # Verify .nojekyll file exists
+            nojekyll_file = worktree_path / ".nojekyll"
+            assert nojekyll_file.exists()
+
+            captured = capsys.readouterr()
+            # Should not print creation message since file already exists
+            assert "Created .nojekyll file" not in captured.out
