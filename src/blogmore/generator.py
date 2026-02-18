@@ -106,8 +106,10 @@ class SiteGenerator:
         self.default_author = default_author
         self.sidebar_config = sidebar_config or {}
 
-        self.parser = PostParser()
-        self.renderer = TemplateRenderer(templates_dir, extra_stylesheets)
+        self.parser = PostParser(site_url=self.site_url)
+        self.renderer = TemplateRenderer(
+            templates_dir, extra_stylesheets, self.site_url
+        )
 
     def _detect_favicon(self) -> str | None:
         """Detect if a favicon file exists in the extras directory.

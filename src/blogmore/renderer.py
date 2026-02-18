@@ -3,6 +3,7 @@
 import datetime as dt
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 from jinja2 import (
     BaseLoader,
@@ -23,6 +24,7 @@ class TemplateRenderer:
         self,
         templates_dir: Path | None = None,
         extra_stylesheets: list[str] | None = None,
+        site_url: str | None = None,
     ) -> None:
         """Initialize the renderer with a templates directory.
 
@@ -31,9 +33,19 @@ class TemplateRenderer:
                           If not provided, uses bundled templates. If provided, custom
                           templates take precedence but fall back to bundled templates.
             extra_stylesheets: Optional list of URLs for additional stylesheets to include
+            site_url: Optional base URL of the site for determining internal vs external links
         """
         self.templates_dir = templates_dir
         self.extra_stylesheets = extra_stylesheets or []
+        self.site_url = site_url
+
+        # Parse the site URL to get the domain for link checking
+        self.site_domain: str | None
+        if site_url:
+            parsed = urlparse(site_url)
+            self.site_domain = parsed.netloc.lower()
+        else:
+            self.site_domain = None
 
         # Set up loaders: custom templates first (if provided), then bundled templates
         loaders: list[BaseLoader] = []
@@ -49,6 +61,7 @@ class TemplateRenderer:
 
         # Add custom filters
         self.env.filters["format_date"] = self._format_date
+        self.env.filters["is_external_link"] = self._is_external_link
 
     @staticmethod
     def _format_date(
@@ -83,6 +96,43 @@ class TemplateRenderer:
                     formatted += f" UTC{tz_offset[0]}{tz_offset[1:3]}:{tz_offset[3:5]}"
 
         return formatted
+
+    def _is_external_link(self, href: str) -> bool:
+        """Determine if a link is external.
+
+        Args:
+            href: The href attribute value
+
+        Returns:
+            True if the link is external, False otherwise
+        """
+        # Skip empty hrefs
+        if not href:
+            return False
+
+        # Relative links (starting with /, #, or no scheme) are internal
+        if href.startswith("/") or href.startswith("#"):
+            return False
+
+        # Parse the URL
+        parsed = urlparse(href)
+
+        # If there's no scheme or netloc, it's a relative link (internal)
+        if not parsed.scheme and not parsed.netloc:
+            return False
+
+        # If we have a site domain, check if the link matches
+        if self.site_domain:
+            link_domain = parsed.netloc.lower()
+            # If domains match, it's internal
+            if (
+                link_domain == self.site_domain
+                or link_domain == f"www.{self.site_domain}"
+            ):
+                return False
+
+        # All other links with schemes are external
+        return True
 
     def render_post(self, post: Post, **context: Any) -> str:
         """Render a single blog post.
