@@ -10,6 +10,7 @@ from typing import Any
 
 from blogmore import __version__
 from blogmore.feeds import BlogFeedGenerator
+from blogmore.icons import IconGenerator, detect_source_icon
 from blogmore.parser import Page, Post, PostParser, remove_date_prefix
 from blogmore.renderer import TemplateRenderer
 from blogmore.utils import normalize_site_url
@@ -85,6 +86,7 @@ class SiteGenerator:
         default_author: str | None = None,
         sidebar_config: dict[str, Any] | None = None,
         clean_first: bool = False,
+        icon_source: str | None = None,
     ) -> None:
         """Initialize the site generator.
 
@@ -101,6 +103,7 @@ class SiteGenerator:
             default_author: Default author name for posts without author in frontmatter
             sidebar_config: Optional sidebar configuration (site_logo, links, socials)
             clean_first: Whether to remove the output directory before generating
+            icon_source: Optional source icon filename in extras/ directory
         """
         self.content_dir = content_dir
         self.templates_dir = templates_dir
@@ -112,6 +115,7 @@ class SiteGenerator:
         self.default_author = default_author
         self.sidebar_config = sidebar_config or {}
         self.clean_first = clean_first
+        self.icon_source = icon_source
 
         self.parser = PostParser(site_url=self.site_url)
         self.renderer = TemplateRenderer(
@@ -119,15 +123,23 @@ class SiteGenerator:
         )
 
     def _detect_favicon(self) -> str | None:
-        """Detect if a favicon file exists in the extras directory.
+        """Detect if a favicon file exists in the icons or extras directory.
 
         Checks for favicon files with common extensions in priority order.
-        If multiple files exist, the first match is returned (e.g., .ico is
-        preferred over .png).
+        First checks the icons directory (for generated icons), then falls back
+        to the extras directory (for manually provided icons).
 
         Returns:
             The favicon URL (relative to site root) if found, None otherwise
         """
+        # First check icons directory (generated icons)
+        icons_dir = self.output_dir / "icons"
+        if icons_dir.exists():
+            favicon_path = icons_dir / "favicon.ico"
+            if favicon_path.is_file():
+                return "/icons/favicon.ico"
+
+        # Fall back to extras directory (existing behavior)
         extras_dir = self.content_dir / "extras"
         if not extras_dir.exists():
             return None
@@ -142,6 +154,29 @@ class SiteGenerator:
                 return f"/favicon{ext}"
 
         return None
+
+    def _generate_icons(self) -> None:
+        """Generate icons from a source image if present."""
+        extras_dir = self.content_dir / "extras"
+
+        # Look for a source icon (using configured name if provided)
+        source_icon = detect_source_icon(extras_dir, self.icon_source)
+
+        if source_icon:
+            print(f"Found source icon: {source_icon.name}")
+            print("Generating favicon and Apple touch icons...")
+
+            # Generate to /icons subdirectory
+            icons_output_dir = self.output_dir / "icons"
+            generator = IconGenerator(source_icon, icons_output_dir)
+            generated = generator.generate_all()
+
+            if generated:
+                print(f"Generated {len(generated)} icon file(s):")
+                for icon_name in generated:
+                    print(f"  - icons/{icon_name}")
+            else:
+                print("Warning: No icons were generated")
 
     def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
@@ -239,6 +274,9 @@ class SiteGenerator:
 
         # Copy post attachments from content directory
         self._copy_attachments()
+
+        # Generate icons from source image
+        self._generate_icons()
 
         # Copy extra files from extras directory
         self._copy_extras()

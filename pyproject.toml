@@ -25,6 +25,7 @@ dependencies = [
     "watchdog>=6.0.0",
     "feedgen>=1.0.0",
     "pygments>=2.18.0",
+    "Pillow>=10.0.0",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",

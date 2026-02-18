@@ -31,6 +31,11 @@ posts_per_feed: 20
 # Optional: Default author name for posts without author in frontmatter
 # default_author: "Your Name"
 
+# Optional: Icon generation
+# Specify a source image in the extras/ directory to generate favicon.ico
+# and Apple touch icons. Should be a square image, ideally 1024x1024 or larger.
+# icon_source: "icon.png"
+
 # Optional: Additional stylesheets to include (can be URLs or relative paths)
 # extra_stylesheets:
 #   - https://example.com/custom.css
