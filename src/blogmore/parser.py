@@ -10,6 +10,7 @@ import frontmatter  # type: ignore[import-untyped]
 import markdown
 import yaml
 
+from blogmore.admonitions import AdmonitionsExtension
 from blogmore.external_links import ExternalLinksExtension
 from blogmore.utils import calculate_reading_time
 
@@ -225,8 +226,9 @@ class PostParser:
         Args:
             site_url: Optional base URL of the site for determining internal vs external links
         """
-        # Create external links extension instance
+        # Create custom extension instances
         external_links_ext = ExternalLinksExtension(site_url=site_url or "")
+        admonitions_ext = AdmonitionsExtension()
 
         self.markdown = markdown.Markdown(
             extensions=[
@@ -236,6 +238,7 @@ class PostParser:
                 "tables",
                 "toc",
                 "footnotes",
+                admonitions_ext,
                 external_links_ext,
             ],
             extension_configs={

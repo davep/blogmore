@@ -501,6 +501,123 @@ img[src*="#centre"] {
     color: var(--text-secondary);
 }
 
+/* GitHub-style admonitions */
+.post-content .admonition {
+    margin: 1.5em 0;
+    padding: 0;
+    border-left: 4px solid;
+    border-radius: 4px;
+    background-color: var(--code-bg);
+}
+
+.post-content .admonition-title {
+    padding: 8px 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.post-content .admonition-content {
+    padding: 8px 12px 12px 12px;
+}
+
+.post-content .admonition-content > *:first-child {
+    margin-top: 0;
+}
+
+.post-content .admonition-content > *:last-child {
+    margin-bottom: 0;
+}
+
+/* Note admonition - blue */
+.post-content .admonition-note {
+    border-left-color: #0969da;
+}
+
+.post-content .admonition-note .admonition-title {
+    color: #0969da;
+}
+
+/* Tip admonition - green */
+.post-content .admonition-tip {
+    border-left-color: #1a7f37;
+}
+
+.post-content .admonition-tip .admonition-title {
+    color: #1a7f37;
+}
+
+/* Important admonition - purple */
+.post-content .admonition-important {
+    border-left-color: #8250df;
+}
+
+.post-content .admonition-important .admonition-title {
+    color: #8250df;
+}
+
+/* Warning admonition - orange */
+.post-content .admonition-warning {
+    border-left-color: #9a6700;
+}
+
+.post-content .admonition-warning .admonition-title {
+    color: #9a6700;
+}
+
+/* Caution admonition - red */
+.post-content .admonition-caution {
+    border-left-color: #d1242f;
+}
+
+.post-content .admonition-caution .admonition-title {
+    color: #d1242f;
+}
+
+/* Dark mode adjustments for admonitions */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) .post-content .admonition-note .admonition-title {
+        color: #58a6ff;
+    }
+
+    :root:not([data-theme]) .post-content .admonition-tip .admonition-title {
+        color: #3fb950;
+    }
+
+    :root:not([data-theme]) .post-content .admonition-important .admonition-title {
+        color: #a371f7;
+    }
+
+    :root:not([data-theme]) .post-content .admonition-warning .admonition-title {
+        color: #d29922;
+    }
+
+    :root:not([data-theme]) .post-content .admonition-caution .admonition-title {
+        color: #f85149;
+    }
+}
+
+:root[data-theme="dark"] .post-content .admonition-note .admonition-title {
+    color: #58a6ff;
+}
+
+:root[data-theme="dark"] .post-content .admonition-tip .admonition-title {
+    color: #3fb950;
+}
+
+:root[data-theme="dark"] .post-content .admonition-important .admonition-title {
+    color: #a371f7;
+}
+
+:root[data-theme="dark"] .post-content .admonition-warning .admonition-title {
+    color: #d29922;
+}
+
+:root[data-theme="dark"] .post-content .admonition-caution .admonition-title {
+    color: #f85149;
+}
+
 .post-summary {
     margin-bottom: 40px;
     padding-bottom: 30px;
