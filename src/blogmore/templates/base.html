@@ -26,19 +26,21 @@
     <div class="site-container">
         <aside class="sidebar">
             <div class="sidebar-content">
-                {% if site_logo %}
-                <div class="sidebar-logo">
-                    <a href="/">
-                        <img src="{{ site_logo }}" alt="{{ site_title }}">
-                    </a>
-                </div>
-                {% endif %}
-
-                <div class="sidebar-title">
-                    <h1><a href="/">{{ site_title }}</a></h1>
-                    {% if site_subtitle %}
-                    <p class="sidebar-subtitle">{{ site_subtitle }}</p>
+                <div class="sidebar-header">
+                    {% if site_logo %}
+                    <div class="sidebar-logo">
+                        <a href="/">
+                            <img src="{{ site_logo }}" alt="{{ site_title }}">
+                        </a>
+                    </div>
                     {% endif %}
+
+                    <div class="sidebar-title">
+                        <h1><a href="/">{{ site_title }}</a></h1>
+                        {% if site_subtitle %}
+                        <p class="sidebar-subtitle">{{ site_subtitle }}</p>
+                        {% endif %}
+                    </div>
                 </div>
 
                 {% if links %}
