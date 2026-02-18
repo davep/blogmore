@@ -12,6 +12,7 @@ from typing import Any
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
+from blogmore.config import get_sidebar_config, load_config
 from blogmore.generator import SiteGenerator
 
 
@@ -114,6 +115,114 @@ class ContentChangeHandler(FileSystemEventHandler):
             print(f"Error during regeneration: {e}", file=sys.stderr)
 
 
+class ConfigChangeHandler(FileSystemEventHandler):
+    """Handle file system events for configuration file changes."""
+
+    def __init__(
+        self,
+        config_path: Path,
+        generator: SiteGenerator,
+        include_drafts: bool,
+        cli_overrides: dict[str, Any],
+        debounce_seconds: float = 0.5,
+    ) -> None:
+        """Initialize the config change handler.
+
+        Args:
+            config_path: Path to the configuration file being watched
+            generator: The site generator to use for regeneration
+            include_drafts: Whether to include drafts in generation
+            cli_overrides: Dictionary of CLI arguments that should override config
+            debounce_seconds: Time to wait before regenerating after a change
+        """
+        super().__init__()
+        self.config_path = config_path.resolve()
+        self.generator = generator
+        self.include_drafts = include_drafts
+        self.cli_overrides = cli_overrides
+        self.debounce_seconds = debounce_seconds
+        self._last_regenerate_time = 0.0
+        self._regenerate_lock = threading.Lock()
+
+    def on_any_event(self, event: FileSystemEvent) -> None:
+        """Handle any file system event.
+
+        Args:
+            event: The file system event
+        """
+        # Ignore directory events
+        if event.is_directory:
+            return
+
+        # Only react to changes to the config file we're watching
+        src_path = event.src_path
+        if isinstance(src_path, bytes):
+            src_path = src_path.decode("utf-8")
+        event_path = Path(src_path).resolve()
+
+        if event_path != self.config_path:
+            return
+
+        # Debounce: only regenerate if enough time has passed
+        current_time = time.time()
+        with self._regenerate_lock:
+            if current_time - self._last_regenerate_time < self.debounce_seconds:
+                return
+            self._last_regenerate_time = current_time
+
+        print(f"\nDetected change in config file {self.config_path.name}, reloading and regenerating site...")
+        try:
+            # Reload the configuration
+            config = load_config(self.config_path)
+            
+            # Apply CLI overrides to the loaded config
+            for key, value in self.cli_overrides.items():
+                if key in config:
+                    config[key] = value
+            
+            # Extract sidebar config
+            sidebar_config = get_sidebar_config(config)
+            
+            # Update the generator with new config values
+            self._update_generator(config, sidebar_config)
+            
+            # Regenerate the site
+            self.generator.generate(include_drafts=self.include_drafts)
+            print("Configuration reloaded and regeneration complete!")
+        except Exception as e:
+            print(f"Error reloading config or regenerating: {e}", file=sys.stderr)
+
+    def _update_generator(
+        self, config: dict[str, Any], sidebar_config: dict[str, Any]
+    ) -> None:
+        """Update generator attributes with new configuration values.
+
+        Args:
+            config: The loaded configuration dictionary
+            sidebar_config: The sidebar configuration
+        """
+        # Update generator attributes with new config values
+        if "site_title" in config:
+            self.generator.site_title = config["site_title"]
+        if "site_subtitle" in config:
+            self.generator.site_subtitle = config["site_subtitle"]
+        if "site_url" in config:
+            self.generator.site_url = config["site_url"]
+        if "posts_per_feed" in config:
+            self.generator.posts_per_feed = config["posts_per_feed"]
+        if "extra_stylesheets" in config:
+            stylesheets = config["extra_stylesheets"]
+            if isinstance(stylesheets, str):
+                self.generator.renderer.extra_stylesheets = [stylesheets]
+            elif isinstance(stylesheets, list):
+                self.generator.renderer.extra_stylesheets = stylesheets
+        if "default_author" in config:
+            self.generator.default_author = config["default_author"]
+        
+        # Update sidebar config
+        self.generator.sidebar_config = sidebar_config
+
+
 def serve_site(
     output_dir: Path,
     port: int = 8000,
@@ -128,6 +237,8 @@ def serve_site(
     extra_stylesheets: list[str] | None = None,
     default_author: str | None = None,
     sidebar_config: dict[str, Any] | None = None,
+    config_path: Path | None = None,
+    cli_overrides: dict[str, Any] | None = None,
 ) -> int:
     """Serve the generated site locally using a simple HTTP server.
 
@@ -146,6 +257,8 @@ def serve_site(
         extra_stylesheets: Optional list of URLs for additional stylesheets
         default_author: Default author name for posts without author in frontmatter
         sidebar_config: Optional sidebar configuration (site_logo, links, socials)
+        config_path: Path to the configuration file being used (if any)
+        cli_overrides: Dictionary of CLI arguments that override config values
 
     Returns:
         Exit code
@@ -211,6 +324,18 @@ def serve_site(
                 print(f"Watching for changes in {content_dir} and {templates_dir}...")
             else:
                 print(f"Watching for changes in {content_dir}...")
+
+            # Watch configuration file if one is being used
+            if config_path is not None and config_path.exists():
+                config_handler = ConfigChangeHandler(
+                    config_path=config_path,
+                    generator=generator,
+                    include_drafts=include_drafts,
+                    cli_overrides=cli_overrides or {},
+                )
+                # Watch the directory containing the config file
+                observer.schedule(config_handler, str(config_path.parent), recursive=False)
+                print(f"Watching for changes in config file: {config_path}")
 
             observer.start()
     elif not output_dir.exists():
