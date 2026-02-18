@@ -12,6 +12,23 @@
 
 {% block content %}
 <article class="post">
+    {% if prev_post or next_post %}
+    <nav class="post-navigation post-navigation-top">
+        {% if prev_post %}
+        <a href="{{ prev_post.url }}" class="post-nav-link post-nav-prev" title="{{ prev_post.title }}">
+            <span class="post-nav-label">← Previous Post</span>
+        </a>
+        {% else %}
+        <span class="post-nav-spacer"></span>
+        {% endif %}
+        {% if next_post %}
+        <a href="{{ next_post.url }}" class="post-nav-link post-nav-next" title="{{ next_post.title }}">
+            <span class="post-nav-label">Next Post →</span>
+        </a>
+        {% endif %}
+    </nav>
+    {% endif %}
+    
     <header class="post-header">
         <h1>{{ post.title }}</h1>
         {% if post.date %}
@@ -35,6 +52,23 @@
         <a href="/{{ tag_dir }}/{{ post.safe_tags()[loop.index0] }}.html" class="tag">{{ tag }}</a>
         {% endfor %}
     </div>
+    {% endif %}
+    
+    {% if prev_post or next_post %}
+    <nav class="post-navigation post-navigation-bottom">
+        {% if prev_post %}
+        <a href="{{ prev_post.url }}" class="post-nav-link post-nav-prev" title="{{ prev_post.title }}">
+            <span class="post-nav-label">← Previous Post</span>
+        </a>
+        {% else %}
+        <span class="post-nav-spacer"></span>
+        {% endif %}
+        {% if next_post %}
+        <a href="{{ next_post.url }}" class="post-nav-link post-nav-next" title="{{ next_post.title }}">
+            <span class="post-nav-label">Next Post →</span>
+        </a>
+        {% endif %}
+    </nav>
     {% endif %}
 </article>
 {% endblock %}

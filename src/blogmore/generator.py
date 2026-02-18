@@ -253,6 +253,25 @@ class SiteGenerator:
         context["all_posts"] = all_posts
         context["pages"] = pages
 
+        # Find previous and next posts in chronological order
+        # all_posts is already sorted by date (newest first)
+        try:
+            current_index = all_posts.index(post)
+            # Previous post is older (higher index)
+            context["prev_post"] = (
+                all_posts[current_index + 1]
+                if current_index + 1 < len(all_posts)
+                else None
+            )
+            # Next post is newer (lower index)
+            context["next_post"] = (
+                all_posts[current_index - 1] if current_index > 0 else None
+            )
+        except ValueError:
+            # Post not in list, no navigation
+            context["prev_post"] = None
+            context["next_post"] = None
+
         html = self.renderer.render_post(post, **context)
 
         # Determine output path based on date
