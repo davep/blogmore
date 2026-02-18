@@ -134,6 +134,10 @@ extra_stylesheets:
 # Serve-specific options
 port: 3000
 no_watch: false
+
+# Publish-specific options
+branch: gh-pages
+remote: origin
 ```
 
 #### Using Configuration Files
@@ -177,6 +181,8 @@ All command-line options can be configured in the YAML file:
 - `extra_stylesheets` - List of additional stylesheet URLs
 - `port` - Port for serve command (default: `8000`)
 - `no_watch` - Disable file watching in serve mode (default: `false`)
+- `branch` - Git branch for publish command (default: `gh-pages`)
+- `remote` - Git remote for publish command (default: `origin`)
 
 **Note:** The `--config` option itself cannot be set in a configuration file.
 
@@ -193,6 +199,26 @@ Serve the site locally with optional generation and auto-reload:
 ```bash
 blogmore serve [posts/] [options]
 ```
+
+**Publish** (`publish`)
+Build and publish the site to a git branch (e.g., for GitHub Pages):
+```bash
+blogmore publish posts/ [options]
+```
+
+This command:
+1. Builds your site to the output directory
+2. Checks that you're in a git repository
+3. Creates or updates a git branch (default: `gh-pages`)
+4. Copies the built site to that branch
+5. Commits and pushes the changes
+
+Example for GitHub Pages:
+```bash
+blogmore publish posts/ --branch gh-pages --remote origin
+```
+
+**Note:** The publish command requires git to be installed and available in your PATH.
 
 ### Common Options
 
@@ -215,6 +241,11 @@ Available for both `build` and `serve` commands:
 
 - `-p, --port` - Port to serve on (default: 8000)
 - `--no-watch` - Disable watching for changes
+
+### Publish-Specific Options
+
+- `--branch` - Git branch to publish to (default: `gh-pages`)
+- `--remote` - Git remote to push to (default: `origin`)
 
 ## Frontmatter Fields
 
