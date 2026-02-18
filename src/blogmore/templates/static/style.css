@@ -184,11 +184,10 @@ body {
     font-weight: normal;
 }
 
-/* Sidebar pages section - no title, just links with separator above */
+/* Sidebar pages section - no title, just links with separator below */
 .sidebar-pages {
     padding-top: 20px;
     padding-bottom: 20px;
-    border-top: 1px solid var(--border-color);
     border-bottom: 1px solid var(--border-color);
 }
 
