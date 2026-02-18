@@ -10,9 +10,12 @@ requires-python = ">=3.12"
 license = "GPL-3.0-or-later"
 keywords = [
     "blog",
+    "blogging",
     "static site generator",
     "markdown",
     "jinja2",
+    "html",
+    "web",
 ]
 dependencies = [
     "jinja2>=3.1.4",
