@@ -31,6 +31,8 @@ posts/
   └── web-development.md
 ```
 
+**Note:** Files can be date-prefixed (e.g., `2026-02-18-hello-world.md`) and BlogMore will automatically remove the date prefix from the URL slug. The post will still use the `date` field from frontmatter for chronological ordering.
+
 **Organised by date**:
 ```
 posts/
@@ -287,16 +289,18 @@ Once your site is ready, publish it to GitHub Pages using the `publish` command.
 
 ### Publishing Steps
 
-1. Ensure your changes are committed:
-   ```bash
-   git add .
-   git commit -m "Add new blog posts"
-   ```
+Ensure your changes are committed:
 
-2. Publish to GitHub Pages:
-   ```bash
-   blogmore publish posts/ --branch gh-pages --remote origin
-   ```
+```bash
+git add .
+git commit -m "Add new blog posts"
+```
+
+Publish to GitHub Pages:
+
+```bash
+blogmore publish posts/ --branch gh-pages --remote origin
+```
 
 This command will:
 - Build your site

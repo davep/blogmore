@@ -54,31 +54,35 @@ uv sync
 
 Once installed, creating a blog is straightforward:
 
-1. Create a directory for your posts:
-   ```bash
-   mkdir posts
-   ```
+Create a directory for your posts:
 
-2. Write your first post in `posts/hello.md`:
-   ```markdown
-   ---
-   title: Hello World
-   date: 2024-01-15
-   tags: [welcome, meta]
-   ---
-   
-   Welcome to my new blog powered by BlogMore!
-   ```
+```bash
+mkdir posts
+```
 
-3. Generate your site:
-   ```bash
-   blogmore build posts/
-   ```
+Write your first post in `posts/hello.md`:
 
-4. Preview locally:
-   ```bash
-   blogmore serve posts/
-   ```
+```markdown
+---
+title: Hello World
+date: 2024-01-15
+tags: [welcome, meta]
+---
+
+Welcome to my new blog powered by BlogMore!
+```
+
+Generate your site:
+
+```bash
+blogmore build posts/
+```
+
+Preview locally:
+
+```bash
+blogmore serve posts/
+```
 
 Visit `http://localhost:8000` to see your site.
 
