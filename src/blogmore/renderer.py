@@ -125,7 +125,10 @@ class TemplateRenderer:
         if self.site_domain:
             link_domain = parsed.netloc.lower()
             # If domains match, it's internal
-            if link_domain == self.site_domain or link_domain == f"www.{self.site_domain}":
+            if (
+                link_domain == self.site_domain
+                or link_domain == f"www.{self.site_domain}"
+            ):
                 return False
 
         # All other links with schemes are external
