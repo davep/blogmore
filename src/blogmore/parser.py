@@ -246,7 +246,10 @@ class PostParser:
                     "css_class": "highlight",
                     "guess_lang": False,
                     "use_pygments": True,
-                }
+                },
+                "footnotes": {
+                    "UNIQUE_IDS": True,
+                },
             },
         )
 

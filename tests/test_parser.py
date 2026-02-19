@@ -1,6 +1,7 @@
 """Unit tests for the parser module."""
 
 import datetime as dt
+import re
 from pathlib import Path
 
 import pytest
@@ -535,6 +536,39 @@ This post has [an external link](https://external.com) and
         # Internal links should not have target="_blank"
         assert 'href="/posts/my-post"' in post.html_content
         assert post.html_content.count('target="_blank"') == 1  # Only external link
+
+    def test_footnote_ids_unique_across_multiple_posts(self, tmp_path: Path) -> None:
+        """Test that footnote IDs are unique when multiple posts are parsed.
+
+        When multiple posts with footnotes appear on the same index page,
+        footnote IDs must not clash to avoid duplicate IDs in the DOM.
+        """
+        parser = PostParser()
+
+        post_file_1 = tmp_path / "post-one.md"
+        post_file_1.write_text(
+            "---\ntitle: Post One\n---\n\nText with footnote[^1].\n\n[^1]: Footnote one.\n"
+        )
+        post_file_2 = tmp_path / "post-two.md"
+        post_file_2.write_text(
+            "---\ntitle: Post Two\n---\n\nText with footnote[^1].\n\n[^1]: Footnote two.\n"
+        )
+
+        post1 = parser.parse_file(post_file_1)
+        post2 = parser.parse_file(post_file_2)
+
+        # Both posts must contain footnote markup
+        assert "footnote" in post1.html_content.lower()
+        assert "footnote" in post2.html_content.lower()
+
+        # Extract all id attributes from both posts combined HTML
+        ids = re.findall(r'\bid="([^"]+)"', post1.html_content + post2.html_content)
+
+        # Every id must be unique - no duplicates across both posts
+        assert len(ids) == len(set(ids)), (
+            f"Duplicate footnote IDs found across posts: "
+            f"{[i for i in ids if ids.count(i) > 1]}"
+        )
 
     def test_external_links_without_site_url(self, tmp_path: Path) -> None:
         """Test that external links work even without site_url configured."""
