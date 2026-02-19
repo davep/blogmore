@@ -19,6 +19,9 @@
     --category-hover-bg: #d0e8f2;
     --category-text: #0066cc;
     --blockquote-border: #ddd;
+    --table-border: #ddd;
+    --table-header-bg: #f0f0f0;
+    --table-stripe-bg: #fafafa;
 }
 
 /* Dark mode colors - applied by system preference */
@@ -41,6 +44,9 @@
         --category-hover-bg: #2a4a5a;
         --category-text: #6eb3ff;
         --blockquote-border: #444;
+        --table-border: #404040;
+        --table-header-bg: #2a2a2a;
+        --table-stripe-bg: #222222;
     }
 }
 
@@ -63,6 +69,9 @@
     --category-hover-bg: #d0e8f2;
     --category-text: #0066cc;
     --blockquote-border: #ddd;
+    --table-border: #ddd;
+    --table-header-bg: #f0f0f0;
+    --table-stripe-bg: #fafafa;
 }
 
 :root[data-theme="dark"] {
@@ -83,6 +92,9 @@
     --category-hover-bg: #2a4a5a;
     --category-text: #6eb3ff;
     --blockquote-border: #444;
+    --table-border: #404040;
+    --table-header-bg: #2a2a2a;
+    --table-stripe-bg: #222222;
 }
 
 * {
@@ -569,6 +581,33 @@ img[src*="#centre"] {
     margin: 0;
     padding-left: 20px;
     color: var(--text-secondary);
+}
+
+/* Tables */
+.post-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1.5em 0;
+    font-size: 0.95em;
+    overflow-x: auto;
+    display: block;
+}
+
+.post-content table th,
+.post-content table td {
+    border: 1px solid var(--table-border);
+    padding: 8px 14px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.post-content table thead th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+}
+
+.post-content table tbody tr:nth-child(even) {
+    background: var(--table-stripe-bg);
 }
 
 /* GitHub-style admonitions */
