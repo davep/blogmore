@@ -1,13 +1,17 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed duplicate HTML element IDs when multiple posts with footnotes appear
+  on the same index page.
+  ([#114](https://github.com/davep/blogmore/pull/114))
+
 ## v0.5.0
 
 **Released: 2026-02-19**
 
-- Fixed duplicate HTML element IDs when multiple posts with footnotes appear
-  on the same index page, by enabling the `UNIQUE_IDS` option in the
-  Markdown footnotes extension.
-  ([#114](https://github.com/davep/blogmore/pull/114))
 - Fixed relative URLs in RSS/Atom feed entry content being left as
   root-relative paths; they are now rewritten to absolute URLs using the
   configured site URL, resolving feed-validator warnings.
