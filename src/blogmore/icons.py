@@ -6,6 +6,28 @@ from xml.etree import ElementTree as ET
 
 from PIL import Image
 
+# PNG icon specifications: (size, filename) tuples for all platforms
+PNG_ICON_SPECS: list[tuple[int, str]] = [
+    # Standard favicon PNG sizes
+    (16, "favicon-16x16.png"),
+    (32, "favicon-32x32.png"),
+    (96, "favicon-96x96.png"),
+    # Apple touch icons
+    (180, "apple-touch-icon.png"),
+    (120, "apple-touch-icon-120.png"),
+    (152, "apple-touch-icon-152.png"),
+    (167, "apple-touch-icon-167.png"),
+    (180, "apple-touch-icon-precomposed.png"),
+    # Android/Chrome icons
+    (192, "android-chrome-192x192.png"),
+    (512, "android-chrome-512x512.png"),
+    # Windows/Microsoft tiles
+    (70, "mstile-70x70.png"),
+    (144, "mstile-144x144.png"),
+    (150, "mstile-150x150.png"),
+    (310, "mstile-310x310.png"),
+]
+
 
 def detect_source_icon(
     extras_dir: Path, custom_filename: str | None = None
@@ -84,39 +106,8 @@ class IconGenerator:
                 if favicon_path:
                     generated["favicon.ico"] = favicon_path
 
-                # Generate standard favicon PNG sizes
-                favicon_sizes = [
-                    (16, "favicon-16x16.png"),
-                    (32, "favicon-32x32.png"),
-                    (96, "favicon-96x96.png"),
-                ]
-                self._generate_png_icons_batch(img, favicon_sizes, generated)
-
-                # Generate Apple touch icons
-                apple_icons = [
-                    (180, "apple-touch-icon.png"),
-                    (120, "apple-touch-icon-120.png"),
-                    (152, "apple-touch-icon-152.png"),
-                    (167, "apple-touch-icon-167.png"),
-                    (180, "apple-touch-icon-precomposed.png"),
-                ]
-                self._generate_png_icons_batch(img, apple_icons, generated)
-
-                # Generate Android/Chrome icons
-                android_icons = [
-                    (192, "android-chrome-192x192.png"),
-                    (512, "android-chrome-512x512.png"),
-                ]
-                self._generate_png_icons_batch(img, android_icons, generated)
-
-                # Generate Windows/Microsoft tiles
-                windows_tiles = [
-                    (70, "mstile-70x70.png"),
-                    (144, "mstile-144x144.png"),
-                    (150, "mstile-150x150.png"),
-                    (310, "mstile-310x310.png"),
-                ]
-                self._generate_png_icons_batch(img, windows_tiles, generated)
+                # Generate all PNG icons (favicon, Apple, Android, Windows)
+                self._generate_png_icons_batch(img, PNG_ICON_SPECS, generated)
 
                 # Generate wide Windows tile (310x150)
                 wide_tile_path = self._generate_wide_tile(img)
