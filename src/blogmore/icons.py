@@ -240,7 +240,11 @@ class IconGenerator:
             # Center the icon
             x_offset = (310 - icon_size) // 2
             y_offset = 0
-            tile.paste(resized, (x_offset, y_offset), resized if resized.mode == "RGBA" else None)
+            tile.paste(
+                resized,
+                (x_offset, y_offset),
+                resized if resized.mode == "RGBA" else None,
+            )
 
             # Save as PNG
             tile.save(output_path, format="PNG")
@@ -329,4 +333,3 @@ class IconGenerator:
         except Exception as e:
             print(f"Error generating browserconfig: {e}")
             return None
-
