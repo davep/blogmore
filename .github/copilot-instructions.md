@@ -47,5 +47,9 @@
 - When adding new functionality that the user can interact with, especially
   if it's configurable, ensure you update the README file to include details
   of what the feature is, why you'd use it, an how you'd use it.
+- We are maintaining a change log in ChangeLog.md. When adding a new feature
+  or fixing a bug, be sure to add an appropriate change log entry. Follow
+  the format that is already there; be sure to link the PR that provides the
+  change.
 
 [//]: # (copilot-instructions.md ends here)
