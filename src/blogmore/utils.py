@@ -76,7 +76,7 @@ def make_urls_absolute(html_content: str, base_url: str) -> str:
 
     def _replace(match: re.Match[str]) -> str:
         attr, quote, path = match.group(1), match.group(2), match.group(3)
-        return f'{attr}={quote}{stripped}{path}{quote}'
+        return f"{attr}={quote}{stripped}{path}{quote}"
 
     return re.sub(
         r'(src|href)=(["\'])(/[^"\']*)\2',
