@@ -1,0 +1,88 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/runner/work/blogmore/blogmore
+configfile: pyproject.toml
+plugins: cov-7.0.0
+collecting ... collected 55 items
+
+tests/test_utils.py::TestCalculateReadingTime::test_calculate_reading_time_short_text PASSED [  1%]
+tests/test_utils.py::TestCalculateReadingTime::test_calculate_reading_time_medium_text PASSED [  3%]
+tests/test_utils.py::TestCalculateReadingTime::test_calculate_reading_time_long_text PASSED [  5%]
+tests/test_utils.py::TestCalculateReadingTime::test_calculate_reading_time_with_markdown_formatting PASSED [  7%]
+tests/test_utils.py::TestCalculateReadingTime::test_calculate_reading_time_with_code_blocks PASSED [  9%]
+tests/test_utils.py::TestCalculateReadingTime::test_calculate_reading_time_with_inline_code PASSED [ 10%]
+tests/test_utils.py::TestCalculateReadingTime::test_calculate_reading_time_with_images PASSED [ 12%]
+tests/test_utils.py::TestCalculateReadingTime::test_calculate_reading_time_with_html_tags PASSED [ 14%]
+tests/test_utils.py::TestCalculateReadingTime::test_calculate_reading_time_custom_wpm PASSED [ 16%]
+tests/test_utils.py::TestCalculateReadingTime::test_calculate_reading_time_rounding PASSED [ 18%]
+tests/test_utils.py::TestCalculateReadingTime::test_calculate_reading_time_empty_string PASSED [ 20%]
+tests/test_utils.py::TestCalculateReadingTime::test_calculate_reading_time_only_formatting PASSED [ 21%]
+tests/test_utils.py::TestNormalizeSiteUrl::test_normalize_no_trailing_slash PASSED [ 23%]
+tests/test_utils.py::TestNormalizeSiteUrl::test_normalize_with_trailing_slash PASSED [ 25%]
+tests/test_utils.py::TestNormalizeSiteUrl::test_normalize_multiple_trailing_slashes PASSED [ 27%]
+tests/test_utils.py::TestNormalizeSiteUrl::test_normalize_empty_string PASSED [ 29%]
+tests/test_utils.py::TestNormalizeSiteUrl::test_normalize_just_slash PASSED [ 30%]
+tests/test_utils.py::TestNormalizeSiteUrl::test_normalize_http_url PASSED [ 32%]
+tests/test_utils.py::TestNormalizeSiteUrl::test_normalize_https_url PASSED [ 34%]
+tests/test_utils.py::TestMakeUrlsAbsolute::test_src_double_quotes PASSED [ 36%]
+tests/test_utils.py::TestMakeUrlsAbsolute::test_src_single_quotes PASSED [ 38%]
+tests/test_utils.py::TestMakeUrlsAbsolute::test_href_double_quotes PASSED [ 40%]
+tests/test_utils.py::TestMakeUrlsAbsolute::test_href_single_quotes PASSED [ 41%]
+tests/test_utils.py::TestMakeUrlsAbsolute::test_absolute_urls_unchanged PASSED [ 43%]
+tests/test_utils.py::TestMakeUrlsAbsolute::test_absolute_http_urls_unchanged PASSED [ 45%]
+tests/test_utils.py::TestMakeUrlsAbsolute::test_multiple_attributes_in_one_call PASSED [ 47%]
+tests/test_utils.py::TestMakeUrlsAbsolute::test_trailing_slash_stripped_from_base_url PASSED [ 49%]
+tests/test_utils.py::TestMakeUrlsAbsolute::test_deeply_nested_path PASSED [ 50%]
+tests/test_utils.py::TestMakeUrlsAbsolute::test_no_relative_urls_returns_unchanged PASSED [ 52%]
+tests/test_utils.py::TestMakeUrlsAbsolute::test_parenthesised_href_made_absolute PASSED [ 54%]
+tests/test_utils.py::TestMakeUrlsAbsolute::test_parenthesised_src_made_absolute PASSED [ 56%]
+tests/test_utils.py::TestMakeUrlsAbsolute::test_parenthesised_absolute_url_unchanged PASSED [ 58%]
+tests/test_feeds.py::TestCreateFeedGenerator::test_create_feed_generator PASSED [ 60%]
+tests/test_feeds.py::TestCreateFeedGenerator::test_create_feed_generator_normalizes_trailing_slash PASSED [ 61%]
+tests/test_feeds.py::TestCreateFeedGenerator::test_create_feed_generator_with_description PASSED [ 63%]
+tests/test_feeds.py::TestCreateFeedGenerator::test_create_feed_generator_empty_url PASSED [ 65%]
+tests/test_feeds.py::TestAddPostToFeed::test_add_post_to_feed PASSED     [ 67%]
+tests/test_feeds.py::TestAddPostToFeed::test_add_post_with_date PASSED   [ 69%]
+tests/test_feeds.py::TestAddPostToFeed::test_add_post_with_category PASSED [ 70%]
+tests/test_feeds.py::TestAddPostToFeed::test_add_post_with_tags PASSED   [ 72%]
+tests/test_feeds.py::TestAddPostToFeed::test_add_post_without_date PASSED [ 74%]
+tests/test_feeds.py::TestAddPostToFeed::test_add_post_relative_urls_made_absolute PASSED [ 76%]
+tests/test_feeds.py::TestGenerateFeed::test_generate_feed_basic PASSED   [ 78%]
+tests/test_feeds.py::TestGenerateFeed::test_generate_feed_with_multiple_posts PASSED [ 80%]
+tests/test_feeds.py::TestGenerateFeed::test_generate_feed_max_posts PASSED [ 81%]
+tests/test_feeds.py::TestGenerateFeed::test_generate_feed_empty_posts PASSED [ 83%]
+tests/test_feeds.py::TestWriteFeeds::test_write_feeds PASSED             [ 85%]
+tests/test_feeds.py::TestWriteFeeds::test_write_feeds_creates_directories PASSED [ 87%]
+tests/test_feeds.py::TestBlogFeedGenerator::test_init PASSED             [ 89%]
+tests/test_feeds.py::TestBlogFeedGenerator::test_init_normalizes_trailing_slash PASSED [ 90%]
+tests/test_feeds.py::TestBlogFeedGenerator::test_generate_index_feeds PASSED [ 92%]
+tests/test_feeds.py::TestBlogFeedGenerator::test_generate_category_feeds PASSED [ 94%]
+tests/test_feeds.py::TestBlogFeedGenerator::test_get_base_url_with_site_url PASSED [ 96%]
+tests/test_feeds.py::TestBlogFeedGenerator::test_get_base_url_without_site_url PASSED [ 98%]
+tests/test_feeds.py::TestBlogFeedGenerator::test_generate_feeds_with_timezone_aware_dates PASSED [100%]
+
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.3-final-0 ________________
+
+Name                             Stmts   Miss  Cover   Missing
+--------------------------------------------------------------
+src/blogmore/__init__.py             8      0   100%
+src/blogmore/__main__.py            95     95     0%   3-251
+src/blogmore/admonitions.py         47     33    30%   41-42, 54-102, 114-117, 129
+src/blogmore/cli.py                 34     34     0%   3-192
+src/blogmore/config.py              49     49     0%   3-145
+src/blogmore/external_links.py      50     35    30%   21-29, 40-41, 50-55, 63-74, 86-107, 119-120, 128-131, 143
+src/blogmore/feeds.py               71      0   100%
+src/blogmore/generator.py          462    414    10%   49-57, 108-121, 136-156, 164-170, 174-193, 197-209, 218-300, 306-349, 353-360, 364-389, 393-399, 404-525, 531-580, 593-602, 607-667, 672-735, 741-795, 808-816, 824-851, 855-887, 891-928, 937-981
+src/blogmore/icons.py              122    107    12%   44-69, 82-83, 92-131, 146-149, 160-190, 205-218, 229-256, 264-294, 302-335
+src/blogmore/parser.py             199    135    32%   29-35, 62-112, 151-153, 157-159, 171-173, 182, 198, 203, 215-217, 230-233, 266-345, 369-393, 408-440, 457-471
+src/blogmore/publisher.py           93     93     0%   3-283
+src/blogmore/renderer.py            76     56    26%   38-64, 79-98, 110-135, 147-148, 162-163, 185-186, 214-215, 244-245, 274-275, 298-299, 319-320, 336-337
+src/blogmore/server.py             160    160     0%   3-385
+src/blogmore/utils.py               22      0   100%
+--------------------------------------------------------------
+TOTAL                             1488   1211    19%
+Coverage HTML written to dir .reports/html
+Coverage XML written to file .reports/coverage.xml
+============================== 55 passed in 1.05s ==============================

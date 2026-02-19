@@ -190,3 +190,25 @@ class TestMakeUrlsAbsolute:
         html = "<p>Hello world</p>"
         result = make_urls_absolute(html, "https://example.com")
         assert result == html
+
+    def test_parenthesised_href_made_absolute(self) -> None:
+        """Test that root-relative href wrapped in parentheses is rewritten.
+
+        Markdown typos like [text]((/path)) render to href="(/path)" which is
+        still a relative URL reference that feed validators will flag.
+        """
+        html = '<a href="(/2024/08/18/paindrop.html)">the other post</a>'
+        result = make_urls_absolute(html, "https://blog.davep.org")
+        assert result == '<a href="https://blog.davep.org/2024/08/18/paindrop.html">the other post</a>'
+
+    def test_parenthesised_src_made_absolute(self) -> None:
+        """Test that root-relative src wrapped in parentheses is rewritten."""
+        html = "<img src='(/img/photo.jpg)'>"
+        result = make_urls_absolute(html, "https://example.com")
+        assert result == "<img src='https://example.com/img/photo.jpg'>"
+
+    def test_parenthesised_absolute_url_unchanged(self) -> None:
+        """Test that an absolute URL wrapped in parentheses is not modified."""
+        html = '<a href="(https://external.com/path)">link</a>'
+        result = make_urls_absolute(html, "https://example.com")
+        assert result == html
