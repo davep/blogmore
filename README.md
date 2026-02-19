@@ -21,6 +21,10 @@ A blog-oriented static site generation engine built in Python.
 - Uses Jinja2 for templating
 - Simple and clean design
 - Automatic tag pages and archive generation
+- **Automatic icon generation** - Generate favicons and platform-specific icons from a single source image
+  - iOS (Apple Touch Icons)
+  - Android/Chrome (with PWA manifest)
+  - Windows/Edge (with tile configuration)
 
 ## Installation
 
@@ -279,6 +283,48 @@ draft: false
 **Tags** are for cross-categorization and can be applied multiple times per post. They're useful for topics that span multiple categories.
 
 For example, a blog might use categories like "python", "javascript", "devops" to separate major topics, while using tags like "tutorial", "advanced", "beginner" to indicate post type.
+
+## Icon Generation
+
+Blogmore can automatically generate favicons and platform-specific icons from a single source image. Place a high-resolution square image (ideally 1024×1024 or larger) in your `extras/` directory, and Blogmore will generate all necessary icon formats.
+
+### Generated Icons
+
+From a single source image, Blogmore generates 18 icon files for all major platforms:
+
+- **Favicon files**: Multi-resolution `.ico` and PNG sizes (16×16, 32×32, 96×96)
+- **Apple Touch Icons**: Optimized for iOS devices (120×120, 152×152, 167×167, 180×180)
+- **Android/Chrome icons**: PWA-ready with web manifest (192×192, 512×512)
+- **Windows tiles**: Microsoft Edge and Windows 10+ tiles (70×70, 144×144, 150×150, 310×310, 310×150)
+
+All icons are generated to the `/icons` subdirectory to avoid conflicts with other files.
+
+### Configuration
+
+**Auto-detection** (no configuration needed):
+Place one of these files in your `extras/` directory:
+- `icon.png` (recommended)
+- `icon.jpg` or `icon.jpeg`
+- `source-icon.png`
+- `app-icon.png`
+
+**Custom filename** via CLI:
+```bash
+blogmore build content/ --icon-source my-logo.png
+```
+
+**Custom filename** via config file:
+```yaml
+# Icon generation
+icon_source: "my-logo.png"
+```
+
+### Requirements
+
+- Source image should be square
+- Recommended size: 1024×1024 or larger
+- Supported formats: PNG, JPEG
+- Transparent backgrounds (PNG) work best
 
 ## Templates
 

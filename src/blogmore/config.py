@@ -85,6 +85,7 @@ def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
         "clean_first": False,
         "branch": "gh-pages",
         "remote": "origin",
+        "icon_source": None,
     }
 
     # For each config key, update args if the arg value is still at its default

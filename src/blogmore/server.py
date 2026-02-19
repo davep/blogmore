@@ -220,6 +220,8 @@ class ConfigChangeHandler(FileSystemEventHandler):
                 self.generator.renderer.extra_stylesheets = stylesheets
         if "default_author" in config:
             self.generator.default_author = config["default_author"]
+        if "icon_source" in config:
+            self.generator.icon_source = config["icon_source"]
 
         # Update sidebar config
         self.generator.sidebar_config = sidebar_config
@@ -242,6 +244,7 @@ def serve_site(
     config_path: Path | None = None,
     cli_overrides: dict[str, Any] | None = None,
     clean_first: bool = False,
+    icon_source: str | None = None,
 ) -> int:
     """Serve the generated site locally using a simple HTTP server.
 
@@ -263,6 +266,7 @@ def serve_site(
         config_path: Path to the configuration file being used (if any)
         cli_overrides: Dictionary of CLI arguments that override config values
         clean_first: Whether to remove the output directory before generating
+        icon_source: Optional source icon filename in extras/ directory
 
     Returns:
         Exit code
@@ -309,6 +313,7 @@ def serve_site(
                 default_author=default_author,
                 sidebar_config=sidebar_config,
                 clean_first=clean_first,
+                icon_source=icon_source,
             )
             generator.generate(include_drafts=include_drafts)
         except Exception as e:

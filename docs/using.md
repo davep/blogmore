@@ -168,6 +168,88 @@ extra_stylesheets:
 
 Place `custom.css` in your content directory at `assets/custom.css` and BlogMore will copy it to the output.
 
+### Adding Site Icons
+
+BlogMore can automatically generate favicons and platform-specific icons from a single source image. This creates icons optimised for iOS, Android, Windows, and all modern browsers.
+
+#### Quick Start
+
+Place a square, high-resolution image (ideally 1024×1024 or larger) in your content directory's `extras/` subdirectory:
+
+```bash
+posts/
+  ├── extras/
+  │   └── icon.png
+  └── my-first-post.md
+```
+
+BlogMore will automatically detect the icon and generate 18 icon files:
+
+- **Favicon files** - Multi-resolution `.ico` and PNG alternatives (16×16, 32×32, 96×96)
+- **Apple Touch Icons** - Optimised for iOS devices (120×120, 152×152, 167×167, 180×180)
+- **Android/Chrome icons** - PWA-ready with web manifest (192×192, 512×512)
+- **Windows tiles** - Microsoft Edge and Windows 10+ tiles (70×70, 144×144, 150×150, 310×310, 310×150)
+
+All generated icons are placed in the `/icons` subdirectory of your output.
+
+#### Using a Custom Icon Filename
+
+If your icon has a different filename, specify it in your configuration:
+
+```yaml
+icon_source: "my-logo.png"
+```
+
+Or via command line:
+
+```bash
+blogmore build posts/ --icon-source my-logo.png
+```
+
+#### Supported Source Filenames
+
+BlogMore auto-detects these filenames in the `extras/` directory:
+
+- `icon.png` (recommended)
+- `icon.jpg` or `icon.jpeg`
+- `source-icon.png`
+- `app-icon.png`
+
+#### Requirements
+
+- **Format:** PNG or JPEG
+- **Size:** 1024×1024 or larger (square)
+- **Transparency:** PNG with transparent backgrounds works best
+
+#### What Gets Generated
+
+When a source icon is detected, BlogMore generates:
+
+```
+output/
+  └── icons/
+      ├── favicon.ico               (16×16, 32×32, 48×48 multi-res)
+      ├── favicon-16x16.png
+      ├── favicon-32x32.png
+      ├── favicon-96x96.png
+      ├── apple-touch-icon.png      (180×180)
+      ├── apple-touch-icon-120.png  (120×120)
+      ├── apple-touch-icon-152.png  (152×152)
+      ├── apple-touch-icon-167.png  (167×167)
+      ├── apple-touch-icon-precomposed.png
+      ├── android-chrome-192x192.png
+      ├── android-chrome-512x512.png
+      ├── mstile-70x70.png
+      ├── mstile-144x144.png
+      ├── mstile-150x150.png
+      ├── mstile-310x310.png
+      ├── mstile-310x150.png
+      ├── site.webmanifest          (PWA manifest)
+      └── browserconfig.xml         (Windows tile config)
+```
+
+The necessary HTML meta tags are automatically added to all pages, but only when the icons exist.
+
 ### Customising the Sidebar
 
 Add a logo, custom links, and social media icons:

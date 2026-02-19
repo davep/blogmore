@@ -86,6 +86,13 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
         help="Remove the output directory before generating the site",
     )
 
+    parser.add_argument(
+        "--icon-source",
+        type=str,
+        default=None,
+        help="Source icon filename in extras/ directory (e.g., 'my-logo.png')",
+    )
+
 
 def create_parser() -> argparse.ArgumentParser:
     """Create and configure the argument parser for blogmore.

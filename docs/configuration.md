@@ -211,6 +211,37 @@ Default author name used for posts that don't specify an `author` field in front
 default_author: "Dave Pearson"
 ```
 
+#### `icon_source`
+
+Filename of the source icon image in the `extras/` directory. BlogMore will generate favicons and platform-specific icons from this image.
+
+**Type:** String  
+**Default:** None (auto-detects `icon.png`, `icon.jpg`, `source-icon.png`, `app-icon.png`)
+
+```yaml
+icon_source: "icon.png"
+```
+
+```yaml
+# Use a custom filename
+icon_source: "my-logo.png"
+```
+
+When a source icon is provided or detected, BlogMore generates 18 icon files optimised for:
+
+- iOS (Apple Touch Icons)
+- Android/Chrome (with PWA manifest)
+- Windows/Edge (with tile configuration)
+- Standard favicons (multi-resolution)
+
+**Requirements:**
+
+- Format: PNG or JPEG
+- Size: Square image, ideally 1024×1024 or larger
+- Location: Must be in the `extras/` subdirectory of your content directory
+
+See [Using BlogMore - Adding Site Icons](using.md#adding-site-icons) for detailed usage instructions.
+
 ### Styling Options
 
 #### `extra_stylesheets`
@@ -379,6 +410,7 @@ include_drafts: false
 clean_first: true
 posts_per_feed: 30
 default_author: "Dave Pearson"
+icon_source: "icon.png"
 
 # Styling
 extra_stylesheets:
