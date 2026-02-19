@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v0.6.0
 
-**Released: WiP**
+**Released: 2026-02-19**
 
 - Fixed duplicate HTML element IDs when multiple posts with footnotes appear
   on the same index page.
