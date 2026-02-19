@@ -460,31 +460,29 @@ article.post {
     align-items: center;
     gap: 15px;
     margin: 30px 0;
-    padding: 15px 0;
+    padding: 0;
 }
 
 .post-navigation-top {
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 30px;
-    padding-bottom: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 0;
 }
 
 .post-navigation-bottom {
-    border-top: 1px solid var(--border-color);
-    margin-top: 30px;
-    padding-top: 20px;
+    margin-top: 20px;
+    padding-top: 0;
 }
 
 .post-nav-link {
     display: inline-flex;
     align-items: center;
-    padding: 10px 18px;
+    padding: 8px 14px;
     background: var(--tag-bg);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     text-decoration: none;
     color: var(--text-color);
-    font-size: 0.9em;
+    font-size: 0.85em;
     transition: all 0.2s ease;
     max-width: 45%;
 }
@@ -519,8 +517,8 @@ article.post {
     }
     
     .post-nav-link {
-        padding: 8px 14px;
-        font-size: 0.85em;
+        padding: 6px 10px;
+        font-size: 0.8em;
         max-width: 48%;
     }
 }
