@@ -48,6 +48,43 @@ def calculate_reading_time(content: str, words_per_minute: int = 200) -> int:
     return minutes
 
 
+def make_urls_absolute(html_content: str, base_url: str) -> str:
+    """Rewrite root-relative URLs in HTML content to absolute URLs.
+
+    Converts ``src`` and ``href`` attributes whose values begin with ``/``
+    to full absolute URLs by prepending *base_url*.  Attributes that already
+    contain an absolute URL (i.e. they include a scheme such as ``https://``)
+    are left unchanged.
+
+    Args:
+        html_content: HTML string that may contain root-relative URL references.
+        base_url: The absolute base URL to prepend (e.g. ``https://example.com``).
+            Any trailing slash is ignored because root-relative paths already
+            start with ``/``.
+
+    Returns:
+        HTML string with root-relative ``src``/``href`` values replaced by
+        absolute URLs.
+
+    Examples:
+        >>> make_urls_absolute('<img src="/img/photo.jpg">', "https://example.com")
+        '<img src="https://example.com/img/photo.jpg">'
+        >>> make_urls_absolute('<a href="/about.html">About</a>', "https://example.com")
+        '<a href="https://example.com/about.html">About</a>'
+    """
+    stripped = base_url.rstrip("/")
+
+    def _replace(match: re.Match[str]) -> str:
+        attr, quote, path = match.group(1), match.group(2), match.group(3)
+        return f'{attr}={quote}{stripped}{path}{quote}'
+
+    return re.sub(
+        r'(src|href)=(["\'])(/[^"\']*)\2',
+        _replace,
+        html_content,
+    )
+
+
 def normalize_site_url(site_url: str) -> str:
     """Normalize a site URL by removing trailing slashes.
 
