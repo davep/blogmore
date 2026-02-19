@@ -1,5 +1,12 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added auto-generation of various 'favicon' types from a single source
+  image. ([#103](https://github.com/davep/blogmore/pull/103))
+
 ## v0.3.0
 
 **Released: 2026-02-18**
