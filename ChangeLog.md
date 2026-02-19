@@ -1,13 +1,13 @@
 # BlogMore ChangeLog
 
-## v0.4.1
+## v0.5.0
 
-**Unreleased**
+**Released: 2026-02-19**
 
 - Fixed relative URLs in RSS/Atom feed entry content being left as
   root-relative paths; they are now rewritten to absolute URLs using the
   configured site URL, resolving feed-validator warnings.
-  ([#107](https://github.com/davep/blogmore/pull/107))
+  ([#110](https://github.com/davep/blogmore/pull/110))
 
 ## v0.4.0
 
