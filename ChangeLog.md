@@ -7,6 +7,9 @@
 - Fixed duplicate HTML element IDs when multiple posts with footnotes appear
   on the same index page.
   ([#114](https://github.com/davep/blogmore/pull/114))
+- Improved table styling with subtle borders, a distinct header background,
+  and alternating row shading that works in both light and dark modes.
+  ([#115](https://github.com/davep/blogmore/pull/115))
 
 ## v0.5.0
 
