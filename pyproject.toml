@@ -1,6 +1,6 @@
 [project]
 name = "blogmore"
-version = "0.3.0"
+version = "0.4.0"
 description = "A blog-oriented static site generation engine"
 readme = "README.md"
 authors = [
@@ -28,7 +28,7 @@ dependencies = [
     "Pillow>=10.0.0",
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Environment :: Console",
     "Intended Audience :: Developers",
     "Natural Language :: English",
@@ -43,10 +43,12 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/davep/blogmore"
+Homepage = "https://blogmore.davep.dev/"
 Repository = "https://github.com/davep/blogmore"
+Documentation = "https://blogmore.davep.dev/"
 Source = "https://github.com/davep/blogmore"
 Issues = "https://github.com/davep/blogmore/issues"
+Discussions = "https://github.com/davep/blogmore/discussions"
 
 [project.scripts]
 blogmore = "blogmore.__main__:main"
