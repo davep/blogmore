@@ -155,17 +155,17 @@ class SiteGenerator:
 
         return None
 
-    def _detect_apple_touch_icons(self) -> bool:
-        """Detect if Apple touch icons exist in the icons directory.
+    def _detect_generated_icons(self) -> bool:
+        """Detect if generated platform icons exist in the icons directory.
 
         Returns:
-            True if Apple touch icons exist, False otherwise
+            True if generated icons exist, False otherwise
         """
         icons_dir = self.output_dir / "icons"
         if not icons_dir.exists():
             return False
 
-        # Check if the main Apple touch icon exists
+        # Check if the main Apple touch icon exists as an indicator
         apple_icon_path = icons_dir / "apple-touch-icon.png"
         return apple_icon_path.is_file()
 
@@ -201,7 +201,7 @@ class SiteGenerator:
             "tag_dir": self.TAG_DIR,
             "category_dir": self.CATEGORY_DIR,
             "favicon_url": self._detect_favicon(),
-            "has_apple_touch_icons": self._detect_apple_touch_icons(),
+            "has_platform_icons": self._detect_generated_icons(),
             "blogmore_version": __version__,
         }
         # Merge sidebar config into context

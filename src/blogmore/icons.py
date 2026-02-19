@@ -90,10 +90,7 @@ class IconGenerator:
                     (32, "favicon-32x32.png"),
                     (96, "favicon-96x96.png"),
                 ]
-                for size, filename in favicon_sizes:
-                    icon_path = self._generate_png_icon(img, size, filename)
-                    if icon_path:
-                        generated[filename] = icon_path
+                self._generate_png_icons_batch(img, favicon_sizes, generated)
 
                 # Generate Apple touch icons
                 apple_icons = [
@@ -103,20 +100,14 @@ class IconGenerator:
                     (167, "apple-touch-icon-167.png"),
                     (180, "apple-touch-icon-precomposed.png"),
                 ]
-                for size, filename in apple_icons:
-                    icon_path = self._generate_png_icon(img, size, filename)
-                    if icon_path:
-                        generated[filename] = icon_path
+                self._generate_png_icons_batch(img, apple_icons, generated)
 
                 # Generate Android/Chrome icons
                 android_icons = [
                     (192, "android-chrome-192x192.png"),
                     (512, "android-chrome-512x512.png"),
                 ]
-                for size, filename in android_icons:
-                    icon_path = self._generate_png_icon(img, size, filename)
-                    if icon_path:
-                        generated[filename] = icon_path
+                self._generate_png_icons_batch(img, android_icons, generated)
 
                 # Generate Windows/Microsoft tiles
                 windows_tiles = [
@@ -125,10 +116,7 @@ class IconGenerator:
                     (150, "mstile-150x150.png"),
                     (310, "mstile-310x310.png"),
                 ]
-                for size, filename in windows_tiles:
-                    icon_path = self._generate_png_icon(img, size, filename)
-                    if icon_path:
-                        generated[filename] = icon_path
+                self._generate_png_icons_batch(img, windows_tiles, generated)
 
                 # Generate wide Windows tile (310x150)
                 wide_tile_path = self._generate_wide_tile(img)
@@ -150,6 +138,24 @@ class IconGenerator:
         except Exception as e:
             print(f"Error generating icons: {e}")
             return {}
+
+    def _generate_png_icons_batch(
+        self,
+        img: Image.Image,
+        icon_specs: list[tuple[int, str]],
+        generated: dict[str, Path],
+    ) -> None:
+        """Generate a batch of PNG icons with the same pattern.
+
+        Args:
+            img: Source PIL Image
+            icon_specs: List of (size, filename) tuples
+            generated: Dictionary to update with successfully generated icons
+        """
+        for size, filename in icon_specs:
+            icon_path = self._generate_png_icon(img, size, filename)
+            if icon_path:
+                generated[filename] = icon_path
 
     def _generate_favicon(self, img: Image.Image) -> Path | None:
         """Generate a multi-resolution favicon.ico file.
