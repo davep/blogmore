@@ -1,6 +1,10 @@
 """Unit tests for the utils module."""
 
-from blogmore.utils import calculate_reading_time, normalize_site_url
+from blogmore.utils import (
+    calculate_reading_time,
+    make_urls_absolute,
+    normalize_site_url,
+)
 
 
 class TestCalculateReadingTime:
@@ -118,3 +122,71 @@ class TestNormalizeSiteUrl:
     def test_normalize_https_url(self) -> None:
         """Test normalizing HTTPS URL with trailing slash."""
         assert normalize_site_url("https://blog.davep.org/") == "https://blog.davep.org"
+
+
+class TestMakeUrlsAbsolute:
+    """Test the make_urls_absolute function."""
+
+    def test_src_double_quotes(self) -> None:
+        """Test that src with double-quoted relative path is rewritten."""
+        html = '<img src="/images/photo.jpg">'
+        result = make_urls_absolute(html, "https://example.com")
+        assert result == '<img src="https://example.com/images/photo.jpg">'
+
+    def test_src_single_quotes(self) -> None:
+        """Test that src with single-quoted relative path is rewritten."""
+        html = "<img src='/images/photo.jpg'>"
+        result = make_urls_absolute(html, "https://example.com")
+        assert result == "<img src='https://example.com/images/photo.jpg'>"
+
+    def test_href_double_quotes(self) -> None:
+        """Test that href with double-quoted relative path is rewritten."""
+        html = '<a href="/about.html">About</a>'
+        result = make_urls_absolute(html, "https://example.com")
+        assert result == '<a href="https://example.com/about.html">About</a>'
+
+    def test_href_single_quotes(self) -> None:
+        """Test that href with single-quoted relative path is rewritten."""
+        html = "<a href='/about.html'>About</a>"
+        result = make_urls_absolute(html, "https://example.com")
+        assert result == "<a href='https://example.com/about.html'>About</a>"
+
+    def test_absolute_urls_unchanged(self) -> None:
+        """Test that existing absolute URLs are not modified."""
+        html = '<img src="https://cdn.example.com/images/photo.jpg">'
+        result = make_urls_absolute(html, "https://example.com")
+        assert result == html
+
+    def test_absolute_http_urls_unchanged(self) -> None:
+        """Test that existing absolute HTTP URLs are not modified."""
+        html = '<a href="http://external.com/page.html">link</a>'
+        result = make_urls_absolute(html, "https://example.com")
+        assert result == html
+
+    def test_multiple_attributes_in_one_call(self) -> None:
+        """Test that multiple relative attributes are all rewritten."""
+        html = (
+            '<img src="/img/banner.png">'
+            '<a href="/posts/hello.html">Hello</a>'
+        )
+        result = make_urls_absolute(html, "https://example.com")
+        assert 'src="https://example.com/img/banner.png"' in result
+        assert 'href="https://example.com/posts/hello.html"' in result
+
+    def test_trailing_slash_stripped_from_base_url(self) -> None:
+        """Test that a trailing slash on base_url does not produce double slashes."""
+        html = '<img src="/img/photo.jpg">'
+        result = make_urls_absolute(html, "https://example.com/")
+        assert result == '<img src="https://example.com/img/photo.jpg">'
+
+    def test_deeply_nested_path(self) -> None:
+        """Test rewriting a deeply nested root-relative path."""
+        html = '<img src="/attachments/2026/02/11/banner.png">'
+        result = make_urls_absolute(html, "https://myblog.com")
+        assert result == '<img src="https://myblog.com/attachments/2026/02/11/banner.png">'
+
+    def test_no_relative_urls_returns_unchanged(self) -> None:
+        """Test that HTML with no relative URLs is returned unchanged."""
+        html = "<p>Hello world</p>"
+        result = make_urls_absolute(html, "https://example.com")
+        assert result == html

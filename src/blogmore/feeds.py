@@ -6,7 +6,7 @@ from pathlib import Path
 from feedgen.feed import FeedGenerator as FeedGen  # type: ignore[import-untyped]
 
 from blogmore.parser import Post
-from blogmore.utils import normalize_site_url
+from blogmore.utils import make_urls_absolute, normalize_site_url
 
 # Directory for feed files (excluding main RSS feed which is at root)
 FEEDS_DIR = "feeds"
@@ -73,7 +73,7 @@ def add_post_to_feed(feed_generator: FeedGen, post: Post, site_url: str) -> None
     feed_entry.id(f"{base_url}{post.url}")
     feed_entry.title(post.title)
     feed_entry.link(href=f"{base_url}{post.url}")
-    feed_entry.content(post.html_content, type="html")
+    feed_entry.content(make_urls_absolute(post.html_content, base_url), type="html")
 
     # Add publication date if available
     if post.date:

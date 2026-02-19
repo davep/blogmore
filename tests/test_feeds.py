@@ -3,8 +3,6 @@
 import datetime as dt
 from pathlib import Path
 
-import pytest
-
 from blogmore.feeds import (
     BlogFeedGenerator,
     add_post_to_feed,
@@ -131,6 +129,30 @@ class TestAddPostToFeed:
 
         entries = fg.entry()
         assert len(entries) == 1
+
+    def test_add_post_relative_urls_made_absolute(self) -> None:
+        """Test that relative URLs in post HTML content are made absolute in the feed."""
+        post = Post(
+            path=Path("test-post.md"),
+            title="Image Post",
+            content="Some content with an image.",
+            html_content='<p><img src="/attachments/2026/02/11/banner.png"></p>',
+            date=None,
+        )
+        fg = create_feed_generator(
+            site_title="Test Blog",
+            site_url="https://example.com",
+            feed_url="https://example.com/feed.xml",
+        )
+        add_post_to_feed(fg, post, "https://example.com")
+
+        entry_content = fg.entry()[0].content()
+        assert entry_content is not None
+        assert 'src="/attachments/' not in entry_content["content"]
+        assert (
+            "https://example.com/attachments/2026/02/11/banner.png"
+            in entry_content["content"]
+        )
 
 
 class TestGenerateFeed:
