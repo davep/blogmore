@@ -52,12 +52,9 @@ def make_urls_absolute(html_content: str, base_url: str) -> str:
     """Rewrite root-relative URLs in HTML content to absolute URLs.
 
     Converts ``src`` and ``href`` attributes whose values begin with ``/``
-    to full absolute URLs by prepending *base_url*.  Also handles the case
-    where a root-relative path is wrapped in parentheses (e.g.
-    ``href="(/path)"``) — a pattern that can arise from Markdown typos like
-    ``[text]((/path))`` — by stripping the parentheses before prepending.
-    Attributes that already contain an absolute URL (i.e. they include a
-    scheme such as ``https://``) are left unchanged.
+    to full absolute URLs by prepending *base_url*.  Attributes that already
+    contain an absolute URL (i.e. they include a scheme such as ``https://``)
+    are left unchanged.
 
     Args:
         html_content: HTML string that may contain root-relative URL references.
@@ -81,24 +78,11 @@ def make_urls_absolute(html_content: str, base_url: str) -> str:
         attr, quote, path = match.group(1), match.group(2), match.group(3)
         return f'{attr}={quote}{stripped}{path}{quote}'
 
-    # Pass 1: handle href="/path" and src="/path"
-    html_content = re.sub(
+    return re.sub(
         r'(src|href)=(["\'])(/[^"\']*)\2',
         _replace,
         html_content,
     )
-
-    # Pass 2: handle href="(/path)" and src="(/path)" — root-relative paths
-    # wrapped in parentheses, which can arise from Markdown typos such as
-    # [text]((/path)).  The parentheses are stripped so the result is a clean
-    # absolute URL rather than https://example.com(/path).
-    html_content = re.sub(
-        r'(src|href)=(["\'])\((/[^"\'\)]*)\)\2',
-        _replace,
-        html_content,
-    )
-
-    return html_content
 
 
 def normalize_site_url(site_url: str) -> str:
