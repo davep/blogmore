@@ -724,6 +724,78 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#adding-site-icons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding Site Icons
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding Site Icons">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-a-custom-icon-filename" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using a Custom Icon Filename
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#supported-source-filenames" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported Source Filenames
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requirements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-gets-generated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Gets Generated
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#customising-the-sidebar" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1304,6 +1376,78 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#adding-site-icons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding Site Icons
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding Site Icons">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-a-custom-icon-filename" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using a Custom Icon Filename
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#supported-source-filenames" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported Source Filenames
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requirements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-gets-generated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Gets Generated
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#customising-the-sidebar" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1623,6 +1767,68 @@ blogmore<span class="w"> </span>publish
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/assets/custom.css</span>
 </code></pre></div>
 <p>Place <code>custom.css</code> in your content directory at <code>assets/custom.css</code> and BlogMore will copy it to the output.</p>
+<h3 id="adding-site-icons">Adding Site Icons</h3>
+<p>BlogMore can automatically generate favicons and platform-specific icons from a single source image. This creates icons optimised for iOS, Android, Windows, and all modern browsers.</p>
+<h4 id="quick-start">Quick Start</h4>
+<p>Place a square, high-resolution image (ideally 1024×1024 or larger) in your content directory's <code>extras/</code> subdirectory:</p>
+<div class="highlight"><pre><span></span><code>posts/
+<span class="w">  </span>├──<span class="w"> </span>extras/
+<span class="w">  </span>│<span class="w">   </span>└──<span class="w"> </span>icon.png
+<span class="w">  </span>└──<span class="w"> </span>my-first-post.md
+</code></pre></div>
+<p>BlogMore will automatically detect the icon and generate 18 icon files:</p>
+<ul>
+<li><strong>Favicon files</strong> - Multi-resolution <code>.ico</code> and PNG alternatives (16×16, 32×32, 96×96)</li>
+<li><strong>Apple Touch Icons</strong> - Optimised for iOS devices (120×120, 152×152, 167×167, 180×180)</li>
+<li><strong>Android/Chrome icons</strong> - PWA-ready with web manifest (192×192, 512×512)</li>
+<li><strong>Windows tiles</strong> - Microsoft Edge and Windows 10+ tiles (70×70, 144×144, 150×150, 310×310, 310×150)</li>
+</ul>
+<p>All generated icons are placed in the <code>/icons</code> subdirectory of your output.</p>
+<h4 id="using-a-custom-icon-filename">Using a Custom Icon Filename</h4>
+<p>If your icon has a different filename, specify it in your configuration:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">icon_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my-logo.png&quot;</span>
+</code></pre></div>
+<p>Or via command line:</p>
+<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--icon-source<span class="w"> </span>my-logo.png
+</code></pre></div>
+<h4 id="supported-source-filenames">Supported Source Filenames</h4>
+<p>BlogMore auto-detects these filenames in the <code>extras/</code> directory:</p>
+<ul>
+<li><code>icon.png</code> (recommended)</li>
+<li><code>icon.jpg</code> or <code>icon.jpeg</code></li>
+<li><code>source-icon.png</code></li>
+<li><code>app-icon.png</code></li>
+</ul>
+<h4 id="requirements">Requirements</h4>
+<ul>
+<li><strong>Format:</strong> PNG or JPEG</li>
+<li><strong>Size:</strong> 1024×1024 or larger (square)</li>
+<li><strong>Transparency:</strong> PNG with transparent backgrounds works best</li>
+</ul>
+<h4 id="what-gets-generated">What Gets Generated</h4>
+<p>When a source icon is detected, BlogMore generates:</p>
+<div class="highlight"><pre><span></span><code>output/
+  └── icons/
+      ├── favicon.ico               (16×16, 32×32, 48×48 multi-res)
+      ├── favicon-16x16.png
+      ├── favicon-32x32.png
+      ├── favicon-96x96.png
+      ├── apple-touch-icon.png      (180×180)
+      ├── apple-touch-icon-120.png  (120×120)
+      ├── apple-touch-icon-152.png  (152×152)
+      ├── apple-touch-icon-167.png  (167×167)
+      ├── apple-touch-icon-precomposed.png
+      ├── android-chrome-192x192.png
+      ├── android-chrome-512x512.png
+      ├── mstile-70x70.png
+      ├── mstile-144x144.png
+      ├── mstile-150x150.png
+      ├── mstile-310x310.png
+      ├── mstile-310x150.png
+      ├── site.webmanifest          (PWA manifest)
+      └── browserconfig.xml         (Windows tile config)
+</code></pre></div>
+<p>The necessary HTML meta tags are automatically added to all pages, but only when the icons exist.</p>
 <h3 id="customising-the-sidebar">Customising the Sidebar</h3>
 <p>Add a logo, custom links, and social media icons:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">site_logo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/images/logo.png</span>

@@ -807,6 +807,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#icon_source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        icon_source
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1459,6 +1470,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#icon_source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        icon_source
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1902,6 +1924,29 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <strong>Default:</strong> None</p>
 <div class="highlight"><pre><span></span><code><span class="nt">default_author</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dave</span><span class="nv"> </span><span class="s">Pearson&quot;</span>
 </code></pre></div>
+<h4 id="icon_source"><code>icon_source</code></h4>
+<p>Filename of the source icon image in the <code>extras/</code> directory. BlogMore will generate favicons and platform-specific icons from this image.</p>
+<p><strong>Type:</strong> String<br />
+<strong>Default:</strong> None (auto-detects <code>icon.png</code>, <code>icon.jpg</code>, <code>source-icon.png</code>, <code>app-icon.png</code>)</p>
+<div class="highlight"><pre><span></span><code><span class="nt">icon_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;icon.png&quot;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># Use a custom filename</span>
+<span class="nt">icon_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my-logo.png&quot;</span>
+</code></pre></div>
+<p>When a source icon is provided or detected, BlogMore generates 18 icon files optimised for:</p>
+<ul>
+<li>iOS (Apple Touch Icons)</li>
+<li>Android/Chrome (with PWA manifest)</li>
+<li>Windows/Edge (with tile configuration)</li>
+<li>Standard favicons (multi-resolution)</li>
+</ul>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li>Format: PNG or JPEG</li>
+<li>Size: Square image, ideally 1024×1024 or larger</li>
+<li>Location: Must be in the <code>extras/</code> subdirectory of your content directory</li>
+</ul>
+<p>See <a href="../using/#adding-site-icons">Using BlogMore - Adding Site Icons</a> for detailed usage instructions.</p>
 <h3 id="styling-options">Styling Options</h3>
 <h4 id="extra_stylesheets"><code>extra_stylesheets</code></h4>
 <p>List of additional stylesheets to include. Can be absolute URLs or paths relative to your site root.</p>
@@ -2009,6 +2054,7 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <span class="nt">clean_first</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="nt">posts_per_feed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
 <span class="nt">default_author</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dave</span><span class="nv"> </span><span class="s">Pearson&quot;</span>
+<span class="nt">icon_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;icon.png&quot;</span>
 
 <span class="c1"># Styling</span>
 <span class="nt">extra_stylesheets</span><span class="p">:</span>
