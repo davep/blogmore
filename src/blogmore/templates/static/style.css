@@ -425,6 +425,11 @@ article.post {
     font-size: 0.9em;
 }
 
+time a {
+    color: inherit;
+    text-decoration: none;
+}
+
 .category {
     margin-top: 10px;
 }
