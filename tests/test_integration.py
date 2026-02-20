@@ -99,10 +99,41 @@ class TestEndToEndWorkflow:
         # Search files should NOT be present when with_search is False (the default)
         assert not (temp_output_dir / "search.html").exists()
         assert not (temp_output_dir / "search_index.json").exists()
+        assert not (temp_output_dir / "static" / "search.js").exists()
 
         # Search nav link should not appear
         index_content = (temp_output_dir / "index.html").read_text()
         assert "/search.html" not in index_content
+
+    def test_search_stale_files_removed_when_disabled(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that stale search files are removed when search is later disabled."""
+        from blogmore.generator import SiteGenerator
+
+        # First build WITH search enabled
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            with_search=True,
+        )
+        generator.generate(include_drafts=False)
+        assert (temp_output_dir / "search.html").exists()
+        assert (temp_output_dir / "search_index.json").exists()
+        assert (temp_output_dir / "static" / "search.js").exists()
+
+        # Rebuild WITHOUT search - stale files must be removed
+        generator2 = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            with_search=False,
+        )
+        generator2.generate(include_drafts=False)
+        assert not (temp_output_dir / "search.html").exists()
+        assert not (temp_output_dir / "search_index.json").exists()
+        assert not (temp_output_dir / "static" / "search.js").exists()
 
     def test_regeneration_workflow(
         self, posts_dir: Path, temp_output_dir: Path

@@ -242,6 +242,19 @@ When a source icon is provided or detected, BlogMore generates 18 icon files opt
 
 See [Using BlogMore - Adding Site Icons](using.md#adding-site-icons) for detailed usage instructions.
 
+#### `with_search`
+
+Enable client-side full-text search. When `true`, BlogMore generates a `search_index.json` file containing every post's title, URL, date, and plain-text content, and a `/search.html` page that performs in-browser search as the reader types. A **Search** link is also added to the navigation bar. No external services are required.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+with_search: true
+```
+
+When set back to `false` (or omitted), any stale `search.html`, `search_index.json`, and `search.js` files from a previous build that had search enabled are automatically removed.
+
 ### Styling Options
 
 #### `extra_stylesheets`
@@ -411,6 +424,7 @@ clean_first: true
 posts_per_feed: 30
 default_author: "Dave Pearson"
 icon_source: "icon.png"
+with_search: true
 
 # Styling
 extra_stylesheets:

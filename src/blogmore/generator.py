@@ -298,6 +298,10 @@ class SiteGenerator:
             print("Generating search index and search page...")
             self._generate_search_index(posts)
             self._generate_search_page(pages)
+        else:
+            # Remove any stale search files left over from a previous build
+            # that had search enabled.
+            self._remove_stale_search_files()
 
         # Copy static assets if they exist
         self._copy_static_assets()
@@ -881,6 +885,19 @@ class SiteGenerator:
         output_path = self.output_dir / "search.html"
         output_path.write_text(html, encoding="utf-8")
 
+    def _remove_stale_search_files(self) -> None:
+        """Remove search-related files left over from a previous build.
+
+        When search is disabled, any ``search.html`` or
+        ``search_index.json`` that may have been written by an earlier
+        build that had search enabled are deleted so they do not appear
+        in the output directory.
+        """
+        for filename in ("search.html", "search_index.json"):
+            stale_path = self.output_dir / filename
+            if stale_path.exists():
+                stale_path.unlink()
+
     def _copy_static_assets(self) -> None:
         """Copy static assets (CSS, JS, images) to output directory."""
         output_static = self.output_dir / "static"
@@ -897,6 +914,9 @@ class SiteGenerator:
             if bundled_static.is_dir():
                 for item in bundled_static.iterdir():
                     if item.is_file():
+                        # Only copy search.js when search is enabled
+                        if item.name == "search.js" and not self.with_search:
+                            continue
                         # Read content and write to output
                         content = item.read_bytes()
                         output_file = output_static / item.name
