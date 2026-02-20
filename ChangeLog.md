@@ -4,12 +4,12 @@
 
 **Released: WiP**
 
-- Post date timestamps are now formatted as `YYYY-MM-DD HH:MM:SS TZ` and
-  each component (year, month, day) links to its corresponding archive page.
-  ([#123](https://github.com/davep/blogmore/pull/123))
 - Footnotes are now rendered in a slightly smaller font size to visually
   differentiate them from body text.
   ([#121](https://github.com/davep/blogmore/pull/121))
+- Post date timestamps are now formatted as `YYYY-MM-DD HH:MM:SS TZ` and
+  each component (year, month, day) links to its corresponding archive page.
+  ([#123](https://github.com/davep/blogmore/pull/123))
 
 ## v0.7.0
 
