@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v0.7.0
 
-**Released: WiP**
+**Released: 2026-02-20**
 
 - Fixed `serve` mode failing with `FileNotFoundError` when `clean_first` is
   enabled. ([#118](https://github.com/davep/blogmore/pull/118))
