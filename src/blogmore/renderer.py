@@ -13,6 +13,7 @@ from jinja2 import (
     PackageLoader,
     select_autoescape,
 )
+from markupsafe import Markup
 
 from blogmore.parser import Page, Post
 
@@ -64,36 +65,47 @@ class TemplateRenderer:
         self.env.filters["is_external_link"] = self._is_external_link
 
     @staticmethod
-    def _format_date(
-        date: dt.datetime | None, format_string: str = "%B %d, %Y %H:%M:%S"
-    ) -> str:
-        """Format a datetime object.
+    def _format_date(date: dt.datetime | None) -> Markup:
+        """Format a datetime object as HTML with archive links.
+
+        The date portion is rendered as
+        ``<a href="/{year}/">{year}</a>-<a href="/{year}/{mm}/">{mm}</a>-<a href="/{year}/{mm}/{dd}/">{dd}</a>``
+        so each component links to the corresponding archive page.
 
         Args:
-            date: The datetime to format
-            format_string: The format string (default shows full date and time)
+            date: The datetime to format.
 
         Returns:
-            Formatted date string or empty string if date is None
+            Markup containing the formatted date HTML, or empty Markup if date is None.
         """
         if date is None:
-            return ""
+            return Markup("")
 
-        # Format the datetime
-        formatted = date.strftime(format_string)
+        year = date.year
+        month = date.month
+        day = date.day
+
+        year_link = Markup(f'<a href="/{year}/">{year}</a>')
+        month_link = Markup(f'<a href="/{year}/{month:02d}/">{month:02d}</a>')
+        day_link = Markup(f'<a href="/{year}/{month:02d}/{day:02d}/">{day:02d}</a>')
+
+        time_str = date.strftime("%H:%M:%S")
+        formatted = Markup(f"{year_link}-{month_link}-{day_link} {time_str}")
 
         # Add timezone information if available
         if date.tzinfo is not None:
             # Get timezone name or offset
             tz_str = date.strftime("%Z")
             if tz_str:
-                formatted += f" {tz_str}"
+                formatted = Markup(f"{formatted} {tz_str}")
             else:
                 # If %Z doesn't work, use the offset
                 tz_offset = date.strftime("%z")
                 if tz_offset:
                     # Format as UTC+HH:MM or UTC-HH:MM
-                    formatted += f" UTC{tz_offset[0]}{tz_offset[1:3]}:{tz_offset[3:5]}"
+                    formatted = Markup(
+                        f"{formatted} UTC{tz_offset[0]}{tz_offset[1:3]}:{tz_offset[3:5]}"
+                    )
 
         return formatted
 

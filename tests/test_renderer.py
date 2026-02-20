@@ -35,7 +35,9 @@ class TestTemplateRenderer:
         """Test formatting a datetime object."""
         date = dt.datetime(2024, 1, 15, 14, 30, 0, tzinfo=dt.UTC)
         formatted = TemplateRenderer._format_date(date)
-        assert "January 15, 2024" in formatted
+        assert "2024" in formatted
+        assert "01" in formatted
+        assert "15" in formatted
         assert "14:30:00" in formatted
 
     def test_format_date_with_timezone(self) -> None:
@@ -49,11 +51,15 @@ class TestTemplateRenderer:
         """Test formatting None returns empty string."""
         assert TemplateRenderer._format_date(None) == ""
 
-    def test_format_date_custom_format(self) -> None:
-        """Test formatting with custom format string."""
-        date = dt.datetime(2024, 1, 15, 14, 30, 0, tzinfo=dt.UTC)
-        formatted = TemplateRenderer._format_date(date, format_string="%Y-%m-%d")
-        assert formatted.startswith("2024-01-15")
+    def test_format_date_links(self) -> None:
+        """Test that format_date produces archive links for year, month and day."""
+        date = dt.datetime(2026, 2, 20, 15, 46, 0, tzinfo=dt.UTC)
+        formatted = TemplateRenderer._format_date(date)
+        assert '<a href="/2026/">2026</a>' in formatted
+        assert '<a href="/2026/02/">02</a>' in formatted
+        assert '<a href="/2026/02/20/">20</a>' in formatted
+        assert "15:46:00" in formatted
+        assert "UTC" in formatted
 
     def test_render_post(self, sample_post: Post) -> None:
         """Test rendering a single post."""
