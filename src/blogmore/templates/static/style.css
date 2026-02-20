@@ -727,6 +727,11 @@ img[src*="#centre"] {
     color: #f85149;
 }
 
+/* Footnotes */
+.post-content .footnote {
+    font-size: 0.85em;
+}
+
 .post-summary {
     margin-bottom: 40px;
     padding-bottom: 30px;

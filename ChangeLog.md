@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Footnotes are now rendered in a slightly smaller font size to visually
+  differentiate them from body text.
+  ([#121](https://github.com/davep/blogmore/pull/121))
+
 ## v0.7.0
 
 **Released: 2026-02-20**
