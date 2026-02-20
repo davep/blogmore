@@ -53,7 +53,6 @@
         if (!query) {
             return escapeHtml(text);
         }
-        const pattern = new RegExp('(' + escapeRegExp(query) + ')', 'gi');
         return escapeHtml(text).replace(
             new RegExp('(' + escapeRegExp(escapeHtml(query)) + ')', 'gi'),
             '<mark>$1</mark>'
@@ -165,9 +164,9 @@
             ' result' +
             (results.length === 1 ? '' : 's') +
             ' found</p>' +
-            '<ol class="search-results-list">' +
+            '<ul class="search-results-list">' +
             items.join('') +
-            '</ol>';
+            '</ul>';
     }
 
     /**
