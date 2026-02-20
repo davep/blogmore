@@ -1,11 +1,11 @@
 # BlogMore ChangeLog
 
-## v0.8.0
+## Unreleased
 
-**Released: Unreleased**
+**Released: WiP**
 
-- Footnotes are now rendered in a slightly smaller font size (`0.85em`) to
-  visually differentiate them from body text.
+- Footnotes are now rendered in a slightly smaller font size to visually
+  differentiate them from body text.
   ([#121](https://github.com/davep/blogmore/pull/121))
 
 ## v0.7.0
