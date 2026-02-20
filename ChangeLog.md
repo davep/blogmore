@@ -4,18 +4,15 @@
 
 **Released: WiP**
 
-- Added client-side full-text search across post titles and content.  Enabled
-  with `--with-search` (CLI) or `with_search: true` (config).  When enabled,
-  a `search_index.json` is generated at build time and a `/search.html` page
-  lets readers search the site entirely in their browser, with no external
-  services required.  Search is off by default.
-  ([#125](https://github.com/davep/blogmore/pull/125))
 - Footnotes are now rendered in a slightly smaller font size to visually
   differentiate them from body text.
   ([#121](https://github.com/davep/blogmore/pull/121))
 - Post date timestamps are now formatted as `YYYY-MM-DD HH:MM:SS TZ` and
   each component (year, month, day) links to its corresponding archive page.
   ([#123](https://github.com/davep/blogmore/pull/123))
+- Added optional client-side full-text search across post titles and
+  content. Search is off by default.
+  ([#124](https://github.com/davep/blogmore/pull/124))
 
 ## v0.7.0
 
