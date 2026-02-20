@@ -71,6 +71,7 @@ def main() -> int:
             clean_first=args.clean_first,
             icon_source=args.icon_source,
             with_search=args.with_search,
+            with_sitemap=args.with_sitemap,
         )
 
     # Handle build command (and its aliases: generate, gen)
@@ -115,6 +116,7 @@ def main() -> int:
                 clean_first=args.clean_first,
                 icon_source=args.icon_source,
                 with_search=args.with_search,
+                with_sitemap=args.with_sitemap,
             )
             generator.generate(include_drafts=args.include_drafts)
             return 0
@@ -165,6 +167,7 @@ def main() -> int:
                 clean_first=args.clean_first,
                 icon_source=args.icon_source,
                 with_search=args.with_search,
+                with_sitemap=args.with_sitemap,
             )
             generator.generate(include_drafts=args.include_drafts)
             print("Site built successfully")
@@ -237,6 +240,7 @@ def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
         "remote": "origin",
         "icon_source": None,
         "with_search": False,
+        "with_sitemap": False,
     }
 
     overrides = {}

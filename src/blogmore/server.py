@@ -224,6 +224,8 @@ class ConfigChangeHandler(FileSystemEventHandler):
             self.generator.icon_source = config["icon_source"]
         if "with_search" in config:
             self.generator.with_search = config["with_search"]
+        if "with_sitemap" in config:
+            self.generator.with_sitemap = config["with_sitemap"]
 
         # Update sidebar config
         self.generator.sidebar_config = sidebar_config
@@ -248,6 +250,7 @@ def serve_site(
     clean_first: bool = False,
     icon_source: str | None = None,
     with_search: bool = False,
+    with_sitemap: bool = False,
 ) -> int:
     """Serve the generated site locally using a simple HTTP server.
 
@@ -271,6 +274,7 @@ def serve_site(
         clean_first: Whether to remove the output directory before generating
         icon_source: Optional source icon filename in extras/ directory
         with_search: Whether to generate a search index and search page
+        with_sitemap: Whether to generate an XML sitemap
 
     Returns:
         Exit code
@@ -319,6 +323,7 @@ def serve_site(
                 clean_first=clean_first,
                 icon_source=icon_source,
                 with_search=with_search,
+                with_sitemap=with_sitemap,
             )
             generator.generate(include_drafts=include_drafts)
         except Exception as e:

@@ -255,6 +255,19 @@ with_search: true
 
 When set back to `false` (or omitted), any stale `search.html`, `search_index.json`, and `search.js` files from a previous build that had search enabled are automatically removed.
 
+#### `with_sitemap`
+
+Generate an XML sitemap (`sitemap.xml`) in the root of the output directory. The sitemap conforms to the [Sitemaps protocol](https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview) and includes an entry for every HTML page generated for the site, except `search.html`.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+with_sitemap: true
+```
+
+A `site_url` should be set when using this option so that sitemap entries contain absolute URLs (e.g. `https://example.com/2024/01/15/my-post.html`). If `site_url` is not provided, URLs will fall back to `https://example.com`.
+
 ### Styling Options
 
 #### `extra_stylesheets`

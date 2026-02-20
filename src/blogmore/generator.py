@@ -14,6 +14,7 @@ from blogmore.icons import IconGenerator, detect_source_icon
 from blogmore.parser import Page, Post, PostParser, remove_date_prefix
 from blogmore.renderer import TemplateRenderer
 from blogmore.search import write_search_index
+from blogmore.sitemap import write_sitemap
 from blogmore.utils import normalize_site_url
 
 
@@ -89,6 +90,7 @@ class SiteGenerator:
         clean_first: bool = False,
         icon_source: str | None = None,
         with_search: bool = False,
+        with_sitemap: bool = False,
     ) -> None:
         """Initialize the site generator.
 
@@ -107,6 +109,7 @@ class SiteGenerator:
             clean_first: Whether to remove the output directory before generating
             icon_source: Optional source icon filename in extras/ directory
             with_search: Whether to generate a search index and search page
+            with_sitemap: Whether to generate an XML sitemap
         """
         self.content_dir = content_dir
         self.templates_dir = templates_dir
@@ -120,6 +123,7 @@ class SiteGenerator:
         self.clean_first = clean_first
         self.icon_source = icon_source
         self.with_search = with_search
+        self.with_sitemap = with_sitemap
 
         self.parser = PostParser(site_url=self.site_url)
         self.renderer = TemplateRenderer(
@@ -311,6 +315,11 @@ class SiteGenerator:
 
         # Copy extra files from extras directory
         self._copy_extras()
+
+        # Generate XML sitemap (only when enabled)
+        if self.with_sitemap:
+            print("Generating XML sitemap...")
+            self._generate_sitemap()
 
         print(f"Site generation complete! Output: {self.output_dir}")
 
@@ -897,6 +906,15 @@ class SiteGenerator:
             stale_path = self.output_dir / filename
             if stale_path.exists():
                 stale_path.unlink()
+
+    def _generate_sitemap(self) -> None:
+        """Generate the XML sitemap file.
+
+        Writes ``sitemap.xml`` to the root of the output directory,
+        containing an entry for every generated HTML page except
+        ``search.html``.
+        """
+        write_sitemap(self.output_dir, self.site_url)
 
     def _copy_static_assets(self) -> None:
         """Copy static assets (CSS, JS, images) to output directory."""
