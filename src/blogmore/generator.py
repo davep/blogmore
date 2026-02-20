@@ -13,6 +13,7 @@ from blogmore.feeds import BlogFeedGenerator
 from blogmore.icons import IconGenerator, detect_source_icon
 from blogmore.parser import Page, Post, PostParser, remove_date_prefix
 from blogmore.renderer import TemplateRenderer
+from blogmore.search import write_search_index
 from blogmore.utils import normalize_site_url
 
 
@@ -287,6 +288,11 @@ class SiteGenerator:
         # Generate feeds
         print("Generating RSS and Atom feeds...")
         self._generate_feeds(posts)
+
+        # Generate search index and search page
+        print("Generating search index and search page...")
+        self._generate_search_index(posts)
+        self._generate_search_page(pages)
 
         # Copy static assets if they exist
         self._copy_static_assets()
@@ -849,6 +855,26 @@ class SiteGenerator:
             category_posts.sort(key=get_sort_key, reverse=True)
 
         feed_gen.generate_category_feeds(posts_by_category)
+
+    def _generate_search_index(self, posts: list[Post]) -> None:
+        """Generate the search index JSON file.
+
+        Args:
+            posts: List of all posts to index.
+        """
+        write_search_index(posts, self.output_dir)
+
+    def _generate_search_page(self, pages: list[Page]) -> None:
+        """Generate the search page.
+
+        Args:
+            pages: List of static pages (for the sidebar navigation).
+        """
+        context = self._get_global_context()
+        context["pages"] = pages
+        html = self.renderer.render_search_page(**context)
+        output_path = self.output_dir / "search.html"
+        output_path.write_text(html, encoding="utf-8")
 
     def _copy_static_assets(self) -> None:
         """Copy static assets (CSS, JS, images) to output directory."""

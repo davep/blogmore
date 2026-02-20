@@ -335,6 +335,18 @@ class TemplateRenderer:
             **context,
         )
 
+    def render_search_page(self, **context: Any) -> str:
+        """Render the search page.
+
+        Args:
+            **context: Context variables to pass to the template.
+
+        Returns:
+            Rendered HTML string.
+        """
+        template = self.env.get_template("search.html")
+        return template.render(extra_stylesheets=self.extra_stylesheets, **context)
+
     def render_template(self, template_name: str, **context: Any) -> str:
         """Render an arbitrary template.
 

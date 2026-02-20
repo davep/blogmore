@@ -46,6 +46,10 @@ class TestEndToEndWorkflow:
         assert (temp_output_dir / "feed.xml").exists()
         assert (temp_output_dir / "static" / "style.css").exists()
 
+        # Verify search files exist
+        assert (temp_output_dir / "search.html").exists()
+        assert (temp_output_dir / "search_index.json").exists()
+
         # Verify post pages exist
         assert (temp_output_dir / "2024" / "01" / "15" / "first-post.html").exists()
         assert (temp_output_dir / "2024" / "01" / "10" / "complex-post.html").exists()

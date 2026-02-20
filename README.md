@@ -21,6 +21,7 @@ A blog-oriented static site generation engine built in Python.
 - Uses Jinja2 for templating
 - Simple and clean design
 - Automatic tag pages and archive generation
+- **Built-in search** - Full-text client-side search across post titles and content, with no external services required
 - **Automatic icon generation** - Generate favicons and platform-specific icons from a single source image
   - iOS (Apple Touch Icons)
   - Android/Chrome (with PWA manifest)
@@ -336,7 +337,41 @@ Blogmore uses Jinja2 templates. The default templates are included, but you can 
 - `archive.html` - Archive page
 - `tag.html` - Tag page
 - `category.html` - Category page
+- `search.html` - Search page
 - `static/style.css` - Stylesheet
+
+## Search
+
+Blogmore generates a client-side full-text search facility automatically.
+No external services or server-side processing are required — everything runs
+entirely in the reader's browser.
+
+### How it works
+
+When the site is built, two files are added to the output directory:
+
+- **`search_index.json`** — A JSON array containing the title, URL, date, and
+  plain-text body of every published post.
+- **`search.html`** — A search page with a text input that loads
+  `search_index.json` and performs an in-browser search as the user types.
+
+A **Search** link is automatically added to the top navigation bar on every
+page.
+
+### Performance
+
+The search index is only fetched when the reader opens the search page; it
+does not affect the load time of any other page.  The search itself uses
+built-in JavaScript string operations — no extra libraries are downloaded.
+
+### Linking to a pre-filled search
+
+Append a `?q=` query string to the search URL to pre-fill the search input
+and immediately show results.  For example:
+
+```
+https://example.com/search.html?q=python
+```
 
 ## Markdown Features
 
