@@ -425,7 +425,9 @@ article.post {
     font-size: 0.9em;
 }
 
-time a {
+time a,
+time a:link,
+time a:visited {
     color: var(--text-secondary);
     text-decoration: none;
 }
