@@ -34,6 +34,7 @@ class TestEndToEndWorkflow:
             output_dir=temp_output_dir,
             site_title="My Test Blog",
             site_url="https://test.example.com",
+            with_search=True,
         )
 
         generator.generate(include_drafts=False)
@@ -46,9 +47,13 @@ class TestEndToEndWorkflow:
         assert (temp_output_dir / "feed.xml").exists()
         assert (temp_output_dir / "static" / "style.css").exists()
 
-        # Verify search files exist
+        # Verify search files exist (with_search=True)
         assert (temp_output_dir / "search.html").exists()
         assert (temp_output_dir / "search_index.json").exists()
+
+        # Verify search nav link appears
+        index_content_html = (temp_output_dir / "index.html").read_text()
+        assert "/search.html" in index_content_html
 
         # Verify post pages exist
         assert (temp_output_dir / "2024" / "01" / "15" / "first-post.html").exists()
@@ -76,6 +81,28 @@ class TestEndToEndWorkflow:
         feed_content = (temp_output_dir / "feed.xml").read_text()
         assert "My First Post" in feed_content
         assert "My Test Blog" in feed_content
+
+    def test_search_disabled_by_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that search files are not generated when with_search is False."""
+        from blogmore.generator import SiteGenerator
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator.generate(include_drafts=False)
+
+        # Search files should NOT be present when with_search is False (the default)
+        assert not (temp_output_dir / "search.html").exists()
+        assert not (temp_output_dir / "search_index.json").exists()
+
+        # Search nav link should not appear
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/search.html" not in index_content
 
     def test_regeneration_workflow(
         self, posts_dir: Path, temp_output_dir: Path

@@ -36,6 +36,10 @@ posts_per_feed: 20
 # and Apple touch icons. Should be a square image, ideally 1024x1024 or larger.
 # icon_source: "icon.png"
 
+# Optional: Enable client-side search (default: false)
+# Generates a search index and a /search.html page when set to true.
+# with_search: false
+
 # Optional: Additional stylesheets to include (can be URLs or relative paths)
 # extra_stylesheets:
 #   - https://example.com/custom.css

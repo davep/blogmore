@@ -2,6 +2,10 @@
 
 {% block title %}Search - {{ site_title }}{% endblock %}
 
+{% block meta_tags %}
+<meta name="robots" content="noindex">
+{% endblock %}
+
 {% block extra_head %}
 <script src="/static/search.js" defer></script>
 {% endblock %}

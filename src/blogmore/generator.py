@@ -88,6 +88,7 @@ class SiteGenerator:
         sidebar_config: dict[str, Any] | None = None,
         clean_first: bool = False,
         icon_source: str | None = None,
+        with_search: bool = False,
     ) -> None:
         """Initialize the site generator.
 
@@ -105,6 +106,7 @@ class SiteGenerator:
             sidebar_config: Optional sidebar configuration (site_logo, links, socials)
             clean_first: Whether to remove the output directory before generating
             icon_source: Optional source icon filename in extras/ directory
+            with_search: Whether to generate a search index and search page
         """
         self.content_dir = content_dir
         self.templates_dir = templates_dir
@@ -117,6 +119,7 @@ class SiteGenerator:
         self.sidebar_config = sidebar_config or {}
         self.clean_first = clean_first
         self.icon_source = icon_source
+        self.with_search = with_search
 
         self.parser = PostParser(site_url=self.site_url)
         self.renderer = TemplateRenderer(
@@ -204,6 +207,7 @@ class SiteGenerator:
             "favicon_url": self._detect_favicon(),
             "has_platform_icons": self._detect_generated_icons(),
             "blogmore_version": __version__,
+            "with_search": self.with_search,
         }
         # Merge sidebar config into context
         context.update(self.sidebar_config)
@@ -289,10 +293,11 @@ class SiteGenerator:
         print("Generating RSS and Atom feeds...")
         self._generate_feeds(posts)
 
-        # Generate search index and search page
-        print("Generating search index and search page...")
-        self._generate_search_index(posts)
-        self._generate_search_page(pages)
+        # Generate search index and search page (only when enabled)
+        if self.with_search:
+            print("Generating search index and search page...")
+            self._generate_search_index(posts)
+            self._generate_search_page(pages)
 
         # Copy static assets if they exist
         self._copy_static_assets()
