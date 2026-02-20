@@ -426,7 +426,7 @@ article.post {
 }
 
 time a {
-    color: inherit;
+    color: var(--text-secondary);
     text-decoration: none;
 }
 
