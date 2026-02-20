@@ -186,6 +186,46 @@ class TestServeSite:
 
         assert result == 1
 
+    @patch("blogmore.server.ReusingTCPServer")
+    @patch("blogmore.server.Observer")
+    def test_serve_uses_directory_parameter_not_chdir(
+        self, mock_observer: MagicMock, mock_server: MagicMock, temp_output_dir: Path
+    ) -> None:
+        """Test that serve_site passes directory to handler instead of os.chdir.
+
+        When clean_first is used, the output directory is removed and recreated
+        during regeneration. The HTTP handler must use an explicit directory path
+        rather than os.getcwd() so it keeps working after directory recreation.
+        """
+        import functools
+
+        # Create a simple file in the output directory
+        (temp_output_dir / "index.html").write_text("<html>Test</html>")
+
+        # Capture the handler passed to ReusingTCPServer
+        captured_handler: list[object] = []
+
+        def capture_args(*args: object, **kwargs: object) -> MagicMock:
+            if args:
+                captured_handler.append(args[1])
+            instance = MagicMock()
+            instance.__enter__ = MagicMock(return_value=instance)
+            instance.__exit__ = MagicMock(return_value=False)
+            instance.serve_forever.side_effect = KeyboardInterrupt()
+            return instance
+
+        mock_server.side_effect = capture_args
+
+        result = serve_site(output_dir=temp_output_dir, watch=False)
+
+        assert result == 0
+        assert len(captured_handler) == 1
+        handler = captured_handler[0]
+        # The handler should be a functools.partial wrapping QuietHTTPRequestHandler
+        # with the output directory explicitly set, not relying on os.getcwd()
+        assert isinstance(handler, functools.partial)
+        assert handler.keywords.get("directory") == str(temp_output_dir)
+
 
 class TestMainCLI:
     """Test the main CLI entry point."""
