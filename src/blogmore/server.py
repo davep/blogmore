@@ -362,9 +362,7 @@ def serve_site(
     # Create a simple HTTP server with our custom handler, passing the output
     # directory explicitly so that the handler continues to work even if
     # clean_first removes and recreates the directory during regeneration.
-    http_handler = functools.partial(
-        QuietHTTPRequestHandler, directory=str(output_dir)
-    )
+    http_handler = functools.partial(QuietHTTPRequestHandler, directory=str(output_dir))
 
     try:
         with ReusingTCPServer(("", port), http_handler) as httpd:
