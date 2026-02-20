@@ -1,5 +1,16 @@
 # BlogMore ChangeLog
 
+## v0.7.0
+
+**Released: 2026-02-20**
+
+- Fixed `serve` mode failing with `FileNotFoundError` when `clean_first` is
+  enabled. The HTTP server now uses an explicit directory path instead of
+  relying on the current working directory, so it continues to work correctly
+  even when the output directory is removed and recreated during
+  regeneration.
+  ([#116](https://github.com/davep/blogmore/pull/116))
+
 ## v0.6.0
 
 **Released: 2026-02-19**

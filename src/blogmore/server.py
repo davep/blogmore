@@ -1,7 +1,7 @@
 """Local server and file watching functionality for blogmore."""
 
+import functools
 import http.server
-import os
 import socketserver
 import sys
 import threading
@@ -359,11 +359,12 @@ def serve_site(
         )
         return 1
 
-    # Change to the output directory
-    os.chdir(output_dir)
-
-    # Create a simple HTTP server with our custom handler
-    http_handler = QuietHTTPRequestHandler
+    # Create a simple HTTP server with our custom handler, passing the output
+    # directory explicitly so that the handler continues to work even if
+    # clean_first removes and recreates the directory during regeneration.
+    http_handler = functools.partial(
+        QuietHTTPRequestHandler, directory=str(output_dir)
+    )
 
     try:
         with ReusingTCPServer(("", port), http_handler) as httpd:
