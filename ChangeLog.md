@@ -1,14 +1,11 @@
 # BlogMore ChangeLog
 
-## v0.9.0
+## Unreleased
 
-**Released: 2026-02-20**
+**Released: WiP**
 
-- Added optional XML sitemap generation (`sitemap.xml`). Pass
-  `--with-sitemap` on the command line, or set `with_sitemap: true` in
-  the configuration file, to generate a sitemap containing an entry for
-  every page in the site except `search.html`.
-  ([#126](https://github.com/davep/blogmore/pull/126))
+- Added optional XML sitemap generation.
+  ([#127](https://github.com/davep/blogmore/pull/127))
 
 ## v0.8.0
 
