@@ -767,6 +767,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#-with-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --with-search
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1495,6 +1506,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#-with-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --with-search
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1973,6 +1995,12 @@ blogmore<span class="w"> </span>gen<span class="w"> </span>&lt;content_dir&gt;<s
 <p>If not specified, BlogMore auto-detects common icon filenames: <code>icon.png</code>, <code>icon.jpg</code>, <code>source-icon.png</code>, <code>app-icon.png</code>.</p>
 <p>When a source icon is provided or detected, BlogMore generates 18 optimised icon files for iOS, Android, Windows, and standard favicons.</p>
 <p>See <a href="../using/#adding-site-icons">Using BlogMore - Adding Site Icons</a> for detailed usage.</p>
+<h4 id="-with-search"><code>--with-search</code></h4>
+<p>Enable client-side full-text search. When set, BlogMore generates a <code>search_index.json</code> file containing every post's title, URL, date, and plain-text content, and a <code>/search.html</code> page that performs in-browser search as the reader types. A <strong>Search</strong> link is also added to the navigation bar. No external services are required.</p>
+<p>Search is <strong>disabled by default</strong>. Pass this flag to opt in.</p>
+<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--with-search
+</code></pre></div>
+<p>When search is later disabled (flag omitted), any stale <code>search.html</code>, <code>search_index.json</code>, and <code>search.js</code> files from a previous build are automatically removed.</p>
 <h3 id="examples">Examples</h3>
 <p>Basic site generation:
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/
@@ -2024,7 +2052,8 @@ blogmore<span class="w"> </span>serve
 - <code>--posts-per-feed</code>
 - <code>--default-author</code>
 - <code>--extra-stylesheet</code>
-- <code>--icon-source</code></p>
+- <code>--icon-source</code>
+- <code>--with-search</code></p>
 <h3 id="examples_1">Examples</h3>
 <p>Basic development server:
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>serve<span class="w"> </span>posts/
@@ -2080,7 +2109,8 @@ blogmore<span class="w"> </span>serve
 - <code>--posts-per-feed</code>
 - <code>--default-author</code>
 - <code>--extra-stylesheet</code>
-- <code>--icon-source</code></p>
+- <code>--icon-source</code>
+- <code>--with-search</code></p>
 <h3 id="how-it-works">How It Works</h3>
 <p>When you run <code>publish</code>, BlogMore:</p>
 <ol>

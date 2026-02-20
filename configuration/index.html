@@ -818,6 +818,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#with_search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        with_search
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1481,6 +1492,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#with_search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        with_search
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1947,6 +1969,13 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <li>Location: Must be in the <code>extras/</code> subdirectory of your content directory</li>
 </ul>
 <p>See <a href="../using/#adding-site-icons">Using BlogMore - Adding Site Icons</a> for detailed usage instructions.</p>
+<h4 id="with_search"><code>with_search</code></h4>
+<p>Enable client-side full-text search. When <code>true</code>, BlogMore generates a <code>search_index.json</code> file containing every post's title, URL, date, and plain-text content, and a <code>/search.html</code> page that performs in-browser search as the reader types. A <strong>Search</strong> link is also added to the navigation bar. No external services are required.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">with_search</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<p>When set back to <code>false</code> (or omitted), any stale <code>search.html</code>, <code>search_index.json</code>, and <code>search.js</code> files from a previous build that had search enabled are automatically removed.</p>
 <h3 id="styling-options">Styling Options</h3>
 <h4 id="extra_stylesheets"><code>extra_stylesheets</code></h4>
 <p>List of additional stylesheets to include. Can be absolute URLs or paths relative to your site root.</p>
@@ -2055,6 +2084,7 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <span class="nt">posts_per_feed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
 <span class="nt">default_author</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dave</span><span class="nv"> </span><span class="s">Pearson&quot;</span>
 <span class="nt">icon_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;icon.png&quot;</span>
+<span class="nt">with_search</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 
 <span class="c1"># Styling</span>
 <span class="nt">extra_stylesheets</span><span class="p">:</span>
