@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Search - {{ site_title }}{% endblock %}
+
+{% block meta_tags %}
+<meta name="robots" content="noindex">
+{% endblock %}
+
+{% block extra_head %}
+<script src="/static/search.js" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="search-page">
+    <h1>Search</h1>
+    <form id="search-form" class="search-form" role="search" action="/search.html" method="get">
+        <label for="search-input" class="search-label">Search posts by title or content:</label>
+        <div class="search-input-row">
+            <input
+                type="search"
+                id="search-input"
+                name="q"
+                class="search-input"
+                placeholder="Enter search terms…"
+                autofocus
+                autocomplete="off"
+                spellcheck="false"
+            >
+            <button type="submit" class="search-button">Search</button>
+        </div>
+    </form>
+    <div id="search-results" class="search-results" aria-live="polite"></div>
+</div>
+{% endblock %}

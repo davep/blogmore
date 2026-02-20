@@ -13,6 +13,7 @@ from blogmore.feeds import BlogFeedGenerator
 from blogmore.icons import IconGenerator, detect_source_icon
 from blogmore.parser import Page, Post, PostParser, remove_date_prefix
 from blogmore.renderer import TemplateRenderer
+from blogmore.search import write_search_index
 from blogmore.utils import normalize_site_url
 
 
@@ -87,6 +88,7 @@ class SiteGenerator:
         sidebar_config: dict[str, Any] | None = None,
         clean_first: bool = False,
         icon_source: str | None = None,
+        with_search: bool = False,
     ) -> None:
         """Initialize the site generator.
 
@@ -104,6 +106,7 @@ class SiteGenerator:
             sidebar_config: Optional sidebar configuration (site_logo, links, socials)
             clean_first: Whether to remove the output directory before generating
             icon_source: Optional source icon filename in extras/ directory
+            with_search: Whether to generate a search index and search page
         """
         self.content_dir = content_dir
         self.templates_dir = templates_dir
@@ -116,6 +119,7 @@ class SiteGenerator:
         self.sidebar_config = sidebar_config or {}
         self.clean_first = clean_first
         self.icon_source = icon_source
+        self.with_search = with_search
 
         self.parser = PostParser(site_url=self.site_url)
         self.renderer = TemplateRenderer(
@@ -203,6 +207,7 @@ class SiteGenerator:
             "favicon_url": self._detect_favicon(),
             "has_platform_icons": self._detect_generated_icons(),
             "blogmore_version": __version__,
+            "with_search": self.with_search,
         }
         # Merge sidebar config into context
         context.update(self.sidebar_config)
@@ -287,6 +292,16 @@ class SiteGenerator:
         # Generate feeds
         print("Generating RSS and Atom feeds...")
         self._generate_feeds(posts)
+
+        # Generate search index and search page (only when enabled)
+        if self.with_search:
+            print("Generating search index and search page...")
+            self._generate_search_index(posts)
+            self._generate_search_page(pages)
+        else:
+            # Remove any stale search files left over from a previous build
+            # that had search enabled.
+            self._remove_stale_search_files()
 
         # Copy static assets if they exist
         self._copy_static_assets()
@@ -850,6 +865,39 @@ class SiteGenerator:
 
         feed_gen.generate_category_feeds(posts_by_category)
 
+    def _generate_search_index(self, posts: list[Post]) -> None:
+        """Generate the search index JSON file.
+
+        Args:
+            posts: List of all posts to index.
+        """
+        write_search_index(posts, self.output_dir)
+
+    def _generate_search_page(self, pages: list[Page]) -> None:
+        """Generate the search page.
+
+        Args:
+            pages: List of static pages (for the sidebar navigation).
+        """
+        context = self._get_global_context()
+        context["pages"] = pages
+        html = self.renderer.render_search_page(**context)
+        output_path = self.output_dir / "search.html"
+        output_path.write_text(html, encoding="utf-8")
+
+    def _remove_stale_search_files(self) -> None:
+        """Remove search-related files left over from a previous build.
+
+        When search is disabled, any ``search.html`` or
+        ``search_index.json`` that may have been written by an earlier
+        build that had search enabled are deleted so they do not appear
+        in the output directory.
+        """
+        for filename in ("search.html", "search_index.json"):
+            stale_path = self.output_dir / filename
+            if stale_path.exists():
+                stale_path.unlink()
+
     def _copy_static_assets(self) -> None:
         """Copy static assets (CSS, JS, images) to output directory."""
         output_static = self.output_dir / "static"
@@ -866,6 +914,9 @@ class SiteGenerator:
             if bundled_static.is_dir():
                 for item in bundled_static.iterdir():
                     if item.is_file():
+                        # Only copy search.js when search is enabled
+                        if item.name == "search.js" and not self.with_search:
+                            continue
                         # Read content and write to output
                         content = item.read_bytes()
                         output_file = output_static / item.name

@@ -10,6 +10,9 @@
 - Post date timestamps are now formatted as `YYYY-MM-DD HH:MM:SS TZ` and
   each component (year, month, day) links to its corresponding archive page.
   ([#123](https://github.com/davep/blogmore/pull/123))
+- Added optional client-side full-text search across post titles and
+  content. Search is off by default.
+  ([#124](https://github.com/davep/blogmore/pull/124))
 
 ## v0.7.0
 

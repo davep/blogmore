@@ -171,6 +171,18 @@ When a source icon is provided or detected, BlogMore generates 18 optimised icon
 
 See [Using BlogMore - Adding Site Icons](using.md#adding-site-icons) for detailed usage.
 
+#### `--with-search`
+
+Enable client-side full-text search. When set, BlogMore generates a `search_index.json` file containing every post's title, URL, date, and plain-text content, and a `/search.html` page that performs in-browser search as the reader types. A **Search** link is also added to the navigation bar. No external services are required.
+
+Search is **disabled by default**. Pass this flag to opt in.
+
+```bash
+blogmore build posts/ --with-search
+```
+
+When search is later disabled (flag omitted), any stale `search.html`, `search_index.json`, and `search.js` files from a previous build are automatically removed.
+
 ### Examples
 
 Basic site generation:
@@ -249,6 +261,7 @@ The serve command also accepts all the build command options:
 - `--default-author`
 - `--extra-stylesheet`
 - `--icon-source`
+- `--with-search`
 
 ### Examples
 
@@ -334,6 +347,7 @@ The publish command also accepts all the build command options:
 - `--default-author`
 - `--extra-stylesheet`
 - `--icon-source`
+- `--with-search`
 
 ### How It Works
 

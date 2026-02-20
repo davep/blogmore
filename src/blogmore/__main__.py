@@ -70,6 +70,7 @@ def main() -> int:
             cli_overrides=cli_overrides,
             clean_first=args.clean_first,
             icon_source=args.icon_source,
+            with_search=args.with_search,
         )
 
     # Handle build command (and its aliases: generate, gen)
@@ -113,6 +114,7 @@ def main() -> int:
                 sidebar_config=sidebar_config,
                 clean_first=args.clean_first,
                 icon_source=args.icon_source,
+                with_search=args.with_search,
             )
             generator.generate(include_drafts=args.include_drafts)
             return 0
@@ -162,6 +164,7 @@ def main() -> int:
                 sidebar_config=sidebar_config,
                 clean_first=args.clean_first,
                 icon_source=args.icon_source,
+                with_search=args.with_search,
             )
             generator.generate(include_drafts=args.include_drafts)
             print("Site built successfully")
@@ -233,6 +236,7 @@ def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
         "branch": "gh-pages",
         "remote": "origin",
         "icon_source": None,
+        "with_search": False,
     }
 
     overrides = {}

@@ -93,6 +93,13 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
         help="Source icon filename in extras/ directory (e.g., 'my-logo.png')",
     )
 
+    parser.add_argument(
+        "--with-search",
+        action="store_true",
+        default=False,
+        help="Generate a client-side search index and search page (default: disabled)",
+    )
+
 
 def create_parser() -> argparse.ArgumentParser:
     """Create and configure the argument parser for blogmore.

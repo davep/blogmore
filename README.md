@@ -21,6 +21,7 @@ A blog-oriented static site generation engine built in Python.
 - Uses Jinja2 for templating
 - Simple and clean design
 - Automatic tag pages and archive generation
+- **Built-in search** - Optional client-side full-text search across post titles and content, enabled with `--with-search`; no external services required
 - **Automatic icon generation** - Generate favicons and platform-specific icons from a single source image
   - iOS (Apple Touch Icons)
   - Android/Chrome (with PWA manifest)
@@ -336,7 +337,52 @@ Blogmore uses Jinja2 templates. The default templates are included, but you can 
 - `archive.html` - Archive page
 - `tag.html` - Tag page
 - `category.html` - Category page
+- `search.html` - Search page
 - `static/style.css` - Stylesheet
+
+## Search
+
+Search is disabled by default.  To enable it, pass `--with-search` on the
+command line or set `with_search: true` in the configuration file.
+
+```bash
+blogmore build posts/ --with-search
+```
+
+```yaml
+# blogmore.yaml
+with_search: true
+```
+
+### How it works
+
+When the site is built with search enabled, two files are added to the output
+directory:
+
+- **`search_index.json`** — A JSON array containing the title, URL, date, and
+  plain-text body of every published post.
+- **`search.html`** — A search page with a text input that loads
+  `search_index.json` and performs an in-browser search as the user types.
+
+A **Search** link is added to the top navigation bar on every page.
+
+No external services or server-side processing are required — everything runs
+entirely in the reader's browser.
+
+### Performance
+
+The search index is only fetched when the reader opens the search page; it
+does not affect the load time of any other page.  The search itself uses
+built-in JavaScript string operations — no extra libraries are downloaded.
+
+### Linking to a pre-filled search
+
+Append a `?q=` query string to the search URL to pre-fill the search input
+and immediately show results.  For example:
+
+```
+https://example.com/search.html?q=python
+```
 
 ## Markdown Features
 
