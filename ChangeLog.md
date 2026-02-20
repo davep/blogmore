@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v0.8.0
 
-**Released: WiP**
+**Released: 2026-02-20**
 
 - Footnotes are now rendered in a slightly smaller font size to visually
   differentiate them from body text.
