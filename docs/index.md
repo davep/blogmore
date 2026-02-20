@@ -26,6 +26,7 @@ BlogMore focuses on simplicity and efficiency in creating blog-focused websites.
 - **Sidebar customisation** - Optional logo, custom links, and social media icons
 - **SEO optimisation** - Proper meta tags, Open Graph tags, and Twitter Card support
 - **Automatic icon generation** - Generate favicons and platform-specific icons (iOS, Android, Windows) from a single source image
+- **Client-side search** - Optional full-text search across post titles and content, running entirely in the browser with no external services (enable with `--with-search`)
 
 ## Installation
 
