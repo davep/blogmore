@@ -181,6 +181,48 @@ class Post:
         """
         return calculate_reading_time(self.content)
 
+    @property
+    def modified_date(self) -> dt.datetime | None:
+        """Get the modified date as a datetime object.
+
+        Parses the ``modified`` field from metadata into a proper datetime,
+        handling datetime objects returned by the YAML parser as well as raw
+        strings in common date formats.
+
+        Returns:
+            The modified datetime, or None if not set in metadata
+        """
+        if not self.metadata:
+            return None
+        modified = self.metadata.get("modified")
+        if modified is None:
+            return None
+        if isinstance(modified, dt.datetime):
+            return modified
+        if isinstance(modified, dt.date):
+            return dt.datetime.combine(modified, dt.time())
+        if isinstance(modified, str):
+            date_formats = [
+                "%Y-%m-%d %H:%M:%S %z",
+                "%Y-%m-%d %H:%M:%S%z",
+                "%Y-%m-%dT%H:%M:%S%z",
+                "%Y-%m-%d %H:%M:%S",
+                "%Y-%m-%dT%H:%M:%S",
+                "%Y-%m-%d",
+            ]
+            for fmt in date_formats:
+                try:
+                    return dt.datetime.strptime(modified, fmt)
+                except ValueError:
+                    continue
+            try:
+                from dateutil import parser as dateutil_parser
+
+                return dateutil_parser.parse(modified)
+            except (ImportError, ValueError):
+                pass
+        return None
+
 
 @dataclass
 class Page:

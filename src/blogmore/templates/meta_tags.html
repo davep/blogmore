@@ -47,8 +47,8 @@
 {% if item.date %}
 <meta property="article:published_time" content="{{ item.date.isoformat() }}">
 {% endif %}
-{% if item.metadata and item.metadata.get('modified') %}
-<meta property="article:modified_time" content="{{ item.metadata.get('modified') }}">
+{% if item.modified_date %}
+<meta property="article:modified_time" content="{{ item.modified_date.isoformat() }}">
 {% elif item.date %}
 <meta property="article:modified_time" content="{{ item.date.isoformat() }}">
 {% endif %}

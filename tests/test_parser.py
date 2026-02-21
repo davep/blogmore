@@ -292,6 +292,81 @@ class TestPost:
         # Reading time should be calculated from the actual text content
         assert post.reading_time >= 1
 
+    def test_modified_date_none_when_no_metadata(self) -> None:
+        """Test that modified_date returns None when metadata is None."""
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content="Content",
+            html_content="<p>Content</p>",
+            metadata=None,
+        )
+        assert post.modified_date is None
+
+    def test_modified_date_none_when_not_in_metadata(self) -> None:
+        """Test that modified_date returns None when modified key absent."""
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content="Content",
+            html_content="<p>Content</p>",
+            metadata={},
+        )
+        assert post.modified_date is None
+
+    def test_modified_date_from_datetime_object(self) -> None:
+        """Test that modified_date returns datetime objects from metadata as-is."""
+        modified = dt.datetime(2026, 2, 21, 16, 29, 0, tzinfo=dt.UTC)
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content="Content",
+            html_content="<p>Content</p>",
+            metadata={"modified": modified},
+        )
+        assert post.modified_date == modified
+
+    def test_modified_date_from_string_with_space_separator(self) -> None:
+        """Test that modified_date parses a string with space separator correctly."""
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content="Content",
+            html_content="<p>Content</p>",
+            metadata={"modified": "2026-02-21 16:29:00 +0000"},
+        )
+        result = post.modified_date
+        assert result is not None
+        assert result.isoformat() == "2026-02-21T16:29:00+00:00"
+
+    def test_modified_date_from_iso_string(self) -> None:
+        """Test that modified_date parses a proper ISO 8601 string correctly."""
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content="Content",
+            html_content="<p>Content</p>",
+            metadata={"modified": "2026-02-21T16:29:00+00:00"},
+        )
+        result = post.modified_date
+        assert result is not None
+        assert result.isoformat() == "2026-02-21T16:29:00+00:00"
+
+    def test_modified_date_isoformat_is_iso8601(self) -> None:
+        """Test that modified_date.isoformat() produces a valid ISO 8601 string."""
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content="Content",
+            html_content="<p>Content</p>",
+            metadata={"modified": "2026-02-21 16:29:00 +0000"},
+        )
+        result = post.modified_date
+        assert result is not None
+        iso_string = result.isoformat()
+        # ISO 8601 requires T as separator between date and time
+        assert "T" in iso_string
+
 
 class TestPage:
     """Test the Page dataclass."""

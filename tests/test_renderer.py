@@ -330,7 +330,10 @@ class TestTemplateRenderer:
 
         # Check article-specific Open Graph tags
         assert '<meta property="article:published_time"' in html
-        assert '<meta property="article:modified_time"' in html
+        assert (
+            '<meta property="article:modified_time" content="2024-03-02T15:30:00+00:00">'
+            in html
+        )
         assert '<meta property="article:author" content="John Doe">' in html
         assert '<meta property="article:section" content="testing">' in html
         assert '<meta property="article:tag" content="seo">' in html
@@ -346,6 +349,27 @@ class TestTemplateRenderer:
         )
         assert '<meta name="twitter:creator" content="@johndoe">' in html
         assert '<meta name="twitter:site" content="@myblog">' in html
+
+    def test_render_post_modified_time_is_iso8601(self) -> None:
+        """Test that article:modified_time is ISO 8601 even for non-ISO frontmatter."""
+        renderer = TemplateRenderer()
+        post = Post(
+            path=Path("test.md"),
+            title="Test Post",
+            content="Test content",
+            html_content="<p>Test content</p>",
+            date=dt.datetime(2026, 2, 20, 15, 46, 0, tzinfo=dt.UTC),
+            metadata={"modified": "2026-02-21 16:29:00 +0000"},
+        )
+
+        html = renderer.render_post(
+            post, site_title="Test Blog", site_url="https://example.com"
+        )
+
+        assert (
+            '<meta property="article:modified_time" content="2026-02-21T16:29:00+00:00">'
+            in html
+        )
 
     def test_render_post_minimal_meta_tags(self) -> None:
         """Test that posts without optional metadata still render correctly."""
