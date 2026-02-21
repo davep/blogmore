@@ -4,12 +4,11 @@
 
 **Released: WiP**
 
-- Posts are now discovered recursively from the content directory, allowing
-  them to be organised in any subdirectory structure (e.g.
-  `posts/2024/01/hello-world.md`).
-  ([#130](https://github.com/davep/blogmore/pull/130))
 - Added optional XML sitemap generation.
   ([#127](https://github.com/davep/blogmore/pull/127))
+- Fixed posts not being discovered recursively (Copilot documented that this
+  was a feature, but never actually implemented it).
+  ([#130](https://github.com/davep/blogmore/pull/130))
 
 ## v0.8.0
 
