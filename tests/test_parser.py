@@ -402,24 +402,35 @@ class TestPostParser:
         parser = PostParser()
         posts = parser.parse_directory(posts_dir, include_drafts=False)
 
-        # Should have 6 posts (excluding draft)
-        assert len(posts) == 6
+        # Should have 7 posts (excluding draft), including nested subdirectory post
+        assert len(posts) == 7
         # Posts should be sorted by date (newest first)
-        assert posts[0].title == "Test Post with Relative Cover No Slash"  # 2024-04-02
-        assert posts[1].title == "Test Post with Relative Cover"  # 2024-04-01
-        assert posts[2].title == "SEO Test Post"  # 2024-03-01
-        assert posts[3].title == "My First Post"  # 2024-01-15
-        assert posts[4].title == "Complex Post with Many Features"  # 2024-01-10
+        assert posts[0].title == "Nested Post"  # 2025-01-05 (in subdirectory)
+        assert posts[1].title == "Test Post with Relative Cover No Slash"  # 2024-04-02
+        assert posts[2].title == "Test Post with Relative Cover"  # 2024-04-01
+        assert posts[3].title == "SEO Test Post"  # 2024-03-01
+        assert posts[4].title == "My First Post"  # 2024-01-15
+        assert posts[5].title == "Complex Post with Many Features"  # 2024-01-10
         # Post without date should be last
-        assert posts[5].title == "Post Without Date"
+        assert posts[6].title == "Post Without Date"
 
     def test_parse_directory_include_drafts(self, posts_dir: Path) -> None:
         """Test parsing directory including drafts."""
         parser = PostParser()
         posts = parser.parse_directory(posts_dir, include_drafts=True)
 
-        # Should have 7 posts (including draft)
-        assert len(posts) == 7
+        # Should have 8 posts (including draft and nested subdirectory post)
+        assert len(posts) == 8
+
+    def test_parse_directory_finds_posts_in_subdirectories(
+        self, posts_dir: Path
+    ) -> None:
+        """Test that posts in subdirectories are discovered recursively."""
+        parser = PostParser()
+        posts = parser.parse_directory(posts_dir, include_drafts=False)
+
+        titles = [post.title for post in posts]
+        assert "Nested Post" in titles
 
     def test_parse_directory_not_found(self) -> None:
         """Test parsing non-existent directory raises FileNotFoundError."""

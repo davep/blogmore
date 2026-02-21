@@ -373,7 +373,7 @@ class PostParser:
             raise FileNotFoundError(f"Directory not found: {directory}")
 
         posts = []
-        for md_file in directory.glob("*.md"):
+        for md_file in directory.rglob("*.md"):
             try:
                 post = self.parse_file(md_file)
                 if not post.draft or include_drafts:
