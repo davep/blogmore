@@ -1,13 +1,16 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed admonitions merging multiple paragraphs into one.
+  ([#135](https://github.com/davep/blogmore/pull/135))
+
 ## v0.9.0
 
 **Released: 2026-02-21**
 
-- Fixed admonitions with multiple paragraphs (separated by blank lines) now
-  correctly render each paragraph as a distinct `<p>` element rather than
-  merging them into one.
-  ([#133](https://github.com/davep/blogmore/pull/133))
 - Added optional XML sitemap generation.
   ([#127](https://github.com/davep/blogmore/pull/127))
 - Fixed posts not being discovered recursively (Copilot documented that this
