@@ -829,6 +829,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#with_sitemap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        with_sitemap
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1503,6 +1514,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#with_sitemap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        with_sitemap
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1976,6 +1998,13 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <div class="highlight"><pre><span></span><code><span class="nt">with_search</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 <p>When set back to <code>false</code> (or omitted), any stale <code>search.html</code>, <code>search_index.json</code>, and <code>search.js</code> files from a previous build that had search enabled are automatically removed.</p>
+<h4 id="with_sitemap"><code>with_sitemap</code></h4>
+<p>Generate an XML sitemap (<code>sitemap.xml</code>) in the root of the output directory. The sitemap conforms to the <a href="https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview">Sitemaps protocol</a> and includes an entry for every HTML page generated for the site, except <code>search.html</code>.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">with_sitemap</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<p>A <code>site_url</code> should be set when using this option so that sitemap entries contain absolute URLs (e.g. <code>https://example.com/2024/01/15/my-post.html</code>). If <code>site_url</code> is not provided, URLs will fall back to <code>https://example.com</code>.</p>
 <h3 id="styling-options">Styling Options</h3>
 <h4 id="extra_stylesheets"><code>extra_stylesheets</code></h4>
 <p>List of additional stylesheets to include. Can be absolute URLs or paths relative to your site root.</p>

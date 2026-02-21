@@ -778,6 +778,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#-with-sitemap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --with-sitemap
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1517,6 +1528,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#-with-sitemap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --with-sitemap
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2001,6 +2023,12 @@ blogmore<span class="w"> </span>gen<span class="w"> </span>&lt;content_dir&gt;<s
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--with-search
 </code></pre></div>
 <p>When search is later disabled (flag omitted), any stale <code>search.html</code>, <code>search_index.json</code>, and <code>search.js</code> files from a previous build are automatically removed.</p>
+<h4 id="-with-sitemap"><code>--with-sitemap</code></h4>
+<p>Generate an XML sitemap (<code>sitemap.xml</code>) in the root of the output directory. The sitemap conforms to the <a href="https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview">Sitemaps protocol</a> and includes an entry for every HTML page generated for the site, except <code>search.html</code>.</p>
+<p>Sitemap generation is <strong>disabled by default</strong>. Pass this flag to opt in.</p>
+<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--with-sitemap
+</code></pre></div>
+<p>A <code>--site-url</code> should be provided so that sitemap entries contain absolute URLs. If omitted, entries will fall back to <code>https://example.com</code>.</p>
 <h3 id="examples">Examples</h3>
 <p>Basic site generation:
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/
@@ -2053,7 +2081,8 @@ blogmore<span class="w"> </span>serve
 - <code>--default-author</code>
 - <code>--extra-stylesheet</code>
 - <code>--icon-source</code>
-- <code>--with-search</code></p>
+- <code>--with-search</code>
+- <code>--with-sitemap</code></p>
 <h3 id="examples_1">Examples</h3>
 <p>Basic development server:
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>serve<span class="w"> </span>posts/
@@ -2110,7 +2139,8 @@ blogmore<span class="w"> </span>serve
 - <code>--default-author</code>
 - <code>--extra-stylesheet</code>
 - <code>--icon-source</code>
-- <code>--with-search</code></p>
+- <code>--with-search</code>
+- <code>--with-sitemap</code></p>
 <h3 id="how-it-works">How It Works</h3>
 <p>When you run <code>publish</code>, BlogMore:</p>
 <ol>
