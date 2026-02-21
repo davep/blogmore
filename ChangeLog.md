@@ -1,5 +1,12 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed admonitions merging multiple paragraphs into one.
+  ([#135](https://github.com/davep/blogmore/pull/135))
+
 ## v0.9.0
 
 **Released: 2026-02-21**

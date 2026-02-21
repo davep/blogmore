@@ -92,12 +92,12 @@ class AdmonitionProcessor(BlockProcessor):
         content_div = SubElement(admonition_div, "div")
         content_div.set("class", "admonition-content")
 
-        # Join and process the content
+        # Join and process the content; split at blank lines so that
+        # separate paragraphs are preserved as distinct blocks.
         content_text = "\n".join(content_lines).strip()
         if content_text:
-            # Parse the content as markdown by creating a new parser
-            # and processing the text
-            self.parser.parseBlocks(content_div, [content_text])
+            content_blocks = [b for b in content_text.split("\n\n") if b.strip()]
+            self.parser.parseBlocks(content_div, content_blocks)
 
         return True
 
