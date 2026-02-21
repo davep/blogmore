@@ -882,6 +882,11 @@ footer a:hover {
         gap: 15px;
     }
 
+    header ul {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
     .post-header h1 {
         font-size: 1.8em;
     }
