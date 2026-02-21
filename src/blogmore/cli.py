@@ -100,6 +100,13 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
         help="Generate a client-side search index and search page (default: disabled)",
     )
 
+    parser.add_argument(
+        "--with-sitemap",
+        action="store_true",
+        default=False,
+        help="Generate an XML sitemap (sitemap.xml) in the output directory (default: disabled)",
+    )
+
 
 def create_parser() -> argparse.ArgumentParser:
     """Create and configure the argument parser for blogmore.

@@ -183,6 +183,18 @@ blogmore build posts/ --with-search
 
 When search is later disabled (flag omitted), any stale `search.html`, `search_index.json`, and `search.js` files from a previous build are automatically removed.
 
+#### `--with-sitemap`
+
+Generate an XML sitemap (`sitemap.xml`) in the root of the output directory. The sitemap conforms to the [Sitemaps protocol](https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview) and includes an entry for every HTML page generated for the site, except `search.html`.
+
+Sitemap generation is **disabled by default**. Pass this flag to opt in.
+
+```bash
+blogmore build posts/ --with-sitemap
+```
+
+A `--site-url` should be provided so that sitemap entries contain absolute URLs. If omitted, entries will fall back to `https://example.com`.
+
 ### Examples
 
 Basic site generation:
@@ -262,6 +274,7 @@ The serve command also accepts all the build command options:
 - `--extra-stylesheet`
 - `--icon-source`
 - `--with-search`
+- `--with-sitemap`
 
 ### Examples
 
@@ -348,6 +361,7 @@ The publish command also accepts all the build command options:
 - `--extra-stylesheet`
 - `--icon-source`
 - `--with-search`
+- `--with-sitemap`
 
 ### How It Works
 

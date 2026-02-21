@@ -1,5 +1,12 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added optional XML sitemap generation.
+  ([#127](https://github.com/davep/blogmore/pull/127))
+
 ## v0.8.0
 
 **Released: 2026-02-20**

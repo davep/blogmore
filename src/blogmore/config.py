@@ -87,6 +87,7 @@ def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
         "remote": "origin",
         "icon_source": None,
         "with_search": False,
+        "with_sitemap": False,
     }
 
     # For each config key, update args if the arg value is still at its default
