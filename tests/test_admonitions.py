@@ -103,7 +103,7 @@ class TestAdmonitionsExtension:
         assert "Note" in html
 
     def test_admonition_with_blank_lines(self) -> None:
-        """Test admonitions that include blank lines in content."""
+        """Test admonitions that include blank lines in content produce separate paragraphs."""
         md = markdown.Markdown(extensions=[AdmonitionsExtension()])
         text = """> [!NOTE]
 > First paragraph.
@@ -112,6 +112,23 @@ class TestAdmonitionsExtension:
         html = md.convert(text)
         assert "First paragraph" in html
         assert "Second paragraph" in html
+        # Each paragraph should be wrapped in its own <p> tag
+        assert "<p>First paragraph.</p>" in html
+        assert "<p>Second paragraph.</p>" in html
+
+    def test_admonition_multiple_paragraphs(self) -> None:
+        """Test admonitions with three or more paragraphs."""
+        md = markdown.Markdown(extensions=[AdmonitionsExtension()])
+        text = """> [!WARNING]
+> First paragraph here.
+>
+> Second paragraph here.
+>
+> Third paragraph here."""
+        html = md.convert(text)
+        assert "<p>First paragraph here.</p>" in html
+        assert "<p>Second paragraph here.</p>" in html
+        assert "<p>Third paragraph here.</p>" in html
 
     def test_regular_blockquote_not_affected(self) -> None:
         """Test that regular blockquotes without alert syntax still work."""
