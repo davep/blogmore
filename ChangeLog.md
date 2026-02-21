@@ -9,9 +9,9 @@
 - Fixed posts not being discovered recursively (Copilot documented that this
   was a feature, but never actually implemented it).
   ([#130](https://github.com/davep/blogmore/pull/130))
-- Fixed the top-level navigation menu overflowing the viewport on narrow/mobile
-  screens by allowing nav items to wrap to the next line.
-  ([#132](https://github.com/davep/blogmore/pull/132))
+- Fixed the top-level navigation menu overflowing the viewport on
+  narrow/mobile screens.
+  ([#131](https://github.com/davep/blogmore/pull/131))
 
 ## v0.8.0
 
