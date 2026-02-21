@@ -6,6 +6,9 @@
 
 - Added optional XML sitemap generation.
   ([#127](https://github.com/davep/blogmore/pull/127))
+- Fixed posts not being discovered recursively (Copilot documented that this
+  was a feature, but never actually implemented it).
+  ([#130](https://github.com/davep/blogmore/pull/130))
 
 ## v0.8.0
 
