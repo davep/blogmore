@@ -8,7 +8,7 @@
   ([#135](https://github.com/davep/blogmore/pull/135))
 - Fixed `article:modified_time` meta tag not using ISO 8601 format when a
   `modified` frontmatter value is set.
-  ([#137](https://github.com/davep/blogmore/pull/137))
+  ([#138](https://github.com/davep/blogmore/pull/138))
 
 ## v0.9.0
 
