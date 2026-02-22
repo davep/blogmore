@@ -12,7 +12,7 @@
 - When icons are generated, a copy of `favicon.ico` is now also placed in
   the root of the output for backward compatibility. A `shortcut icon` link
   header is also included for legacy browser support.
-  ([#139](https://github.com/davep/blogmore/pull/139))
+  ([#140](https://github.com/davep/blogmore/pull/140))
 
 ## v0.9.0
 
