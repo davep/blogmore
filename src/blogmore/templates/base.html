@@ -37,6 +37,11 @@
     <link rel="alternate" type="application/rss+xml" title="{{ site_title }} - RSS Feed" href="{{ site_url }}/feed.xml">
     <link rel="alternate" type="application/atom+xml" title="{{ site_title }} - Atom Feed" href="{{ site_url }}/feeds/all.atom.xml">
     {% endblock %}
+    {% block site_author_meta %}
+    {% if default_author %}
+    <meta name="author" content="{{ default_author }}">
+    {% endif %}
+    {% endblock %}
     {% block meta_tags %}{% endblock %}
     <script src="/static/theme.js"></script>
     {% block extra_head %}{% endblock %}

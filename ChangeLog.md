@@ -10,6 +10,9 @@
 - Added the `site_keywords` configuration option. When set, it is used as a
   a fallback set of keywords for any `head` metadata that uses them.
   ([#150](https://github.com/davep/blogmore/pull/150))
+- Author metadata is now added to the `head` of all pages, if the site's
+  default author has been set.
+  ([#152](https://github.com/davep/blogmore/pull/152))
 
 ## v0.10.0
 

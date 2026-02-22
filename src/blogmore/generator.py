@@ -227,6 +227,7 @@ class SiteGenerator:
             "has_platform_icons": self._detect_generated_icons(),
             "blogmore_version": __version__,
             "with_search": self.with_search,
+            "default_author": self.default_author,
         }
         # Merge sidebar config into context
         context.update(self.sidebar_config)

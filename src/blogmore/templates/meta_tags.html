@@ -13,8 +13,10 @@
 {% set include_article_tags = include_article_tags | default(false) %}
 
 {# Standard SEO meta tags #}
-{% if item.metadata and item.metadata.get('author') %}
-<meta name="author" content="{{ item.metadata.get('author') }}">
+{% set item_author = item.metadata.get('author') if item.metadata else none %}
+{% set effective_author = item_author if item_author else default_author %}
+{% if effective_author %}
+<meta name="author" content="{{ effective_author }}">
 {% endif %}
 {% set description = item.description if item.description else site_description %}
 {% if description %}
