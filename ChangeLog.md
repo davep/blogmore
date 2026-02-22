@@ -13,9 +13,7 @@
   also default to the platform icon for `og:image` and `twitter:image`.
   ([#160](https://github.com/davep/blogmore/pull/160))
 - Added optional CSS minification via the `--minify-css` command-line switch
-  or the `minify_css: true` configuration option. When enabled, the generated
-  CSS is minified using `rcssmin` and written as `styles.min.css` instead of
-  `style.css`. Minification is disabled by default.
+  or the `minify_css: true` configuration option.
   ([#161](https://github.com/davep/blogmore/pull/161))
 
 ## v0.11.0
