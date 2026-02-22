@@ -124,9 +124,7 @@ class FontAwesomeOptimizer:
                 continue
             codepoint = icon_data.get("unicode", "")
             if codepoint:
-                lines.append(
-                    f'.fa-{icon_name}::before {{ content: "\\{codepoint}"; }}'
-                )
+                lines.append(f'.fa-{icon_name}::before {{ content: "\\{codepoint}"; }}')
 
         return "\n".join(lines) + "\n"
 
