@@ -25,6 +25,9 @@ from blogmore.search import write_search_index
 from blogmore.sitemap import write_sitemap
 from blogmore.utils import normalize_site_url
 
+CSS_FILENAME = "style.css"
+CSS_MINIFIED_FILENAME = "styles.min.css"
+
 
 def sanitize_for_url(value: str) -> str:
     """Sanitize a string for safe use in URLs and filenames.
@@ -230,7 +233,7 @@ class SiteGenerator:
     def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
         styles_css_url = (
-            "/static/styles.min.css" if self.minify_css else "/static/style.css"
+            f"/static/{CSS_MINIFIED_FILENAME}" if self.minify_css else f"/static/{CSS_FILENAME}"
         )
         context = {
             "site_title": self.site_title,
@@ -436,7 +439,7 @@ class SiteGenerator:
 
         # Prefer custom style.css if a templates directory is configured
         if self.templates_dir is not None:
-            custom_css = self.templates_dir / "static" / "style.css"
+            custom_css = self.templates_dir / "static" / CSS_FILENAME
             if custom_css.is_file():
                 css_source = custom_css.read_text(encoding="utf-8")
 
@@ -444,19 +447,19 @@ class SiteGenerator:
         if css_source is None:
             try:
                 bundled_css = files("blogmore").joinpath(
-                    "templates", "static", "style.css"
+                    "templates", "static", CSS_FILENAME
                 )
                 css_source = bundled_css.read_text(encoding="utf-8")
             except Exception as e:
                 print(
-                    f"Warning: Could not read bundled style.css for minification: {e}"
+                    f"Warning: Could not read bundled {CSS_FILENAME} for minification: {e}"
                 )
                 return
 
         minified = rcssmin.cssmin(css_source)
-        output_path = output_static / "styles.min.css"
+        output_path = output_static / CSS_MINIFIED_FILENAME
         output_path.write_text(minified, encoding="utf-8")
-        print("Generated minified CSS as styles.min.css")
+        print(f"Generated minified CSS as {CSS_MINIFIED_FILENAME}")
 
     def _generate_post_page(
         self, post: Post, all_posts: list[Post], pages: list[Page]
@@ -1075,7 +1078,7 @@ class SiteGenerator:
                         if item.name == "search.js" and not self.with_search:
                             continue
                         # When minifying CSS, skip the original style.css
-                        if item.name == "style.css" and self.minify_css:
+                        if item.name == CSS_FILENAME and self.minify_css:
                             continue
                         # Read content and write to output
                         content = item.read_bytes()
@@ -1093,7 +1096,7 @@ class SiteGenerator:
                     if item.is_file():
                         relative_path = item.relative_to(custom_static_dir)
                         # When minifying CSS, skip the original style.css from custom dir too
-                        if relative_path.name == "style.css" and self.minify_css:
+                        if relative_path.name == CSS_FILENAME and self.minify_css:
                             continue
                         output_file = output_static / relative_path
                         output_file.parent.mkdir(parents=True, exist_ok=True)
