@@ -555,6 +555,63 @@ class TestTemplateRenderer:
             in html
         )
 
+    def test_render_post_defaults_og_image_to_platform_icon(self) -> None:
+        """Test that posts without a cover default to the platform icon for og:image."""
+        renderer = TemplateRenderer()
+        post = Post(
+            path=Path("test.md"),
+            title="Test Post",
+            content="Test content",
+            html_content="<p>Test content</p>",
+            date=dt.datetime(2024, 3, 1, 10, 0, 0, tzinfo=dt.UTC),
+            metadata={},
+        )
+
+        html = renderer.render_post(
+            post,
+            site_title="Test Blog",
+            site_url="https://example.com",
+            has_platform_icons=True,
+        )
+
+        assert (
+            '<meta property="og:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in html
+        )
+        assert (
+            '<meta name="twitter:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in html
+        )
+
+    def test_render_post_cover_takes_priority_over_platform_icon(self) -> None:
+        """Test that an explicit cover URL takes priority over the platform icon default."""
+        renderer = TemplateRenderer()
+        post = Post(
+            path=Path("test.md"),
+            title="Test Post",
+            content="Test content",
+            html_content="<p>Test content</p>",
+            date=dt.datetime(2024, 3, 1, 10, 0, 0, tzinfo=dt.UTC),
+            metadata={"cover": "https://example.com/custom-cover.jpg"},
+        )
+
+        html = renderer.render_post(
+            post,
+            site_title="Test Blog",
+            site_url="https://example.com",
+            has_platform_icons=True,
+        )
+
+        assert (
+            '<meta property="og:image" content="https://example.com/custom-cover.jpg">'
+            in html
+        )
+        assert (
+            '<meta name="twitter:image" content="https://example.com/custom-cover.jpg">'
+            in html
+        )
+        assert "android-chrome-512x512.png" not in html
+
     def test_init_with_site_url(self) -> None:
         """Test initializing renderer with site_url."""
         renderer = TemplateRenderer(site_url="https://example.com")

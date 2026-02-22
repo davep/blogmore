@@ -45,6 +45,8 @@
 {% else %}
 <meta property="og:image" content="{{ site_url }}/{{ cover_url }}">
 {% endif %}
+{% elif has_platform_icons %}
+<meta property="og:image" content="{{ site_url }}/icons/android-chrome-512x512.png">
 {% endif %}
 
 {# Article-specific Open Graph tags #}
@@ -85,6 +87,8 @@
 {% else %}
 <meta name="twitter:image" content="{{ site_url }}/{{ cover_url }}">
 {% endif %}
+{% elif has_platform_icons %}
+<meta name="twitter:image" content="{{ site_url }}/icons/android-chrome-512x512.png">
 {% endif %}
 {% if item.metadata and item.metadata.get('twitter_creator') %}
 <meta name="twitter:creator" content="{{ item.metadata.get('twitter_creator') }}">
