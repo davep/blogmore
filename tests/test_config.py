@@ -11,6 +11,7 @@ from blogmore.config import (
     get_sidebar_config,
     load_config,
     merge_config_with_args,
+    normalize_site_keywords,
 )
 
 
@@ -585,3 +586,103 @@ class TestCleanFirstConfig:
         merge_config_with_args(config, args)
 
         assert args.clean_first is False
+
+
+class TestNormalizeSiteKeywords:
+    """Test the normalize_site_keywords function."""
+
+    def test_none_returns_none(self) -> None:
+        """Test that None input returns None."""
+        assert normalize_site_keywords(None) is None
+
+    def test_empty_string_returns_none(self) -> None:
+        """Test that an empty string returns None."""
+        assert normalize_site_keywords("") is None
+
+    def test_comma_separated_string(self) -> None:
+        """Test normalizing a comma-separated string."""
+        result = normalize_site_keywords("python, web, programming")
+        assert result == ["python", "web", "programming"]
+
+    def test_comma_separated_string_no_spaces(self) -> None:
+        """Test normalizing a comma-separated string without spaces."""
+        result = normalize_site_keywords("python,web,programming")
+        assert result == ["python", "web", "programming"]
+
+    def test_list_of_strings(self) -> None:
+        """Test normalizing a list of strings."""
+        result = normalize_site_keywords(["python", "web", "programming"])
+        assert result == ["python", "web", "programming"]
+
+    def test_list_strips_whitespace(self) -> None:
+        """Test that list items have whitespace stripped."""
+        result = normalize_site_keywords(["  python  ", "  web  "])
+        assert result == ["python", "web"]
+
+    def test_string_strips_whitespace(self) -> None:
+        """Test that string items have whitespace stripped."""
+        result = normalize_site_keywords("  python  ,  web  ")
+        assert result == ["python", "web"]
+
+    def test_empty_list_returns_none(self) -> None:
+        """Test that an empty list returns None."""
+        assert normalize_site_keywords([]) is None
+
+    def test_list_with_empty_strings_filters_them(self) -> None:
+        """Test that empty strings in lists are filtered out."""
+        result = normalize_site_keywords(["python", "", "web"])
+        assert result == ["python", "web"]
+
+    def test_string_with_trailing_comma(self) -> None:
+        """Test handling a string with a trailing comma."""
+        result = normalize_site_keywords("python, web,")
+        assert result == ["python", "web"]
+
+    def test_invalid_type_returns_none(self) -> None:
+        """Test that an invalid type returns None."""
+        assert normalize_site_keywords(42) is None  # type: ignore[arg-type]
+
+
+class TestSiteKeywordsConfig:
+    """Test site_keywords handling in merge_config_with_args."""
+
+    def test_site_keywords_list_from_config(self) -> None:
+        """Test loading site_keywords as a YAML list from config."""
+        config = {"site_keywords": ["python", "web", "programming"]}
+        args = Mock()
+        args.site_keywords = None  # default
+
+        merge_config_with_args(config, args)
+
+        assert args.site_keywords == ["python", "web", "programming"]
+
+    def test_site_keywords_string_from_config(self) -> None:
+        """Test loading site_keywords as a comma-separated string from config."""
+        config = {"site_keywords": "python, web, programming"}
+        args = Mock()
+        args.site_keywords = None  # default
+
+        merge_config_with_args(config, args)
+
+        assert args.site_keywords == ["python", "web", "programming"]
+
+    def test_cli_site_keywords_overrides_config(self) -> None:
+        """Test that a CLI-set site_keywords is not overridden by config."""
+        config = {"site_keywords": ["config-kw"]}
+        args = Mock()
+        args.site_keywords = "cli-keyword"  # explicitly set by CLI (non-default)
+
+        merge_config_with_args(config, args)
+
+        # CLI value should not be overridden since it differs from default (None)
+        assert args.site_keywords == "cli-keyword"
+
+    def test_site_keywords_not_set_remains_none(self) -> None:
+        """Test that site_keywords remains None when not in config."""
+        config = {}
+        args = Mock()
+        args.site_keywords = None  # default
+
+        merge_config_with_args(config, args)
+
+        assert args.site_keywords is None

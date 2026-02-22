@@ -20,6 +20,17 @@ site_title: "My Blog"
 # description of their own (e.g. index, archive, tag, and category pages)
 # site_description: "A blog about interesting things"
 
+# Optional: Default keywords used in metadata for pages that have no keywords of
+# their own (e.g. index, archive, tag, and category pages). Can be a
+# comma-separated string or a YAML list. Individual posts use their tags as
+# keywords, so site_keywords only applies when no post-specific keywords are
+# available.
+# site_keywords: "blog, technology, programming"
+# site_keywords:
+#   - blog
+#   - technology
+#   - programming
+
 # Optional: Base URL of your site (used for RSS feeds and canonical URLs)
 site_url: "https://example.com"
 

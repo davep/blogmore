@@ -55,6 +55,12 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     )
 
     parser.add_argument(
+        "--site-keywords",
+        default=None,
+        help="Default keywords for pages as a comma-separated list (optional)",
+    )
+
+    parser.add_argument(
         "--site-url",
         default="",
         help="Base URL of the site (optional)",

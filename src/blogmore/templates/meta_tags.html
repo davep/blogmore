@@ -22,6 +22,8 @@
 {% endif %}
 {% if include_keywords and item.tags %}
 <meta name="keywords" content="{{ item.tags|join(', ') }}">
+{% elif include_keywords and site_keywords %}
+<meta name="keywords" content="{{ site_keywords|join(', ') }}">
 {% endif %}
 
 {# Open Graph meta tags #}

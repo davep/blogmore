@@ -83,6 +83,7 @@ class SiteGenerator:
         site_title: str = "My Blog",
         site_subtitle: str = "",
         site_description: str = "",
+        site_keywords: list[str] | None = None,
         site_url: str = "",
         posts_per_feed: int = 20,
         extra_stylesheets: list[str] | None = None,
@@ -104,6 +105,8 @@ class SiteGenerator:
             site_subtitle: Subtitle of the blog site
             site_description: Default description used in metadata for pages that
                               have no description of their own
+            site_keywords: Default keywords used in metadata for pages that have no
+                           keywords of their own
             site_url: Base URL of the site
             posts_per_feed: Maximum number of posts to include in feeds (default: 20)
             extra_stylesheets: Optional list of URLs for additional stylesheets
@@ -120,6 +123,7 @@ class SiteGenerator:
         self.site_title = site_title
         self.site_subtitle = site_subtitle
         self.site_description = site_description
+        self.site_keywords = site_keywords
         self.site_url = normalize_site_url(site_url)
         self.posts_per_feed = posts_per_feed
         self.default_author = default_author
@@ -215,6 +219,7 @@ class SiteGenerator:
             "site_title": self.site_title,
             "site_subtitle": self.site_subtitle,
             "site_description": self.site_description,
+            "site_keywords": self.site_keywords,
             "site_url": self.site_url,
             "tag_dir": self.TAG_DIR,
             "category_dir": self.CATEGORY_DIR,

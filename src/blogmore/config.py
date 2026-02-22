@@ -8,6 +8,28 @@ import yaml
 DEFAULT_CONFIG_FILES = ["blogmore.yaml", "blogmore.yml"]
 
 
+def normalize_site_keywords(value: Any) -> list[str] | None:
+    """Normalize site keywords from various input formats.
+
+    Handles both comma-separated strings and lists of strings.
+
+    Args:
+        value: Keywords as a comma-separated string, a list of strings, or None
+
+    Returns:
+        List of stripped keyword strings, or None if no valid keywords
+    """
+    if value is None:
+        return None
+    if isinstance(value, list):
+        keywords = [str(item).strip() for item in value if str(item).strip()]
+    elif isinstance(value, str):
+        keywords = [kw.strip() for kw in value.split(",") if kw.strip()]
+    else:
+        return None
+    return keywords if keywords else None
+
+
 def load_config(config_path: Path | None = None) -> dict[str, Any]:
     """Load configuration from a YAML file.
 
@@ -73,6 +95,7 @@ def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
         "site_title": "My Blog",
         "site_subtitle": "",
         "site_description": "",
+        "site_keywords": None,
         "site_url": "",
         "output": Path("output"),
         "templates": None,
@@ -115,6 +138,11 @@ def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
                     setattr(args, config_key, config_value)
                 elif isinstance(config_value, str):
                     setattr(args, config_key, [config_value])
+            # Handle site_keywords specially (supports list or comma-separated string)
+            elif config_key == "site_keywords":
+                normalized = normalize_site_keywords(config_value)
+                if normalized is not None:
+                    setattr(args, config_key, normalized)
             else:
                 setattr(args, config_key, config_value)
 

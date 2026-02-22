@@ -995,3 +995,141 @@ class TestSiteGenerator:
         )
         # site_description should NOT be used
         assert "Default site description" not in content
+
+    def test_site_keywords_in_index_page(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that site_keywords appear in the index page meta tags."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_keywords=["python", "web", "programming"],
+        )
+
+        generator.generate(include_drafts=False)
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert '<meta name="keywords" content="python, web, programming">' in index_content
+
+    def test_site_keywords_in_archive_page(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that site_keywords appear in the archive page meta tags."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_keywords=["python", "web"],
+        )
+
+        generator.generate(include_drafts=False)
+
+        archive_content = (temp_output_dir / "archive.html").read_text()
+        assert '<meta name="keywords" content="python, web">' in archive_content
+
+    def test_site_keywords_in_tag_page(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that site_keywords appear in tag pages."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_keywords=["blog", "posts"],
+        )
+
+        generator.generate(include_drafts=False)
+
+        tag_content = (temp_output_dir / "tag" / "python.html").read_text()
+        assert '<meta name="keywords" content="blog, posts">' in tag_content
+
+    def test_site_keywords_not_shown_when_not_configured(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that no keywords meta tag appears when site_keywords is not set."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator.generate(include_drafts=False)
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert '<meta name="keywords"' not in index_content
+
+    def test_post_tags_take_precedence_over_site_keywords(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a post's own tags are used as keywords, not site_keywords."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_keywords=["site-wide-keyword"],
+        )
+
+        generator.generate(include_drafts=False)
+
+        # The seo-test-post has its own tags (e.g., "python", "web")
+        post_file = temp_output_dir / "2024" / "03" / "01" / "seo-test-post.html"
+        assert post_file.exists()
+        content = post_file.read_text()
+        # Post's own tags should be used as keywords
+        assert '<meta name="keywords" content="' in content
+        assert "site-wide-keyword" not in content
+
+    def test_site_keywords_used_for_post_without_tags(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that site_keywords are used for posts with no tags."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        post_file = content_dir / "no-tags.md"
+        post_file.write_text(
+            "---\ntitle: No Tags Post\ndate: 2024-06-01\n---\n\nPost with no tags.\n"
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_keywords=["fallback", "keyword"],
+        )
+
+        generator.generate(include_drafts=False)
+
+        post_file_out = temp_output_dir / "2024" / "06" / "01" / "no-tags.html"
+        assert post_file_out.exists()
+        content = post_file_out.read_text()
+        assert '<meta name="keywords" content="fallback, keyword">' in content
+
+    def test_site_keywords_in_global_context(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that site_keywords is included in the global template context."""
+        keywords = ["python", "web"]
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_keywords=keywords,
+        )
+
+        context = generator._get_global_context()
+        assert context["site_keywords"] == keywords
+
+    def test_site_keywords_none_in_global_context(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that site_keywords is None in global context when not set."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        context = generator._get_global_context()
+        assert context["site_keywords"] is None
