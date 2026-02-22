@@ -155,6 +155,31 @@ Individual posts and pages that have a `description` field in their frontmatter,
 site_description: "A blog about Python, web development, and open source"
 ```
 
+#### `site_keywords`
+
+Default keywords for the site, used in the `<meta name="keywords">` tag for pages that do not have more specific keywords available.
+
+This applies to index pages, archive pages, tag pages, category pages, tags listing, and categories listing. Individual posts use their own tags as keywords, so `site_keywords` only applies when no post-specific keywords are available. Static pages with no tags also fall back to `site_keywords`.
+
+The value can be specified as either a comma-separated string or a YAML list of strings.
+
+**Type:** String (comma-separated) or list of strings  
+**Default:** None (no keywords meta tag)
+
+```yaml
+# As a comma-separated string
+site_keywords: "blog, technology, programming, python"
+```
+
+```yaml
+# As a YAML list
+site_keywords:
+  - blog
+  - technology
+  - programming
+  - python
+```
+
 #### `site_url`
 
 The base URL of your site. Used for generating absolute URLs in RSS/Atom feeds, canonical URLs, and Open Graph tags.
@@ -443,6 +468,7 @@ templates: custom-templates
 site_title: "Dave's Tech Blog"
 site_subtitle: "Python, web development, and open source"
 site_description: "A blog about Python, web development, and open source software"
+site_keywords: "python, web development, open source, programming"
 site_url: "https://davep.org/blog"
 
 # Content options

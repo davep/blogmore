@@ -11,6 +11,7 @@ from blogmore.config import (
     get_sidebar_config,
     load_config,
     merge_config_with_args,
+    normalize_site_keywords,
 )
 from blogmore.generator import SiteGenerator
 from blogmore.publisher import PublishError, publish_site
@@ -50,6 +51,11 @@ def main() -> int:
         print(f"Error: Invalid configuration file: {e}", file=sys.stderr)
         return 1
 
+    # Normalize site_keywords: CLI provides a string, config provides a list or string
+    site_keywords = normalize_site_keywords(
+        getattr(args, "site_keywords", None)
+    )
+
     # Handle serve command
     if args.command in ("serve", "test"):
         return serve_site(
@@ -60,6 +66,7 @@ def main() -> int:
             site_title=args.site_title,
             site_subtitle=args.site_subtitle,
             site_description=args.site_description,
+            site_keywords=site_keywords,
             site_url=args.site_url,
             include_drafts=args.include_drafts,
             watch=not args.no_watch,
@@ -110,6 +117,7 @@ def main() -> int:
                 site_title=args.site_title,
                 site_subtitle=args.site_subtitle,
                 site_description=args.site_description,
+                site_keywords=site_keywords,
                 site_url=args.site_url,
                 posts_per_feed=args.posts_per_feed,
                 extra_stylesheets=args.extra_stylesheets,
@@ -162,6 +170,7 @@ def main() -> int:
                 site_title=args.site_title,
                 site_subtitle=args.site_subtitle,
                 site_description=args.site_description,
+                site_keywords=site_keywords,
                 site_url=args.site_url,
                 posts_per_feed=args.posts_per_feed,
                 extra_stylesheets=args.extra_stylesheets,
@@ -229,6 +238,7 @@ def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
         "site_title": "My Blog",
         "site_subtitle": "",
         "site_description": "",
+        "site_keywords": None,
         "site_url": "",
         "output": Path("output"),
         "templates": None,

@@ -8,6 +8,9 @@
 <meta property="og:description" content="{{ site_description }}">
 <meta name="twitter:description" content="{{ site_description }}">
 {% endif %}
+{% if site_keywords %}
+<meta name="keywords" content="{{ site_keywords|join(', ') }}">
+{% endif %}
 {% endblock %}
 
 {% block content %}
