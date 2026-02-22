@@ -9,6 +9,10 @@
 - Fixed `article:modified_time` meta tag not using ISO 8601 format when a
   `modified` frontmatter value is set.
   ([#138](https://github.com/davep/blogmore/pull/138))
+- When icons are generated, a copy of `favicon.ico` is now also placed in
+  the root of the output for backward compatibility. A `shortcut icon` link
+  header is also included for legacy browser support.
+  ([#140](https://github.com/davep/blogmore/pull/140))
 
 ## v0.9.0
 
