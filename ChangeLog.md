@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v0.11.0
 
-**Released: WiP**
+**Released: 2026-02-22**
 
 - Added the `site_description` configuration option. When set, it is used as
   a fallback description for any `head` metadata that uses a description of
