@@ -1,5 +1,12 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Removed redundant CSS rules from `style.css`.
+  ([#159](https://github.com/davep/blogmore/pull/159))
+
 ## v0.11.0
 
 **Released: 2026-02-22**
@@ -27,11 +34,6 @@
   CSS overhead down to only what's needed for the "social icons" in the
   sidebar, rather than pulling down the whole FontAwesome CSS.
   ([#155](https://github.com/davep/blogmore/pull/155))
-- Removed redundant CSS rules from `style.css`: the duplicate
-  `:root[data-theme="light"]` block (identical to the default `:root` block)
-  and a duplicate `@media (max-width: 768px)` block, reducing file size by
-  approximately 85 lines.
-  ([#156](https://github.com/davep/blogmore/pull/156))
 
 ## v0.10.0
 
