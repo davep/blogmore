@@ -9,6 +9,8 @@ from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
+import rcssmin  # type: ignore[import-untyped]
+
 from blogmore import __version__
 from blogmore.feeds import BlogFeedGenerator
 from blogmore.fontawesome import (
@@ -99,6 +101,7 @@ class SiteGenerator:
         icon_source: str | None = None,
         with_search: bool = False,
         with_sitemap: bool = False,
+        minify_css: bool = False,
     ) -> None:
         """Initialize the site generator.
 
@@ -122,6 +125,7 @@ class SiteGenerator:
             icon_source: Optional source icon filename in extras/ directory
             with_search: Whether to generate a search index and search page
             with_sitemap: Whether to generate an XML sitemap
+            minify_css: Whether to minify the CSS, writing it as styles.min.css
         """
         self.content_dir = content_dir
         self.templates_dir = templates_dir
@@ -138,6 +142,7 @@ class SiteGenerator:
         self.icon_source = icon_source
         self.with_search = with_search
         self.with_sitemap = with_sitemap
+        self.minify_css = minify_css
 
         # Default to CDN URL; updated during generate() once socials are known
         self._fontawesome_css_url: str = FONTAWESOME_CDN_CSS_URL
@@ -224,6 +229,9 @@ class SiteGenerator:
 
     def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
+        styles_css_url = (
+            "/static/styles.min.css" if self.minify_css else "/static/style.css"
+        )
         context = {
             "site_title": self.site_title,
             "site_subtitle": self.site_subtitle,
@@ -238,6 +246,7 @@ class SiteGenerator:
             "with_search": self.with_search,
             "default_author": self.default_author,
             "fontawesome_css_url": self._fontawesome_css_url,
+            "styles_css_url": styles_css_url,
         }
         # Merge sidebar config into context
         context.update(self.sidebar_config)
@@ -412,6 +421,38 @@ class SiteGenerator:
         css_path = static_dir / "fontawesome.css"
         css_path.write_text(css_content, encoding="utf-8")
         print("Generated optimized FontAwesome CSS")
+
+    def _write_minified_css(self, output_static: Path) -> None:
+        """Read the source CSS, minify it, and write it as ``styles.min.css``.
+
+        The source CSS is read from the custom templates directory (if
+        available) or from the bundled templates.  The minified output is
+        written to ``output_static/styles.min.css``.
+
+        Args:
+            output_static: Path to the output static directory.
+        """
+        css_source: str | None = None
+
+        # Prefer custom style.css if a templates directory is configured
+        if self.templates_dir is not None:
+            custom_css = self.templates_dir / "static" / "style.css"
+            if custom_css.is_file():
+                css_source = custom_css.read_text(encoding="utf-8")
+
+        # Fall back to bundled style.css
+        if css_source is None:
+            try:
+                bundled_css = files("blogmore").joinpath("templates", "static", "style.css")
+                css_source = bundled_css.read_text(encoding="utf-8")
+            except Exception as e:
+                print(f"Warning: Could not read bundled style.css for minification: {e}")
+                return
+
+        minified = rcssmin.cssmin(css_source)
+        output_path = output_static / "styles.min.css"
+        output_path.write_text(minified, encoding="utf-8")
+        print("Generated minified CSS as styles.min.css")
 
     def _generate_post_page(
         self, post: Post, all_posts: list[Post], pages: list[Page]
@@ -1007,7 +1048,11 @@ class SiteGenerator:
         write_sitemap(self.output_dir, self.site_url)
 
     def _copy_static_assets(self) -> None:
-        """Copy static assets (CSS, JS, images) to output directory."""
+        """Copy static assets (CSS, JS, images) to output directory.
+
+        When ``minify_css`` is enabled, the ``style.css`` file is minified and
+        written as ``styles.min.css``; the original ``style.css`` is not written.
+        """
         output_static = self.output_dir / "static"
 
         # Clear output static directory if it exists
@@ -1025,6 +1070,9 @@ class SiteGenerator:
                         # Only copy search.js when search is enabled
                         if item.name == "search.js" and not self.with_search:
                             continue
+                        # When minifying CSS, skip the original style.css
+                        if item.name == "style.css" and self.minify_css:
+                            continue
                         # Read content and write to output
                         content = item.read_bytes()
                         output_file = output_static / item.name
@@ -1040,10 +1088,17 @@ class SiteGenerator:
                 for item in custom_static_dir.rglob("*"):
                     if item.is_file():
                         relative_path = item.relative_to(custom_static_dir)
+                        # When minifying CSS, skip the original style.css from custom dir too
+                        if relative_path.name == "style.css" and self.minify_css:
+                            continue
                         output_file = output_static / relative_path
                         output_file.parent.mkdir(parents=True, exist_ok=True)
                         shutil.copy2(item, output_file)
                 print(f"Copied custom static assets from {custom_static_dir}")
+
+        # Minify CSS if requested
+        if self.minify_css:
+            self._write_minified_css(output_static)
 
     def _copy_attachments(self) -> None:
         """Copy post attachments (images, files, etc.) from the attachments directory to output directory."""

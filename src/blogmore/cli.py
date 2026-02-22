@@ -119,6 +119,13 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
         help="Generate an XML sitemap (sitemap.xml) in the output directory (default: disabled)",
     )
 
+    parser.add_argument(
+        "--minify-css",
+        action="store_true",
+        default=False,
+        help="Minify the generated CSS, writing it as styles.min.css (default: disabled)",
+    )
+
 
 def create_parser() -> argparse.ArgumentParser:
     """Create and configure the argument parser for blogmore.
