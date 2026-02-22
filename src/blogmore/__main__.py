@@ -52,9 +52,7 @@ def main() -> int:
         return 1
 
     # Normalize site_keywords: CLI provides a string, config provides a list or string
-    site_keywords = normalize_site_keywords(
-        getattr(args, "site_keywords", None)
-    )
+    site_keywords = normalize_site_keywords(getattr(args, "site_keywords", None))
 
     # Handle serve command
     if args.command in ("serve", "test"):
