@@ -195,6 +195,16 @@ blogmore build posts/ --with-sitemap
 
 A `--site-url` should be provided so that sitemap entries contain absolute URLs. If omitted, entries will fall back to `https://example.com`.
 
+#### `--minify-css`
+
+Minify the generated CSS and write it as `styles.min.css` instead of `style.css`. This reduces the size of the stylesheet delivered to visitors.
+
+CSS minification is **disabled by default**. Pass this flag to opt in.
+
+```bash
+blogmore build posts/ --minify-css
+```
+
 ### Examples
 
 Basic site generation:
@@ -275,6 +285,7 @@ The serve command also accepts all the build command options:
 - `--icon-source`
 - `--with-search`
 - `--with-sitemap`
+- `--minify-css`
 
 ### Examples
 
@@ -362,6 +373,7 @@ The publish command also accepts all the build command options:
 - `--icon-source`
 - `--with-search`
 - `--with-sitemap`
+- `--minify-css`
 
 ### How It Works
 

@@ -308,6 +308,17 @@ A `site_url` should be set when using this option so that sitemap entries contai
 
 ### Styling Options
 
+#### `minify_css`
+
+Minify the generated CSS and write it as `styles.min.css` instead of `style.css`. This reduces the size of the stylesheet delivered to visitors.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+minify_css: true
+```
+
 #### `extra_stylesheets`
 
 List of additional stylesheets to include. Can be absolute URLs or paths relative to your site root.
@@ -480,6 +491,7 @@ icon_source: "icon.png"
 with_search: true
 
 # Styling
+minify_css: true
 extra_stylesheets:
   - https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700
   - /assets/custom.css

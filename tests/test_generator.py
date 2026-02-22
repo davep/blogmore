@@ -1445,3 +1445,124 @@ class TestSiteGenerator:
         content = (temp_output_dir / "index.html").read_text()
         assert '<meta property="og:image"' not in content
         assert '<meta name="twitter:image"' not in content
+
+
+class TestMinifyCss:
+    """Test the minify_css feature."""
+
+    def test_minify_css_false_by_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that CSS is not minified by default."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator.generate(include_drafts=False)
+
+        assert (temp_output_dir / "static" / "style.css").exists()
+        assert not (temp_output_dir / "static" / "styles.min.css").exists()
+
+    def test_minify_css_generates_min_css(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that minify_css generates styles.min.css and not style.css."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            minify_css=True,
+        )
+
+        generator.generate(include_drafts=False)
+
+        assert (temp_output_dir / "static" / "styles.min.css").exists()
+        assert not (temp_output_dir / "static" / "style.css").exists()
+
+    def test_minify_css_produces_smaller_file(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that the minified CSS file is smaller than the original."""
+        normal_output = tmp_path / "normal"
+        minified_output = tmp_path / "minified"
+
+        normal_generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=normal_output,
+        )
+        normal_generator.generate(include_drafts=False)
+
+        minified_generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=minified_output,
+            minify_css=True,
+        )
+        minified_generator.generate(include_drafts=False)
+
+        normal_size = (normal_output / "static" / "style.css").stat().st_size
+        minified_size = (minified_output / "static" / "styles.min.css").stat().st_size
+        assert minified_size < normal_size
+
+    def test_minify_css_url_in_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that pages reference styles.min.css when minify_css is enabled."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            minify_css=True,
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert "/static/styles.min.css" in content
+        assert "/static/style.css" not in content
+
+    def test_normal_css_url_in_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that pages reference style.css when minify_css is disabled."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert "/static/style.css" in content
+        assert "/static/styles.min.css" not in content
+
+    def test_minify_css_with_custom_templates(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that a custom style.css is minified when minify_css is enabled."""
+        templates_dir = tmp_path / "templates"
+        static_dir = templates_dir / "static"
+        static_dir.mkdir(parents=True)
+        custom_css = static_dir / "style.css"
+        custom_css.write_text("body  {  color:  red;  }", encoding="utf-8")
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=templates_dir,
+            output_dir=temp_output_dir,
+            minify_css=True,
+        )
+
+        generator.generate(include_drafts=False)
+
+        assert (temp_output_dir / "static" / "styles.min.css").exists()
+        assert not (temp_output_dir / "static" / "style.css").exists()
+        minified_content = (
+            temp_output_dir / "static" / "styles.min.css"
+        ).read_text(encoding="utf-8")
+        assert "body" in minified_content
+        assert "color" in minified_content
