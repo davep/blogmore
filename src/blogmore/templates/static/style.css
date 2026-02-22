@@ -51,29 +51,6 @@
 }
 
 /* Manual theme overrides - these override system preference */
-:root[data-theme="light"] {
-    --bg-color: #fff;
-    --text-color: #333;
-    --text-secondary: #666;
-    --border-color: #eee;
-    --border-color-light: #f0f0f0;
-    --link-color: #0066cc;
-    --link-hover-color: #0052a3;
-    --link-visited-color: #551a8b;
-    --hover-color: #0066cc;
-    --hover-color-dark: #0052a3;
-    --code-bg: #f5f5f5;
-    --tag-bg: #f0f0f0;
-    --tag-hover-bg: #e0e0e0;
-    --category-bg: #e8f4f8;
-    --category-hover-bg: #d0e8f2;
-    --category-text: #0066cc;
-    --blockquote-border: #ddd;
-    --table-border: #ddd;
-    --table-header-bg: #f0f0f0;
-    --table-stripe-bg: #fafafa;
-}
-
 :root[data-theme="dark"] {
     --bg-color: #1a1a1a;
     --text-color: #e0e0e0;
@@ -344,6 +321,20 @@ body {
         margin-left: 0;
         max-width: 100%;
         padding: 15px;
+    }
+
+    header nav {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    header ul {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .post-header h1 {
+        font-size: 1.8em;
     }
 }
 
@@ -814,82 +805,6 @@ footer a {
 
 footer a:hover {
     color: var(--text-color);
-}
-
-@media (max-width: 768px) {
-    .site-container {
-        flex-direction: column;
-    }
-
-    .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
-        border-right: none;
-        border-bottom: 2px solid var(--border-color);
-        padding: 20px;
-        order: -1;
-    }
-
-    .sidebar-content {
-        gap: 20px;
-    }
-
-    .sidebar-logo {
-        padding-bottom: 15px;
-    }
-
-    .sidebar-logo img {
-        max-width: 140px;
-        max-height: 140px;
-    }
-
-    .sidebar-pages {
-        padding-bottom: 12px;
-    }
-
-    .sidebar-section {
-        padding-bottom: 12px;
-    }
-
-    .sidebar-section h2 {
-        font-size: 1em;
-        margin-bottom: 10px;
-    }
-
-    .sidebar-links li {
-        display: inline-block;
-        margin-right: 15px;
-        margin-bottom: 5px;
-    }
-
-    .sidebar-socials {
-        gap: 12px;
-    }
-
-    .sidebar-socials a {
-        font-size: 1.5em;
-    }
-
-    .main-wrapper {
-        margin-left: 0;
-        max-width: 100%;
-        padding: 15px;
-    }
-
-    header nav {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    header ul {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .post-header h1 {
-        font-size: 1.8em;
-    }
 }
 
 /* Theme toggle button */
