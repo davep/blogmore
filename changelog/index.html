@@ -8,6 +8,8 @@
       
       
       
+        <link rel="canonical" href="https://blogmore.davep.dev/changelog/">
+      
       
         <link rel="prev" href="../configuration/">
       
@@ -581,6 +583,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v0110" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.11.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v0100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.10.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v090" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -719,6 +743,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v0110" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.11.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v0100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.10.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v090" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -816,6 +862,46 @@
 
 
 <h1 id="blogmore-changelog">BlogMore ChangeLog</h1>
+<h2 id="v0110">v0.11.0</h2>
+<p><strong>Released: 2026-02-22</strong></p>
+<ul>
+<li>Added the <code>site_description</code> configuration option. When set, it is used as
+  a fallback description for any <code>head</code> metadata that uses a description of
+  the page. (<a href="https://github.com/davep/blogmore/pull/146">#146</a>)</li>
+<li>Added the <code>site_keywords</code> configuration option. When set, it is used as a
+  a fallback set of keywords for any <code>head</code> metadata that uses them.
+  (<a href="https://github.com/davep/blogmore/pull/150">#150</a>)</li>
+<li>Author metadata is now added to the <code>head</code> of all pages, if the site's
+  default author has been set.
+  (<a href="https://github.com/davep/blogmore/pull/152">#152</a>)</li>
+<li>Added <code>og:title</code> meta tag to all generated pages that previously lacked it
+  (index, archive, tag, category, tags overview, categories overview, and
+  search pages). The title is derived from the site name, subtitle, and a
+  description of the page type.
+  (<a href="https://github.com/davep/blogmore/pull/153">#153</a>)</li>
+<li>Added full social/share-friendly <code>&lt;head&gt;</code> meta tags to the main index page,
+  including <code>og:type</code>, <code>og:url</code>, <code>og:site_name</code>, <code>og:image</code>, <code>twitter:card</code>,
+  <code>twitter:title</code>, and <code>twitter:image</code>. The image is taken from the configured
+  site logo, or the largest generated platform icon if no logo is set.
+  (<a href="https://github.com/davep/blogmore/pull/154">#154</a>)</li>
+<li>Added automatic FontAwesome CSS optimisation. This reduces the FontAwesome
+  CSS overhead down to only what's needed for the "social icons" in the
+  sidebar, rather than pulling down the whole FontAwesome CSS.
+  (<a href="https://github.com/davep/blogmore/pull/155">#155</a>)</li>
+</ul>
+<h2 id="v0100">v0.10.0</h2>
+<p><strong>Released: 2026-02-22</strong></p>
+<ul>
+<li>Fixed admonitions merging multiple paragraphs into one.
+  (<a href="https://github.com/davep/blogmore/pull/135">#135</a>)</li>
+<li>Fixed <code>article:modified_time</code> meta tag not using ISO 8601 format when a
+  <code>modified</code> frontmatter value is set.
+  (<a href="https://github.com/davep/blogmore/pull/138">#138</a>)</li>
+<li>When icons are generated, a copy of <code>favicon.ico</code> is now also placed in
+  the root of the output for backward compatibility. A <code>shortcut icon</code> link
+  header is also included for legacy browser support.
+  (<a href="https://github.com/davep/blogmore/pull/140">#140</a>)</li>
+</ul>
 <h2 id="v090">v0.9.0</h2>
 <p><strong>Released: 2026-02-21</strong></p>
 <ul>

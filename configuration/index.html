@@ -8,6 +8,8 @@
       
       
       
+        <link rel="canonical" href="https://blogmore.davep.dev/configuration/">
+      
       
         <link rel="prev" href="../command_line/">
       
@@ -736,6 +738,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#site_description" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        site_description
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#site_keywords" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        site_keywords
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#site_url" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1421,6 +1445,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#site_description" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        site_description
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#site_keywords" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        site_keywords
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#site_url" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1930,6 +1976,29 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <strong>Default:</strong> Empty string</p>
 <div class="highlight"><pre><span></span><code><span class="nt">site_subtitle</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Python,</span><span class="nv"> </span><span class="s">web</span><span class="nv"> </span><span class="s">development,</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">open</span><span class="nv"> </span><span class="s">source&quot;</span>
 </code></pre></div>
+<h4 id="site_description"><code>site_description</code></h4>
+<p>A default description for the site, used in <code>&lt;meta name="description"&gt;</code>, <code>og:description</code>, and <code>twitter:description</code> tags for pages that do not have a description of their own. This applies to index pages, archive pages, tag pages, category pages, and any post or static page whose content cannot yield an auto-extracted description.</p>
+<p>Individual posts and pages that have a <code>description</code> field in their frontmatter, or whose content begins with a text paragraph, continue to use that content-specific description — <code>site_description</code> is only used as a fallback.</p>
+<p><strong>Type:</strong> String<br />
+<strong>Default:</strong> Empty string (no fallback description)</p>
+<div class="highlight"><pre><span></span><code><span class="nt">site_description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;A</span><span class="nv"> </span><span class="s">blog</span><span class="nv"> </span><span class="s">about</span><span class="nv"> </span><span class="s">Python,</span><span class="nv"> </span><span class="s">web</span><span class="nv"> </span><span class="s">development,</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">open</span><span class="nv"> </span><span class="s">source&quot;</span>
+</code></pre></div>
+<h4 id="site_keywords"><code>site_keywords</code></h4>
+<p>Default keywords for the site, used in the <code>&lt;meta name="keywords"&gt;</code> tag for pages that do not have more specific keywords available.</p>
+<p>This applies to index pages, archive pages, tag pages, category pages, tags listing, and categories listing. Individual posts use their own tags as keywords, so <code>site_keywords</code> only applies when no post-specific keywords are available. Static pages with no tags also fall back to <code>site_keywords</code>.</p>
+<p>The value can be specified as either a comma-separated string or a YAML list of strings.</p>
+<p><strong>Type:</strong> String (comma-separated) or list of strings<br />
+<strong>Default:</strong> None (no keywords meta tag)</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># As a comma-separated string</span>
+<span class="nt">site_keywords</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;blog,</span><span class="nv"> </span><span class="s">technology,</span><span class="nv"> </span><span class="s">programming,</span><span class="nv"> </span><span class="s">python&quot;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># As a YAML list</span>
+<span class="nt">site_keywords</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">blog</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">technology</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">programming</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+</code></pre></div>
 <h4 id="site_url"><code>site_url</code></h4>
 <p>The base URL of your site. Used for generating absolute URLs in RSS/Atom feeds, canonical URLs, and Open Graph tags.</p>
 <p><strong>Type:</strong> String (URL)<br />
@@ -2105,6 +2174,8 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <span class="c1"># Site metadata</span>
 <span class="nt">site_title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dave&#39;s</span><span class="nv"> </span><span class="s">Tech</span><span class="nv"> </span><span class="s">Blog&quot;</span>
 <span class="nt">site_subtitle</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Python,</span><span class="nv"> </span><span class="s">web</span><span class="nv"> </span><span class="s">development,</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">open</span><span class="nv"> </span><span class="s">source&quot;</span>
+<span class="nt">site_description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;A</span><span class="nv"> </span><span class="s">blog</span><span class="nv"> </span><span class="s">about</span><span class="nv"> </span><span class="s">Python,</span><span class="nv"> </span><span class="s">web</span><span class="nv"> </span><span class="s">development,</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">open</span><span class="nv"> </span><span class="s">source</span><span class="nv"> </span><span class="s">software&quot;</span>
+<span class="nt">site_keywords</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;python,</span><span class="nv"> </span><span class="s">web</span><span class="nv"> </span><span class="s">development,</span><span class="nv"> </span><span class="s">open</span><span class="nv"> </span><span class="s">source,</span><span class="nv"> </span><span class="s">programming&quot;</span>
 <span class="nt">site_url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://davep.org/blog&quot;</span>
 
 <span class="c1"># Content options</span>
