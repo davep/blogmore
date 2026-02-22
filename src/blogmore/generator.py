@@ -197,6 +197,13 @@ class SiteGenerator:
                 print(f"Generated {len(generated)} icon file(s):")
                 for icon_name in generated:
                     print(f"  - icons/{icon_name}")
+
+                # Copy favicon.ico to the root for backward compatibility
+                favicon_ico = generated.get("favicon.ico")
+                if favicon_ico:
+                    root_favicon = self.output_dir / "favicon.ico"
+                    shutil.copy2(favicon_ico, root_favicon)
+                    print("  - favicon.ico (root copy for backward compatibility)")
             else:
                 print("Warning: No icons were generated")
 

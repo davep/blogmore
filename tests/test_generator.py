@@ -683,6 +683,69 @@ class TestSiteGenerator:
         content = index_file.read_text()
         assert '<link rel="icon"' not in content
 
+    def test_generate_icons_copies_favicon_to_root(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that _generate_icons copies favicon.ico to the root output directory."""
+        from PIL import Image
+
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        extras_dir = content_dir / "extras"
+        extras_dir.mkdir()
+
+        # Create a real source icon image
+        source_icon = extras_dir / "icon.png"
+        img = Image.new("RGBA", (64, 64), (255, 0, 0, 255))
+        img.save(source_icon)
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator._generate_icons()
+
+        # favicon.ico should exist in the icons subdirectory
+        assert (temp_output_dir / "icons" / "favicon.ico").is_file()
+
+        # favicon.ico should also exist in the root output directory
+        assert (temp_output_dir / "favicon.ico").is_file()
+
+    def test_shortcut_icon_in_generated_html_with_platform_icons(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that shortcut icon link is included when platform icons exist."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Create a post
+        post_file = content_dir / "test-post.md"
+        post_file.write_text(
+            "---\ntitle: Test Post\ndate: 2024-01-01\n---\n\nTest content"
+        )
+
+        # Manually create icons to simulate generated platform icons
+        icons_dir = temp_output_dir / "icons"
+        icons_dir.mkdir(parents=True)
+        (icons_dir / "favicon.ico").write_bytes(b"fake ico")
+        (icons_dir / "apple-touch-icon.png").write_bytes(b"fake png")
+        (temp_output_dir / "favicon.ico").write_bytes(b"fake ico")
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator.generate(include_drafts=False)
+
+        index_file = temp_output_dir / "index.html"
+        assert index_file.exists()
+        html_content = index_file.read_text()
+        assert '<link rel="shortcut icon" href="/favicon.ico">' in html_content
+
     def test_clean_first_removes_output_directory(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
