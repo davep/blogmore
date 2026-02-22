@@ -516,6 +516,43 @@ class TestSiteGenerator:
         content = output_file.read_text()
         assert '<meta name="author" content="Default Author">' in content
 
+    def test_default_author_on_index_page(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that default_author appears in the author meta tag on the index page."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            default_author="Site Author",
+        )
+
+        generator.generate(include_drafts=False)
+
+        index_file = temp_output_dir / "index.html"
+        assert index_file.exists()
+
+        content = index_file.read_text()
+        assert '<meta name="author" content="Site Author">' in content
+
+    def test_no_author_on_index_page_without_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that no author meta tag appears on the index page when default_author is not set."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator.generate(include_drafts=False)
+
+        index_file = temp_output_dir / "index.html"
+        assert index_file.exists()
+
+        content = index_file.read_text()
+        assert '<meta name="author"' not in content
+
     def test_detect_favicon_ico(self, tmp_path: Path, temp_output_dir: Path) -> None:
         """Test detecting favicon.ico file."""
         # Create a content directory with extras/favicon.ico
