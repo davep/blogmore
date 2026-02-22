@@ -3,6 +3,7 @@
 import datetime as dt
 import re
 import shutil
+import urllib.error
 from collections import defaultdict
 from importlib.resources import files
 from pathlib import Path
@@ -10,6 +11,11 @@ from typing import Any
 
 from blogmore import __version__
 from blogmore.feeds import BlogFeedGenerator
+from blogmore.fontawesome import (
+    FONTAWESOME_CDN_CSS_URL,
+    FONTAWESOME_LOCAL_CSS_PATH,
+    FontAwesomeOptimizer,
+)
 from blogmore.icons import IconGenerator, detect_source_icon
 from blogmore.parser import Page, Post, PostParser, remove_date_prefix
 from blogmore.renderer import TemplateRenderer
@@ -133,6 +139,9 @@ class SiteGenerator:
         self.with_search = with_search
         self.with_sitemap = with_sitemap
 
+        # Default to CDN URL; updated during generate() once socials are known
+        self._fontawesome_css_url: str = FONTAWESOME_CDN_CSS_URL
+
         self.parser = PostParser(site_url=self.site_url)
         self.renderer = TemplateRenderer(
             templates_dir, extra_stylesheets, self.site_url
@@ -228,6 +237,7 @@ class SiteGenerator:
             "blogmore_version": __version__,
             "with_search": self.with_search,
             "default_author": self.default_author,
+            "fontawesome_css_url": self._fontawesome_css_url,
         }
         # Merge sidebar config into context
         context.update(self.sidebar_config)
@@ -269,6 +279,12 @@ class SiteGenerator:
         # Generate icons from source image BEFORE generating HTML pages
         # so that the has_apple_touch_icons flag is correctly set
         self._generate_icons()
+
+        # Prepare the FontAwesome CSS URL (and content if optimisation succeeds).
+        # Must be done before any HTML is rendered so the correct URL is embedded
+        # in every page, but the CSS file itself is written after _copy_static_assets()
+        # so it is not overwritten by that step.
+        fontawesome_css_content = self._prepare_fontawesome_css()
 
         # Generate individual post pages
         print("Generating post pages...")
@@ -326,6 +342,11 @@ class SiteGenerator:
         # Copy static assets if they exist
         self._copy_static_assets()
 
+        # Write the optimised FontAwesome CSS file after static assets have been
+        # copied so it is not overwritten by _copy_static_assets().
+        if fontawesome_css_content is not None:
+            self._write_fontawesome_css(fontawesome_css_content)
+
         # Copy post attachments from content directory
         self._copy_attachments()
 
@@ -338,6 +359,59 @@ class SiteGenerator:
             self._generate_sitemap()
 
         print(f"Site generation complete! Output: {self.output_dir}")
+
+    def _prepare_fontawesome_css(self) -> str | None:
+        """Determine the FontAwesome CSS URL and optionally build optimised CSS.
+
+        Extracts the social icon names from the sidebar configuration and
+        attempts to fetch the FontAwesome metadata from GitHub to build a
+        minimal CSS file.  Updates ``self._fontawesome_css_url`` with the URL
+        that every rendered page will reference.
+
+        Returns:
+            The CSS content string to write to disk if optimisation succeeded,
+            or ``None`` if no social icons are configured or if the metadata
+            fetch failed (in the latter case the full CDN URL is used instead).
+        """
+        socials: list[Any] = self.sidebar_config.get("socials", [])
+        if not socials:
+            # No social icons — no FontAwesome CSS needed at all.
+            self._fontawesome_css_url = ""
+            return None
+
+        icon_names = [
+            str(social["site"])
+            for social in socials
+            if isinstance(social, dict) and "site" in social
+        ]
+        optimizer = FontAwesomeOptimizer(icon_names)
+
+        try:
+            metadata = optimizer.fetch_icon_metadata()
+        except (urllib.error.URLError, ValueError, OSError) as error:
+            print(f"Warning: Could not fetch FontAwesome metadata: {error}")
+            print("Falling back to full FontAwesome CDN stylesheet.")
+            self._fontawesome_css_url = FONTAWESOME_CDN_CSS_URL
+            return None
+
+        print("Optimizing FontAwesome CSS...")
+        self._fontawesome_css_url = FONTAWESOME_LOCAL_CSS_PATH
+        return optimizer.build_css(metadata)
+
+    def _write_fontawesome_css(self, css_content: str) -> None:
+        """Write the optimised FontAwesome CSS file to the static directory.
+
+        Must be called *after* :meth:`_copy_static_assets` so the file is not
+        overwritten.
+
+        Args:
+            css_content: CSS text to write.
+        """
+        static_dir = self.output_dir / "static"
+        static_dir.mkdir(parents=True, exist_ok=True)
+        css_path = static_dir / "fontawesome.css"
+        css_path.write_text(css_content, encoding="utf-8")
+        print("Generated optimized FontAwesome CSS")
 
     def _generate_post_page(
         self, post: Post, all_posts: list[Post], pages: list[Page]

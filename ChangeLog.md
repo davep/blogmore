@@ -23,6 +23,10 @@
   `twitter:title`, and `twitter:image`. The image is taken from the configured
   site logo, or the largest generated platform icon if no logo is set.
   ([#154](https://github.com/davep/blogmore/pull/154))
+- Added automatic FontAwesome CSS optimisation. This reduces the FontAwesome
+  CSS overhead down to only what's needed for the "social icons" in the
+  sidebar, rather than pulling down the whole FontAwesome CSS.
+  ([#155](https://github.com/davep/blogmore/pull/155))
 
 ## v0.10.0
 
