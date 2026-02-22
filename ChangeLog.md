@@ -13,6 +13,11 @@
 - Author metadata is now added to the `head` of all pages, if the site's
   default author has been set.
   ([#152](https://github.com/davep/blogmore/pull/152))
+- Added `og:title` meta tag to all generated pages that previously lacked it
+  (index, archive, tag, category, tags overview, categories overview, and
+  search pages). The title is derived from the site name, subtitle, and a
+  description of the page type.
+  ([#153](https://github.com/davep/blogmore/pull/153))
 
 ## v0.10.0
 
