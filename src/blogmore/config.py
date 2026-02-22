@@ -72,6 +72,7 @@ def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
     defaults = {
         "site_title": "My Blog",
         "site_subtitle": "",
+        "site_description": "",
         "site_url": "",
         "output": Path("output"),
         "templates": None,

@@ -16,8 +16,9 @@
 {% if item.metadata and item.metadata.get('author') %}
 <meta name="author" content="{{ item.metadata.get('author') }}">
 {% endif %}
-{% if item.description %}
-<meta name="description" content="{{ item.description }}">
+{% set description = item.description if item.description else site_description %}
+{% if description %}
+<meta name="description" content="{{ description }}">
 {% endif %}
 {% if include_keywords and item.tags %}
 <meta name="keywords" content="{{ item.tags|join(', ') }}">
@@ -27,8 +28,8 @@
 <meta property="og:title" content="{{ item.title }}">
 <meta property="og:type" content="{{ content_type }}">
 <meta property="og:url" content="{{ site_url }}{{ item.url }}">
-{% if item.description %}
-<meta property="og:description" content="{{ item.description }}">
+{% if description %}
+<meta property="og:description" content="{{ description }}">
 {% endif %}
 <meta property="og:site_name" content="{{ site_title }}">
 {% if item.metadata and item.metadata.get('cover') %}
@@ -68,8 +69,8 @@
 {# Twitter Card meta tags #}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ item.title }}">
-{% if item.description %}
-<meta name="twitter:description" content="{{ item.description }}">
+{% if description %}
+<meta name="twitter:description" content="{{ description }}">
 {% endif %}
 {% if item.metadata and item.metadata.get('cover') %}
 {% set cover_url = item.metadata.get('cover') %}

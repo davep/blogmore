@@ -16,6 +16,10 @@ site_title: "My Blog"
 # Optional: Site subtitle (optional)
 # site_subtitle: "A subtitle for my blog"
 
+# Optional: Default site description used in metadata for pages that have no
+# description of their own (e.g. index, archive, tag, and category pages)
+# site_description: "A blog about interesting things"
+
 # Optional: Base URL of your site (used for RSS feeds and canonical URLs)
 site_url: "https://example.com"
 

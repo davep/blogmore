@@ -142,6 +142,19 @@ An optional subtitle or tagline displayed below the site title.
 site_subtitle: "Python, web development, and open source"
 ```
 
+#### `site_description`
+
+A default description for the site, used in `<meta name="description">`, `og:description`, and `twitter:description` tags for pages that do not have a description of their own. This applies to index pages, archive pages, tag pages, category pages, and any post or static page whose content cannot yield an auto-extracted description.
+
+Individual posts and pages that have a `description` field in their frontmatter, or whose content begins with a text paragraph, continue to use that content-specific description — `site_description` is only used as a fallback.
+
+**Type:** String  
+**Default:** Empty string (no fallback description)
+
+```yaml
+site_description: "A blog about Python, web development, and open source"
+```
+
 #### `site_url`
 
 The base URL of your site. Used for generating absolute URLs in RSS/Atom feeds, canonical URLs, and Open Graph tags.
@@ -429,6 +442,7 @@ templates: custom-templates
 # Site metadata
 site_title: "Dave's Tech Blog"
 site_subtitle: "Python, web development, and open source"
+site_description: "A blog about Python, web development, and open source software"
 site_url: "https://davep.org/blog"
 
 # Content options
