@@ -443,10 +443,14 @@ class SiteGenerator:
         # Fall back to bundled style.css
         if css_source is None:
             try:
-                bundled_css = files("blogmore").joinpath("templates", "static", "style.css")
+                bundled_css = files("blogmore").joinpath(
+                    "templates", "static", "style.css"
+                )
                 css_source = bundled_css.read_text(encoding="utf-8")
             except Exception as e:
-                print(f"Warning: Could not read bundled style.css for minification: {e}")
+                print(
+                    f"Warning: Could not read bundled style.css for minification: {e}"
+                )
                 return
 
         minified = rcssmin.cssmin(css_source)
