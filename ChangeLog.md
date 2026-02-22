@@ -18,6 +18,11 @@
   search pages). The title is derived from the site name, subtitle, and a
   description of the page type.
   ([#153](https://github.com/davep/blogmore/pull/153))
+- Added full social/share-friendly `<head>` meta tags to the main index page,
+  including `og:type`, `og:url`, `og:site_name`, `og:image`, `twitter:card`,
+  `twitter:title`, and `twitter:image`. The image is taken from the configured
+  site logo, or the largest generated platform icon if no logo is set.
+  ([#154](https://github.com/davep/blogmore/pull/154))
 
 ## v0.10.0
 
