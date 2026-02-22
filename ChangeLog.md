@@ -4,16 +4,12 @@
 
 **Released: WiP**
 
-- Added the `site_keywords` configuration option. When set, it is used as a
-  fallback `<meta name="keywords">` tag for index, archive, tag, category,
-  tags listing, and categories listing pages, as well as for posts and static
-  pages that have no tags of their own. Individual posts use their tags as
-  keywords, so `site_keywords` only applies when no post-specific keywords
-  are available. The value can be a comma-separated string or a YAML list.
-  ([#148](https://github.com/davep/blogmore/pull/148))
 - Added the `site_description` configuration option. When set, it is used as
   a fallback description for any `head` metadata that uses a description of
   the page. ([#146](https://github.com/davep/blogmore/pull/146))
+- Added the `site_keywords` configuration option. When set, it is used as a
+  a fallback set of keywords for any `head` metadata that uses them.
+  ([#150](https://github.com/davep/blogmore/pull/150))
 
 ## v0.10.0
 
