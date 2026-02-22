@@ -233,7 +233,9 @@ class SiteGenerator:
     def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
         styles_css_url = (
-            f"/static/{CSS_MINIFIED_FILENAME}" if self.minify_css else f"/static/{CSS_FILENAME}"
+            f"/static/{CSS_MINIFIED_FILENAME}"
+            if self.minify_css
+            else f"/static/{CSS_FILENAME}"
         )
         context = {
             "site_title": self.site_title,
