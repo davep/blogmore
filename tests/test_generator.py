@@ -1170,3 +1170,241 @@ class TestSiteGenerator:
 
         context = generator._get_global_context()
         assert context["site_keywords"] is None
+
+    def test_index_page_og_type_is_website(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the index page has og:type set to website."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert '<meta property="og:type" content="website">' in content
+
+    def test_index_page_og_url(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the index page has og:url set to the site root URL."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_url="https://example.com",
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert '<meta property="og:url" content="https://example.com/">' in content
+
+    def test_index_page_og_site_name(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the index page has og:site_name set to the site title."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_title="My Awesome Blog",
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert '<meta property="og:site_name" content="My Awesome Blog">' in content
+
+    def test_index_page_twitter_card_summary_without_image(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that index page has twitter:card set to summary when no image is available."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert '<meta name="twitter:card" content="summary">' in content
+
+    def test_index_page_twitter_card_summary_large_image_with_site_logo(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that index page uses summary_large_image twitter:card when site_logo is set."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            sidebar_config={"site_logo": "/images/logo.png"},
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert '<meta name="twitter:card" content="summary_large_image">' in content
+
+    def test_index_page_twitter_title(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the index page has twitter:title set to the site title."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_title="My Blog",
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert '<meta name="twitter:title" content="My Blog">' in content
+
+    def test_index_page_twitter_title_with_subtitle(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that twitter:title includes subtitle when site_subtitle is set."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_title="My Blog",
+            site_subtitle="Thoughts and ideas",
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert (
+            '<meta name="twitter:title" content="My Blog - Thoughts and ideas">'
+            in content
+        )
+
+    def test_index_page_og_image_with_site_logo_absolute_url(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that og:image uses site_logo when it is an absolute URL."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            sidebar_config={"site_logo": "https://cdn.example.com/logo.png"},
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert (
+            '<meta property="og:image" content="https://cdn.example.com/logo.png">'
+            in content
+        )
+        assert (
+            '<meta name="twitter:image" content="https://cdn.example.com/logo.png">'
+            in content
+        )
+
+    def test_index_page_og_image_with_site_logo_relative_url(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that og:image prepends site_url when site_logo is a root-relative URL."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_url="https://example.com",
+            sidebar_config={"site_logo": "/images/logo.png"},
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert (
+            '<meta property="og:image" content="https://example.com/images/logo.png">'
+            in content
+        )
+        assert (
+            '<meta name="twitter:image" content="https://example.com/images/logo.png">'
+            in content
+        )
+
+    def test_index_page_og_image_with_site_logo_bare_relative_path(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that og:image prepends site_url with slash when site_logo is a bare relative path."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_url="https://example.com",
+            sidebar_config={"site_logo": "images/logo.png"},
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert (
+            '<meta property="og:image" content="https://example.com/images/logo.png">'
+            in content
+        )
+        assert (
+            '<meta name="twitter:image" content="https://example.com/images/logo.png">'
+            in content
+        )
+
+    def test_index_page_og_image_with_platform_icons_when_no_site_logo(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that og:image uses the 512px platform icon when has_platform_icons is true."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        post_file = content_dir / "test-post.md"
+        post_file.write_text(
+            "---\ntitle: Test Post\ndate: 2024-01-01\n---\n\nTest content"
+        )
+
+        # Manually create icons to simulate generated platform icons
+        icons_dir = temp_output_dir / "icons"
+        icons_dir.mkdir(parents=True)
+        (icons_dir / "apple-touch-icon.png").write_bytes(b"fake png")
+        (icons_dir / "android-chrome-512x512.png").write_bytes(b"fake png")
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_url="https://example.com",
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert (
+            '<meta property="og:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in content
+        )
+        assert (
+            '<meta name="twitter:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in content
+        )
+        assert '<meta name="twitter:card" content="summary_large_image">' in content
+
+    def test_index_page_no_og_image_without_logo_or_icons(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that no og:image appears when site_logo is not set and no platform icons exist."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert '<meta property="og:image"' not in content
+        assert '<meta name="twitter:image"' not in content

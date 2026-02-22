@@ -3,14 +3,40 @@
 {% block title %}{{ site_title }}{% endblock %}
 
 {% block meta_tags %}
+{% if site_logo %}
+{% if site_logo.startswith('http://') or site_logo.startswith('https://') %}
+{% set og_image = site_logo %}
+{% elif site_logo.startswith('/') %}
+{% set og_image = site_url ~ site_logo %}
+{% else %}
+{% set og_image = site_url ~ '/' ~ site_logo %}
+{% endif %}
+{% elif has_platform_icons %}
+{% set og_image = site_url ~ '/icons/android-chrome-512x512.png' %}
+{% else %}
+{% set og_image = '' %}
+{% endif %}
 <meta property="og:title" content="{{ site_title }}{% if site_subtitle %} - {{ site_subtitle }}{% endif %}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ site_url }}/">
+<meta property="og:site_name" content="{{ site_title }}">
 {% if site_description %}
 <meta name="description" content="{{ site_description }}">
 <meta property="og:description" content="{{ site_description }}">
-<meta name="twitter:description" content="{{ site_description }}">
+{% endif %}
+{% if og_image %}
+<meta property="og:image" content="{{ og_image }}">
 {% endif %}
 {% if site_keywords %}
 <meta name="keywords" content="{{ site_keywords|join(', ') }}">
+{% endif %}
+<meta name="twitter:card" content="{{ 'summary_large_image' if og_image else 'summary' }}">
+<meta name="twitter:title" content="{{ site_title }}{% if site_subtitle %} - {{ site_subtitle }}{% endif %}">
+{% if site_description %}
+<meta name="twitter:description" content="{{ site_description }}">
+{% endif %}
+{% if og_image %}
+<meta name="twitter:image" content="{{ og_image }}">
 {% endif %}
 {% endblock %}
 
