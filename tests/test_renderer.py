@@ -643,3 +643,106 @@ class TestTemplateRenderer:
 
         # Check for the generator meta tag with version
         assert f'<meta name="generator" content="blogmore v{__version__}">' in html
+
+    def test_render_index_og_title(self, sample_post: Post) -> None:
+        """Test that the index page includes og:title with site title."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=1,
+            total_pages=1,
+            site_title="Test Blog",
+        )
+
+        assert '<meta property="og:title" content="Test Blog">' in html
+
+    def test_render_index_og_title_with_subtitle(self, sample_post: Post) -> None:
+        """Test that the index page includes og:title with site title and subtitle."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=1,
+            total_pages=1,
+            site_title="Test Blog",
+            site_subtitle="A testing blog",
+        )
+
+        assert '<meta property="og:title" content="Test Blog - A testing blog">' in html
+
+    def test_render_archive_og_title_no_archive_title(
+        self, sample_post: Post
+    ) -> None:
+        """Test that the archive page includes og:title when no archive_title is set."""
+        renderer = TemplateRenderer()
+        html = renderer.render_archive(
+            posts=[sample_post],
+            site_title="Test Blog",
+        )
+
+        assert '<meta property="og:title" content="Test Blog">' in html
+
+    def test_render_archive_og_title_with_archive_title(
+        self, sample_post: Post
+    ) -> None:
+        """Test that the archive page includes og:title when an archive_title is set."""
+        renderer = TemplateRenderer()
+        html = renderer.render_archive(
+            posts=[sample_post],
+            archive_title="Posts from 2024",
+            site_title="Test Blog",
+        )
+
+        assert (
+            '<meta property="og:title" content="Posts from 2024 - Test Blog">' in html
+        )
+
+    def test_render_categories_page_og_title(self) -> None:
+        """Test that the categories page includes og:title."""
+        renderer = TemplateRenderer()
+        html = renderer.render_categories_page(
+            categories=[],
+            site_title="Test Blog",
+        )
+
+        assert '<meta property="og:title" content="All Categories - Test Blog">' in html
+
+    def test_render_category_page_og_title(self, sample_post: Post) -> None:
+        """Test that a category page includes og:title with the category name."""
+        renderer = TemplateRenderer()
+        html = renderer.render_category_page(
+            category="Python",
+            posts=[sample_post],
+            site_title="Test Blog",
+        )
+
+        assert (
+            '<meta property="og:title" content="Category: Python - Test Blog">' in html
+        )
+
+    def test_render_tags_page_og_title(self) -> None:
+        """Test that the tags page includes og:title."""
+        renderer = TemplateRenderer()
+        html = renderer.render_tags_page(
+            tags=[],
+            site_title="Test Blog",
+        )
+
+        assert '<meta property="og:title" content="All Tags - Test Blog">' in html
+
+    def test_render_tag_page_og_title(self, sample_post: Post) -> None:
+        """Test that a tag page includes og:title with the tag name."""
+        renderer = TemplateRenderer()
+        html = renderer.render_tag_page(
+            tag="python",
+            posts=[sample_post],
+            site_title="Test Blog",
+        )
+
+        assert '<meta property="og:title" content="Tag: python - Test Blog">' in html
+
+    def test_render_search_page_og_title(self) -> None:
+        """Test that the search page includes og:title."""
+        renderer = TemplateRenderer()
+        html = renderer.render_search_page(site_title="Test Blog")
+
+        assert '<meta property="og:title" content="Search - Test Blog">' in html

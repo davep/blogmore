@@ -4,6 +4,11 @@
 
 **Released: WiP**
 
+- Added `og:title` meta tag to all generated pages that previously lacked it
+  (index, archive, tag, category, tags overview, categories overview, and
+  search pages). The title is derived from the site name, subtitle, and a
+  description of the page type.
+  ([#153](https://github.com/davep/blogmore/pull/153))
 - Added the `site_description` configuration option. When set, it is used as
   a fallback description for any `head` metadata that uses a description of
   the page. ([#146](https://github.com/davep/blogmore/pull/146))

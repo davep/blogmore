@@ -3,6 +3,7 @@
 {% block title %}{% if archive_title %}{{ archive_title }}{% else %}Archive{% endif %} - {{ site_title }}{% endblock %}
 
 {% block meta_tags %}
+<meta property="og:title" content="{% if archive_title %}{{ archive_title }} - {% endif %}{{ site_title }}">
 {% if site_description %}
 <meta name="description" content="{{ site_description }}">
 <meta property="og:description" content="{{ site_description }}">
