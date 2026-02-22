@@ -2,13 +2,11 @@
 
 ## Unreleased
 
-- Added `site_description` configuration option. When set, it is used as a
-  fallback `description`, `og:description`, and `twitter:description` meta tag
-  value for pages that have no description of their own (e.g. the main index,
-  archive, tag, and category pages). Individual posts and pages that already
-  have a description — either from frontmatter or auto-extracted from their
-  content — are not affected.
-  ([#145](https://github.com/davep/blogmore/pull/145))
+**Released: WiP**
+
+- Added the `site_description` configuration option. When set, it is used as
+  a fallback description for any `head` metadata that uses a description of
+  the page. ([#146](https://github.com/davep/blogmore/pull/146))
 
 ## v0.10.0
 
