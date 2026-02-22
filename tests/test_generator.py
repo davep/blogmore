@@ -1393,6 +1393,43 @@ class TestSiteGenerator:
         )
         assert '<meta name="twitter:card" content="summary_large_image">' in content
 
+    def test_index_page_og_image_platform_icons_take_priority_over_site_logo(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that platform icons take priority over site_logo for og:image."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        post_file = content_dir / "test-post.md"
+        post_file.write_text(
+            "---\ntitle: Test Post\ndate: 2024-01-01\n---\n\nTest content"
+        )
+
+        # Manually create icons to simulate generated platform icons
+        icons_dir = temp_output_dir / "icons"
+        icons_dir.mkdir(parents=True)
+        (icons_dir / "apple-touch-icon.png").write_bytes(b"fake png")
+        (icons_dir / "android-chrome-512x512.png").write_bytes(b"fake png")
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_url="https://example.com",
+            sidebar_config={"site_logo": "/images/logo.png"},
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert (
+            '<meta property="og:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in content
+        )
+        assert (
+            '<meta name="twitter:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in content
+        )
+
     def test_index_page_no_og_image_without_logo_or_icons(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:

@@ -3,7 +3,9 @@
 {% block title %}{{ site_title }}{% endblock %}
 
 {% block meta_tags %}
-{% if site_logo %}
+{% if has_platform_icons %}
+{% set og_image = site_url ~ '/icons/android-chrome-512x512.png' %}
+{% elif site_logo %}
 {% if site_logo.startswith('http://') or site_logo.startswith('https://') %}
 {% set og_image = site_logo %}
 {% elif site_logo.startswith('/') %}
@@ -11,8 +13,6 @@
 {% else %}
 {% set og_image = site_url ~ '/' ~ site_logo %}
 {% endif %}
-{% elif has_platform_icons %}
-{% set og_image = site_url ~ '/icons/android-chrome-512x512.png' %}
 {% else %}
 {% set og_image = '' %}
 {% endif %}

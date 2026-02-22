@@ -6,6 +6,10 @@
 
 - Removed redundant CSS rules from `style.css`.
   ([#159](https://github.com/davep/blogmore/pull/159))
+- The default `og:image` for the site index page now uses the `icon_source`
+  generated platform icon (`android-chrome-512x512.png`) when available,
+  falling back to `site_logo` if no platform icons have been generated.
+  ([#160](https://github.com/davep/blogmore/pull/160))
 
 ## v0.11.0
 
