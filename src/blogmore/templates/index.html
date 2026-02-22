@@ -2,6 +2,14 @@
 
 {% block title %}{{ site_title }}{% endblock %}
 
+{% block meta_tags %}
+{% if site_description %}
+<meta name="description" content="{{ site_description }}">
+<meta property="og:description" content="{{ site_description }}">
+<meta name="twitter:description" content="{{ site_description }}">
+{% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="posts-list">
     <h1>Recent Posts</h1>

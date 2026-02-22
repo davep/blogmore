@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added the `site_description` configuration option. When set, it is used as
+  a fallback description for any `head` metadata that uses a description of
+  the page. ([#146](https://github.com/davep/blogmore/pull/146))
+
 ## v0.10.0
 
 **Released: 2026-02-22**

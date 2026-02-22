@@ -253,6 +253,26 @@ class TestMergeConfigWithArgs:
 
         assert args.site_subtitle == "CLI subtitle"
 
+    def test_site_description_from_config(self) -> None:
+        """Test loading site_description from config."""
+        config = {"site_description": "A great blog about stuff"}
+        args = Mock()
+        args.site_description = ""  # default
+
+        merge_config_with_args(config, args)
+
+        assert args.site_description == "A great blog about stuff"
+
+    def test_cli_site_description_overrides_config(self) -> None:
+        """Test that CLI site_description overrides config."""
+        config = {"site_description": "Config description"}
+        args = Mock()
+        args.site_description = "CLI description"
+
+        merge_config_with_args(config, args)
+
+        assert args.site_description == "CLI description"
+
     def test_site_url_from_config(self) -> None:
         """Test loading site_url from config."""
         config = {"site_url": "https://example.com"}

@@ -49,6 +49,12 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     )
 
     parser.add_argument(
+        "--site-description",
+        default="",
+        help="Default description for pages that have no description of their own (optional)",
+    )
+
+    parser.add_argument(
         "--site-url",
         default="",
         help="Base URL of the site (optional)",

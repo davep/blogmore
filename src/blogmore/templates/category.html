@@ -12,6 +12,14 @@
 <li><a href="/feeds/{{ safe_category }}.atom.xml" title="Subscribe to {{ category }} via Atom feed">Atom</a></li>
 {% endblock %}
 
+{% block meta_tags %}
+{% if site_description %}
+<meta name="description" content="{{ site_description }}">
+<meta property="og:description" content="{{ site_description }}">
+<meta name="twitter:description" content="{{ site_description }}">
+{% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="category-page">
     <h1>Posts in category "{{ category }}"</h1>

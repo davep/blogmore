@@ -208,6 +208,8 @@ class ConfigChangeHandler(FileSystemEventHandler):
             self.generator.site_title = config["site_title"]
         if "site_subtitle" in config:
             self.generator.site_subtitle = config["site_subtitle"]
+        if "site_description" in config:
+            self.generator.site_description = config["site_description"]
         if "site_url" in config:
             self.generator.site_url = config["site_url"]
         if "posts_per_feed" in config:
@@ -238,6 +240,7 @@ def serve_site(
     templates_dir: Path | None = None,
     site_title: str = "My Blog",
     site_subtitle: str = "",
+    site_description: str = "",
     site_url: str = "",
     include_drafts: bool = False,
     watch: bool = True,
@@ -262,6 +265,7 @@ def serve_site(
                       If not provided, uses bundled templates.
         site_title: Title of the blog site
         site_subtitle: Subtitle of the blog site
+        site_description: Default description used in metadata for pages with no description
         site_url: Base URL of the site
         include_drafts: Whether to include drafts
         watch: Whether to watch for changes and regenerate (default: True)
@@ -315,6 +319,7 @@ def serve_site(
                 output_dir=output_dir,
                 site_title=site_title,
                 site_subtitle=site_subtitle,
+                site_description=site_description,
                 site_url=site_url,
                 posts_per_feed=posts_per_feed,
                 extra_stylesheets=extra_stylesheets,

@@ -835,3 +835,163 @@ class TestSiteGenerator:
 
         assert "blogmore_version" in context
         assert context["blogmore_version"] == __version__
+
+    def test_site_description_in_global_context(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that site_description is included in the global context."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_description="A great blog about things",
+        )
+
+        context = generator._get_global_context()
+
+        assert context["site_description"] == "A great blog about things"
+
+    def test_site_description_default_is_empty(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that site_description defaults to an empty string."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        assert generator.site_description == ""
+
+    def test_site_description_in_index_page(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that site_description appears in the index page meta tags."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_description="My site description",
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert '<meta name="description" content="My site description">' in content
+        assert '<meta property="og:description" content="My site description">' in content
+
+    def test_no_description_meta_in_index_without_site_description(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that no description meta tag appears in index when site_description is empty."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert '<meta name="description"' not in content
+
+    def test_site_description_in_archive_page(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that site_description appears in the archive page meta tags."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_description="My site description",
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "archive.html").read_text()
+        assert '<meta name="description" content="My site description">' in content
+
+    def test_site_description_in_tags_page(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that site_description appears in the tags page meta tags."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_description="My site description",
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "tags.html").read_text()
+        assert '<meta name="description" content="My site description">' in content
+
+    def test_site_description_in_categories_page(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that site_description appears in the categories page meta tags."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_description="My site description",
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "categories.html").read_text()
+        assert '<meta name="description" content="My site description">' in content
+
+    def test_site_description_fallback_on_post_without_description(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that site_description is used as fallback for posts with no text content."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Create a post whose content is only an image, so no text description
+        # can be auto-extracted.  The site_description should be used as fallback.
+        post_file = content_dir / "image-only.md"
+        post_file.write_text(
+            "---\ntitle: Image Only Post\ndate: 2024-06-01\n---\n\n"
+            "![A photo](photo.jpg)\n"
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_description="Default site description",
+        )
+
+        generator.generate(include_drafts=False)
+
+        post_file_out = temp_output_dir / "2024" / "06" / "01" / "image-only.html"
+        assert post_file_out.exists()
+        content = post_file_out.read_text()
+        assert '<meta name="description" content="Default site description">' in content
+
+    def test_site_description_not_used_when_post_has_description(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a post's own description takes precedence over site_description."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_description="Default site description",
+        )
+
+        generator.generate(include_drafts=False)
+
+        # seo-test-post.md has its own description
+        post_file = temp_output_dir / "2024" / "03" / "01" / "seo-test-post.html"
+        assert post_file.exists()
+        content = post_file.read_text()
+        # Own description should be used
+        assert (
+            "This is a test post with SEO and social media meta tags" in content
+        )
+        # site_description should NOT be used
+        assert "Default site description" not in content
