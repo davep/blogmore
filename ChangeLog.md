@@ -4,13 +4,6 @@
 
 **Released: WiP**
 
-- Added automatic FontAwesome CSS optimisation. At build time, BlogMore now
-  fetches the official FontAwesome 6.5.1 icon metadata from GitHub and
-  generates a minimal CSS file containing only the brand icons actually used
-  in the sidebar socials configuration.  This reduces the FontAwesome CSS
-  payload from ~80 KB (full CDN stylesheet) to ~2–5 KB.  If the metadata
-  cannot be fetched, the full CDN stylesheet is used as a fallback.
-  ([#NNN](https://github.com/davep/blogmore/pull/NNN))
 - Added the `site_description` configuration option. When set, it is used as
   a fallback description for any `head` metadata that uses a description of
   the page. ([#146](https://github.com/davep/blogmore/pull/146))
@@ -30,6 +23,10 @@
   `twitter:title`, and `twitter:image`. The image is taken from the configured
   site logo, or the largest generated platform icon if no logo is set.
   ([#154](https://github.com/davep/blogmore/pull/154))
+- Added automatic FontAwesome CSS optimisation. This reduces the FontAwesome
+  CSS overhead down to only what's needed for the "social icons" in the
+  sidebar, rather than pulling down the whole FontAwesome CSS.
+  ([#155](https://github.com/davep/blogmore/pull/155))
 
 ## v0.10.0
 
