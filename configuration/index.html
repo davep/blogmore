@@ -882,6 +882,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#minify_css" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        minify_css
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#extra_stylesheets" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1589,6 +1600,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#minify_css" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        minify_css
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#extra_stylesheets" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2075,6 +2097,12 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 </code></pre></div>
 <p>A <code>site_url</code> should be set when using this option so that sitemap entries contain absolute URLs (e.g. <code>https://example.com/2024/01/15/my-post.html</code>). If <code>site_url</code> is not provided, URLs will fall back to <code>https://example.com</code>.</p>
 <h3 id="styling-options">Styling Options</h3>
+<h4 id="minify_css"><code>minify_css</code></h4>
+<p>Minify the generated CSS and write it as <code>styles.min.css</code> instead of <code>style.css</code>. This reduces the size of the stylesheet delivered to visitors.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">minify_css</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
 <h4 id="extra_stylesheets"><code>extra_stylesheets</code></h4>
 <p>List of additional stylesheets to include. Can be absolute URLs or paths relative to your site root.</p>
 <p><strong>Type:</strong> List of strings (URLs or paths)<br />
@@ -2187,6 +2215,7 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <span class="nt">with_search</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 
 <span class="c1"># Styling</span>
+<span class="nt">minify_css</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="nt">extra_stylesheets</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/assets/custom.css</span>

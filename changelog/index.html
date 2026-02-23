@@ -583,6 +583,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v0120" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.12.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v0110" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -743,6 +754,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v0120" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.12.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v0110" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -862,6 +884,21 @@
 
 
 <h1 id="blogmore-changelog">BlogMore ChangeLog</h1>
+<h2 id="v0120">v0.12.0</h2>
+<p><strong>Released: 2026-02-23</strong></p>
+<ul>
+<li>Removed redundant CSS rules from <code>style.css</code>.
+  (<a href="https://github.com/davep/blogmore/pull/159">#159</a>)</li>
+<li>The default <code>og:image</code> for the site index page now uses the <code>icon_source</code>
+  generated platform icon (<code>android-chrome-512x512.png</code>) when available,
+  falling back to <code>site_logo</code> if no platform icons have been generated.
+  Post and page templates that don't have an explicit <code>cover</code> image set now
+  also default to the platform icon for <code>og:image</code> and <code>twitter:image</code>.
+  (<a href="https://github.com/davep/blogmore/pull/160">#160</a>)</li>
+<li>Added optional CSS minification via the <code>--minify-css</code> command-line switch
+  or the <code>minify_css: true</code> configuration option.
+  (<a href="https://github.com/davep/blogmore/pull/161">#161</a>)</li>
+</ul>
 <h2 id="v0110">v0.11.0</h2>
 <p><strong>Released: 2026-02-22</strong></p>
 <ul>
