@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v0.13.0
 
-**Released: WiP**
+**Released: 2026-02-23**
 
 - FontAwesome loading is now non-blocking: `font-display` changed from
   `block` to `swap`, and a `<link rel="preload">` hint for the WOFF2 font
