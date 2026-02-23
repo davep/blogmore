@@ -15,6 +15,11 @@
 - Added optional CSS minification via the `--minify-css` command-line switch
   or the `minify_css: true` configuration option.
   ([#161](https://github.com/davep/blogmore/pull/161))
+- Font Awesome loading is now non-blocking: `font-display` changed from
+  `block` to `swap`, and a `<link rel="preload">` hint for the WOFF2 font
+  file is added to all pages that use Font Awesome icons, improving initial
+  page rendering speed.
+  ([#163](https://github.com/davep/blogmore/pull/163))
 
 ## v0.11.0
 
