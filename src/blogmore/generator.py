@@ -14,6 +14,7 @@ import rcssmin  # type: ignore[import-untyped]
 from blogmore import __version__
 from blogmore.feeds import BlogFeedGenerator
 from blogmore.fontawesome import (
+    FONTAWESOME_CDN_BRANDS_WOFF2_URL,
     FONTAWESOME_CDN_CSS_URL,
     FONTAWESOME_LOCAL_CSS_PATH,
     FontAwesomeOptimizer,
@@ -251,6 +252,7 @@ class SiteGenerator:
             "with_search": self.with_search,
             "default_author": self.default_author,
             "fontawesome_css_url": self._fontawesome_css_url,
+            "fontawesome_woff2_url": FONTAWESOME_CDN_BRANDS_WOFF2_URL,
             "styles_css_url": styles_css_url,
         }
         # Merge sidebar config into context

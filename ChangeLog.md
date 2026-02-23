@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- FontAwesome loading is now non-blocking: `font-display` changed from
+  `block` to `swap`, and a `<link rel="preload">` hint for the WOFF2 font
+  file is added to all pages that use FontAwesome icons, improving initial
+  page rendering speed. ([#163](https://github.com/davep/blogmore/pull/163))
+
 ## v0.12.0
 
 **Released: 2026-02-23**

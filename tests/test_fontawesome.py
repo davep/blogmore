@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from blogmore.fontawesome import (
+    FONTAWESOME_CDN_BRANDS_WOFF2_URL,
     FONTAWESOME_CDN_CSS_URL,
     FONTAWESOME_CDN_WEBFONTS_BASE,
     FONTAWESOME_LOCAL_CSS_PATH,
@@ -45,6 +46,11 @@ class TestFontAwesomeConstants:
     def test_local_css_path_under_static(self) -> None:
         """Test that the local CSS path is under /static/."""
         assert FONTAWESOME_LOCAL_CSS_PATH.startswith("/static/")
+
+    def test_cdn_brands_woff2_url_derived_from_webfonts_base(self) -> None:
+        """Test that the brands WOFF2 URL is derived from the webfonts base URL."""
+        assert FONTAWESOME_CDN_BRANDS_WOFF2_URL.startswith(FONTAWESOME_CDN_WEBFONTS_BASE)
+        assert FONTAWESOME_CDN_BRANDS_WOFF2_URL.endswith(".woff2")
 
 
 class TestFontAwesomeOptimizerInit:
@@ -136,6 +142,12 @@ class TestFontAwesomeOptimizerBuildCss:
         assert "@font-face" in css
         assert ".fa-brands" in css
         assert "::before" not in css
+
+    def test_font_display_swap(self) -> None:
+        """Test that font-display is set to swap for non-blocking font loading."""
+        optimizer = FontAwesomeOptimizer(["github"])
+        css = optimizer.build_css(STUB_METADATA)
+        assert "font-display: swap;" in css
 
     def test_css_ends_with_newline(self) -> None:
         """Test that the generated CSS ends with a newline."""
@@ -297,6 +309,36 @@ class TestFontAwesomeOptimizerInGenerator:
         # HTML should reference the local CSS path
         index_html = (temp_output_dir / "index.html").read_text()
         assert FONTAWESOME_LOCAL_CSS_PATH in index_html
+
+    def test_socials_includes_woff2_preload_hint(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a preload link for the WOFF2 font is present when socials are configured."""
+        from blogmore.generator import SiteGenerator
+
+        sidebar_config = {
+            "socials": [{"site": "github", "url": "https://github.com/example"}]
+        }
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            sidebar_config=sidebar_config,
+        )
+
+        with patch.object(
+            FontAwesomeOptimizer,
+            "fetch_icon_metadata",
+            return_value=STUB_METADATA,
+        ):
+            generator.generate(include_drafts=False)
+
+        index_html = (temp_output_dir / "index.html").read_text()
+        expected_preload = (
+            f'<link rel="preload" href="{FONTAWESOME_CDN_BRANDS_WOFF2_URL}"'
+            ' as="font" type="font/woff2" crossorigin="anonymous">'
+        )
+        assert expected_preload in index_html
 
     def test_socials_falls_back_to_cdn_on_fetch_failure(
         self, posts_dir: Path, temp_output_dir: Path
