@@ -27,6 +27,7 @@
     <meta name="theme-color" content="#ffffff">
     {% endif %}
     {% if fontawesome_css_url %}
+    <link rel="preload" href="{{ fontawesome_woff2_url }}" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ fontawesome_css_url }}">
     {% endif %}
     <link rel="stylesheet" href="{{ styles_css_url }}">

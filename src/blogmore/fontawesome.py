@@ -38,6 +38,11 @@ FONTAWESOME_CDN_WEBFONTS_BASE = (
     f"/{FONTAWESOME_VERSION}/webfonts"
 )
 
+# CDN URL for the brands WOFF2 font file (used for preload hint)
+FONTAWESOME_CDN_BRANDS_WOFF2_URL = (
+    f"{FONTAWESOME_CDN_WEBFONTS_BASE}/fa-brands-400.woff2"
+)
+
 # Local path (relative to site root) where the optimized CSS is written
 FONTAWESOME_LOCAL_CSS_PATH = "/static/fontawesome.css"
 
@@ -98,7 +103,7 @@ class FontAwesomeOptimizer:
             '    font-family: "Font Awesome 6 Brands";',
             "    font-style: normal;",
             "    font-weight: 400;",
-            "    font-display: block;",
+            "    font-display: swap;",
             f'    src: url("{woff2_url}") format("woff2"),',
             f'         url("{ttf_url}") format("truetype");',
             "}",
