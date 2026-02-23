@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v0.12.0
 
-**Released: WiP**
+**Released: 2026-02-23**
 
 - Removed redundant CSS rules from `style.css`.
   ([#159](https://github.com/davep/blogmore/pull/159))
