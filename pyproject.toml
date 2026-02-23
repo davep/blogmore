@@ -1,6 +1,6 @@
 [project]
 name = "blogmore"
-version = "0.12.0"
+version = "0.13.0"
 description = "A blog-oriented static site generation engine"
 readme = "README.md"
 authors = [
