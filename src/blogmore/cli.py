@@ -126,6 +126,13 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
         help="Minify the generated CSS, writing it as styles.min.css (default: disabled)",
     )
 
+    parser.add_argument(
+        "--minify-js",
+        action="store_true",
+        default=False,
+        help="Minify the generated JavaScript, writing as theme.min.js (and search.min.js if search enabled)",
+    )
+
 
 def create_parser() -> argparse.ArgumentParser:
     """Create and configure the argument parser for blogmore.

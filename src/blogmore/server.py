@@ -260,6 +260,7 @@ def serve_site(
     with_search: bool = False,
     with_sitemap: bool = False,
     minify_css: bool = False,
+    minify_js: bool = False,
 ) -> int:
     """Serve the generated site locally using a simple HTTP server.
 
@@ -287,6 +288,7 @@ def serve_site(
         with_search: Whether to generate a search index and search page
         with_sitemap: Whether to generate an XML sitemap
         minify_css: Whether to minify the CSS, writing it as styles.min.css
+        minify_js: Whether to minify the JavaScript, writing it as theme.min.js
 
     Returns:
         Exit code
@@ -339,6 +341,7 @@ def serve_site(
                 with_search=with_search,
                 with_sitemap=with_sitemap,
                 minify_css=minify_css,
+                minify_js=minify_js,
             )
             generator.generate(include_drafts=include_drafts)
         except Exception as e:

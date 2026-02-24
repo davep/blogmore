@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 import rcssmin  # type: ignore[import-untyped]
+import rjsmin  # type: ignore[import-untyped]
 
 from blogmore import __version__
 from blogmore.feeds import BlogFeedGenerator
@@ -28,6 +29,10 @@ from blogmore.utils import normalize_site_url
 
 CSS_FILENAME = "style.css"
 CSS_MINIFIED_FILENAME = "styles.min.css"
+THEME_JS_FILENAME = "theme.js"
+THEME_JS_MINIFIED_FILENAME = "theme.min.js"
+SEARCH_JS_FILENAME = "search.js"
+SEARCH_JS_MINIFIED_FILENAME = "search.min.js"
 
 
 def sanitize_for_url(value: str) -> str:
@@ -106,6 +111,7 @@ class SiteGenerator:
         with_search: bool = False,
         with_sitemap: bool = False,
         minify_css: bool = False,
+        minify_js: bool = False,
     ) -> None:
         """Initialize the site generator.
 
@@ -130,6 +136,8 @@ class SiteGenerator:
             with_search: Whether to generate a search index and search page
             with_sitemap: Whether to generate an XML sitemap
             minify_css: Whether to minify the CSS, writing it as styles.min.css
+            minify_js: Whether to minify the JavaScript, writing it as theme.min.js
+                       (and search.min.js if search is enabled)
         """
         self.content_dir = content_dir
         self.templates_dir = templates_dir
@@ -147,6 +155,7 @@ class SiteGenerator:
         self.with_search = with_search
         self.with_sitemap = with_sitemap
         self.minify_css = minify_css
+        self.minify_js = minify_js
 
         # Default to CDN URL; updated during generate() once socials are known
         self._fontawesome_css_url: str = FONTAWESOME_CDN_CSS_URL
@@ -238,6 +247,16 @@ class SiteGenerator:
             if self.minify_css
             else f"/static/{CSS_FILENAME}"
         )
+        theme_js_url = (
+            f"/static/{THEME_JS_MINIFIED_FILENAME}"
+            if self.minify_js
+            else f"/static/{THEME_JS_FILENAME}"
+        )
+        search_js_url = (
+            f"/static/{SEARCH_JS_MINIFIED_FILENAME}"
+            if self.minify_js
+            else f"/static/{SEARCH_JS_FILENAME}"
+        )
         context = {
             "site_title": self.site_title,
             "site_subtitle": self.site_subtitle,
@@ -254,6 +273,8 @@ class SiteGenerator:
             "fontawesome_css_url": self._fontawesome_css_url,
             "fontawesome_woff2_url": FONTAWESOME_CDN_BRANDS_WOFF2_URL,
             "styles_css_url": styles_css_url,
+            "theme_js_url": theme_js_url,
+            "search_js_url": search_js_url,
         }
         # Merge sidebar config into context
         context.update(self.sidebar_config)
@@ -464,6 +485,44 @@ class SiteGenerator:
         output_path = output_static / CSS_MINIFIED_FILENAME
         output_path.write_text(minified, encoding="utf-8")
         print(f"Generated minified CSS as {CSS_MINIFIED_FILENAME}")
+
+    def _write_minified_js(self, output_static: Path, js_filename: str, js_minified_filename: str) -> None:
+        """Read a source JavaScript file, minify it, and write it with the minified name.
+
+        The source JS is read from the custom templates directory (if
+        available) or from the bundled templates.  The minified output is
+        written to ``output_static/<js_minified_filename>``.
+
+        Args:
+            output_static: Path to the output static directory.
+            js_filename: The original JavaScript filename (e.g. ``theme.js``).
+            js_minified_filename: The minified output filename (e.g. ``theme.min.js``).
+        """
+        js_source: str | None = None
+
+        # Prefer custom JS file if a templates directory is configured
+        if self.templates_dir is not None:
+            custom_js = self.templates_dir / "static" / js_filename
+            if custom_js.is_file():
+                js_source = custom_js.read_text(encoding="utf-8")
+
+        # Fall back to bundled JS file
+        if js_source is None:
+            try:
+                bundled_js = files("blogmore").joinpath(
+                    "templates", "static", js_filename
+                )
+                js_source = bundled_js.read_text(encoding="utf-8")
+            except Exception as e:
+                print(
+                    f"Warning: Could not read bundled {js_filename} for minification: {e}"
+                )
+                return
+
+        minified = rjsmin.jsmin(js_source)
+        output_path = output_static / js_minified_filename
+        output_path.write_text(minified, encoding="utf-8")
+        print(f"Generated minified JS as {js_minified_filename}")
 
     def _generate_post_page(
         self, post: Post, all_posts: list[Post], pages: list[Page]
@@ -1063,6 +1122,10 @@ class SiteGenerator:
 
         When ``minify_css`` is enabled, the ``style.css`` file is minified and
         written as ``styles.min.css``; the original ``style.css`` is not written.
+
+        When ``minify_js`` is enabled, the ``theme.js`` file is minified and
+        written as ``theme.min.js`` (and ``search.js`` as ``search.min.js`` if
+        search is enabled); the originals are not written.
         """
         output_static = self.output_dir / "static"
 
@@ -1079,10 +1142,15 @@ class SiteGenerator:
                 for item in bundled_static.iterdir():
                     if item.is_file():
                         # Only copy search.js when search is enabled
-                        if item.name == "search.js" and not self.with_search:
+                        if item.name == SEARCH_JS_FILENAME and not self.with_search:
                             continue
                         # When minifying CSS, skip the original style.css
                         if item.name == CSS_FILENAME and self.minify_css:
+                            continue
+                        # When minifying JS, skip original JS files
+                        if item.name == THEME_JS_FILENAME and self.minify_js:
+                            continue
+                        if item.name == SEARCH_JS_FILENAME and self.minify_js:
                             continue
                         # Read content and write to output
                         content = item.read_bytes()
@@ -1102,6 +1170,11 @@ class SiteGenerator:
                         # When minifying CSS, skip the original style.css from custom dir too
                         if relative_path.name == CSS_FILENAME and self.minify_css:
                             continue
+                        # When minifying JS, skip original JS files from custom dir too
+                        if relative_path.name == THEME_JS_FILENAME and self.minify_js:
+                            continue
+                        if relative_path.name == SEARCH_JS_FILENAME and self.minify_js:
+                            continue
                         output_file = output_static / relative_path
                         output_file.parent.mkdir(parents=True, exist_ok=True)
                         shutil.copy2(item, output_file)
@@ -1110,6 +1183,12 @@ class SiteGenerator:
         # Minify CSS if requested
         if self.minify_css:
             self._write_minified_css(output_static)
+
+        # Minify JS if requested
+        if self.minify_js:
+            self._write_minified_js(output_static, THEME_JS_FILENAME, THEME_JS_MINIFIED_FILENAME)
+            if self.with_search:
+                self._write_minified_js(output_static, SEARCH_JS_FILENAME, SEARCH_JS_MINIFIED_FILENAME)
 
     def _copy_attachments(self) -> None:
         """Copy post attachments (images, files, etc.) from the attachments directory to output directory."""

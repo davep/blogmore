@@ -319,6 +319,17 @@ Minify the generated CSS and write it as `styles.min.css` instead of `style.css`
 minify_css: true
 ```
 
+#### `minify_js`
+
+Minify the generated JavaScript and write it as `theme.min.js` instead of `theme.js`. If search is enabled, `search.js` is also minified and written as `search.min.js`. The original unminified files are not written when this option is enabled.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+minify_js: true
+```
+
 #### `extra_stylesheets`
 
 List of additional stylesheets to include. Can be absolute URLs or paths relative to your site root.
@@ -492,6 +503,7 @@ with_search: true
 
 # Styling
 minify_css: true
+minify_js: true
 extra_stylesheets:
   - https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700
   - /assets/custom.css

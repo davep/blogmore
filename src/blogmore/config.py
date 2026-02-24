@@ -113,6 +113,7 @@ def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
         "with_search": False,
         "with_sitemap": False,
         "minify_css": False,
+        "minify_js": False,
     }
 
     # For each config key, update args if the arg value is still at its default

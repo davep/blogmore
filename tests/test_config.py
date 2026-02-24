@@ -706,3 +706,23 @@ class TestSiteKeywordsConfig:
         merge_config_with_args(config, args)
 
         assert args.minify_css is True
+
+    def test_minify_js_from_config(self) -> None:
+        """Test loading minify_js from config."""
+        config = {"minify_js": True}
+        args = Mock()
+        args.minify_js = False  # default
+
+        merge_config_with_args(config, args)
+
+        assert args.minify_js is True
+
+    def test_cli_minify_js_overrides_config(self) -> None:
+        """Test that CLI minify_js overrides config."""
+        config = {"minify_js": False}
+        args = Mock()
+        args.minify_js = True  # set via CLI
+
+        merge_config_with_args(config, args)
+
+        assert args.minify_js is True

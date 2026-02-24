@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+- Added optional JavaScript minification via the `--minify-js` command-line
+  switch or the `minify_js: true` configuration option. When enabled,
+  `theme.js` is minified and written as `theme.min.js`, and if search is
+  also enabled, `search.js` is minified and written as `search.min.js`. The
+  original unminified files are not written when minification is active.
+  ([#165](https://github.com/davep/blogmore/pull/165))
+
 ## v0.13.0
 
 **Released: 2026-02-23**
