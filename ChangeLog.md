@@ -1,6 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v0.14.0
+
+**Released: 2026-02-24**
 
 - Added optional JavaScript minification via the `--minify-js` command-line
   switch or the `minify_js: true` configuration option.
