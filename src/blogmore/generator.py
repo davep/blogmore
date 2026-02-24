@@ -486,7 +486,9 @@ class SiteGenerator:
         output_path.write_text(minified, encoding="utf-8")
         print(f"Generated minified CSS as {CSS_MINIFIED_FILENAME}")
 
-    def _write_minified_js(self, output_static: Path, js_filename: str, js_minified_filename: str) -> None:
+    def _write_minified_js(
+        self, output_static: Path, js_filename: str, js_minified_filename: str
+    ) -> None:
         """Read a source JavaScript file, minify it, and write it with the minified name.
 
         The source JS is read from the custom templates directory (if
@@ -1186,9 +1188,13 @@ class SiteGenerator:
 
         # Minify JS if requested
         if self.minify_js:
-            self._write_minified_js(output_static, THEME_JS_FILENAME, THEME_JS_MINIFIED_FILENAME)
+            self._write_minified_js(
+                output_static, THEME_JS_FILENAME, THEME_JS_MINIFIED_FILENAME
+            )
             if self.with_search:
-                self._write_minified_js(output_static, SEARCH_JS_FILENAME, SEARCH_JS_MINIFIED_FILENAME)
+                self._write_minified_js(
+                    output_static, SEARCH_JS_FILENAME, SEARCH_JS_MINIFIED_FILENAME
+                )
 
     def _copy_attachments(self) -> None:
         """Copy post attachments (images, files, etc.) from the attachments directory to output directory."""
