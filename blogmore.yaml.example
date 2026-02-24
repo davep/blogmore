@@ -55,6 +55,19 @@ posts_per_feed: 20
 # Generates a search index and a /search.html page when set to true.
 # with_search: false
 
+# Optional: Generate an XML sitemap (default: false)
+# Requires site_url to be set for absolute URLs in the sitemap.
+# with_sitemap: false
+
+# Styling options
+
+# Optional: Minify the CSS, writing it as styles.min.css (default: false)
+# minify_css: false
+
+# Optional: Minify the JavaScript, writing it as theme.min.js (default: false)
+# If search is enabled, search.js is also minified as search.min.js.
+# minify_js: false
+
 # Optional: Additional stylesheets to include (can be URLs or relative paths)
 # extra_stylesheets:
 #   - https://example.com/custom.css
