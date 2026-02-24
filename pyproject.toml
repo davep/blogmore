@@ -27,6 +27,7 @@ dependencies = [
     "pygments>=2.18.0",
     "Pillow>=10.0.0",
     "rcssmin>=1.1.2",
+    "rjsmin>=1.2.5",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",

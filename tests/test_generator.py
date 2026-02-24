@@ -1566,3 +1566,179 @@ class TestMinifyCss:
         ).read_text(encoding="utf-8")
         assert "body" in minified_content
         assert "color" in minified_content
+
+
+class TestMinifyJs:
+    """Test the minify_js feature."""
+
+    def test_minify_js_false_by_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that JavaScript is not minified by default."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator.generate(include_drafts=False)
+
+        assert (temp_output_dir / "static" / "theme.js").exists()
+        assert not (temp_output_dir / "static" / "theme.min.js").exists()
+
+    def test_minify_js_generates_min_js(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that minify_js generates theme.min.js and not theme.js."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            minify_js=True,
+        )
+
+        generator.generate(include_drafts=False)
+
+        assert (temp_output_dir / "static" / "theme.min.js").exists()
+        assert not (temp_output_dir / "static" / "theme.js").exists()
+
+    def test_minify_js_produces_smaller_file(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that the minified JS file is smaller than the original."""
+        normal_output = tmp_path / "normal"
+        minified_output = tmp_path / "minified"
+
+        normal_generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=normal_output,
+        )
+        normal_generator.generate(include_drafts=False)
+
+        minified_generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=minified_output,
+            minify_js=True,
+        )
+        minified_generator.generate(include_drafts=False)
+
+        normal_size = (normal_output / "static" / "theme.js").stat().st_size
+        minified_size = (minified_output / "static" / "theme.min.js").stat().st_size
+        assert minified_size < normal_size
+
+    def test_minify_js_url_in_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that pages reference theme.min.js when minify_js is enabled."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            minify_js=True,
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert "/static/theme.min.js" in content
+        assert "/static/theme.js" not in content
+
+    def test_normal_js_url_in_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that pages reference theme.js when minify_js is disabled."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert "/static/theme.js" in content
+        assert "/static/theme.min.js" not in content
+
+    def test_minify_js_search_without_search_enabled(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that search.min.js is not generated when search is disabled."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            minify_js=True,
+            with_search=False,
+        )
+
+        generator.generate(include_drafts=False)
+
+        assert not (temp_output_dir / "static" / "search.min.js").exists()
+        assert not (temp_output_dir / "static" / "search.js").exists()
+
+    def test_minify_js_with_search_generates_min_search_js(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that search.min.js is generated when both minify_js and with_search are enabled."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            minify_js=True,
+            with_search=True,
+        )
+
+        generator.generate(include_drafts=False)
+
+        assert (temp_output_dir / "static" / "search.min.js").exists()
+        assert not (temp_output_dir / "static" / "search.js").exists()
+
+    def test_minify_js_search_url_in_search_page(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that search page references search.min.js when minify_js is enabled."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            minify_js=True,
+            with_search=True,
+        )
+
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "search.html").read_text()
+        assert "/static/search.min.js" in content
+        assert "/static/search.js" not in content
+
+    def test_minify_js_with_custom_templates(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that a custom theme.js is minified when minify_js is enabled."""
+        templates_dir = tmp_path / "templates"
+        static_dir = templates_dir / "static"
+        static_dir.mkdir(parents=True)
+        custom_js = static_dir / "theme.js"
+        custom_js.write_text(
+            "/* comment */ function hello() { return 'world'; }",
+            encoding="utf-8",
+        )
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=templates_dir,
+            output_dir=temp_output_dir,
+            minify_js=True,
+        )
+
+        generator.generate(include_drafts=False)
+
+        assert (temp_output_dir / "static" / "theme.min.js").exists()
+        assert not (temp_output_dir / "static" / "theme.js").exists()
+        minified_content = (
+            temp_output_dir / "static" / "theme.min.js"
+        ).read_text(encoding="utf-8")
+        assert "hello" in minified_content
+        assert "world" in minified_content

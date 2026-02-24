@@ -79,6 +79,7 @@ def main() -> int:
             with_search=args.with_search,
             with_sitemap=args.with_sitemap,
             minify_css=args.minify_css,
+            minify_js=args.minify_js,
         )
 
     # Handle build command (and its aliases: generate, gen)
@@ -127,6 +128,7 @@ def main() -> int:
                 with_search=args.with_search,
                 with_sitemap=args.with_sitemap,
                 minify_css=args.minify_css,
+                minify_js=args.minify_js,
             )
             generator.generate(include_drafts=args.include_drafts)
             return 0
@@ -181,6 +183,7 @@ def main() -> int:
                 with_search=args.with_search,
                 with_sitemap=args.with_sitemap,
                 minify_css=args.minify_css,
+                minify_js=args.minify_js,
             )
             generator.generate(include_drafts=args.include_drafts)
             print("Site built successfully")
@@ -257,6 +260,7 @@ def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
         "with_search": False,
         "with_sitemap": False,
         "minify_css": False,
+        "minify_js": False,
     }
 
     overrides = {}

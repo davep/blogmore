@@ -205,6 +205,16 @@ CSS minification is **disabled by default**. Pass this flag to opt in.
 blogmore build posts/ --minify-css
 ```
 
+#### `--minify-js`
+
+Minify the generated JavaScript and write it as `theme.min.js` instead of `theme.js`. If search is enabled (`--with-search`), `search.js` is also minified and written as `search.min.js`. The original unminified files are not written when this flag is set.
+
+JavaScript minification is **disabled by default**. Pass this flag to opt in.
+
+```bash
+blogmore build posts/ --minify-js
+```
+
 ### Examples
 
 Basic site generation:
@@ -286,6 +296,7 @@ The serve command also accepts all the build command options:
 - `--with-search`
 - `--with-sitemap`
 - `--minify-css`
+- `--minify-js`
 
 ### Examples
 
@@ -374,6 +385,7 @@ The publish command also accepts all the build command options:
 - `--with-search`
 - `--with-sitemap`
 - `--minify-css`
+- `--minify-js`
 
 ### How It Works
 

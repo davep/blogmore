@@ -1,5 +1,11 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+- Added optional JavaScript minification via the `--minify-js` command-line
+  switch or the `minify_js: true` configuration option.
+  ([#166](https://github.com/davep/blogmore/pull/166))
+
 ## v0.13.0
 
 **Released: 2026-02-23**
