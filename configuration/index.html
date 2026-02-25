@@ -893,6 +893,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#minify_js" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        minify_js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#extra_stylesheets" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1611,6 +1622,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#minify_js" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        minify_js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#extra_stylesheets" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2103,6 +2125,12 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <strong>Default:</strong> <code>false</code></p>
 <div class="highlight"><pre><span></span><code><span class="nt">minify_css</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
+<h4 id="minify_js"><code>minify_js</code></h4>
+<p>Minify the generated JavaScript and write it as <code>theme.min.js</code> instead of <code>theme.js</code>. If search is enabled, <code>search.js</code> is also minified and written as <code>search.min.js</code>. The original unminified files are not written when this option is enabled.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">minify_js</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
 <h4 id="extra_stylesheets"><code>extra_stylesheets</code></h4>
 <p>List of additional stylesheets to include. Can be absolute URLs or paths relative to your site root.</p>
 <p><strong>Type:</strong> List of strings (URLs or paths)<br />
@@ -2216,6 +2244,7 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 
 <span class="c1"># Styling</span>
 <span class="nt">minify_css</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">minify_js</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="nt">extra_stylesheets</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/assets/custom.css</span>

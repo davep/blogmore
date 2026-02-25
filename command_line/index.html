@@ -802,6 +802,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#-minify-js" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --minify-js
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1563,6 +1574,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#-minify-js" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --minify-js
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2058,6 +2080,11 @@ blogmore<span class="w"> </span>gen<span class="w"> </span>&lt;content_dir&gt;<s
 <p>CSS minification is <strong>disabled by default</strong>. Pass this flag to opt in.</p>
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--minify-css
 </code></pre></div>
+<h4 id="-minify-js"><code>--minify-js</code></h4>
+<p>Minify the generated JavaScript and write it as <code>theme.min.js</code> instead of <code>theme.js</code>. If search is enabled (<code>--with-search</code>), <code>search.js</code> is also minified and written as <code>search.min.js</code>. The original unminified files are not written when this flag is set.</p>
+<p>JavaScript minification is <strong>disabled by default</strong>. Pass this flag to opt in.</p>
+<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--minify-js
+</code></pre></div>
 <h3 id="examples">Examples</h3>
 <p>Basic site generation:
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/
@@ -2112,7 +2139,8 @@ blogmore<span class="w"> </span>serve
 - <code>--icon-source</code>
 - <code>--with-search</code>
 - <code>--with-sitemap</code>
-- <code>--minify-css</code></p>
+- <code>--minify-css</code>
+- <code>--minify-js</code></p>
 <h3 id="examples_1">Examples</h3>
 <p>Basic development server:
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>serve<span class="w"> </span>posts/
@@ -2171,7 +2199,8 @@ blogmore<span class="w"> </span>serve
 - <code>--icon-source</code>
 - <code>--with-search</code>
 - <code>--with-sitemap</code>
-- <code>--minify-css</code></p>
+- <code>--minify-css</code>
+- <code>--minify-js</code></p>
 <h3 id="how-it-works">How It Works</h3>
 <p>When you run <code>publish</code>, BlogMore:</p>
 <ol>
