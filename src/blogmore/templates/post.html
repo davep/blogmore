@@ -12,6 +12,11 @@
     {% include "meta_tags.html" %}
 {% endblock %}
 
+{% block extra_head %}
+    {% if prev_post %}<link rel="prev" href="{{ prev_post.url }}">{% endif %}
+    {% if next_post %}<link rel="next" href="{{ next_post.url }}">{% endif %}
+{% endblock %}
+
 {% block content %}
 <article class="post">
     {% if prev_post or next_post %}

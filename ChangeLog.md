@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Post pages that have previous and/or next post navigation now also include
+  `<link rel="prev">` and `<link rel="next">` tags in the `<head>` of the
+  generated HTML. ([#171](https://github.com/davep/blogmore/pull/171))
+
 ## v0.14.0
 
 **Released: 2026-02-24**
