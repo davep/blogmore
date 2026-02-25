@@ -1742,3 +1742,123 @@ class TestMinifyJs:
         ).read_text(encoding="utf-8")
         assert "hello" in minified_content
         assert "world" in minified_content
+
+
+class TestPrevNextHeadLinkTags:
+    """Test that prev/next link tags are correctly added to the head of post pages."""
+
+    def test_post_with_prev_and_next_has_head_link_tags(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a post with both prev and next navigation has link tags in head."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Create three posts so the middle one has both prev and next
+        (content_dir / "2024-01-01-oldest.md").write_text(
+            "---\ntitle: Oldest Post\ndate: 2024-01-01\n---\n\nOldest content."
+        )
+        (content_dir / "2024-01-15-middle.md").write_text(
+            "---\ntitle: Middle Post\ndate: 2024-01-15\n---\n\nMiddle content."
+        )
+        (content_dir / "2024-02-01-newest.md").write_text(
+            "---\ntitle: Newest Post\ndate: 2024-02-01\n---\n\nNewest content."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        middle_post_file = temp_output_dir / "2024" / "01" / "15" / "middle.html"
+        assert middle_post_file.exists()
+        content = middle_post_file.read_text()
+
+        # Middle post should have both prev (older) and next (newer) link tags in head
+        assert '<link rel="prev" href="/2024/01/01/oldest.html">' in content
+        assert '<link rel="next" href="/2024/02/01/newest.html">' in content
+
+    def test_oldest_post_has_only_next_head_link_tag(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the oldest post has only a next link tag in head (no prev)."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-01-oldest.md").write_text(
+            "---\ntitle: Oldest Post\ndate: 2024-01-01\n---\n\nOldest content."
+        )
+        (content_dir / "2024-02-01-newest.md").write_text(
+            "---\ntitle: Newest Post\ndate: 2024-02-01\n---\n\nNewest content."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        oldest_post_file = temp_output_dir / "2024" / "01" / "01" / "oldest.html"
+        assert oldest_post_file.exists()
+        content = oldest_post_file.read_text()
+
+        # Oldest post has no previous post, only a next link
+        assert 'rel="prev"' not in content
+        assert '<link rel="next" href="/2024/02/01/newest.html">' in content
+
+    def test_newest_post_has_only_prev_head_link_tag(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the newest post has only a prev link tag in head (no next)."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-01-oldest.md").write_text(
+            "---\ntitle: Oldest Post\ndate: 2024-01-01\n---\n\nOldest content."
+        )
+        (content_dir / "2024-02-01-newest.md").write_text(
+            "---\ntitle: Newest Post\ndate: 2024-02-01\n---\n\nNewest content."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        newest_post_file = temp_output_dir / "2024" / "02" / "01" / "newest.html"
+        assert newest_post_file.exists()
+        content = newest_post_file.read_text()
+
+        # Newest post has no next post, only a prev link
+        assert '<link rel="prev" href="/2024/01/01/oldest.html">' in content
+        assert 'rel="next"' not in content
+
+    def test_single_post_has_no_head_link_tags(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a lone post with no navigation has no prev/next link tags in head."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-01-only.md").write_text(
+            "---\ntitle: Only Post\ndate: 2024-01-01\n---\n\nOnly content."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        only_post_file = temp_output_dir / "2024" / "01" / "01" / "only.html"
+        assert only_post_file.exists()
+        content = only_post_file.read_text()
+
+        assert 'rel="prev"' not in content
+        assert 'rel="next"' not in content
