@@ -280,6 +280,18 @@ class SiteGenerator:
         context.update(self.sidebar_config)
         return context
 
+    def _canonical_url_for_path(self, output_path: Path) -> str:
+        """Compute the fully-qualified canonical URL for a given output file path.
+
+        Args:
+            output_path: Absolute path to the output file within the output directory.
+
+        Returns:
+            The fully-qualified canonical URL for the given file.
+        """
+        relative = output_path.relative_to(self.output_dir)
+        return f"{self.site_url}/{relative.as_posix()}"
+
     def generate(self, include_drafts: bool = False) -> None:
         """Generate the complete static site.
 
@@ -553,8 +565,6 @@ class SiteGenerator:
             context["prev_post"] = None
             context["next_post"] = None
 
-        html = self.renderer.render_post(post, **context)
-
         # Determine output path based on date
         if post.date:
             # Create year/month/day directory structure
@@ -573,17 +583,19 @@ class SiteGenerator:
             # Fallback for posts without dates
             output_path = self.output_dir / f"{post.slug}.html"
 
+        context["canonical_url"] = self._canonical_url_for_path(output_path)
+        html = self.renderer.render_post(post, **context)
         output_path.write_text(html, encoding="utf-8")
 
     def _generate_page(self, page: Page, pages: list[Page]) -> None:
         """Generate a single static page."""
         context = self._get_global_context()
         context["pages"] = pages
+        output_path = self.output_dir / f"{page.slug}.html"
+        context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_page(page, **context)
 
-        # Output to root of site
-        output_path = self.output_dir / f"{page.slug}.html"
         output_path.write_text(html, encoding="utf-8")
 
     def _generate_index_page(self, posts: list[Post], pages: list[Page]) -> None:
@@ -600,10 +612,6 @@ class SiteGenerator:
 
         # Generate each page
         for page_num, page_posts in enumerate(paginated_posts, start=1):
-            html = self.renderer.render_index(
-                page_posts, page=page_num, total_pages=total_pages, **context
-            )
-
             if page_num == 1:
                 # First page is at root
                 output_path = self.output_dir / "index.html"
@@ -613,16 +621,22 @@ class SiteGenerator:
                 page_dir.mkdir(exist_ok=True)
                 output_path = page_dir / f"{page_num}.html"
 
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
+            html = self.renderer.render_index(
+                page_posts, page=page_num, total_pages=total_pages, **context
+            )
+
             output_path.write_text(html, encoding="utf-8")
 
     def _generate_archive_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the archive page."""
         context = self._get_global_context()
         context["pages"] = pages
+        output_path = self.output_dir / "archive.html"
+        context["canonical_url"] = self._canonical_url_for_path(output_path)
         html = self.renderer.render_archive(
             posts, page=1, total_pages=1, base_path="/archive", **context
         )
-        output_path = self.output_dir / "archive.html"
         output_path.write_text(html, encoding="utf-8")
 
     def _generate_date_archives(self, posts: list[Post], pages: list[Page]) -> None:
@@ -659,15 +673,6 @@ class SiteGenerator:
                 # Base path for pagination links
                 base_path = f"/{year}"
 
-                html = self.renderer.render_archive(
-                    page_posts,
-                    archive_title=f"Posts from {year}",
-                    page=page_num,
-                    total_pages=total_pages,
-                    base_path=base_path,
-                    **context,
-                )
-
                 if page_num == 1:
                     # First page is at year/index.html
                     output_path = year_dir / "index.html"
@@ -676,6 +681,16 @@ class SiteGenerator:
                     page_dir = year_dir / "page"
                     page_dir.mkdir(exist_ok=True)
                     output_path = page_dir / f"{page_num}.html"
+
+                context["canonical_url"] = self._canonical_url_for_path(output_path)
+                html = self.renderer.render_archive(
+                    page_posts,
+                    archive_title=f"Posts from {year}",
+                    page=page_num,
+                    total_pages=total_pages,
+                    base_path=base_path,
+                    **context,
+                )
 
                 output_path.write_text(html, encoding="utf-8")
 
@@ -695,15 +710,6 @@ class SiteGenerator:
                 # Base path for pagination links
                 base_path = f"/{year}/{month:02d}"
 
-                html = self.renderer.render_archive(
-                    page_posts,
-                    archive_title=f"Posts from {month_name}",
-                    page=page_num,
-                    total_pages=total_pages,
-                    base_path=base_path,
-                    **context,
-                )
-
                 if page_num == 1:
                     # First page is at year/month/index.html
                     output_path = month_dir / "index.html"
@@ -712,6 +718,16 @@ class SiteGenerator:
                     page_dir = month_dir / "page"
                     page_dir.mkdir(exist_ok=True)
                     output_path = page_dir / f"{page_num}.html"
+
+                context["canonical_url"] = self._canonical_url_for_path(output_path)
+                html = self.renderer.render_archive(
+                    page_posts,
+                    archive_title=f"Posts from {month_name}",
+                    page=page_num,
+                    total_pages=total_pages,
+                    base_path=base_path,
+                    **context,
+                )
 
                 output_path.write_text(html, encoding="utf-8")
 
@@ -731,15 +747,6 @@ class SiteGenerator:
                 # Base path for pagination links
                 base_path = f"/{year}/{month:02d}/{day:02d}"
 
-                html = self.renderer.render_archive(
-                    page_posts,
-                    archive_title=f"Posts from {date_str}",
-                    page=page_num,
-                    total_pages=total_pages,
-                    base_path=base_path,
-                    **context,
-                )
-
                 if page_num == 1:
                     # First page is at year/month/day/index.html
                     output_path = day_dir / "index.html"
@@ -748,6 +755,16 @@ class SiteGenerator:
                     page_dir = day_dir / "page"
                     page_dir.mkdir(exist_ok=True)
                     output_path = page_dir / f"{page_num}.html"
+
+                context["canonical_url"] = self._canonical_url_for_path(output_path)
+                html = self.renderer.render_archive(
+                    page_posts,
+                    archive_title=f"Posts from {date_str}",
+                    page=page_num,
+                    total_pages=total_pages,
+                    base_path=base_path,
+                    **context,
+                )
 
                 output_path.write_text(html, encoding="utf-8")
 
@@ -786,15 +803,6 @@ class SiteGenerator:
 
             # Generate each page
             for page_num, page_posts in enumerate(paginated_posts, start=1):
-                html = self.renderer.render_tag_page(
-                    tag_display,  # Use display name for rendering
-                    page_posts,
-                    page=page_num,
-                    total_pages=total_pages,
-                    safe_tag=safe_tag,
-                    **context,
-                )
-
                 if page_num == 1:
                     # First page is at tag/{tag}.html
                     output_path = tag_dir / f"{safe_tag}.html"
@@ -803,6 +811,16 @@ class SiteGenerator:
                     tag_page_dir = tag_dir / safe_tag
                     tag_page_dir.mkdir(exist_ok=True)
                     output_path = tag_page_dir / f"{page_num}.html"
+
+                context["canonical_url"] = self._canonical_url_for_path(output_path)
+                html = self.renderer.render_tag_page(
+                    tag_display,  # Use display name for rendering
+                    page_posts,
+                    page=page_num,
+                    total_pages=total_pages,
+                    safe_tag=safe_tag,
+                    **context,
+                )
 
                 output_path.write_text(html, encoding="utf-8")
 
@@ -886,11 +904,11 @@ class SiteGenerator:
         # Render the tags page
         context = self._get_global_context()
         context["pages"] = pages
+        output_path = self.output_dir / "tags.html"
+        context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_tags_page(tag_data, **context)
 
-        # Output to root of site
-        output_path = self.output_dir / "tags.html"
         output_path.write_text(html, encoding="utf-8")
 
     def _generate_categories_page(self, posts: list[Post], pages: list[Page]) -> None:
@@ -954,11 +972,11 @@ class SiteGenerator:
         # Render the categories page
         context = self._get_global_context()
         context["pages"] = pages
+        output_path = self.output_dir / "categories.html"
+        context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_categories_page(category_data, **context)
 
-        # Output to root of site
-        output_path = self.output_dir / "categories.html"
         output_path.write_text(html, encoding="utf-8")
 
     def _generate_category_pages(self, posts: list[Post], pages: list[Page]) -> None:
@@ -1001,15 +1019,6 @@ class SiteGenerator:
 
             # Generate each page
             for page_num, page_posts in enumerate(paginated_posts, start=1):
-                html = self.renderer.render_category_page(
-                    category_display,  # Use display name for rendering
-                    page_posts,
-                    page=page_num,
-                    total_pages=total_pages,
-                    safe_category=safe_category,
-                    **context,
-                )
-
                 if page_num == 1:
                     # First page is at category/{category}.html
                     output_path = category_dir / f"{safe_category}.html"
@@ -1018,6 +1027,16 @@ class SiteGenerator:
                     category_page_dir = category_dir / safe_category
                     category_page_dir.mkdir(exist_ok=True)
                     output_path = category_page_dir / f"{page_num}.html"
+
+                context["canonical_url"] = self._canonical_url_for_path(output_path)
+                html = self.renderer.render_category_page(
+                    category_display,  # Use display name for rendering
+                    page_posts,
+                    page=page_num,
+                    total_pages=total_pages,
+                    safe_category=safe_category,
+                    **context,
+                )
 
                 output_path.write_text(html, encoding="utf-8")
 
@@ -1093,8 +1112,9 @@ class SiteGenerator:
         """
         context = self._get_global_context()
         context["pages"] = pages
-        html = self.renderer.render_search_page(**context)
         output_path = self.output_dir / "search.html"
+        context["canonical_url"] = self._canonical_url_for_path(output_path)
+        html = self.renderer.render_search_page(**context)
         output_path.write_text(html, encoding="utf-8")
 
     def _remove_stale_search_files(self) -> None:

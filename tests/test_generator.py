@@ -1862,3 +1862,257 @@ class TestPrevNextHeadLinkTags:
 
         assert 'rel="prev"' not in content
         assert 'rel="next"' not in content
+
+
+class TestCanonicalLinkTags:
+    """Test that canonical link tags are correctly added to the head of all pages."""
+
+    def test_post_page_has_canonical_link(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a post page includes the correct canonical link tag."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-my-post.md").write_text(
+            "---\ntitle: My Post\ndate: 2024-01-15\n---\n\nPost content."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_url="https://example.com",
+        )
+        generator.generate(include_drafts=False)
+
+        post_file = temp_output_dir / "2024" / "01" / "15" / "my-post.html"
+        assert post_file.exists()
+        content = post_file.read_text()
+
+        assert (
+            '<link rel="canonical" href="https://example.com/2024/01/15/my-post.html">'
+            in content
+        )
+
+    def test_static_page_has_canonical_link(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a static page includes the correct canonical link tag."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        pages_dir = content_dir / "pages"
+        pages_dir.mkdir()
+
+        (pages_dir / "about.md").write_text(
+            "---\ntitle: About\n---\n\nAbout content."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_url="https://example.com",
+        )
+        generator.generate(include_drafts=False)
+
+        page_file = temp_output_dir / "about.html"
+        assert page_file.exists()
+        content = page_file.read_text()
+
+        assert (
+            '<link rel="canonical" href="https://example.com/about.html">' in content
+        )
+
+    def test_index_page_has_canonical_link(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the index page includes the correct canonical link tag."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_url="https://example.com",
+        )
+        generator.generate(include_drafts=False)
+
+        index_file = temp_output_dir / "index.html"
+        assert index_file.exists()
+        content = index_file.read_text()
+
+        assert (
+            '<link rel="canonical" href="https://example.com/index.html">' in content
+        )
+
+    def test_archive_page_has_canonical_link(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the archive page includes the correct canonical link tag."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_url="https://example.com",
+        )
+        generator.generate(include_drafts=False)
+
+        archive_file = temp_output_dir / "archive.html"
+        assert archive_file.exists()
+        content = archive_file.read_text()
+
+        assert (
+            '<link rel="canonical" href="https://example.com/archive.html">' in content
+        )
+
+    def test_tags_page_has_canonical_link(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the tags overview page includes the correct canonical link tag."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-15\ntags: [python]\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_url="https://example.com",
+        )
+        generator.generate(include_drafts=False)
+
+        tags_file = temp_output_dir / "tags.html"
+        assert tags_file.exists()
+        content = tags_file.read_text()
+
+        assert (
+            '<link rel="canonical" href="https://example.com/tags.html">' in content
+        )
+
+    def test_tag_page_has_canonical_link(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that an individual tag page includes the correct canonical link tag."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-15\ntags: [python]\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_url="https://example.com",
+        )
+        generator.generate(include_drafts=False)
+
+        tag_file = temp_output_dir / "tag" / "python.html"
+        assert tag_file.exists()
+        content = tag_file.read_text()
+
+        assert (
+            '<link rel="canonical" href="https://example.com/tag/python.html">'
+            in content
+        )
+
+    def test_categories_page_has_canonical_link(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the categories overview page includes the correct canonical link tag."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-15\ncategory: Python\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_url="https://example.com",
+        )
+        generator.generate(include_drafts=False)
+
+        categories_file = temp_output_dir / "categories.html"
+        assert categories_file.exists()
+        content = categories_file.read_text()
+
+        assert (
+            '<link rel="canonical" href="https://example.com/categories.html">'
+            in content
+        )
+
+    def test_category_page_has_canonical_link(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that an individual category page includes the correct canonical link tag."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-15\ncategory: Python\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_url="https://example.com",
+        )
+        generator.generate(include_drafts=False)
+
+        category_file = temp_output_dir / "category" / "python.html"
+        assert category_file.exists()
+        content = category_file.read_text()
+
+        assert (
+            '<link rel="canonical" href="https://example.com/category/python.html">'
+            in content
+        )
+
+    def test_date_archive_page_has_canonical_link(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a date-based archive page includes the correct canonical link tag."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_url="https://example.com",
+        )
+        generator.generate(include_drafts=False)
+
+        year_archive_file = temp_output_dir / "2024" / "index.html"
+        assert year_archive_file.exists()
+        content = year_archive_file.read_text()
+
+        assert (
+            '<link rel="canonical" href="https://example.com/2024/index.html">'
+            in content
+        )

@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Every generated page now includes a `<link rel="canonical" href="...">`
+  tag in the `<head>`, pointing to the fully-qualified URL for that page.
+  ([#174](https://github.com/davep/blogmore/pull/174))
+
 ## v1.0.0
 
 **Released: 2026-02-25**
