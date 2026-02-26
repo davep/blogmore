@@ -827,7 +827,7 @@ class TestTemplateRenderer:
     def test_render_index_pagination_appears_at_top_and_bottom(
         self, sample_post: Post
     ) -> None:
-        """Test that pagination appears both before and after the post list."""
+        """Test that pagination appears both before and after the post list on pages beyond the first."""
         renderer = TemplateRenderer()
         html = renderer.render_index(
             posts=[sample_post],
@@ -836,8 +836,23 @@ class TestTemplateRenderer:
             site_title="Test Blog",
         )
 
-        # Pagination nav should appear twice (top and bottom)
+        # Pagination nav should appear twice (top and bottom) on page 2+
         assert html.count('class="pagination"') == 2
+
+    def test_render_index_pagination_only_at_bottom_on_page_one(
+        self, sample_post: Post
+    ) -> None:
+        """Test that pagination only appears at the bottom on page 1 of the index."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=1,
+            total_pages=3,
+            site_title="Test Blog",
+        )
+
+        # Pagination nav should appear only once (bottom only) on page 1
+        assert html.count('class="pagination"') == 1
 
     def test_render_index_no_pagination_for_single_page(
         self, sample_post: Post

@@ -45,7 +45,7 @@
 {% block content %}
 <div class="posts-list">
     <h1>Recent Posts</h1>
-    {{ pagination(page, total_pages, '/index.html', '/page/', '.html') }}
+    {% if page > 1 %}{{ pagination(page, total_pages, '/index.html', '/page/', '.html') }}{% endif %}
 
     {% if posts %}
     {% for post in posts %}
