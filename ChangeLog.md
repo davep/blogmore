@@ -1,6 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v1.2.0
+
+**Released: 2026-02-26**
 
 - Pagination navigation on archival pages (categories, tags, date archives,
   and the main index) has been improved: previous/next links are now styled
