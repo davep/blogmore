@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v1.1.0
 
-**Released: WiP**
+**Released: 2026-02-26**
 
 - Every generated page now includes a `<link rel="canonical" href="...">`
   tag in the `<head>`, pointing to the fully-qualified URL for that page.
