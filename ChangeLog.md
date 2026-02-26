@@ -9,6 +9,8 @@
   pagination is now displayed at both the top and bottom of each paginated
   page (the front page of the site excepted, which only shows it at the
   bottom). ([#177](https://github.com/davep/blogmore/pull/177))
+- Fixes pages appearing in the post history.
+  ([#180](https://github.com/davep/blogmore/pull/180))
 
 ## v1.1.0
 
