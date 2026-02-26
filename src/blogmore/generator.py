@@ -303,10 +303,17 @@ class SiteGenerator:
             print(f"Removing output directory: {self.output_dir}")
             shutil.rmtree(self.output_dir)
 
-        # Parse all posts
+        # Parse all pages from the pages subdirectory (must be done first so we
+        # can exclude them when scanning for posts)
+        pages_dir = self.content_dir / "pages"
+        pages = self.parser.parse_pages_directory(pages_dir)
+
+        # Parse all posts, excluding the pages subdirectory
         print(f"Parsing posts from {self.content_dir}...")
         posts = self.parser.parse_directory(
-            self.content_dir, include_drafts=include_drafts
+            self.content_dir,
+            include_drafts=include_drafts,
+            exclude_dirs=[pages_dir],
         )
         print(f"Found {len(posts)} posts")
 
@@ -315,10 +322,6 @@ class SiteGenerator:
             for post in posts:
                 if post.metadata is not None and "author" not in post.metadata:
                     post.metadata["author"] = self.default_author
-
-        # Parse all pages from the pages subdirectory
-        pages_dir = self.content_dir / "pages"
-        pages = self.parser.parse_pages_directory(pages_dir)
         if pages:
             print(f"Found {len(pages)} pages")
 

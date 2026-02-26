@@ -513,6 +513,33 @@ class TestPostParser:
         with pytest.raises(FileNotFoundError):
             parser.parse_directory(Path("nonexistent"))
 
+    def test_parse_directory_excludes_subdirectory(self, tmp_path: Path) -> None:
+        """Test that files in excluded subdirectories are not returned."""
+        parser = PostParser()
+
+        # Create a post in the root content directory
+        post_file = tmp_path / "my-post.md"
+        post_file.write_text(
+            "---\ntitle: Regular Post\ndate: 2024-01-01\n---\nContent"
+        )
+
+        # Create a page in the pages subdirectory (should be excluded)
+        pages_subdir = tmp_path / "pages"
+        pages_subdir.mkdir()
+        page_file = pages_subdir / "about.md"
+        page_file.write_text(
+            "---\ntitle: About Page\ndate: 2024-01-02\n---\nPage content"
+        )
+
+        posts_without_exclusion = parser.parse_directory(tmp_path)
+        assert len(posts_without_exclusion) == 2
+
+        posts_with_exclusion = parser.parse_directory(
+            tmp_path, exclude_dirs=[pages_subdir]
+        )
+        assert len(posts_with_exclusion) == 1
+        assert posts_with_exclusion[0].title == "Regular Post"
+
     def test_parse_page(self, pages_dir: Path) -> None:
         """Test parsing a static page."""
         parser = PostParser()

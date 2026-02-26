@@ -400,13 +400,17 @@ class PostParser:
         )
 
     def parse_directory(
-        self, directory: Path, include_drafts: bool = False
+        self,
+        directory: Path,
+        include_drafts: bool = False,
+        exclude_dirs: list[Path] | None = None,
     ) -> list[Post]:
         """Parse all markdown files in a directory.
 
         Args:
             directory: Directory containing markdown files
             include_drafts: Whether to include posts marked as drafts
+            exclude_dirs: Optional list of subdirectories to exclude from scanning
 
         Returns:
             List of Post objects sorted by date (newest first)
@@ -414,8 +418,15 @@ class PostParser:
         if not directory.exists():
             raise FileNotFoundError(f"Directory not found: {directory}")
 
+        resolved_exclude_dirs = [d.resolve() for d in (exclude_dirs or [])]
+
         posts = []
         for md_file in directory.rglob("*.md"):
+            if any(
+                md_file.resolve().is_relative_to(excluded)
+                for excluded in resolved_exclude_dirs
+            ):
+                continue
             try:
                 post = self.parse_file(md_file)
                 if not post.draft or include_drafts:

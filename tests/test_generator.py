@@ -294,6 +294,14 @@ class TestSiteGenerator:
         # Check that page was generated
         assert (temp_output_dir / "about.html").exists()
 
+        # Check that pages are not included in the main post listing.
+        # Pages appear in sidebar navigation (expected), but must NOT be rendered
+        # as post articles in index or archive views.
+        # The posts fixture has 7 non-draft posts; the 2 pages in pages_dir
+        # must not inflate this count to 9.
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert index_content.count('<article class="post-summary">') == 7
+
     def test_generate_excludes_drafts_by_default(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
