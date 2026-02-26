@@ -1,12 +1,17 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Every generated page now includes a `<link rel="canonical" href="...">`
+  tag in the `<head>`, pointing to the fully-qualified URL for that page.
+  ([#174](https://github.com/davep/blogmore/pull/174))
+
 ## v1.0.0
 
 **Released: 2026-02-25**
 
-- Every generated page now includes a `<link rel="canonical" href="...">` tag
-  in the `<head>`, pointing to the fully-qualified URL for that page.
-  ([#172](https://github.com/davep/blogmore/pull/172))
 - Post pages that have previous and/or next post navigation now also include
   `<link rel="prev">` and `<link rel="next">` tags in the `<head>` of the
   generated HTML. ([#171](https://github.com/davep/blogmore/pull/171))
