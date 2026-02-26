@@ -1,0 +1,45 @@
+{#
+    Reusable pagination navigation macro.
+
+    Parameters:
+        page (int): The current page number (1-based).
+        total_pages (int): The total number of pages.
+        page1_url (str): The URL for page 1 (often different from the numbered pattern).
+        page_n_url_prefix (str): The URL prefix for pages 2 and above (page number is appended).
+        page_n_url_suffix (str): The URL suffix for pages 2 and above (defaults to ".html").
+
+    Example usage (from a template):
+        {% from '_pagination.html' import pagination %}
+        {{ pagination(page, total_pages, '/index.html', '/page/', '.html') }}
+#}
+{% macro pagination(page, total_pages, page1_url, page_n_url_prefix, page_n_url_suffix=".html") %}
+{% if total_pages > 1 %}
+<nav class="pagination" aria-label="Page navigation">
+    {# Previous page link #}
+    {% if page > 1 %}
+    <a href="{% if page == 2 %}{{ page1_url }}{% else %}{{ page_n_url_prefix }}{{ page - 1 }}{{ page_n_url_suffix }}{% endif %}" class="pagination-link pagination-prev">← Previous</a>
+    {% endif %}
+
+    {# Numbered page links with ellipsis for large ranges #}
+    {% set ns = namespace(last_shown=0) %}
+    {% for i in range(1, total_pages + 1) %}
+        {% if i == 1 or i == total_pages or (i >= page - 2 and i <= page + 2) %}
+            {% if ns.last_shown > 0 and i > ns.last_shown + 1 %}
+    <span class="pagination-ellipsis">…</span>
+            {% endif %}
+            {% if i == page %}
+    <span class="pagination-link pagination-number pagination-current" aria-current="page">{{ i }}</span>
+            {% else %}
+    <a href="{% if i == 1 %}{{ page1_url }}{% else %}{{ page_n_url_prefix }}{{ i }}{{ page_n_url_suffix }}{% endif %}" class="pagination-link pagination-number">{{ i }}</a>
+            {% endif %}
+            {% set ns.last_shown = i %}
+        {% endif %}
+    {% endfor %}
+
+    {# Next page link #}
+    {% if page < total_pages %}
+    <a href="{{ page_n_url_prefix }}{{ page + 1 }}{{ page_n_url_suffix }}" class="pagination-link pagination-next">Next →</a>
+    {% endif %}
+</nav>
+{% endif %}
+{% endmacro %}

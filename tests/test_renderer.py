@@ -803,3 +803,183 @@ class TestTemplateRenderer:
         html = renderer.render_search_page(site_title="Test Blog")
 
         assert '<meta property="og:title" content="Search - Test Blog">' in html
+
+    def test_render_index_pagination_shows_numbered_links(
+        self, sample_post: Post
+    ) -> None:
+        """Test that index pagination shows numbered page links."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=3,
+            total_pages=5,
+            site_title="Test Blog",
+        )
+
+        # Should have numbered page links
+        assert 'class="pagination-link pagination-number' in html
+        # Current page should be marked
+        assert 'pagination-current' in html
+        # Should have prev and next links
+        assert 'pagination-prev' in html
+        assert 'pagination-next' in html
+
+    def test_render_index_pagination_appears_at_top_and_bottom(
+        self, sample_post: Post
+    ) -> None:
+        """Test that pagination appears both before and after the post list."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=2,
+            total_pages=3,
+            site_title="Test Blog",
+        )
+
+        # Pagination nav should appear twice (top and bottom)
+        assert html.count('class="pagination"') == 2
+
+    def test_render_index_no_pagination_for_single_page(
+        self, sample_post: Post
+    ) -> None:
+        """Test that pagination nav is not shown when there is only one page."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=1,
+            total_pages=1,
+            site_title="Test Blog",
+        )
+
+        assert 'class="pagination"' not in html
+
+    def test_render_index_pagination_prev_link_url(self, sample_post: Post) -> None:
+        """Test that the previous page link points to the correct URL."""
+        renderer = TemplateRenderer()
+        # Page 2 of 3: prev should be /index.html
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=2,
+            total_pages=3,
+            site_title="Test Blog",
+        )
+        assert 'href="/index.html"' in html
+
+        # Page 3 of 3: prev should be /page/2.html
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=3,
+            total_pages=3,
+            site_title="Test Blog",
+        )
+        assert 'href="/page/2.html"' in html
+
+    def test_render_index_pagination_next_link_url(self, sample_post: Post) -> None:
+        """Test that the next page link points to the correct URL."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=1,
+            total_pages=3,
+            site_title="Test Blog",
+        )
+        assert 'href="/page/2.html"' in html
+
+    def test_render_index_pagination_ellipsis_for_many_pages(
+        self, sample_post: Post
+    ) -> None:
+        """Test that ellipsis is shown when there are many pages."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=5,
+            total_pages=10,
+            site_title="Test Blog",
+        )
+
+        # Should have ellipsis between non-adjacent page groups
+        assert 'pagination-ellipsis' in html
+
+    def test_render_tag_page_pagination_appears_at_top_and_bottom(
+        self, sample_post: Post
+    ) -> None:
+        """Test that tag page pagination appears both before and after the post list."""
+        renderer = TemplateRenderer()
+        html = renderer.render_tag_page(
+            tag="python",
+            posts=[sample_post],
+            page=2,
+            total_pages=3,
+            site_title="Test Blog",
+            safe_tag="python",
+            tag_dir="tags",
+        )
+
+        assert html.count('class="pagination"') == 2
+
+    def test_render_category_page_pagination_appears_at_top_and_bottom(
+        self, sample_post: Post
+    ) -> None:
+        """Test that category page pagination appears both before and after the post list."""
+        renderer = TemplateRenderer()
+        html = renderer.render_category_page(
+            category="Python",
+            posts=[sample_post],
+            page=2,
+            total_pages=3,
+            site_title="Test Blog",
+            safe_category="python",
+            category_dir="category",
+        )
+
+        assert html.count('class="pagination"') == 2
+
+    def test_render_archive_pagination_appears_at_top_and_bottom(
+        self, sample_post: Post
+    ) -> None:
+        """Test that archive page pagination appears both before and after the post list."""
+        renderer = TemplateRenderer()
+        html = renderer.render_archive(
+            posts=[sample_post],
+            archive_title="Posts from 2024",
+            page=2,
+            total_pages=3,
+            site_title="Test Blog",
+            base_path="/2024",
+        )
+
+        assert html.count('class="pagination"') == 2
+
+    def test_render_tag_page_pagination_page_url(self, sample_post: Post) -> None:
+        """Test that tag page pagination uses the correct URL pattern."""
+        renderer = TemplateRenderer()
+        # Page 2 of 3: prev should be /tags/python.html (page 1)
+        html = renderer.render_tag_page(
+            tag="python",
+            posts=[sample_post],
+            page=2,
+            total_pages=3,
+            site_title="Test Blog",
+            safe_tag="python",
+            tag_dir="tags",
+        )
+        assert 'href="/tags/python.html"' in html  # page 1 URL
+        assert 'href="/tags/python/3.html"' in html  # page 3 URL
+
+    def test_render_category_page_pagination_page_url(
+        self, sample_post: Post
+    ) -> None:
+        """Test that category page pagination uses the correct URL pattern."""
+        renderer = TemplateRenderer()
+        # Page 2 of 3: prev should be /category/python.html (page 1)
+        html = renderer.render_category_page(
+            category="Python",
+            posts=[sample_post],
+            page=2,
+            total_pages=3,
+            site_title="Test Blog",
+            safe_category="python",
+            category_dir="category",
+        )
+        assert 'href="/category/python.html"' in html  # page 1 URL
+        assert 'href="/category/python/3.html"' in html  # page 3 URL

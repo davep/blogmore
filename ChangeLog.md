@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+- Pagination navigation on archival pages (categories, tags, date archives, and
+  the main index) has been improved: previous/next links are now styled as
+  buttons to match the rest of the site's navigation, numbered page links are
+  shown between them (with ellipsis for large page counts), and pagination is
+  now displayed at both the top and bottom of each paginated page.
+  ([#175](https://github.com/davep/blogmore/pull/175))
+
 ## v1.1.0
 
 **Released: 2026-02-26**

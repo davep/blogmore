@@ -40,10 +40,13 @@
 {% endif %}
 {% endblock %}
 
+{% from '_pagination.html' import pagination %}
+
 {% block content %}
 <div class="posts-list">
     <h1>Recent Posts</h1>
-    
+    {{ pagination(page, total_pages, '/index.html', '/page/', '.html') }}
+
     {% if posts %}
     {% for post in posts %}
     <article class="post-summary">
@@ -72,23 +75,7 @@
     {% else %}
     <p>No posts yet.</p>
     {% endif %}
-    
-    {% if total_pages > 1 %}
-    <nav class="pagination">
-        {% if page > 1 %}
-            {% if page == 2 %}
-                <a href="/index.html" class="pagination-prev">← Previous</a>
-            {% else %}
-                <a href="/page/{{ page - 1 }}.html" class="pagination-prev">← Previous</a>
-            {% endif %}
-        {% endif %}
-        
-        <span class="pagination-info">Page {{ page }} of {{ total_pages }}</span>
-        
-        {% if page < total_pages %}
-            <a href="/page/{{ page + 1 }}.html" class="pagination-next">Next →</a>
-        {% endif %}
-    </nav>
-    {% endif %}
+
+    {{ pagination(page, total_pages, '/index.html', '/page/', '.html') }}
 </div>
 {% endblock %}
