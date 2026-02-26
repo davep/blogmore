@@ -24,10 +24,13 @@
 {% endif %}
 {% endblock %}
 
+{% from '_pagination.html' import pagination %}
+
 {% block content %}
 <div class="category-page">
     <h1>Posts in category "{{ category }}"</h1>
-    
+    {{ pagination(page, total_pages, '/' ~ category_dir ~ '/' ~ safe_category ~ '.html', '/' ~ category_dir ~ '/' ~ safe_category ~ '/', '.html') }}
+
     {% if posts %}
     {% for post in posts %}
     <article class="post-summary">
@@ -51,23 +54,7 @@
     {% else %}
     <p>No posts in this category.</p>
     {% endif %}
-    
-    {% if total_pages > 1 %}
-    <nav class="pagination">
-        {% if page > 1 %}
-            {% if page == 2 %}
-                <a href="/{{ category_dir }}/{{ safe_category }}.html" class="pagination-prev">← Previous</a>
-            {% else %}
-                <a href="/{{ category_dir }}/{{ safe_category }}/{{ page - 1 }}.html" class="pagination-prev">← Previous</a>
-            {% endif %}
-        {% endif %}
-        
-        <span class="pagination-info">Page {{ page }} of {{ total_pages }}</span>
-        
-        {% if page < total_pages %}
-            <a href="/{{ category_dir }}/{{ safe_category }}/{{ page + 1 }}.html" class="pagination-next">Next →</a>
-        {% endif %}
-    </nav>
-    {% endif %}
+
+    {{ pagination(page, total_pages, '/' ~ category_dir ~ '/' ~ safe_category ~ '.html', '/' ~ category_dir ~ '/' ~ safe_category ~ '/', '.html') }}
 </div>
 {% endblock %}

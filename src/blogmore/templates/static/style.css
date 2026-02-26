@@ -533,6 +533,76 @@ time a:visited {
     }
 }
 
+/* Pagination navigation (archive, category, tag, index pages) */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.pagination-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    background: var(--tag-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 0.85em;
+    transition: all 0.2s ease;
+    min-width: 2.5em;
+}
+
+.pagination-link:hover {
+    background: var(--tag-hover-bg);
+    border-color: var(--hover-color);
+    color: var(--hover-color);
+    transform: translateY(-1px);
+}
+
+.pagination-prev,
+.pagination-next {
+    min-width: auto;
+    padding: 8px 16px;
+}
+
+.pagination-current {
+    background: var(--hover-color);
+    border-color: var(--hover-color);
+    color: var(--bg-color);
+    font-weight: 600;
+    cursor: default;
+    pointer-events: none;
+}
+
+.pagination-current:hover {
+    transform: none;
+}
+
+.pagination-ellipsis {
+    color: var(--text-secondary);
+    padding: 0 4px;
+    font-size: 0.85em;
+}
+
+@media (max-width: 768px) {
+    .pagination-link {
+        padding: 6px 10px;
+        font-size: 0.8em;
+        min-width: 2em;
+    }
+
+    .pagination-prev,
+    .pagination-next {
+        padding: 6px 12px;
+    }
+}
+
 .post-content {
     font-size: 1.05em;
 }

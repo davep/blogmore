@@ -14,10 +14,13 @@
 {% endif %}
 {% endblock %}
 
+{% from '_pagination.html' import pagination %}
+
 {% block content %}
 <div class="archive">
     <h1>{% if archive_title %}{{ archive_title }}{% else %}Archive{% endif %}</h1>
-    
+    {{ pagination(page, total_pages, base_path ~ '/index.html', base_path ~ '/page/', '.html') }}
+
     {% if posts %}
     {% if archive_title %}
     {# Date-based archive pages (year/month) - show full post content #}
@@ -102,23 +105,7 @@
     {% else %}
     <p>No posts yet.</p>
     {% endif %}
-    
-    {% if total_pages > 1 %}
-    <nav class="pagination">
-        {% if page > 1 %}
-            {% if page == 2 %}
-                <a href="{{ base_path }}/index.html" class="pagination-prev">← Previous</a>
-            {% else %}
-                <a href="{{ base_path }}/page/{{ page - 1 }}.html" class="pagination-prev">← Previous</a>
-            {% endif %}
-        {% endif %}
-        
-        <span class="pagination-info">Page {{ page }} of {{ total_pages }}</span>
-        
-        {% if page < total_pages %}
-            <a href="{{ base_path }}/page/{{ page + 1 }}.html" class="pagination-next">Next →</a>
-        {% endif %}
-    </nav>
-    {% endif %}
+
+    {{ pagination(page, total_pages, base_path ~ '/index.html', base_path ~ '/page/', '.html') }}
 </div>
 {% endblock %}
