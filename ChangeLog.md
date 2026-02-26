@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Paginated listing pages (the main index, category pages, tag pages, and
+  date-based archive pages) now include `<link rel="prev" href="...">` and
+  `<link rel="next" href="...">` tags in the `<head>` where appropriate,
+  helping search engines understand the pagination structure.
+  ([#182](https://github.com/davep/blogmore/pull/182))
 - Pagination navigation on archival pages (categories, tags, date archives,
   and the main index) has been improved: previous/next links are now styled
   as buttons to match the rest of the site's navigation, numbered page links

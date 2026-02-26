@@ -48,6 +48,8 @@
     {% endblock %}
     {% block meta_tags %}{% endblock %}
     <script src="{{ theme_js_url }}"></script>
+    {% if prev_page_url %}<link rel="prev" href="{{ prev_page_url }}">{% endif %}
+    {% if next_page_url %}<link rel="next" href="{{ next_page_url }}">{% endif %}
     {% block extra_head %}{% endblock %}
 </head>
 <body>
