@@ -280,6 +280,42 @@ class SiteGenerator:
         context.update(self.sidebar_config)
         return context
 
+    @staticmethod
+    def _compute_pagination_urls(
+        page_num: int,
+        total_pages: int,
+        page1_url: str,
+        page_n_url_prefix: str,
+        page_n_url_suffix: str = ".html",
+    ) -> tuple[str | None, str | None]:
+        """Compute the previous and next page URLs for a paginated page.
+
+        Args:
+            page_num: The current page number (1-based).
+            total_pages: The total number of pages.
+            page1_url: The URL for page 1.
+            page_n_url_prefix: The URL prefix for pages 2 and above (page number appended).
+            page_n_url_suffix: The URL suffix for pages 2 and above.
+
+        Returns:
+            A tuple of (prev_url, next_url) where each is None if there is no
+            previous or next page respectively.
+        """
+        prev_url: str | None = None
+        next_url: str | None = None
+
+        if page_num > 1:
+            prev_url = (
+                page1_url
+                if page_num == 2
+                else f"{page_n_url_prefix}{page_num - 1}{page_n_url_suffix}"
+            )
+
+        if page_num < total_pages:
+            next_url = f"{page_n_url_prefix}{page_num + 1}{page_n_url_suffix}"
+
+        return prev_url, next_url
+
     def _canonical_url_for_path(self, output_path: Path) -> str:
         """Compute the fully-qualified canonical URL for a given output file path.
 
@@ -625,6 +661,11 @@ class SiteGenerator:
                 output_path = page_dir / f"{page_num}.html"
 
             context["canonical_url"] = self._canonical_url_for_path(output_path)
+            prev_url, next_url = self._compute_pagination_urls(
+                page_num, total_pages, "/index.html", "/page/", ".html"
+            )
+            context["prev_page_url"] = prev_url
+            context["next_page_url"] = next_url
             html = self.renderer.render_index(
                 page_posts, page=page_num, total_pages=total_pages, **context
             )
@@ -686,6 +727,15 @@ class SiteGenerator:
                     output_path = page_dir / f"{page_num}.html"
 
                 context["canonical_url"] = self._canonical_url_for_path(output_path)
+                prev_url, next_url = self._compute_pagination_urls(
+                    page_num,
+                    total_pages,
+                    f"{base_path}/index.html",
+                    f"{base_path}/page/",
+                    ".html",
+                )
+                context["prev_page_url"] = prev_url
+                context["next_page_url"] = next_url
                 html = self.renderer.render_archive(
                     page_posts,
                     archive_title=f"Posts from {year}",
@@ -723,6 +773,15 @@ class SiteGenerator:
                     output_path = page_dir / f"{page_num}.html"
 
                 context["canonical_url"] = self._canonical_url_for_path(output_path)
+                prev_url, next_url = self._compute_pagination_urls(
+                    page_num,
+                    total_pages,
+                    f"{base_path}/index.html",
+                    f"{base_path}/page/",
+                    ".html",
+                )
+                context["prev_page_url"] = prev_url
+                context["next_page_url"] = next_url
                 html = self.renderer.render_archive(
                     page_posts,
                     archive_title=f"Posts from {month_name}",
@@ -760,6 +819,15 @@ class SiteGenerator:
                     output_path = page_dir / f"{page_num}.html"
 
                 context["canonical_url"] = self._canonical_url_for_path(output_path)
+                prev_url, next_url = self._compute_pagination_urls(
+                    page_num,
+                    total_pages,
+                    f"{base_path}/index.html",
+                    f"{base_path}/page/",
+                    ".html",
+                )
+                context["prev_page_url"] = prev_url
+                context["next_page_url"] = next_url
                 html = self.renderer.render_archive(
                     page_posts,
                     archive_title=f"Posts from {date_str}",
@@ -816,6 +884,15 @@ class SiteGenerator:
                     output_path = tag_page_dir / f"{page_num}.html"
 
                 context["canonical_url"] = self._canonical_url_for_path(output_path)
+                prev_url, next_url = self._compute_pagination_urls(
+                    page_num,
+                    total_pages,
+                    f"/{self.TAG_DIR}/{safe_tag}.html",
+                    f"/{self.TAG_DIR}/{safe_tag}/",
+                    ".html",
+                )
+                context["prev_page_url"] = prev_url
+                context["next_page_url"] = next_url
                 html = self.renderer.render_tag_page(
                     tag_display,  # Use display name for rendering
                     page_posts,
@@ -1032,6 +1109,15 @@ class SiteGenerator:
                     output_path = category_page_dir / f"{page_num}.html"
 
                 context["canonical_url"] = self._canonical_url_for_path(output_path)
+                prev_url, next_url = self._compute_pagination_urls(
+                    page_num,
+                    total_pages,
+                    f"/{self.CATEGORY_DIR}/{safe_category}.html",
+                    f"/{self.CATEGORY_DIR}/{safe_category}/",
+                    ".html",
+                )
+                context["prev_page_url"] = prev_url
+                context["next_page_url"] = next_url
                 html = self.renderer.render_category_page(
                     category_display,  # Use display name for rendering
                     page_posts,

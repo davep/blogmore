@@ -1872,6 +1872,249 @@ class TestPrevNextHeadLinkTags:
         assert 'rel="next"' not in content
 
 
+class TestPaginationHeadLinkTags:
+    """Test that prev/next link tags are added to the head of paginated listing pages."""
+
+    def test_index_page_2_has_prev_link_tag(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that index page 2 has a prev link pointing to page 1."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Create 11 posts to trigger a second index page
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent {i}."
+            )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        page2_file = temp_output_dir / "page" / "2.html"
+        assert page2_file.exists()
+        content = page2_file.read_text()
+
+        assert '<link rel="prev" href="/index.html">' in content
+        assert 'rel="next"' not in content
+
+    def test_index_page_1_has_next_link_tag(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that index page 1 has a next link pointing to page 2 when there are multiple pages."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent {i}."
+            )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        index_file = temp_output_dir / "index.html"
+        assert index_file.exists()
+        content = index_file.read_text()
+
+        assert 'rel="prev"' not in content
+        assert '<link rel="next" href="/page/2.html">' in content
+
+    def test_index_middle_page_has_both_link_tags(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that an index middle page has both prev and next link tags."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Create 21 posts to trigger three index pages
+        for i in range(1, 22):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent {i}."
+            )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        page2_file = temp_output_dir / "page" / "2.html"
+        assert page2_file.exists()
+        content = page2_file.read_text()
+
+        assert '<link rel="prev" href="/index.html">' in content
+        assert '<link rel="next" href="/page/3.html">' in content
+
+    def test_tag_page_2_has_prev_link_tag(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that tag page 2 has a prev link pointing to tag page 1."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\ntags: [python]\n---\n\nContent {i}."
+            )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        tag_page2_file = temp_output_dir / "tag" / "python" / "2.html"
+        assert tag_page2_file.exists()
+        content = tag_page2_file.read_text()
+
+        assert '<link rel="prev" href="/tag/python.html">' in content
+        assert 'rel="next"' not in content
+
+    def test_tag_page_1_has_next_link_tag(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that tag page 1 has a next link when there are multiple pages."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\ntags: [python]\n---\n\nContent {i}."
+            )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        tag_page1_file = temp_output_dir / "tag" / "python.html"
+        assert tag_page1_file.exists()
+        content = tag_page1_file.read_text()
+
+        assert 'rel="prev"' not in content
+        assert '<link rel="next" href="/tag/python/2.html">' in content
+
+    def test_category_page_2_has_prev_link_tag(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that category page 2 has a prev link pointing to category page 1."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\ncategory: Tech\n---\n\nContent {i}."
+            )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        cat_page2_file = temp_output_dir / "category" / "tech" / "2.html"
+        assert cat_page2_file.exists()
+        content = cat_page2_file.read_text()
+
+        assert '<link rel="prev" href="/category/tech.html">' in content
+        assert 'rel="next"' not in content
+
+    def test_category_page_1_has_next_link_tag(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that category page 1 has a next link when there are multiple pages."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\ncategory: Tech\n---\n\nContent {i}."
+            )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        cat_page1_file = temp_output_dir / "category" / "tech.html"
+        assert cat_page1_file.exists()
+        content = cat_page1_file.read_text()
+
+        assert 'rel="prev"' not in content
+        assert '<link rel="next" href="/category/tech/2.html">' in content
+
+    def test_year_archive_page_2_has_prev_link_tag(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that year archive page 2 has a prev link pointing to page 1."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Create 11 posts all in the same year to trigger pagination
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent {i}."
+            )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        year_page2_file = temp_output_dir / "2024" / "page" / "2.html"
+        assert year_page2_file.exists()
+        content = year_page2_file.read_text()
+
+        assert '<link rel="prev" href="/2024/index.html">' in content
+        assert 'rel="next"' not in content
+
+    def test_single_page_listing_has_no_pagination_link_tags(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a single-page listing has no prev/next link tags in head."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-01-only.md").write_text(
+            "---\ntitle: Only Post\ndate: 2024-01-01\ntags: [python]\ncategory: Tech\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        index_file = temp_output_dir / "index.html"
+        tag_page = temp_output_dir / "tag" / "python.html"
+        cat_page = temp_output_dir / "category" / "tech.html"
+
+        for page_file in (index_file, tag_page, cat_page):
+            assert page_file.exists()
+            content = page_file.read_text()
+            assert 'rel="prev"' not in content
+            assert 'rel="next"' not in content
+
+
 class TestCanonicalLinkTags:
     """Test that canonical link tags are correctly added to the head of all pages."""
 

@@ -11,6 +11,10 @@
   bottom). ([#177](https://github.com/davep/blogmore/pull/177))
 - Fixes pages appearing in the post history.
   ([#180](https://github.com/davep/blogmore/pull/180))
+- Paginated listing pages (the main index, category pages, tag pages, and
+  date-based archive pages) now include `<link rel="prev" href="...">` and
+  `<link rel="next" href="...">` tags in the `<head>` where appropriate.
+  ([#181](https://github.com/davep/blogmore/pull/181))
 
 ## v1.1.0
 
