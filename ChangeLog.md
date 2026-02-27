@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Made cosmetic changes to the categories and tags pages to make the clouds
+  look a bit more compact.
+  ([#184](https://github.com/davep/blogmore/pull/184))
+
 ## v1.2.0
 
 **Released: 2026-02-26**
