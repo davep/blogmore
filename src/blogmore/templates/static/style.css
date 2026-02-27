@@ -1181,18 +1181,19 @@ footer a:hover {
 :root[data-theme="dark"] .highlight .il { color: #ae81ff } /* Literal.Number.Integer.Long */
 
 /* Tags page styles */
-.tags-page h1 {
-    margin-bottom: 30px;
+.tags-page h1,
+.categories-page h1 {
+    margin-bottom: 20px;
 }
 
 .tag-cloud {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 8px 12px;
     align-items: baseline;
     justify-content: flex-start;
-    line-height: 2;
-    margin: 30px 0;
+    line-height: 1.4;
+    margin: 20px 0;
 }
 
 .tag-cloud-item {
