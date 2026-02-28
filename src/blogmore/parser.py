@@ -158,6 +158,13 @@ class Post:
             return [sanitize_for_url(tag) for tag in self.tags]
         return []
 
+    def sorted_tag_pairs(self) -> list[tuple[str, str]]:
+        """Get tags as (display, safe) pairs sorted in casefold alphabetical order."""
+        if not self.tags:
+            return []
+        pairs = [(tag, sanitize_for_url(tag)) for tag in self.tags]
+        return sorted(pairs, key=lambda pair: pair[0].casefold())
+
     @property
     def description(self) -> str:
         """Get the description for the post.

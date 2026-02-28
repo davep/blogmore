@@ -4,6 +4,9 @@
 
 **Released: WiP**
 
+- Tags are now displayed in casefold alphabetical order wherever a list of
+  tags is shown (post pages, index, archive, category, and tag pages).
+  ([#189](https://github.com/davep/blogmore/pull/189))
 - Fixed a `publish` failure when working across multiple machines: the
   publish branch is now fetched from remote before use, so a local branch
   that is behind its remote counterpart no longer causes a non-fast-forward

@@ -201,7 +201,45 @@ class TestPost:
         )
         assert post.safe_tags() == ["c", "web-dev"]
 
-    def test_description_from_metadata(self) -> None:
+    def test_sorted_tag_pairs(self) -> None:
+        """Test sorted_tag_pairs returns (display, safe) pairs in casefold order."""
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content="Test",
+            html_content="<p>Test</p>",
+            tags=["Zebra", "apple", "Mango"],
+        )
+        assert post.sorted_tag_pairs() == [
+            ("apple", "apple"),
+            ("Mango", "mango"),
+            ("Zebra", "zebra"),
+        ]
+
+    def test_sorted_tag_pairs_empty(self) -> None:
+        """Test sorted_tag_pairs with no tags."""
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content="Test",
+            html_content="<p>Test</p>",
+            tags=None,
+        )
+        assert post.sorted_tag_pairs() == []
+
+    def test_sorted_tag_pairs_case_insensitive(self) -> None:
+        """Test sorted_tag_pairs uses casefold for sorting."""
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content="Test",
+            html_content="<p>Test</p>",
+            tags=["Beta", "alpha", "Gamma"],
+        )
+        result = post.sorted_tag_pairs()
+        assert [display for display, _ in result] == ["alpha", "Beta", "Gamma"]
+
+
         """Test that description from metadata is used when present."""
         post = Post(
             path=Path("test.md"),
