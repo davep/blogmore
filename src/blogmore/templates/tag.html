@@ -39,8 +39,8 @@
         </div>
         {% if post.tags %}
         <div class="tags">
-            {% for tag in post.tags %}
-            <a href="/{{ tag_dir }}/{{ post.safe_tags()[loop.index0] }}.html" class="tag">{{ tag }}</a>
+            {% for tag, safe_tag in post.sorted_tag_pairs() %}
+            <a href="/{{ tag_dir }}/{{ safe_tag }}.html" class="tag">{{ tag }}</a>
             {% endfor %}
         </div>
         {% endif %}
