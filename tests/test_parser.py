@@ -128,6 +128,19 @@ class TestExtractFirstParagraph:
         content = "![Image 1](img1.jpg)\n![Image 2](img2.jpg)\n\nFirst paragraph here."
         assert extract_first_paragraph(content) == "First paragraph here."
 
+    def test_skip_linked_image(self) -> None:
+        """Test that a markdown image wrapped in a link is skipped."""
+        content = "[![Alt text](image.jpg)](https://example.com/)\n\nThis is the first paragraph."
+        assert extract_first_paragraph(content) == "This is the first paragraph."
+
+    def test_paragraph_after_linked_image(self) -> None:
+        """Test extracting paragraph after a linked image (image that is also a link)."""
+        content = (
+            "[![Banner](/img/banner.png)](https://example.com/)\n\n"
+            "I've just released v1.1.0 of my app."
+        )
+        assert extract_first_paragraph(content) == "I've just released v1.1.0 of my app."
+
     def test_code_block_stops_extraction(self) -> None:
         """Test that code blocks stop extraction if we have content."""
         content = "First paragraph.\n\n```python\ncode here\n```"
