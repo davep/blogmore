@@ -84,11 +84,13 @@ def publish_site(
     1. Checks that git is available
     2. Checks that we're in a git repository
     3. Uses a temporary git worktree to prepare the branch
-    4. Copies only the output directory contents to the worktree
-    5. Ensures a .nojekyll file exists in the root (for GitHub Pages)
-    6. Commits the changes
-    7. Pushes to the remote
-    8. Cleans up the worktree
+    4. If the branch exists locally, fetches from remote to ensure it is
+       up-to-date (handles multi-machine publishing scenarios)
+    5. Copies only the output directory contents to the worktree
+    6. Ensures a .nojekyll file exists in the root (for GitHub Pages)
+    7. Commits the changes
+    8. Pushes to the remote
+    9. Cleans up the worktree
 
     Args:
         output_dir: Directory containing the generated site
@@ -168,6 +170,19 @@ def publish_site(
                 )
                 print(f"Fetched existing branch '{branch}' from remote")
                 branch_exists_locally = True
+        else:
+            # Branch exists locally - fetch from remote to ensure it is
+            # up-to-date. This handles the multi-machine publishing scenario
+            # where another machine has already published newer content; without
+            # this step the subsequent push would be rejected as non-fast-forward.
+            fetch_result = subprocess.run(
+                ["git", "fetch", remote, f"+{branch}:{branch}"],
+                cwd=git_root,
+                capture_output=True,
+                check=False,
+            )
+            if fetch_result.returncode == 0:
+                print(f"Fetched latest '{branch}' from remote")
 
         if branch_exists_locally:
             # Create worktree from existing branch

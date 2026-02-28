@@ -614,3 +614,92 @@ class TestPublishSite:
             f"git commit (index {commit_index}) should occur before "
             f"git push (index {push_index})"
         )
+
+    @patch("blogmore.publisher.subprocess.run")
+    @patch("blogmore.publisher.shutil.rmtree")
+    @patch("blogmore.publisher.shutil.copy2")
+    @patch("blogmore.publisher.shutil.copytree")
+    @patch("blogmore.publisher.tempfile.mkdtemp")
+    @patch("blogmore.publisher.check_git_available", return_value=True)
+    @patch("blogmore.publisher.check_is_git_repository", return_value=True)
+    @patch("blogmore.publisher.get_git_root")
+    def test_publish_site_fetches_before_push_when_branch_exists_locally(
+        self,
+        mock_get_git_root: MagicMock,
+        mock_check_is_git_repository: MagicMock,
+        mock_check_git_available: MagicMock,
+        mock_mkdtemp: MagicMock,
+        mock_copytree: MagicMock,
+        mock_copy2: MagicMock,
+        mock_rmtree: MagicMock,
+        mock_run: MagicMock,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        """Test that remote is fetched before push when branch already exists locally.
+
+        This covers the multi-machine publishing scenario: if another machine
+        has already published newer content, the local branch will be behind
+        the remote. Without fetching first, the push would be rejected as
+        non-fast-forward.
+        """
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+        (output_dir / "index.html").write_text("<html></html>")
+
+        git_root = tmp_path / "repo"
+        git_root.mkdir()
+        mock_get_git_root.return_value = git_root
+
+        worktree_path = tmp_path / "worktree"
+        worktree_path.mkdir()
+        mock_mkdtemp.return_value = str(worktree_path)
+
+        git_commands: list[list[str]] = []
+
+        def run_side_effect(*args: object, **kwargs: object) -> MagicMock:
+            cmd = args[0] if args else []
+            if not isinstance(cmd, list):
+                return MagicMock(returncode=0, stdout="")
+
+            if cmd[0] == "git":
+                git_commands.append(cmd)
+
+            if cmd[:3] == ["git", "rev-parse", "--verify"]:
+                # Branch exists locally (simulating multi-machine scenario)
+                return MagicMock(returncode=0, stdout="abc123")
+            elif cmd[:2] == ["git", "diff"]:
+                # There are changes
+                return MagicMock(returncode=1, stdout="")
+            else:
+                return MagicMock(returncode=0, stdout="")
+
+        mock_run.side_effect = run_side_effect
+
+        publish_site(output_dir, branch="gh-pages", remote="origin")
+
+        # Verify that git fetch was called to update the local branch from remote
+        fetch_calls = [
+            cmd for cmd in git_commands if cmd[:2] == ["git", "fetch"]
+        ]
+        assert fetch_calls, "git fetch should be called when branch exists locally"
+        # The fetch must use force (+) to handle non-fast-forward remote updates
+        assert any(
+            "+gh-pages:gh-pages" in cmd or "+gh-pages:gh-pages" in " ".join(cmd)
+            for cmd in fetch_calls
+        ), "git fetch should use force refspec (+branch:branch)"
+
+        # Verify fetch happens before push
+        fetch_index = next(
+            i for i, cmd in enumerate(git_commands) if cmd[:2] == ["git", "fetch"]
+        )
+        push_index = next(
+            i for i, cmd in enumerate(git_commands) if cmd[:2] == ["git", "push"]
+        )
+        assert fetch_index < push_index, (
+            f"git fetch (index {fetch_index}) should occur before "
+            f"git push (index {push_index})"
+        )
+
+        captured = capsys.readouterr()
+        assert "Fetched latest 'gh-pages' from remote" in captured.out
