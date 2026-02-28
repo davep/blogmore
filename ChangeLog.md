@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v1.3.0
 
-**Released: WiP**
+**Released: 2026-02-28**
 
 - Made cosmetic changes to the categories and tags pages to make the clouds
   look a bit more compact.
