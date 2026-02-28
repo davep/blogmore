@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+- Fixed a `publish` failure when working across multiple machines: the
+  publish branch is now fetched from remote before use, so a local branch
+  that is behind its remote counterpart no longer causes a
+  non-fast-forward push error.
+  ([#186](https://github.com/davep/blogmore/pull/186))
+
 ## v1.3.0
 
 **Released: 2026-02-28**
