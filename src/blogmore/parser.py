@@ -74,6 +74,10 @@ def extract_first_paragraph(content: str) -> str:
         if stripped.startswith("!["):
             continue
 
+        # Skip markdown linked image syntax ([![alt](img)](url))
+        if stripped.startswith("[!["):
+            continue
+
         # Skip HTML img tags
         if stripped.startswith("<img"):
             continue

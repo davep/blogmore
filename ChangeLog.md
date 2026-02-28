@@ -11,6 +11,10 @@
 - Tags are now displayed in casefold alphabetical order wherever a list of
   tags is shown (post pages, index, archive, category, and tag pages).
   ([#189](https://github.com/davep/blogmore/pull/189))
+- Fixed the default description finder not skipping images that are also
+  links (i.e. `[![alt](img)](url)` syntax), so posts starting with a linked
+  banner image now correctly use the first text paragraph as the description.
+  ([#190](https://github.com/davep/blogmore/pull/190))
 
 ## v1.3.0
 
