@@ -14,6 +14,15 @@ from blogmore.admonitions import AdmonitionsExtension
 from blogmore.external_links import ExternalLinksExtension
 from blogmore.utils import calculate_reading_time
 
+_DATE_FORMATS = [
+    "%Y-%m-%d %H:%M:%S %z",
+    "%Y-%m-%d %H:%M:%S%z",
+    "%Y-%m-%dT%H:%M:%S%z",
+    "%Y-%m-%d %H:%M:%S",
+    "%Y-%m-%dT%H:%M:%S",
+    "%Y-%m-%d",
+]
+
 
 def sanitize_for_url(value: str) -> str:
     """Sanitize a string for safe use in URLs and filenames.
@@ -70,24 +79,12 @@ def extract_first_paragraph(content: str) -> str:
         if not in_paragraph and not stripped:
             continue
 
-        # Skip markdown image syntax
-        if stripped.startswith("!["):
-            continue
-
-        # Skip markdown linked image syntax ([![alt](img)](url))
-        if stripped.startswith("[!["):
-            continue
-
-        # Skip HTML img tags
-        if stripped.startswith("<img"):
+        # Skip image syntax (markdown images, linked images, and HTML img tags)
+        if stripped.startswith(("![", "[![", "<img")):
             continue
 
         # If we hit a heading, code block, or other special syntax, stop if we have content
-        if (
-            stripped.startswith("#")
-            or stripped.startswith("```")
-            or stripped.startswith("---")
-        ):
+        if stripped.startswith(("#", "```", "---")):
             if paragraph_lines:
                 break
             continue
@@ -213,15 +210,7 @@ class Post:
         if isinstance(modified, dt.date):
             return dt.datetime.combine(modified, dt.time())
         if isinstance(modified, str):
-            date_formats = [
-                "%Y-%m-%d %H:%M:%S %z",
-                "%Y-%m-%d %H:%M:%S%z",
-                "%Y-%m-%dT%H:%M:%S%z",
-                "%Y-%m-%d %H:%M:%S",
-                "%Y-%m-%dT%H:%M:%S",
-                "%Y-%m-%d",
-            ]
-            for fmt in date_formats:
+            for fmt in _DATE_FORMATS:
                 try:
                     return dt.datetime.strptime(modified, fmt)
                 except ValueError:
@@ -233,6 +222,25 @@ class Post:
             except (ImportError, ValueError):
                 pass
         return None
+
+
+def post_sort_key(post: Post) -> float:
+    """Compute a sort key for a post based on its date.
+
+    Posts without dates sort to the end (key value 0.0). Timezone-aware
+    and naive datetimes are both converted to a UTC timestamp for comparison.
+
+    Args:
+        post: The post to compute a sort key for
+
+    Returns:
+        A float sort key derived from the post date
+    """
+    if post.date is None:
+        return 0.0
+    if post.date.tzinfo:
+        return post.date.timestamp()
+    return post.date.replace(tzinfo=dt.UTC).timestamp()
 
 
 @dataclass
@@ -306,6 +314,39 @@ class PostParser:
             },
         )
 
+    def _load_frontmatter(
+        self, path: Path, content_type: str = "file"
+    ) -> frontmatter.Post:
+        """Load and parse frontmatter from a markdown file.
+
+        Args:
+            path: Path to the markdown file
+            content_type: Human-readable description of the file type (e.g. "post"
+                          or "page"), used in error messages
+
+        Returns:
+            Parsed frontmatter post object
+
+        Raises:
+            ValueError: If the frontmatter YAML is malformed
+        """
+        try:
+            return frontmatter.load(path)
+        except yaml.scanner.ScannerError as e:
+            raise ValueError(
+                f"YAML syntax error in frontmatter of {path}:\n"
+                f"  {e}\n\n"
+                f"Common causes:\n"
+                f"  - Unquoted colons in values "
+                f"(e.g., 'title: My {content_type}: the sequel')\n"
+                f"  - Missing quotes around special characters\n"
+                f"  - Incorrect indentation\n\n"
+                f"Fix: Wrap values containing colons or special characters in quotes:\n"
+                f'  title: "My {content_type}: the sequel"'
+            ) from e
+        except Exception as e:
+            raise ValueError(f"Error parsing frontmatter in {path}: {e}") from e
+
     def parse_file(self, path: Path) -> Post:
         """Parse a markdown file with frontmatter.
 
@@ -323,22 +364,7 @@ class PostParser:
             raise FileNotFoundError(f"Post file not found: {path}")
 
         # Parse frontmatter
-        try:
-            post_data = frontmatter.load(path)
-        except yaml.scanner.ScannerError as e:
-            # Provide a helpful error message for YAML syntax errors
-            raise ValueError(
-                f"YAML syntax error in frontmatter of {path}:\n"
-                f"  {e}\n\n"
-                f"Common causes:\n"
-                f"  - Unquoted colons in values (e.g., 'title: My post: the sequel')\n"
-                f"  - Missing quotes around special characters\n"
-                f"  - Incorrect indentation\n\n"
-                f"Fix: Wrap values containing colons or special characters in quotes:\n"
-                f'  title: "My post: the sequel"'
-            ) from e
-        except Exception as e:
-            raise ValueError(f"Error parsing frontmatter in {path}: {e}") from e
+        post_data = self._load_frontmatter(path, content_type="post")
 
         # Extract metadata
         title = post_data.get("title")
@@ -356,14 +382,7 @@ class PostParser:
                 date = dt.datetime.combine(date_value, dt.time())
             elif isinstance(date_value, str):
                 # Try to parse common date formats, including timezone-aware formats
-                date_formats = [
-                    "%Y-%m-%d %H:%M:%S%z",  # With timezone offset
-                    "%Y-%m-%dT%H:%M:%S%z",  # ISO format with timezone
-                    "%Y-%m-%d %H:%M:%S",  # Without timezone
-                    "%Y-%m-%dT%H:%M:%S",  # ISO format without timezone
-                    "%Y-%m-%d",  # Date only
-                ]
-                for fmt in date_formats:
+                for fmt in _DATE_FORMATS:
                     try:
                         date = dt.datetime.strptime(date_value, fmt)
                         break
@@ -447,16 +466,7 @@ class PostParser:
                 continue
 
         # Sort by date (newest first)
-        # Handle timezone-aware and naive datetimes by converting to UTC timestamp
-        def get_sort_key(post: Post) -> float:
-            if post.date is None:
-                return 0.0  # Posts without dates sort to the end
-            # Convert to UTC timestamp for comparison
-            if post.date.tzinfo:
-                return post.date.timestamp()
-            return post.date.replace(tzinfo=dt.UTC).timestamp()
-
-        posts.sort(key=get_sort_key, reverse=True)
+        posts.sort(key=post_sort_key, reverse=True)
         return posts
 
     def parse_page(self, path: Path) -> Page:
@@ -476,22 +486,7 @@ class PostParser:
             raise FileNotFoundError(f"Page file not found: {path}")
 
         # Parse frontmatter
-        try:
-            page_data = frontmatter.load(path)
-        except yaml.scanner.ScannerError as e:
-            # Provide a helpful error message for YAML syntax errors
-            raise ValueError(
-                f"YAML syntax error in frontmatter of {path}:\n"
-                f"  {e}\n\n"
-                f"Common causes:\n"
-                f"  - Unquoted colons in values (e.g., 'title: My page: the sequel')\n"
-                f"  - Missing quotes around special characters\n"
-                f"  - Incorrect indentation\n\n"
-                f"Fix: Wrap values containing colons or special characters in quotes:\n"
-                f'  title: "My page: the sequel"'
-            ) from e
-        except Exception as e:
-            raise ValueError(f"Error parsing frontmatter in {path}: {e}") from e
+        page_data = self._load_frontmatter(path, content_type="page")
 
         # Extract metadata
         title = page_data.get("title")

@@ -1,7 +1,6 @@
 """Static site generator for blog content."""
 
 import datetime as dt
-import re
 import shutil
 import urllib.error
 from collections import defaultdict
@@ -21,7 +20,14 @@ from blogmore.fontawesome import (
     FontAwesomeOptimizer,
 )
 from blogmore.icons import IconGenerator, detect_source_icon
-from blogmore.parser import Page, Post, PostParser, remove_date_prefix
+from blogmore.parser import (
+    Page,
+    Post,
+    PostParser,
+    post_sort_key,
+    remove_date_prefix,
+    sanitize_for_url,
+)
 from blogmore.renderer import TemplateRenderer
 from blogmore.search import write_search_index
 from blogmore.sitemap import write_sitemap
@@ -33,26 +39,6 @@ THEME_JS_FILENAME = "theme.js"
 THEME_JS_MINIFIED_FILENAME = "theme.min.js"
 SEARCH_JS_FILENAME = "search.js"
 SEARCH_JS_MINIFIED_FILENAME = "search.min.js"
-
-
-def sanitize_for_url(value: str) -> str:
-    """Sanitize a string for safe use in URLs and filenames.
-
-    Args:
-        value: The string to sanitize
-
-    Returns:
-        A sanitized string safe for URLs and filenames
-    """
-    # Remove or replace dangerous characters
-    # Allow only alphanumeric, dash, underscore
-    sanitized = re.sub(r"[^\w\-]", "-", value.lower())
-    # Remove multiple consecutive dashes
-    sanitized = re.sub(r"-+", "-", sanitized)
-    # Remove leading/trailing dashes
-    sanitized = sanitized.strip("-")
-    # Ensure it's not empty
-    return sanitized or "unnamed"
 
 
 def paginate_posts(posts: list[Post], posts_per_page: int) -> list[list[Post]]:
@@ -852,15 +838,7 @@ class SiteGenerator:
         # Generate paginated pages for each tag
         for tag_lower, (tag_display, tag_posts) in posts_by_tag.items():
             # Sort tag posts by date (newest first)
-            # Handle timezone-aware and naive datetimes
-            def get_sort_key(post: Post) -> float:
-                if post.date is None:
-                    return 0.0
-                if post.date.tzinfo:
-                    return post.date.timestamp()
-                return post.date.replace(tzinfo=dt.UTC).timestamp()
-
-            tag_posts.sort(key=get_sort_key, reverse=True)
+            tag_posts.sort(key=post_sort_key, reverse=True)
 
             # Sanitize tag for filename (use lowercase version)
             safe_tag = sanitize_for_url(tag_lower)
@@ -1075,15 +1053,7 @@ class SiteGenerator:
             category_posts,
         ) in posts_by_category.items():
             # Sort category posts by date (newest first)
-            # Handle timezone-aware and naive datetimes
-            def get_sort_key(post: Post) -> float:
-                if post.date is None:
-                    return 0.0
-                if post.date.tzinfo:
-                    return post.date.timestamp()
-                return post.date.replace(tzinfo=dt.UTC).timestamp()
-
-            category_posts.sort(key=get_sort_key, reverse=True)
+            category_posts.sort(key=post_sort_key, reverse=True)
 
             # Sanitize category for filename (use lowercase version)
             safe_category = sanitize_for_url(category_lower)
@@ -1173,15 +1143,7 @@ class SiteGenerator:
             _category_display,
             category_posts,
         ) in posts_by_category.items():
-
-            def get_sort_key(post: Post) -> float:
-                if post.date is None:
-                    return 0.0
-                if post.date.tzinfo:
-                    return post.date.timestamp()
-                return post.date.replace(tzinfo=dt.UTC).timestamp()
-
-            category_posts.sort(key=get_sort_key, reverse=True)
+            category_posts.sort(key=post_sort_key, reverse=True)
 
         feed_gen.generate_category_feeds(posts_by_category)
 
