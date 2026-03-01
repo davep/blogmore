@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed `serve` mode rebuilding once per changed file when multiple files
+  are modified or added at the same time.
+  ([#193](https://github.com/davep/blogmore/pull/193))
+
 ## v1.4.0
 
 **Released: 2026-03-01**

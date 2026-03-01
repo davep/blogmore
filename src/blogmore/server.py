@@ -5,7 +5,6 @@ import http.server
 import socketserver
 import sys
 import threading
-import time
 from pathlib import Path
 from typing import Any
 
@@ -71,14 +70,14 @@ class ContentChangeHandler(FileSystemEventHandler):
         Args:
             generator: The site generator to use for regeneration
             include_drafts: Whether to include drafts in generation
-            debounce_seconds: Time to wait before regenerating after a change
+            debounce_seconds: Time to wait after the last change before regenerating
         """
         super().__init__()
         self.generator = generator
         self.include_drafts = include_drafts
         self.debounce_seconds = debounce_seconds
-        self._last_regenerate_time = 0.0
-        self._regenerate_lock = threading.Lock()
+        self._pending_timer: threading.Timer | None = None
+        self._timer_lock = threading.Lock()
 
     def on_any_event(self, event: FileSystemEvent) -> None:
         """Handle any file system event.
@@ -100,13 +99,23 @@ class ContentChangeHandler(FileSystemEventHandler):
         ):
             return
 
-        # Debounce: only regenerate if enough time has passed
-        current_time = time.time()
-        with self._regenerate_lock:
-            if current_time - self._last_regenerate_time < self.debounce_seconds:
-                return
-            self._last_regenerate_time = current_time
+        # Debounce: cancel any pending regeneration and schedule a new one so
+        # that a burst of events (e.g. multiple files dropped at once) results
+        # in only a single rebuild after the burst settles.
+        with self._timer_lock:
+            if self._pending_timer is not None:
+                self._pending_timer.cancel()
+            self._pending_timer = threading.Timer(
+                self.debounce_seconds, self._regenerate, args=(path,)
+            )
+            self._pending_timer.start()
 
+    def _regenerate(self, path: Path) -> None:
+        """Regenerate the site after a debounced change event.
+
+        Args:
+            path: Path to the file that triggered the regeneration
+        """
         print(f"\nDetected change in {path}, regenerating site...")
         try:
             self.generator.generate(include_drafts=self.include_drafts)
@@ -141,8 +150,8 @@ class ConfigChangeHandler(FileSystemEventHandler):
         self.include_drafts = include_drafts
         self.cli_overrides = cli_overrides
         self.debounce_seconds = debounce_seconds
-        self._last_regenerate_time = 0.0
-        self._regenerate_lock = threading.Lock()
+        self._pending_timer: threading.Timer | None = None
+        self._timer_lock = threading.Lock()
 
     def on_any_event(self, event: FileSystemEvent) -> None:
         """Handle any file system event.
@@ -163,13 +172,18 @@ class ConfigChangeHandler(FileSystemEventHandler):
         if event_path != self.config_path:
             return
 
-        # Debounce: only regenerate if enough time has passed
-        current_time = time.time()
-        with self._regenerate_lock:
-            if current_time - self._last_regenerate_time < self.debounce_seconds:
-                return
-            self._last_regenerate_time = current_time
+        # Debounce: cancel any pending regeneration and schedule a new one so
+        # that a burst of save events results in only a single config reload.
+        with self._timer_lock:
+            if self._pending_timer is not None:
+                self._pending_timer.cancel()
+            self._pending_timer = threading.Timer(
+                self.debounce_seconds, self._reload_and_regenerate
+            )
+            self._pending_timer.start()
 
+    def _reload_and_regenerate(self) -> None:
+        """Reload configuration and regenerate the site after a debounced change."""
         print(
             f"\nDetected change in config file {self.config_path.name}, reloading and regenerating site..."
         )

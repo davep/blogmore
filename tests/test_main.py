@@ -1,6 +1,7 @@
 """Integration tests for the CLI module."""
 
 import sys
+import time
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -95,6 +96,72 @@ class TestContentChangeHandler:
         for filename in ["test~", "test.swp", "test.tmp", "test.pyc"]:
             event = FileCreatedEvent(str(posts_dir / filename))
             handler.on_any_event(event)
+
+    def test_debounce_coalesces_multiple_events(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that multiple rapid events result in only one rebuild."""
+        from unittest.mock import MagicMock, patch
+
+        from blogmore.generator import SiteGenerator
+        from watchdog.events import FileCreatedEvent
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        handler = ContentChangeHandler(generator=generator, debounce_seconds=0.05)
+
+        with patch.object(handler, "_regenerate") as mock_regenerate:
+            # Fire several events in quick succession
+            for i in range(5):
+                event = FileCreatedEvent(str(posts_dir / f"post{i}.md"))
+                handler.on_any_event(event)
+
+            # Wait long enough for the debounce timer to fire
+
+            time.sleep(0.2)
+
+        # Only one rebuild should have happened despite five events
+        assert mock_regenerate.call_count == 1
+
+    def test_debounce_timer_resets_on_new_event(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a new event resets the debounce timer."""
+        from unittest.mock import MagicMock, patch
+
+        from blogmore.generator import SiteGenerator
+        from watchdog.events import FileCreatedEvent
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        handler = ContentChangeHandler(generator=generator, debounce_seconds=0.1)
+
+        with patch.object(handler, "_regenerate") as mock_regenerate:
+            # Fire first event
+            event1 = FileCreatedEvent(str(posts_dir / "post1.md"))
+            handler.on_any_event(event1)
+
+            # Wait less than the debounce window, then fire another event
+            time.sleep(0.05)
+            event2 = FileCreatedEvent(str(posts_dir / "post2.md"))
+            handler.on_any_event(event2)
+
+            # At this point the timer should have been reset; no rebuild yet
+            assert mock_regenerate.call_count == 0
+
+            # Wait for the (reset) debounce timer to fire
+            time.sleep(0.2)
+
+        # Still only one rebuild
+        assert mock_regenerate.call_count == 1
 
 
 class TestServeSite:
@@ -974,6 +1041,7 @@ class TestConfigChangeHandler:
         self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
     ) -> None:
         """Test that config changes trigger reload and regeneration."""
+
         from blogmore.generator import SiteGenerator
         from watchdog.events import FileModifiedEvent
 
@@ -999,6 +1067,7 @@ class TestConfigChangeHandler:
                 generator=generator,
                 include_drafts=False,
                 cli_overrides={},
+                debounce_seconds=0.05,
             )
 
             # Update the config file
@@ -1010,9 +1079,10 @@ class TestConfigChangeHandler:
             with open(config_file, "w") as f:
                 yaml.dump(new_config_data, f)
 
-            # Trigger the event
+            # Trigger the event and wait for the debounce timer to fire
             event = FileModifiedEvent(str(config_file))
             handler.on_any_event(event)
+            time.sleep(0.2)
 
             # Verify generate was called
             mock_generate.assert_called_once_with(include_drafts=False)
@@ -1026,6 +1096,7 @@ class TestConfigChangeHandler:
         self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
     ) -> None:
         """Test that CLI overrides are preserved when config is reloaded."""
+
         from blogmore.generator import SiteGenerator
         from watchdog.events import FileModifiedEvent
 
@@ -1053,6 +1124,7 @@ class TestConfigChangeHandler:
                 generator=generator,
                 include_drafts=False,
                 cli_overrides=cli_overrides,
+                debounce_seconds=0.05,
             )
 
             # Update the config file
@@ -1064,9 +1136,10 @@ class TestConfigChangeHandler:
             with open(config_file, "w") as f:
                 yaml.dump(new_config_data, f)
 
-            # Trigger the event
+            # Trigger the event and wait for the debounce timer to fire
             event = FileModifiedEvent(str(config_file))
             handler.on_any_event(event)
+            time.sleep(0.2)
 
             # Verify generate was called
             mock_generate.assert_called_once_with(include_drafts=False)
@@ -1080,6 +1153,7 @@ class TestConfigChangeHandler:
         self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
     ) -> None:
         """Test that extra_stylesheets are updated correctly."""
+
         from blogmore.generator import SiteGenerator
         from watchdog.events import FileModifiedEvent
 
@@ -1102,6 +1176,7 @@ class TestConfigChangeHandler:
                 generator=generator,
                 include_drafts=False,
                 cli_overrides={},
+                debounce_seconds=0.05,
             )
 
             # Update config with new stylesheets
@@ -1111,9 +1186,10 @@ class TestConfigChangeHandler:
             with open(config_file, "w") as f:
                 yaml.dump(new_config_data, f)
 
-            # Trigger the event
+            # Trigger the event and wait for the debounce timer to fire
             event = FileModifiedEvent(str(config_file))
             handler.on_any_event(event)
+            time.sleep(0.2)
 
             # Verify stylesheets were updated
             assert generator.renderer.extra_stylesheets == [
@@ -1126,6 +1202,7 @@ class TestConfigChangeHandler:
         self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
     ) -> None:
         """Test that sidebar configuration is updated correctly."""
+
         from blogmore.generator import SiteGenerator
         from watchdog.events import FileModifiedEvent
 
@@ -1149,6 +1226,7 @@ class TestConfigChangeHandler:
                 generator=generator,
                 include_drafts=False,
                 cli_overrides={},
+                debounce_seconds=0.05,
             )
 
             # Update config with new sidebar config
@@ -1163,9 +1241,10 @@ class TestConfigChangeHandler:
             with open(config_file, "w") as f:
                 yaml.dump(new_config_data, f)
 
-            # Trigger the event
+            # Trigger the event and wait for the debounce timer to fire
             event = FileModifiedEvent(str(config_file))
             handler.on_any_event(event)
+            time.sleep(0.2)
 
             # Verify sidebar config was updated
             assert generator.sidebar_config["site_logo"] == "/images/newlogo.png"
@@ -1177,7 +1256,8 @@ class TestConfigChangeHandler:
     def test_on_any_event_debouncing(
         self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
     ) -> None:
-        """Test that rapid config changes are debounced."""
+        """Test that rapid config changes are debounced into a single rebuild."""
+
         from blogmore.generator import SiteGenerator
         from watchdog.events import FileModifiedEvent
 
@@ -1196,14 +1276,18 @@ class TestConfigChangeHandler:
                 generator=generator,
                 include_drafts=False,
                 cli_overrides={},
-                debounce_seconds=1.0,  # 1 second debounce
+                debounce_seconds=0.1,
             )
 
-            # Trigger multiple events rapidly
+            # Trigger multiple events rapidly - no rebuild should have fired yet
             event = FileModifiedEvent(str(config_file))
             handler.on_any_event(event)
             handler.on_any_event(event)
             handler.on_any_event(event)
+            assert mock_generate.call_count == 0
 
-            # Only one generation should occur due to debouncing
+            # Wait for the debounce timer to fire
+            time.sleep(0.3)
+
+            # Only one generation should have occurred despite multiple events
             assert mock_generate.call_count == 1
