@@ -153,7 +153,8 @@ def get_sidebar_config(config: dict[str, Any]) -> dict[str, Any]:
     """Extract sidebar configuration from the config dictionary.
 
     Returns sidebar configuration items (site_logo, links, socials) if they
-    exist in the configuration file.
+    exist in the configuration file. The ``socials`` list is sorted
+    alphabetically by site name.
 
     Args:
         config: Dictionary containing configuration values
@@ -166,5 +167,13 @@ def get_sidebar_config(config: dict[str, Any]) -> dict[str, Any]:
     for key in ("site_logo", "links", "socials"):
         if key in config:
             sidebar_config[key] = config[key]
+
+    if "socials" in sidebar_config and isinstance(sidebar_config["socials"], list):
+        sidebar_config["socials"] = sorted(
+            sidebar_config["socials"],
+            key=lambda s: str(s.get("site", "")).casefold()
+            if isinstance(s, dict)
+            else "",
+        )
 
     return sidebar_config

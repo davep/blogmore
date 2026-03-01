@@ -515,8 +515,24 @@ class TestGetSidebarConfig:
         result = get_sidebar_config(config)
         assert result == {
             "socials": [
-                {"site": "mastodon", "url": "https://fosstodon.org/@user"},
                 {"site": "github", "url": "https://github.com/user"},
+                {"site": "mastodon", "url": "https://fosstodon.org/@user"},
+            ]
+        }
+
+    def test_extract_socials_already_sorted(self) -> None:
+        """Test that socials already in alphabetical order remain sorted."""
+        config = {
+            "socials": [
+                {"site": "github", "url": "https://github.com/user"},
+                {"site": "mastodon", "url": "https://fosstodon.org/@user"},
+            ]
+        }
+        result = get_sidebar_config(config)
+        assert result == {
+            "socials": [
+                {"site": "github", "url": "https://github.com/user"},
+                {"site": "mastodon", "url": "https://fosstodon.org/@user"},
             ]
         }
 
