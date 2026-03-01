@@ -4,10 +4,6 @@
 
 **Released: WiP**
 
-- Reduced repetitive boilerplate code throughout the codebase, using
-  idiomatic Python patterns such as tuple arguments to `startswith`,
-  module-level constants, and shared helper functions.
-  ([#194](https://github.com/davep/blogmore/pull/194))
 - Fixed `serve` mode rebuilding once per changed file when multiple files
   are modified or added at the same time.
   ([#193](https://github.com/davep/blogmore/pull/193))
