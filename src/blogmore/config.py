@@ -171,9 +171,9 @@ def get_sidebar_config(config: dict[str, Any]) -> dict[str, Any]:
     if "socials" in sidebar_config and isinstance(sidebar_config["socials"], list):
         sidebar_config["socials"] = sorted(
             sidebar_config["socials"],
-            key=lambda s: str(s.get("site", "")).casefold()
-            if isinstance(s, dict)
-            else "",
+            key=lambda s: (
+                str(s.get("site", "")).casefold() if isinstance(s, dict) else ""
+            ),
         )
 
     return sidebar_config
