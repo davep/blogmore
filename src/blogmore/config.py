@@ -161,18 +161,10 @@ def get_sidebar_config(config: dict[str, Any]) -> dict[str, Any]:
     Returns:
         Dictionary containing sidebar configuration values
     """
-    sidebar_config = {}
+    sidebar_config: dict[str, Any] = {}
 
-    # Extract site_logo if present
-    if "site_logo" in config:
-        sidebar_config["site_logo"] = config["site_logo"]
-
-    # Extract links if present
-    if "links" in config:
-        sidebar_config["links"] = config["links"]
-
-    # Extract socials if present
-    if "socials" in config:
-        sidebar_config["socials"] = config["socials"]
+    for key in ("site_logo", "links", "socials"):
+        if key in config:
+            sidebar_config[key] = config[key]
 
     return sidebar_config

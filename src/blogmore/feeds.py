@@ -5,7 +5,7 @@ from pathlib import Path
 
 from feedgen.feed import FeedGenerator as FeedGen  # type: ignore[import-untyped]
 
-from blogmore.parser import Post
+from blogmore.parser import Post, sanitize_for_url
 from blogmore.utils import make_urls_absolute, normalize_site_url
 
 # Directory for feed files (excluding main RSS feed which is at root)
@@ -243,8 +243,6 @@ class BlogFeedGenerator:
             category_posts,
         ) in posts_by_category.items():
             # Sanitize category for filename
-            from blogmore.generator import sanitize_for_url
-
             safe_category = sanitize_for_url(category_lower)
 
             # Generate both RSS and Atom feeds with correct self-referencing URLs
