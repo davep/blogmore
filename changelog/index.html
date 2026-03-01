@@ -583,6 +583,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v140" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.4.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.3.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v120" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -809,6 +831,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v140" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.4.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.3.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v120" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -994,6 +1038,28 @@
 
 
 <h1 id="blogmore-changelog">BlogMore ChangeLog</h1>
+<h2 id="v140">v1.4.0</h2>
+<p><strong>Released: 2026-03-01</strong></p>
+<ul>
+<li>Fixed a <code>publish</code> failure when working across multiple machines: the
+  publish branch is now fetched from remote before use, so a local branch
+  that is behind its remote counterpart no longer causes a non-fast-forward
+  push error. (<a href="https://github.com/davep/blogmore/pull/187">#187</a>)</li>
+<li>Tags are now displayed in casefold alphabetical order wherever a list of
+  tags is shown (post pages, index, archive, category, and tag pages).
+  (<a href="https://github.com/davep/blogmore/pull/189">#189</a>)</li>
+<li>Fixed the default description finder not skipping images that are also
+  links (i.e. <code>[![alt](img)](url)</code> syntax), so posts starting with a linked
+  banner image now correctly use the first text paragraph as the
+  description. (<a href="https://github.com/davep/blogmore/pull/191">#191</a>)</li>
+</ul>
+<h2 id="v130">v1.3.0</h2>
+<p><strong>Released: 2026-02-28</strong></p>
+<ul>
+<li>Made cosmetic changes to the categories and tags pages to make the clouds
+  look a bit more compact.
+  (<a href="https://github.com/davep/blogmore/pull/184">#184</a>)</li>
+</ul>
 <h2 id="v120">v1.2.0</h2>
 <p><strong>Released: 2026-02-26</strong></p>
 <ul>
