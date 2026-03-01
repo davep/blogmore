@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v1.4.0
 
-**Released: WiP**
+**Released: 2026-03-01**
 
 - Fixed a `publish` failure when working across multiple machines: the
   publish branch is now fetched from remote before use, so a local branch
