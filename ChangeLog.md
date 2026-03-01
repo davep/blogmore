@@ -1,15 +1,17 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed `serve` mode rebuilding once per changed file when multiple files
+  are modified or added at the same time.
+  ([#193](https://github.com/davep/blogmore/pull/193))
+
 ## v1.4.0
 
 **Released: 2026-03-01**
 
-- Fixed `serve` mode rebuilding once per changed file when multiple files are
-  modified or added at the same time. The file-watcher debounce now uses a
-  true timer-based debounce: a single rebuild is scheduled after the last
-  change, so any burst of events (e.g. dropping several files into the
-  content directory at once) results in only one rebuild.
-  ([#193](https://github.com/davep/blogmore/pull/193))
 - Fixed a `publish` failure when working across multiple machines: the
   publish branch is now fetched from remote before use, so a local branch
   that is behind its remote counterpart no longer causes a non-fast-forward
