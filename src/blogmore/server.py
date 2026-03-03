@@ -13,6 +13,7 @@ from watchdog.observers import Observer
 
 from blogmore.config import get_sidebar_config, load_config, normalize_site_keywords
 from blogmore.generator import SiteGenerator
+from blogmore.parser import CUSTOM_404_HTML
 
 
 class ReusingTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -73,7 +74,7 @@ class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             explain: Optional longer error explanation
         """
         if code == 404:
-            custom_404 = Path(self.directory) / "404.html"
+            custom_404 = Path(self.directory) / CUSTOM_404_HTML
             if custom_404.exists():
                 content = custom_404.read_bytes()
                 self.send_response(404)

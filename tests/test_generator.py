@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from blogmore.generator import SiteGenerator, paginate_posts, sanitize_for_url
-from blogmore.parser import Post
+from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN, Post
 
 
 class TestSanitizeForUrl:
@@ -2381,7 +2381,7 @@ class TestCustom404Page:
         content_dir.mkdir()
         pages_dir = content_dir / "pages"
         pages_dir.mkdir()
-        (pages_dir / "404.md").write_text(
+        (pages_dir / CUSTOM_404_MARKDOWN).write_text(
             "---\ntitle: Page Not Found\n---\n\nSorry, page not found."
         )
 
@@ -2392,8 +2392,8 @@ class TestCustom404Page:
         )
         generator.generate(include_drafts=False)
 
-        assert (temp_output_dir / "404.html").exists()
-        content = (temp_output_dir / "404.html").read_text()
+        assert (temp_output_dir / CUSTOM_404_HTML).exists()
+        content = (temp_output_dir / CUSTOM_404_HTML).read_text()
         assert "Page Not Found" in content
 
     def test_generate_does_not_create_404_html_when_no_404_md(
@@ -2410,7 +2410,7 @@ class TestCustom404Page:
         )
         generator.generate(include_drafts=False)
 
-        assert not (temp_output_dir / "404.html").exists()
+        assert not (temp_output_dir / CUSTOM_404_HTML).exists()
 
     def test_404_md_not_included_in_sidebar_pages(
         self, tmp_path: Path, temp_output_dir: Path
@@ -2423,7 +2423,7 @@ class TestCustom404Page:
         (pages_dir / "about.md").write_text(
             "---\ntitle: About\n---\n\nAbout page."
         )
-        (pages_dir / "404.md").write_text(
+        (pages_dir / CUSTOM_404_MARKDOWN).write_text(
             "---\ntitle: Page Not Found\n---\n\nSorry, page not found."
         )
 
@@ -2438,7 +2438,7 @@ class TestCustom404Page:
         # The about page should appear in navigation
         assert "About" in index_content
         # 404.html should not appear as a nav link alongside regular pages
-        assert "404.html" not in index_content
+        assert CUSTOM_404_HTML not in index_content
 
     def test_404_html_generated_in_root_output_directory(
         self, tmp_path: Path, temp_output_dir: Path
@@ -2448,7 +2448,7 @@ class TestCustom404Page:
         content_dir.mkdir()
         pages_dir = content_dir / "pages"
         pages_dir.mkdir()
-        (pages_dir / "404.md").write_text(
+        (pages_dir / CUSTOM_404_MARKDOWN).write_text(
             "---\ntitle: Not Found\n---\n\nContent."
         )
 
@@ -2459,6 +2459,6 @@ class TestCustom404Page:
         )
         generator.generate(include_drafts=False)
 
-        assert (temp_output_dir / "404.html").exists()
+        assert (temp_output_dir / CUSTOM_404_HTML).exists()
         # Should be in root, not in a subdirectory
-        assert not (temp_output_dir / "pages" / "404.html").exists()
+        assert not (temp_output_dir / "pages" / CUSTOM_404_HTML).exists()

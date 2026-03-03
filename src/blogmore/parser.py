@@ -23,6 +23,9 @@ _DATE_FORMATS = [
     "%Y-%m-%d",
 ]
 
+CUSTOM_404_MARKDOWN = "404.md"
+CUSTOM_404_HTML = "404.html"
+
 
 def sanitize_for_url(value: str) -> str:
     """Sanitize a string for safe use in URLs and filenames.
@@ -524,7 +527,7 @@ class PostParser:
 
         pages = []
         for md_file in directory.glob("*.md"):
-            if md_file.name == "404.md":
+            if md_file.name == CUSTOM_404_MARKDOWN:
                 continue
             try:
                 page = self.parse_page(md_file)
@@ -547,7 +550,7 @@ class PostParser:
             A Page object if ``404.md`` exists and parses successfully,
             otherwise ``None``
         """
-        path = directory / "404.md"
+        path = directory / CUSTOM_404_MARKDOWN
         if not path.exists():
             return None
         try:

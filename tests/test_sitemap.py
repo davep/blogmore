@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN
 from blogmore.sitemap import (
     EXCLUDED_PAGES,
     SITEMAP_FILENAME,
@@ -95,16 +96,16 @@ class TestCollectSitemapUrls:
     def test_all_excluded_pages_constants(self) -> None:
         """Test that the EXCLUDED_PAGES constant contains expected entries."""
         assert "search.html" in EXCLUDED_PAGES
-        assert "404.html" in EXCLUDED_PAGES
+        assert CUSTOM_404_HTML in EXCLUDED_PAGES
 
     def test_excludes_404_html(self, tmp_path: Path) -> None:
         """Test that 404.html is excluded from the sitemap."""
         (tmp_path / "index.html").write_text("<html/>")
-        (tmp_path / "404.html").write_text("<html/>")
+        (tmp_path / CUSTOM_404_HTML).write_text("<html/>")
 
         urls = collect_sitemap_urls(tmp_path, "https://example.com")
 
-        assert "https://example.com/404.html" not in urls
+        assert f"https://example.com/{CUSTOM_404_HTML}" not in urls
         assert "https://example.com/index.html" in urls
 
 
@@ -312,7 +313,7 @@ class TestSitemapIntegrationWithGenerator:
         content_dir.mkdir()
         pages_dir = content_dir / "pages"
         pages_dir.mkdir()
-        (pages_dir / "404.md").write_text(
+        (pages_dir / CUSTOM_404_MARKDOWN).write_text(
             "---\ntitle: Page Not Found\n---\n\nSorry, page not found."
         )
 
@@ -325,6 +326,6 @@ class TestSitemapIntegrationWithGenerator:
         )
         generator.generate(include_drafts=False)
 
-        assert (temp_output_dir / "404.html").exists()
+        assert (temp_output_dir / CUSTOM_404_HTML).exists()
         content = (temp_output_dir / "sitemap.xml").read_text()
-        assert "404.html" not in content
+        assert CUSTOM_404_HTML not in content

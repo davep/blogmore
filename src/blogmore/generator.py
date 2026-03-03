@@ -21,6 +21,7 @@ from blogmore.fontawesome import (
 )
 from blogmore.icons import IconGenerator, detect_source_icon
 from blogmore.parser import (
+    CUSTOM_404_HTML,
     Page,
     Post,
     PostParser,
@@ -633,7 +634,7 @@ class SiteGenerator:
         """Generate the custom 404 page in the root of the output directory."""
         context = self._get_global_context()
         context["pages"] = pages
-        output_path = self.output_dir / "404.html"
+        output_path = self.output_dir / CUSTOM_404_HTML
         context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_page(page, **context)

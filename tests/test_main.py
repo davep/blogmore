@@ -9,6 +9,7 @@ import pytest
 import yaml
 
 from blogmore.__main__ import main
+from blogmore.parser import CUSTOM_404_HTML
 from blogmore.server import ConfigChangeHandler, ContentChangeHandler, serve_site
 
 
@@ -175,7 +176,7 @@ class TestQuietHTTPRequestHandler:
         from blogmore.server import QuietHTTPRequestHandler
 
         custom_404_content = b"<html><body>Custom 404</body></html>"
-        (tmp_path / "404.html").write_bytes(custom_404_content)
+        (tmp_path / CUSTOM_404_HTML).write_bytes(custom_404_content)
 
         output_buffer = io.BytesIO()
 
@@ -220,7 +221,7 @@ class TestQuietHTTPRequestHandler:
 
         from blogmore.server import QuietHTTPRequestHandler
 
-        (tmp_path / "404.html").write_text("<html>Custom 404</html>")
+        (tmp_path / CUSTOM_404_HTML).write_text("<html>Custom 404</html>")
 
         output_buffer = io.BytesIO()
 

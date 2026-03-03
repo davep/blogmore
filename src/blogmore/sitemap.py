@@ -3,13 +3,14 @@
 from pathlib import Path
 from xml.etree.ElementTree import Element, SubElement, indent, tostring
 
+from blogmore.parser import CUSTOM_404_HTML
 from blogmore.utils import normalize_site_url
 
 SITEMAP_XMLNS = "http://www.sitemaps.org/schemas/sitemap/0.9"
 SITEMAP_FILENAME = "sitemap.xml"
 
 # Pages to exclude from the sitemap
-EXCLUDED_PAGES = frozenset({"search.html", "404.html"})
+EXCLUDED_PAGES = frozenset({"search.html", CUSTOM_404_HTML})
 
 
 def collect_sitemap_urls(output_dir: Path, site_url: str) -> list[str]:
