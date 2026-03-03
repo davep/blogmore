@@ -58,6 +58,8 @@ class TemplateRenderer:
         self.env = Environment(
             loader=ChoiceLoader(loaders),
             autoescape=select_autoescape(["html", "xml"]),
+            trim_blocks=True,
+            lstrip_blocks=True,
         )
 
         # Add custom filters

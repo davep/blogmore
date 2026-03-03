@@ -31,6 +31,12 @@ class TestTemplateRenderer:
         renderer = TemplateRenderer(extra_stylesheets=stylesheets)
         assert renderer.extra_stylesheets == stylesheets
 
+    def test_jinja2_whitespace_control_enabled(self) -> None:
+        """Test that Jinja2 whitespace control options are enabled."""
+        renderer = TemplateRenderer()
+        assert renderer.env.trim_blocks is True
+        assert renderer.env.lstrip_blocks is True
+
     def test_format_date_with_datetime(self) -> None:
         """Test formatting a datetime object."""
         date = dt.datetime(2024, 1, 15, 14, 30, 0, tzinfo=dt.UTC)

@@ -4,6 +4,9 @@
 
 **Released: WiP**
 
+- Enabled Jinja2's `trim_blocks` and `lstrip_blocks` whitespace control options
+  to reduce excessive vertical whitespace in generated HTML output.
+  ([#194](https://github.com/davep/blogmore/pull/194))
 - Fixed `serve` mode rebuilding once per changed file when multiple files
   are modified or added at the same time.
   ([#193](https://github.com/davep/blogmore/pull/193))
