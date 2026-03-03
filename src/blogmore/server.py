@@ -73,7 +73,7 @@ class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             explain: Optional longer error explanation
         """
         if code == 404:
-            custom_404 = Path(self.directory) / "404.html"  # type: ignore[attr-defined]
+            custom_404 = Path(self.directory) / "404.html"
             if custom_404.exists():
                 content = custom_404.read_bytes()
                 self.send_response(404)
