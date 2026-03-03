@@ -9,7 +9,7 @@ SITEMAP_XMLNS = "http://www.sitemaps.org/schemas/sitemap/0.9"
 SITEMAP_FILENAME = "sitemap.xml"
 
 # Pages to exclude from the sitemap
-EXCLUDED_PAGES = frozenset({"search.html"})
+EXCLUDED_PAGES = frozenset({"search.html", "404.html"})
 
 
 def collect_sitemap_urls(output_dir: Path, site_url: str) -> list[str]:
