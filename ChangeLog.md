@@ -4,16 +4,14 @@
 
 **Released: WiP**
 
-- Added support for a custom 404 page: place a `404.md` file in the
-  `pages/` subdirectory of your content directory and BlogMore will generate
-  a `404.html` file in the root of your output directory. The `serve`
-  command will serve this page for any missing resource during local
-  development. ([#199](https://github.com/davep/blogmore/pull/199))
 - Reduced excessive vertical whitespace in generated HTML output.
   ([#197](https://github.com/davep/blogmore/pull/197))
 - Fixed `serve` mode rebuilding once per changed file when multiple files
   are modified or added at the same time.
   ([#194](https://github.com/davep/blogmore/pull/194))
+- Added support for a custom 404 page. The `serve` command will serve this
+  page for any missing resource during local development.
+  ([#199](https://github.com/davep/blogmore/pull/199))
 
 ## v1.4.0
 
