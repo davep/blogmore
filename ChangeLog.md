@@ -1,14 +1,14 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v1.5.0
 
-**Released: WiP**
+**Released: 2026-03-03**
 
-- Reduced excessive vertical whitespace in generated HTML output.
-  ([#197](https://github.com/davep/blogmore/pull/197))
 - Fixed `serve` mode rebuilding once per changed file when multiple files
   are modified or added at the same time.
   ([#194](https://github.com/davep/blogmore/pull/194))
+- Reduced excessive vertical whitespace in generated HTML output.
+  ([#197](https://github.com/davep/blogmore/pull/197))
 - Added support for a custom 404 page. The `serve` command will serve this
   page for any missing resource during local development.
   ([#199](https://github.com/davep/blogmore/pull/199))
