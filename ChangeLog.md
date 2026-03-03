@@ -4,9 +4,11 @@
 
 **Released: WiP**
 
+- Reduced excessive vertical whitespace in generated HTML output.
+  ([#197](https://github.com/davep/blogmore/pull/197))
 - Fixed `serve` mode rebuilding once per changed file when multiple files
   are modified or added at the same time.
-  ([#193](https://github.com/davep/blogmore/pull/193))
+  ([#194](https://github.com/davep/blogmore/pull/194))
 
 ## v1.4.0
 
