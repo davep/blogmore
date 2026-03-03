@@ -686,6 +686,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#custom-404-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom 404 Page
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1338,6 +1349,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#custom-404-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom 404 Page
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1748,6 +1770,32 @@ Your post content goes here...
 <span class="nn">---</span>
 </code></pre></div>
 <p>Tags appear on post pages and visitors can view all posts with a tag at <code>/tag/tutorial.html</code>.</p>
+<h3 id="custom-404-page">Custom 404 Page</h3>
+<p>Services such as GitHub Pages support a custom 404 page that is displayed
+whenever a visitor tries to access a URL that does not exist on your site.</p>
+<p>To create one, add a <code>404.md</code> file to the <code>pages/</code> subdirectory of your
+content directory:</p>
+<div class="highlight"><pre><span></span><code>posts/
+  pages/
+    404.md
+    about.md
+</code></pre></div>
+<p>The file uses the same frontmatter and Markdown format as any other page:</p>
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">title: Page Not Found</span>
+<span class="gu">---</span>
+
+Sorry, the page you were looking for does not exist.
+
+[<span class="nt">Return to the home page</span>](<span class="na">/</span>)
+</code></pre></div>
+<p>BlogMore will generate a <code>404.html</code> file in the root of your output
+directory. This file will <strong>not</strong> appear as a link in the site navigation.</p>
+<p>When testing locally with <code>blogmore serve</code>, the development server will
+automatically serve this custom page whenever a resource cannot be found,
+so you can preview the 404 experience before publishing.</p>
+<p>If <code>404.md</code> is absent, no <code>404.html</code> file is generated and the server falls
+back to its built-in 404 response.</p>
 <h2 id="customisation">Customisation</h2>
 <h3 id="using-configuration-files">Using Configuration Files</h3>
 <p>Create a <code>blogmore.yaml</code> to avoid repeating command-line options:</p>
