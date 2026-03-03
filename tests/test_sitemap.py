@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN
 from blogmore.sitemap import (
     EXCLUDED_PAGES,
     SITEMAP_FILENAME,
@@ -93,8 +94,19 @@ class TestCollectSitemapUrls:
         assert "https://example.com/index.html" in urls
 
     def test_all_excluded_pages_constants(self) -> None:
-        """Test that the EXCLUDED_PAGES constant contains search.html."""
+        """Test that the EXCLUDED_PAGES constant contains expected entries."""
         assert "search.html" in EXCLUDED_PAGES
+        assert CUSTOM_404_HTML in EXCLUDED_PAGES
+
+    def test_excludes_404_html(self, tmp_path: Path) -> None:
+        """Test that 404.html is excluded from the sitemap."""
+        (tmp_path / "index.html").write_text("<html/>")
+        (tmp_path / CUSTOM_404_HTML).write_text("<html/>")
+
+        urls = collect_sitemap_urls(tmp_path, "https://example.com")
+
+        assert f"https://example.com/{CUSTOM_404_HTML}" not in urls
+        assert "https://example.com/index.html" in urls
 
 
 class TestGenerateSitemapXml:
@@ -290,3 +302,30 @@ class TestSitemapIntegrationWithGenerator:
 
         content = (temp_output_dir / "sitemap.xml").read_text()
         assert "https://example.com/index.html" in content
+
+    def test_sitemap_excludes_404_html(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that 404.html is excluded from the sitemap."""
+        from blogmore.generator import SiteGenerator
+
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        pages_dir = content_dir / "pages"
+        pages_dir.mkdir()
+        (pages_dir / CUSTOM_404_MARKDOWN).write_text(
+            "---\ntitle: Page Not Found\n---\n\nSorry, page not found."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            site_url="https://example.com",
+            with_sitemap=True,
+        )
+        generator.generate(include_drafts=False)
+
+        assert (temp_output_dir / CUSTOM_404_HTML).exists()
+        content = (temp_output_dir / "sitemap.xml").read_text()
+        assert CUSTOM_404_HTML not in content

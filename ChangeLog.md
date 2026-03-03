@@ -9,6 +9,9 @@
 - Fixed `serve` mode rebuilding once per changed file when multiple files
   are modified or added at the same time.
   ([#194](https://github.com/davep/blogmore/pull/194))
+- Added support for a custom 404 page. The `serve` command will serve this
+  page for any missing resource during local development.
+  ([#199](https://github.com/davep/blogmore/pull/199))
 
 ## v1.4.0
 

@@ -13,6 +13,7 @@ from watchdog.observers import Observer
 
 from blogmore.config import get_sidebar_config, load_config, normalize_site_keywords
 from blogmore.generator import SiteGenerator
+from blogmore.parser import CUSTOM_404_HTML
 
 
 class ReusingTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -39,6 +40,10 @@ class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
     Uses HTTP/1.1 to enable keep-alive connections, which significantly improves
     performance in browsers like Safari that make many parallel requests.
+
+    When a ``404.html`` file exists in the served directory it is returned as
+    the response body for any 404 error, mirroring the behaviour of services
+    such as GitHub Pages.
     """
 
     # Enable HTTP/1.1 for persistent connections (keep-alive)
@@ -54,6 +59,31 @@ class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             # Client disconnected before we finished sending data.
             # This is normal behavior and not an error condition.
             pass
+
+    def send_error(
+        self,
+        code: int,
+        message: str | None = None,
+        explain: str | None = None,
+    ) -> None:
+        """Send an error response, serving the custom 404 page when available.
+
+        Args:
+            code: HTTP status code
+            message: Optional short error message
+            explain: Optional longer error explanation
+        """
+        if code == 404:
+            custom_404 = Path(self.directory) / CUSTOM_404_HTML
+            if custom_404.exists():
+                content = custom_404.read_bytes()
+                self.send_response(404)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(content)))
+                self.end_headers()
+                self.wfile.write(content)
+                return
+        super().send_error(code, message, explain)
 
 
 class ContentChangeHandler(FileSystemEventHandler):

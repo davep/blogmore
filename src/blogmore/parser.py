@@ -23,6 +23,9 @@ _DATE_FORMATS = [
     "%Y-%m-%d",
 ]
 
+CUSTOM_404_MARKDOWN = "404.md"
+CUSTOM_404_HTML = "404.html"
+
 
 def sanitize_for_url(value: str) -> str:
     """Sanitize a string for safe use in URLs and filenames.
@@ -510,6 +513,9 @@ class PostParser:
     def parse_pages_directory(self, directory: Path) -> list[Page]:
         """Parse all markdown files in a pages directory.
 
+        The special file ``404.md`` is excluded from the returned list; use
+        :meth:`parse_404_page` to obtain it separately.
+
         Args:
             directory: Directory containing page markdown files
 
@@ -521,6 +527,8 @@ class PostParser:
 
         pages = []
         for md_file in directory.glob("*.md"):
+            if md_file.name == CUSTOM_404_MARKDOWN:
+                continue
             try:
                 page = self.parse_page(md_file)
                 pages.append(page)
@@ -531,3 +539,22 @@ class PostParser:
         # Sort by title (alphabetically)
         pages.sort(key=lambda page: page.title.lower())
         return pages
+
+    def parse_404_page(self, directory: Path) -> Page | None:
+        """Parse the optional custom 404 page from a pages directory.
+
+        Args:
+            directory: Directory that may contain a ``404.md`` file
+
+        Returns:
+            A Page object if ``404.md`` exists and parses successfully,
+            otherwise ``None``
+        """
+        path = directory / CUSTOM_404_MARKDOWN
+        if not path.exists():
+            return None
+        try:
+            return self.parse_page(path)
+        except (ValueError, FileNotFoundError) as e:
+            print(f"Warning: Skipping {path}: {e}")
+            return None

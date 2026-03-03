@@ -133,6 +133,43 @@ tags: [tutorial, intermediate, decorators]
 
 Tags appear on post pages and visitors can view all posts with a tag at `/tag/tutorial.html`.
 
+### Custom 404 Page
+
+Services such as GitHub Pages support a custom 404 page that is displayed
+whenever a visitor tries to access a URL that does not exist on your site.
+
+To create one, add a `404.md` file to the `pages/` subdirectory of your
+content directory:
+
+```
+posts/
+  pages/
+    404.md
+    about.md
+```
+
+The file uses the same frontmatter and Markdown format as any other page:
+
+```markdown
+---
+title: Page Not Found
+---
+
+Sorry, the page you were looking for does not exist.
+
+[Return to the home page](/)
+```
+
+BlogMore will generate a `404.html` file in the root of your output
+directory. This file will **not** appear as a link in the site navigation.
+
+When testing locally with `blogmore serve`, the development server will
+automatically serve this custom page whenever a resource cannot be found,
+so you can preview the 404 experience before publishing.
+
+If `404.md` is absent, no `404.html` file is generated and the server falls
+back to its built-in 404 response.
+
 ## Customisation
 
 ### Using Configuration Files
