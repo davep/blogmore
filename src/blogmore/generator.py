@@ -329,6 +329,7 @@ class SiteGenerator:
         # can exclude them when scanning for posts)
         pages_dir = self.content_dir / "pages"
         pages = self.parser.parse_pages_directory(pages_dir)
+        page_404 = self.parser.parse_404_page(pages_dir)
 
         # Parse all posts, excluding the pages subdirectory
         print(f"Parsing posts from {self.content_dir}...")
@@ -370,6 +371,11 @@ class SiteGenerator:
             print("Generating static pages...")
             for page in pages:
                 self._generate_page(page, pages)
+
+        # Generate custom 404 page if present
+        if page_404 is not None:
+            print("Generating custom 404 page...")
+            self._generate_404_page(page_404, pages)
 
         # Generate index page
         print("Generating index page...")
@@ -617,6 +623,17 @@ class SiteGenerator:
         context = self._get_global_context()
         context["pages"] = pages
         output_path = self.output_dir / f"{page.slug}.html"
+        context["canonical_url"] = self._canonical_url_for_path(output_path)
+
+        html = self.renderer.render_page(page, **context)
+
+        output_path.write_text(html, encoding="utf-8")
+
+    def _generate_404_page(self, page: Page, pages: list[Page]) -> None:
+        """Generate the custom 404 page in the root of the output directory."""
+        context = self._get_global_context()
+        context["pages"] = pages
+        output_path = self.output_dir / "404.html"
         context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_page(page, **context)

@@ -631,6 +631,33 @@ class TestPostParser:
         pages = parser.parse_pages_directory(Path("nonexistent"))
         assert pages == []
 
+    def test_parse_pages_directory_excludes_404(self, pages_dir: Path) -> None:
+        """Test that 404.md is excluded from parse_pages_directory results."""
+        parser = PostParser()
+        pages = parser.parse_pages_directory(pages_dir)
+        slugs = [page.slug for page in pages]
+        assert "404" not in slugs
+
+    def test_parse_404_page(self, pages_dir: Path) -> None:
+        """Test parsing the custom 404 page."""
+        parser = PostParser()
+        page = parser.parse_404_page(pages_dir)
+        assert page is not None
+        assert page.slug == "404"
+        assert page.title == "Page Not Found"
+
+    def test_parse_404_page_missing(self, tmp_path: Path) -> None:
+        """Test that parse_404_page returns None when 404.md does not exist."""
+        parser = PostParser()
+        page = parser.parse_404_page(tmp_path)
+        assert page is None
+
+    def test_parse_404_page_directory_not_found(self) -> None:
+        """Test that parse_404_page returns None when directory does not exist."""
+        parser = PostParser()
+        page = parser.parse_404_page(Path("nonexistent"))
+        assert page is None
+
     def test_parse_date_formats(self, tmp_path: Path) -> None:
         """Test parsing various date formats."""
         parser = PostParser()

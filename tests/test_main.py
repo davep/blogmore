@@ -164,7 +164,77 @@ class TestContentChangeHandler:
         assert mock_regenerate.call_count == 1
 
 
-class TestServeSite:
+class TestQuietHTTPRequestHandler:
+    """Test the QuietHTTPRequestHandler class."""
+
+    def test_serve_custom_404_page_when_present(self, tmp_path: Path) -> None:
+        """Test that a custom 404.html is served when a file is not found."""
+        import io
+        from unittest.mock import patch
+
+        from blogmore.server import QuietHTTPRequestHandler
+
+        custom_404_content = b"<html><body>Custom 404</body></html>"
+        (tmp_path / "404.html").write_bytes(custom_404_content)
+
+        output_buffer = io.BytesIO()
+
+        handler = QuietHTTPRequestHandler.__new__(QuietHTTPRequestHandler)
+        handler.directory = str(tmp_path)
+        handler.wfile = output_buffer
+
+        with patch.object(handler, "send_response") as mock_send_response, patch.object(
+            handler, "send_header"
+        ), patch.object(handler, "end_headers"):
+            handler.send_error(404)
+            mock_send_response.assert_called_once_with(404)
+
+        written = output_buffer.getvalue()
+        assert b"Custom 404" in written
+
+    def test_fallback_to_default_error_when_no_custom_404(
+        self, tmp_path: Path
+    ) -> None:
+        """Test that the default error response is used when 404.html is absent."""
+        import io
+        from unittest.mock import patch
+
+        from blogmore.server import QuietHTTPRequestHandler
+
+        output_buffer = io.BytesIO()
+
+        handler = QuietHTTPRequestHandler.__new__(QuietHTTPRequestHandler)
+        handler.directory = str(tmp_path)
+        handler.wfile = output_buffer
+
+        with patch.object(
+            QuietHTTPRequestHandler.__bases__[0], "send_error"
+        ) as mock_super_send_error:
+            handler.send_error(404)
+            mock_super_send_error.assert_called_once_with(404, None, None)
+
+    def test_non_404_errors_use_default_handler(self, tmp_path: Path) -> None:
+        """Test that non-404 errors always use the default error handler."""
+        import io
+        from unittest.mock import patch
+
+        from blogmore.server import QuietHTTPRequestHandler
+
+        (tmp_path / "404.html").write_text("<html>Custom 404</html>")
+
+        output_buffer = io.BytesIO()
+
+        handler = QuietHTTPRequestHandler.__new__(QuietHTTPRequestHandler)
+        handler.directory = str(tmp_path)
+        handler.wfile = output_buffer
+
+        with patch.object(
+            QuietHTTPRequestHandler.__bases__[0], "send_error"
+        ) as mock_super_send_error:
+            handler.send_error(500)
+            mock_super_send_error.assert_called_once_with(500, None, None)
+
+
     """Test the serve_site function."""
 
     @patch("blogmore.server.ReusingTCPServer")
