@@ -156,6 +156,10 @@ body {
     text-align: center;
 }
 
+.burger-menu::before {
+    content: '☰';
+}
+
 .burger-menu:hover {
     color: var(--link-hover-color);
 }
@@ -163,6 +167,11 @@ body {
 .burger-menu:focus {
     outline: 2px solid var(--hover-color);
     outline-offset: 2px;
+}
+
+/* In expanded state, swap ☰ for ✕ */
+.sidebar.sidebar-expanded .burger-menu::before {
+    content: '✕';
 }
 
 .sidebar-header {
@@ -346,6 +355,20 @@ body {
         display: flex;
         gap: 20px;
         padding-top: 16px;
+    }
+
+    /* In expanded state: hide title, float the ✕ button to top-right at logo level */
+    .sidebar.sidebar-expanded .sidebar-mobile-title,
+    .sidebar.sidebar-expanded .sidebar-mobile-spacer {
+        display: none;
+    }
+
+    .sidebar.sidebar-expanded .sidebar-mobile-bar {
+        position: absolute;
+        /* align with logo top: sidebar padding-top (12px) + content padding-top (16px) */
+        top: 28px;
+        right: 20px;
+        width: auto;
     }
 
     .sidebar-logo {
