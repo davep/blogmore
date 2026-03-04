@@ -55,6 +55,11 @@
 <body>
     <div class="site-container">
         <aside class="sidebar">
+            <div class="sidebar-mobile-bar">
+                <span class="sidebar-mobile-spacer"></span>
+                <span class="sidebar-mobile-title"><a href="/">{{ site_title }}</a></span>
+                <button class="burger-menu" type="button" aria-label="Toggle navigation" aria-expanded="false"></button>
+            </div>
             <div class="sidebar-content">
                 <div class="sidebar-header">
                     {% if site_logo %}

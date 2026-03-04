@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Improved mobile layout: in "mobile view" the sidebar is collapsed by
+  default to show only the site title and a burger menu (☰) button. Clicking
+  the burger menu expands the full sidebar (logo, subtitle, pages, links,
+  socials). ([#202](https://github.com/davep/blogmore/pull/202))
+
 ## v1.5.0
 
 **Released: 2026-03-03**

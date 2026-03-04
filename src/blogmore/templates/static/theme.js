@@ -108,15 +108,38 @@
             toggleButton.addEventListener('click', toggleTheme);
         }
     }
-    
+
+    /**
+     * Set up burger menu for mobile navigation
+     */
+    function setupBurgerMenu() {
+        const burgerButton = document.querySelector('.burger-menu');
+        const sidebar = document.querySelector('.sidebar');
+        if (burgerButton && sidebar) {
+            function toggleBurgerMenu() {
+                const expanded = sidebar.classList.toggle('sidebar-expanded');
+                burgerButton.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            }
+            burgerButton.addEventListener('click', toggleBurgerMenu);
+        }
+    }
+
+    /**
+     * Set up all UI features after DOM is ready
+     */
+    function setupUIFeatures() {
+        setupThemeToggle();
+        setupBurgerMenu();
+    }
+
     // Initialize theme immediately to prevent flash
     initTheme();
     
     // Set up toggle button after DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupThemeToggle);
+        document.addEventListener('DOMContentLoaded', setupUIFeatures);
     } else {
-        setupThemeToggle();
+        setupUIFeatures();
     }
     
     // Listen for system theme changes when no manual preference is set
