@@ -615,6 +615,52 @@ class TestPostParser:
         assert isinstance(post.category, str)
         assert post.category == "2024"
 
+    def test_parse_file_bare_scalar_tag_raises_helpful_error(
+        self, tmp_path: Path
+    ) -> None:
+        """Test that a bare scalar tags value raises a helpful error.
+
+        ``tags: +3`` is parsed by YAML as integer ``3`` (not a list or string).
+        Iterating over an int raises ``'int' object is not iterable``, which is
+        cryptic.  The parser should detect this case and raise a clear
+        ``ValueError`` that names the file and explains the fix.
+        """
+        parser = PostParser()
+        post_file = tmp_path / "bare-scalar-tags.md"
+        post_file.write_text(
+            "---\n"
+            "title: Post With Bare Scalar Tag\n"
+            "date: 2024-01-01\n"
+            "tags: +3\n"
+            "---\n"
+            "Content"
+        )
+
+        with pytest.raises(ValueError, match="'tags' in frontmatter must be a string or list"):
+            parser.parse_file(post_file)
+
+    def test_parse_file_bare_scalar_tag_error_cites_file(
+        self, tmp_path: Path
+    ) -> None:
+        """Test that the bare-scalar tags error message includes the filename."""
+        parser = PostParser()
+        post_file = tmp_path / "bare-scalar-tags-2.md"
+        post_file.write_text(
+            "---\n"
+            "title: Post With Bare Scalar Tag\n"
+            "date: 2024-01-01\n"
+            "tags: +3\n"
+            "---\n"
+            "Content"
+        )
+
+        with pytest.raises(ValueError) as exc_info:
+            parser.parse_file(post_file)
+
+        error_message = str(exc_info.value)
+        assert str(post_file) in error_message
+        assert "Fix" in error_message
+
     def test_parse_directory(self, posts_dir: Path) -> None:
         """Test parsing a directory of posts."""
         parser = PostParser()

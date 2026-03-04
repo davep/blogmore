@@ -416,12 +416,22 @@ class PostParser:
             category = None
 
         # Extract tags - coerce each item to str in case YAML parsed numeric
-        # values as int (e.g. `tags: [2024, python]` gives [2024, "python"])
+        # values as int (e.g. `tags: [2024, python]` gives [2024, "python"]).
+        # A bare scalar (e.g. `tags: +3` parsed as int 3) is not iterable and
+        # must be caught explicitly with a helpful error rather than letting
+        # Python raise "'int' object is not iterable".
         raw_tags = post_data.get("tags", [])
         if isinstance(raw_tags, str):
             tags: list[str] = [tag.strip() for tag in raw_tags.split(",")]
-        else:
+        elif isinstance(raw_tags, list):
             tags = [str(tag).strip() for tag in raw_tags]
+        else:
+            raise ValueError(
+                f"Post 'tags' in frontmatter must be a string or list in: {path}\n"
+                f"  Found: {raw_tags!r} (type: {type(raw_tags).__name__})\n"
+                f"  Fix: wrap the value in quotes or brackets, e.g. "
+                f" tags: 'my-tag'  or  tags: [tag1, tag2]"
+            )
 
         # Check draft status
         draft = post_data.get("draft", False)
