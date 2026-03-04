@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v1.6.0
 
-**Released: WiP**
+**Released: 2026-03-04**
 
 - Improved mobile layout: in "mobile view" the sidebar is collapsed by
   default to show only the site title and a burger menu (☰) button. Clicking
