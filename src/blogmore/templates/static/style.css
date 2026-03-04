@@ -357,18 +357,10 @@ body {
         padding-top: 16px;
     }
 
-    /* In expanded state: hide title, float the ✕ button to top-right at logo level */
-    .sidebar.sidebar-expanded .sidebar-mobile-title,
-    .sidebar.sidebar-expanded .sidebar-mobile-spacer {
+    /* In expanded state: hide the title text only; keep the spacer so the
+       button stays at the same position as in the collapsed state */
+    .sidebar.sidebar-expanded .sidebar-mobile-title {
         display: none;
-    }
-
-    .sidebar.sidebar-expanded .sidebar-mobile-bar {
-        position: absolute;
-        /* align with logo top: sidebar padding-top (12px) + content padding-top (16px) */
-        top: 28px;
-        right: 20px;
-        width: auto;
     }
 
     .sidebar-logo {
