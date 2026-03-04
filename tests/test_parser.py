@@ -523,6 +523,144 @@ class TestPostParser:
         with pytest.raises(ValueError, match="YAML syntax error"):
             parser.parse_file(post_file)
 
+    def test_parse_file_non_string_title_raises_helpful_error(
+        self, tmp_path: Path
+    ) -> None:
+        """Test that a non-string title raises a helpful error citing the file.
+
+        YAML parses bare values like ``+1`` as ``int`` (1) rather than the
+        string ``"+1"``.  Silently coercing to str would produce ``"1"``,
+        which is wrong.  Instead the parser should raise a clear error
+        telling the user which file is affected and how to fix it.
+        """
+        parser = PostParser()
+        post_file = tmp_path / "plus-one-title.md"
+        post_file.write_text(
+            "---\n"
+            "title: +1\n"
+            "date: 2024-01-01\n"
+            "---\n"
+            "Content"
+        )
+
+        with pytest.raises(ValueError, match="'title' in frontmatter must be a string"):
+            parser.parse_file(post_file)
+
+    def test_parse_file_non_string_title_error_cites_file(
+        self, tmp_path: Path
+    ) -> None:
+        """Test that the non-string title error message includes the filename."""
+        parser = PostParser()
+        post_file = tmp_path / "bad-title.md"
+        post_file.write_text(
+            "---\n"
+            "title: +1\n"
+            "date: 2024-01-01\n"
+            "---\n"
+            "Content"
+        )
+
+        with pytest.raises(ValueError) as exc_info:
+            parser.parse_file(post_file)
+
+        error_message = str(exc_info.value)
+        assert str(post_file) in error_message
+        assert "Fix" in error_message
+
+    def test_parse_file_numeric_tags_coerced_to_str(self, tmp_path: Path) -> None:
+        """Test that numeric tags (e.g. a year like 2024) are coerced to str.
+
+        YAML parses bare numbers as int, so `tags: [2024, python]` yields
+        [2024, "python"].  The parser must convert each element to str so that
+        feed generators (feedgen) don't raise
+        "Argument must be bytes or unicode, got 'int'".
+        """
+        parser = PostParser()
+        post_file = tmp_path / "numeric-tags.md"
+        post_file.write_text(
+            "---\n"
+            "title: Numeric Tags Post\n"
+            "date: 2024-01-01\n"
+            "tags: [2024, python]\n"
+            "---\n"
+            "Content"
+        )
+
+        post = parser.parse_file(post_file)
+
+        assert post.tags is not None
+        assert all(isinstance(tag, str) for tag in post.tags)
+        assert post.tags == ["2024", "python"]
+
+    def test_parse_file_numeric_category_coerced_to_str(self, tmp_path: Path) -> None:
+        """Test that a numeric category value is coerced to str.
+
+        YAML parses `category: 2024` as int.  The parser must convert it to
+        str so that feed generators don't raise
+        "Argument must be bytes or unicode, got 'int'".
+        """
+        parser = PostParser()
+        post_file = tmp_path / "numeric-category.md"
+        post_file.write_text(
+            "---\n"
+            "title: Numeric Category Post\n"
+            "date: 2024-01-01\n"
+            "category: 2024\n"
+            "---\n"
+            "Content"
+        )
+
+        post = parser.parse_file(post_file)
+
+        assert isinstance(post.category, str)
+        assert post.category == "2024"
+
+    def test_parse_file_bare_scalar_tag_raises_helpful_error(
+        self, tmp_path: Path
+    ) -> None:
+        """Test that a bare scalar tags value raises a helpful error.
+
+        ``tags: +3`` is parsed by YAML as integer ``3`` (not a list or string).
+        Iterating over an int raises ``'int' object is not iterable``, which is
+        cryptic.  The parser should detect this case and raise a clear
+        ``ValueError`` that names the file and explains the fix.
+        """
+        parser = PostParser()
+        post_file = tmp_path / "bare-scalar-tags.md"
+        post_file.write_text(
+            "---\n"
+            "title: Post With Bare Scalar Tag\n"
+            "date: 2024-01-01\n"
+            "tags: +3\n"
+            "---\n"
+            "Content"
+        )
+
+        with pytest.raises(ValueError, match="'tags' in frontmatter must be a string or list"):
+            parser.parse_file(post_file)
+
+    def test_parse_file_bare_scalar_tag_error_cites_file(
+        self, tmp_path: Path
+    ) -> None:
+        """Test that the bare-scalar tags error message includes the filename."""
+        parser = PostParser()
+        post_file = tmp_path / "bare-scalar-tags-2.md"
+        post_file.write_text(
+            "---\n"
+            "title: Post With Bare Scalar Tag\n"
+            "date: 2024-01-01\n"
+            "tags: +3\n"
+            "---\n"
+            "Content"
+        )
+
+        with pytest.raises(ValueError) as exc_info:
+            parser.parse_file(post_file)
+
+        error_message = str(exc_info.value)
+        assert str(post_file) in error_message
+        assert "Fix" in error_message
+
     def test_parse_directory(self, posts_dir: Path) -> None:
         """Test parsing a directory of posts."""
         parser = PostParser()
@@ -613,6 +751,27 @@ class TestPostParser:
         page_file.write_text("---\n---\nContent")
 
         with pytest.raises(ValueError, match="missing required 'title'"):
+            parser.parse_page(page_file)
+
+    def test_parse_page_non_string_title_raises_helpful_error(
+        self, tmp_path: Path
+    ) -> None:
+        """Test that a non-string page title raises a helpful error.
+
+        YAML parses ``title: +1`` as ``int`` 1.  Silently coercing to str
+        would produce ``"1"`` which is wrong.  The parser should raise a
+        clear error naming the file and suggesting a fix.
+        """
+        parser = PostParser()
+        page_file = tmp_path / "bad-title-page.md"
+        page_file.write_text(
+            "---\n"
+            "title: +1\n"
+            "---\n"
+            "Content"
+        )
+
+        with pytest.raises(ValueError, match="'title' in frontmatter must be a string"):
             parser.parse_page(page_file)
 
     def test_parse_pages_directory(self, pages_dir: Path) -> None:

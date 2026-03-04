@@ -409,3 +409,67 @@ class TestBlogFeedGenerator:
 
         # Should generate without errors
         assert (output_dir / "feed.xml").exists()
+
+    def test_generate_feeds_with_numeric_string_tags(self, tmp_path: Path) -> None:
+        """Test that feed generation succeeds when tags are numeric strings.
+
+        When YAML frontmatter contains a bare number as a tag (e.g.
+        ``tags: [2024, python]``), the YAML parser produces an int.
+        After the parser coerces these to str, feed generation must still
+        produce valid output without raising
+        "Argument must be bytes or unicode, got 'int'".
+        """
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+
+        post = Post(
+            path=Path("numeric-tag-post.md"),
+            title="Post With Numeric Tag",
+            content="Content",
+            html_content="<p>Content</p>",
+            date=dt.datetime(2024, 1, 15, 12, 0, 0, tzinfo=dt.UTC),
+            tags=["2024", "python"],
+        )
+
+        generator = BlogFeedGenerator(
+            output_dir=output_dir,
+            site_title="Test Blog",
+            site_url="https://example.com",
+        )
+
+        generator.generate_index_feeds(posts=[post])
+
+        assert (output_dir / "feed.xml").exists()
+        rss_content = (output_dir / "feed.xml").read_text()
+        assert "Post With Numeric Tag" in rss_content
+
+    def test_generate_feeds_with_numeric_string_category(self, tmp_path: Path) -> None:
+        """Test that feed generation succeeds when category is a numeric string.
+
+        When YAML frontmatter contains ``category: 2024``, the YAML parser
+        produces an int.  After the parser coerces it to str, feed generation
+        must still produce valid output.
+        """
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+
+        post = Post(
+            path=Path("numeric-category-post.md"),
+            title="Post With Numeric Category",
+            content="Content",
+            html_content="<p>Content</p>",
+            date=dt.datetime(2024, 1, 15, 12, 0, 0, tzinfo=dt.UTC),
+            category="2024",
+        )
+
+        generator = BlogFeedGenerator(
+            output_dir=output_dir,
+            site_title="Test Blog",
+            site_url="https://example.com",
+        )
+
+        generator.generate_index_feeds(posts=[post])
+
+        assert (output_dir / "feed.xml").exists()
+        rss_content = (output_dir / "feed.xml").read_text()
+        assert "Post With Numeric Category" in rss_content

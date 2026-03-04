@@ -8,6 +8,11 @@
   default to show only the site title and a burger menu (☰) button. Clicking
   the burger menu expands the full sidebar (logo, subtitle, pages, links,
   socials). ([#202](https://github.com/davep/blogmore/pull/202))
+- Fixed a site-build crash ("Argument must be bytes or unicode, got 'int'")
+  that occurred when a post's frontmatter contained a bare number as a tag
+  or category value (e.g. `tags: [2024, python]` or `category: 2024`). Also
+  added some other checks and warnings for frontmatter values that could
+  appear ambiguous. ([#204](https://github.com/davep/blogmore/pull/204))
 
 ## v1.5.0
 
