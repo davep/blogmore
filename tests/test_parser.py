@@ -661,6 +661,30 @@ class TestPostParser:
         assert str(post_file) in error_message
         assert "Fix" in error_message
 
+    def test_parse_file_bare_tags_entry_yields_no_tags(
+        self, tmp_path: Path
+    ) -> None:
+        """Test that a bare ``tags:`` frontmatter entry produces an empty tag list.
+
+        A bare ``tags:`` with no associated value is parsed by YAML as ``None``.
+        The parser should treat this silently as no tags rather than raising an
+        error and skipping the post.
+        """
+        parser = PostParser()
+        post_file = tmp_path / "bare-tags.md"
+        post_file.write_text(
+            "---\n"
+            "title: Post With Bare Tags\n"
+            "date: 2024-01-01\n"
+            "tags:\n"
+            "---\n"
+            "Content"
+        )
+
+        post = parser.parse_file(post_file)
+
+        assert post.tags == []
+
     def test_parse_directory(self, posts_dir: Path) -> None:
         """Test parsing a directory of posts."""
         parser = PostParser()

@@ -420,9 +420,13 @@ class PostParser:
         # A bare scalar (e.g. `tags: +3` parsed as int 3) is not iterable and
         # must be caught explicitly with a helpful error rather than letting
         # Python raise "'int' object is not iterable".
+        # A bare `tags:` with no value is parsed by YAML as None; treat it as
+        # an empty list (no tags).
         raw_tags = post_data.get("tags", [])
-        if isinstance(raw_tags, str):
-            tags: list[str] = [tag.strip() for tag in raw_tags.split(",")]
+        if raw_tags is None:
+            tags: list[str] = []
+        elif isinstance(raw_tags, str):
+            tags = [tag.strip() for tag in raw_tags.split(",")]
         elif isinstance(raw_tags, list):
             tags = [str(tag).strip() for tag in raw_tags]
         else:
