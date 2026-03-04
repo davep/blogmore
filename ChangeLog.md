@@ -4,9 +4,8 @@
 
 **Released: Unreleased**
 
-- A bare `tags:` frontmatter entry (with no associated value, which YAML
-  parses as `None`) is now silently treated as an empty tag list instead of
-  causing a warning and skipping the post.
+- A bare `tags:` frontmatter entry is now silently treated as an empty tag
+  list instead of causing a warning and skipping the post.
   ([#207](https://github.com/davep/blogmore/pull/207))
 
 ## v1.6.0
