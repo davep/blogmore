@@ -523,6 +523,54 @@ class TestPostParser:
         with pytest.raises(ValueError, match="YAML syntax error"):
             parser.parse_file(post_file)
 
+    def test_parse_file_numeric_tags_coerced_to_str(self, tmp_path: Path) -> None:
+        """Test that numeric tags (e.g. a year like 2024) are coerced to str.
+
+        YAML parses bare numbers as int, so `tags: [2024, python]` yields
+        [2024, "python"].  The parser must convert each element to str so that
+        feed generators (feedgen) don't raise
+        "Argument must be bytes or unicode, got 'int'".
+        """
+        parser = PostParser()
+        post_file = tmp_path / "numeric-tags.md"
+        post_file.write_text(
+            "---\n"
+            "title: Numeric Tags Post\n"
+            "date: 2024-01-01\n"
+            "tags: [2024, python]\n"
+            "---\n"
+            "Content"
+        )
+
+        post = parser.parse_file(post_file)
+
+        assert post.tags is not None
+        assert all(isinstance(tag, str) for tag in post.tags)
+        assert post.tags == ["2024", "python"]
+
+    def test_parse_file_numeric_category_coerced_to_str(self, tmp_path: Path) -> None:
+        """Test that a numeric category value is coerced to str.
+
+        YAML parses `category: 2024` as int.  The parser must convert it to
+        str so that feed generators don't raise
+        "Argument must be bytes or unicode, got 'int'".
+        """
+        parser = PostParser()
+        post_file = tmp_path / "numeric-category.md"
+        post_file.write_text(
+            "---\n"
+            "title: Numeric Category Post\n"
+            "date: 2024-01-01\n"
+            "category: 2024\n"
+            "---\n"
+            "Content"
+        )
+
+        post = parser.parse_file(post_file)
+
+        assert isinstance(post.category, str)
+        assert post.category == "2024"
+
     def test_parse_directory(self, posts_dir: Path) -> None:
         """Test parsing a directory of posts."""
         parser = PostParser()

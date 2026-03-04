@@ -401,15 +401,21 @@ class PostParser:
                     except (ImportError, ValueError):
                         pass
 
-        # Extract category
-        category = post_data.get("category")
-        if category and isinstance(category, str):
-            category = category.strip()
+        # Extract category - coerce to str in case YAML parsed it as a non-string
+        # (e.g. `category: 2024` is parsed as int by the YAML parser)
+        raw_category = post_data.get("category")
+        if raw_category is not None:
+            category: str | None = str(raw_category).strip() or None
+        else:
+            category = None
 
-        # Extract tags
-        tags = post_data.get("tags", [])
-        if isinstance(tags, str):
-            tags = [tag.strip() for tag in tags.split(",")]
+        # Extract tags - coerce each item to str in case YAML parsed numeric
+        # values as int (e.g. `tags: [2024, python]` gives [2024, "python"])
+        raw_tags = post_data.get("tags", [])
+        if isinstance(raw_tags, str):
+            tags: list[str] = [tag.strip() for tag in raw_tags.split(",")]
+        else:
+            tags = [str(tag).strip() for tag in raw_tags]
 
         # Check draft status
         draft = post_data.get("draft", False)
