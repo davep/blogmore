@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## v1.7.0
+## v1.6.1
 
-**Released: Unreleased**
+**Released: 2026-03-04**
 
 - A bare `tags:` frontmatter entry is now silently treated as an empty tag
   list instead of causing a warning and skipping the post.
