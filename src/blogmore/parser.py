@@ -373,6 +373,12 @@ class PostParser:
         title = post_data.get("title")
         if not title:
             raise ValueError(f"Post missing required 'title' in frontmatter: {path}")
+        if not isinstance(title, str):
+            raise ValueError(
+                f"Post 'title' in frontmatter must be a string in: {path}\n"
+                f"  Found: {title!r} (type: {type(title).__name__})\n"
+                f"  Fix: wrap the value in quotes, e.g.  title: 'My Post Title'"
+            )
 
         # Parse date if present
         date = None
@@ -501,6 +507,12 @@ class PostParser:
         title = page_data.get("title")
         if not title:
             raise ValueError(f"Page missing required 'title' in frontmatter: {path}")
+        if not isinstance(title, str):
+            raise ValueError(
+                f"Page 'title' in frontmatter must be a string in: {path}\n"
+                f"  Found: {title!r} (type: {type(title).__name__})\n"
+                f"  Fix: wrap the value in quotes, e.g.  title: 'My Page Title'"
+            )
 
         # Convert markdown to HTML
         html_content = self.markdown.convert(page_data.content)

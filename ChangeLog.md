@@ -8,7 +8,9 @@
   that occurred when a post's frontmatter contained a bare number as a tag or
   category value (e.g. `tags: [2024, python]` or `category: 2024`). YAML
   parses bare numbers as `int`, so the parser now coerces all tag and category
-  values to `str` during parsing.
+  values to `str` during parsing. Posts and pages with a non-string `title`
+  (e.g. `title: +1`, which YAML parses as integer `1`) now raise a clear
+  error citing the problematic file and suggesting the value be quoted.
   ([#205](https://github.com/davep/blogmore/pull/205))
 - Improved mobile layout: in "mobile view" the sidebar is collapsed by
   default to show only the site title and a burger menu (☰) button. Clicking
