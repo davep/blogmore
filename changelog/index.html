@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.4">
     
     
       
@@ -583,6 +583,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v160" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.6.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v150" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -842,6 +853,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v160" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.6.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v150" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1060,6 +1082,19 @@
 
 
 <h1 id="blogmore-changelog">BlogMore ChangeLog</h1>
+<h2 id="v160">v1.6.0</h2>
+<p><strong>Released: 2026-03-04</strong></p>
+<ul>
+<li>Improved mobile layout: in "mobile view" the sidebar is collapsed by
+  default to show only the site title and a burger menu (☰) button. Clicking
+  the burger menu expands the full sidebar (logo, subtitle, pages, links,
+  socials). (<a href="https://github.com/davep/blogmore/pull/202">#202</a>)</li>
+<li>Fixed a site-build crash ("Argument must be bytes or unicode, got 'int'")
+  that occurred when a post's frontmatter contained a bare number as a tag
+  or category value (e.g. <code>tags: [2024, python]</code> or <code>category: 2024</code>). Also
+  added some other checks and warnings for frontmatter values that could
+  appear ambiguous. (<a href="https://github.com/davep/blogmore/pull/204">#204</a>)</li>
+</ul>
 <h2 id="v150">v1.5.0</h2>
 <p><strong>Released: 2026-03-03</strong></p>
 <ul>
