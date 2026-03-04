@@ -4,20 +4,15 @@
 
 **Released: WiP**
 
-- Fixed a site-build crash ("Argument must be bytes or unicode, got 'int'")
-  that occurred when a post's frontmatter contained a bare number as a tag or
-  category value (e.g. `tags: [2024, python]` or `category: 2024`). YAML
-  parses bare numbers as `int`, so the parser now coerces all tag and category
-  values to `str` during parsing. Posts and pages with a non-string `title`
-  (e.g. `title: +1`, which YAML parses as integer `1`) now raise a clear
-  error citing the problematic file and suggesting the value be quoted. A
-  bare scalar `tags` value (e.g. `tags: +3`, parsed as integer `3`) also
-  raises a clear error rather than crashing with `'int' object is not iterable`.
-  ([#205](https://github.com/davep/blogmore/pull/205))
 - Improved mobile layout: in "mobile view" the sidebar is collapsed by
   default to show only the site title and a burger menu (☰) button. Clicking
   the burger menu expands the full sidebar (logo, subtitle, pages, links,
   socials). ([#202](https://github.com/davep/blogmore/pull/202))
+- Fixed a site-build crash ("Argument must be bytes or unicode, got 'int'")
+  that occurred when a post's frontmatter contained a bare number as a tag
+  or category value (e.g. `tags: [2024, python]` or `category: 2024`). Also
+  added some other checks and warnings for frontmatter values that could
+  appear ambiguous. ([#204](https://github.com/davep/blogmore/pull/204))
 
 ## v1.5.0
 
