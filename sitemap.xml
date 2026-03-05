@@ -2,30 +2,46 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://blogmore.davep.dev/</loc>
-         <lastmod>2026-03-04</lastmod>
+         <lastmod>2026-03-05</lastmod>
+    </url>
+    <url>
+         <loc>https://blogmore.davep.dev/building/</loc>
+         <lastmod>2026-03-05</lastmod>
     </url>
     <url>
          <loc>https://blogmore.davep.dev/changelog/</loc>
-         <lastmod>2026-03-04</lastmod>
+         <lastmod>2026-03-05</lastmod>
     </url>
     <url>
          <loc>https://blogmore.davep.dev/command_line/</loc>
-         <lastmod>2026-03-04</lastmod>
+         <lastmod>2026-03-05</lastmod>
     </url>
     <url>
          <loc>https://blogmore.davep.dev/configuration/</loc>
-         <lastmod>2026-03-04</lastmod>
-    </url>
-    <url>
-         <loc>https://blogmore.davep.dev/getting_started/</loc>
-         <lastmod>2026-03-04</lastmod>
+         <lastmod>2026-03-05</lastmod>
     </url>
     <url>
          <loc>https://blogmore.davep.dev/license/</loc>
-         <lastmod>2026-03-04</lastmod>
+         <lastmod>2026-03-05</lastmod>
     </url>
     <url>
-         <loc>https://blogmore.davep.dev/using/</loc>
-         <lastmod>2026-03-04</lastmod>
+         <loc>https://blogmore.davep.dev/metadata_and_sidebar/</loc>
+         <lastmod>2026-03-05</lastmod>
+    </url>
+    <url>
+         <loc>https://blogmore.davep.dev/setting_up_your_blog/</loc>
+         <lastmod>2026-03-05</lastmod>
+    </url>
+    <url>
+         <loc>https://blogmore.davep.dev/templates/</loc>
+         <lastmod>2026-03-05</lastmod>
+    </url>
+    <url>
+         <loc>https://blogmore.davep.dev/writing_a_page/</loc>
+         <lastmod>2026-03-05</lastmod>
+    </url>
+    <url>
+         <loc>https://blogmore.davep.dev/writing_a_post/</loc>
+         <lastmod>2026-03-05</lastmod>
     </url>
 </urlset>

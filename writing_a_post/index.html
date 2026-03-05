@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://blogmore.davep.dev/using/">
+        <link rel="canonical" href="https://blogmore.davep.dev/writing_a_post/">
       
       
-        <link rel="prev" href="../getting_started/">
+        <link rel="prev" href="../setting_up_your_blog/">
       
       
-        <link rel="next" href="../command_line/">
+        <link rel="next" href="../writing_a_page/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Using BlogMore - BlogMore</title>
+        <title>Writing a Post - BlogMore</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#using-blogmore" class="md-skip">
+        <a href="#writing-a-post" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Using BlogMore
+              Writing a Post
             
           </span>
         </div>
@@ -347,6 +347,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -409,14 +417,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting_started/" class="md-nav__link">
+      <a href="../setting_up_your_blog/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Getting Started with BlogMore
+    Setting Up Your Blog
   
 
     
@@ -453,7 +461,7 @@
   <span class="md-ellipsis">
     
   
-    Using BlogMore
+    Writing a Post
   
 
     
@@ -471,7 +479,7 @@
   <span class="md-ellipsis">
     
   
-    Using BlogMore
+    Writing a Post
   
 
     
@@ -497,22 +505,73 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#writing-posts" class="md-nav__link">
+  <a href="#your-first-post" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Writing Posts
+        Your first post
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Writing Posts">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#frontmatter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frontmatter
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Frontmatter">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#creating-a-new-post" class="md-nav__link">
+  <a href="#required-fields" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Creating a New Post
+        Required fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Required fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#title" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        title
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Optional fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#date" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        date
       
     </span>
   </a>
@@ -520,10 +579,125 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#post-metadata" class="md-nav__link">
+  <a href="#tags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Post Metadata
+        tags
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#category" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        category
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#author" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        author
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#draft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        draft
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        description
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cover" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cover
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#twitter_creator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        twitter_creator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#twitter_site" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        twitter_site
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modified" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        modified
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#date-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Date formats
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tags-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tags formats
       
     </span>
   </a>
@@ -536,291 +710,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#development-workflow" class="md-nav__link">
+  <a href="#categories-and-tags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Development Workflow
+        Categories and tags
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Development Workflow">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#starting-the-development-server" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Starting the Development Server
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#including-drafts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Including Drafts
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#using-different-ports" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using Different Ports
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#building-your-site" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Building Your Site
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Building Your Site">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#clean-builds" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Clean Builds
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#publishing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Publishing
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Publishing">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#publishing-to-github-pages" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Publishing to GitHub Pages
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#publishing-to-other-branches" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Publishing to Other Branches
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#organising-content" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Organising Content
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Organising Content">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#using-categories" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using Categories
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#using-tags" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using Tags
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#custom-404-page" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Custom 404 Page
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#customisation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Customisation
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Customisation">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#using-configuration-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using Configuration Files
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adding-custom-styles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Adding Custom Styles
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adding-site-icons" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Adding Site Icons
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Adding Site Icons">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quick Start
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#using-a-custom-icon-filename" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using a Custom Icon Filename
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#supported-source-filenames" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Supported Source Filenames
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Requirements
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#what-gets-generated" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What Gets Generated
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#customising-the-sidebar" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Customising the Sidebar
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -828,19 +724,30 @@
   <a href="#markdown-features" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Markdown Features
+        Markdown features
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Markdown Features">
+    <nav class="md-nav" aria-label="Markdown features">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#syntax-highlighting" class="md-nav__link">
+  <a href="#basic-formatting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Syntax Highlighting
+        Basic formatting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#code-blocks-with-syntax-highlighting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code blocks with syntax highlighting
       
     </span>
   </a>
@@ -859,17 +766,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#admonitions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Admonitions
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#footnotes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -880,61 +776,11 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#common-tasks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Common Tasks
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Common Tasks">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
-  <a href="#changing-site-title" class="md-nav__link">
+  <a href="#admonitions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Changing Site Title
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#setting-site-url" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Setting Site URL
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#controlling-feed-length" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Controlling Feed Length
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#using-custom-templates" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using Custom Templates
+        Admonitions
       
     </span>
   </a>
@@ -943,67 +789,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Troubleshooting
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Troubleshooting">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#port-already-in-use" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Port Already in Use
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#site-not-updating" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Site Not Updating
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#drafts-appearing-in-production" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Drafts Appearing in Production
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Next Steps
-      
-    </span>
-  </a>
   
 </li>
       
@@ -1011,6 +796,118 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../writing_a_page/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing a Page
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metadata_and_sidebar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metadata and Sidebar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../building/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building and Publishing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1160,22 +1057,73 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#writing-posts" class="md-nav__link">
+  <a href="#your-first-post" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Writing Posts
+        Your first post
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Writing Posts">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#frontmatter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frontmatter
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Frontmatter">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#creating-a-new-post" class="md-nav__link">
+  <a href="#required-fields" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Creating a New Post
+        Required fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Required fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#title" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        title
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Optional fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#date" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        date
       
     </span>
   </a>
@@ -1183,10 +1131,125 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#post-metadata" class="md-nav__link">
+  <a href="#tags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Post Metadata
+        tags
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#category" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        category
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#author" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        author
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#draft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        draft
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        description
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cover" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cover
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#twitter_creator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        twitter_creator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#twitter_site" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        twitter_site
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modified" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        modified
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#date-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Date formats
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tags-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tags formats
       
     </span>
   </a>
@@ -1199,291 +1262,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#development-workflow" class="md-nav__link">
+  <a href="#categories-and-tags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Development Workflow
+        Categories and tags
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Development Workflow">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#starting-the-development-server" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Starting the Development Server
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#including-drafts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Including Drafts
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#using-different-ports" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using Different Ports
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#building-your-site" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Building Your Site
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Building Your Site">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#clean-builds" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Clean Builds
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#publishing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Publishing
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Publishing">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#publishing-to-github-pages" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Publishing to GitHub Pages
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#publishing-to-other-branches" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Publishing to Other Branches
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#organising-content" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Organising Content
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Organising Content">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#using-categories" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using Categories
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#using-tags" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using Tags
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#custom-404-page" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Custom 404 Page
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#customisation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Customisation
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Customisation">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#using-configuration-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using Configuration Files
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adding-custom-styles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Adding Custom Styles
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#adding-site-icons" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Adding Site Icons
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Adding Site Icons">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quick Start
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#using-a-custom-icon-filename" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using a Custom Icon Filename
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#supported-source-filenames" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Supported Source Filenames
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Requirements
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#what-gets-generated" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What Gets Generated
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#customising-the-sidebar" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Customising the Sidebar
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1491,19 +1276,30 @@
   <a href="#markdown-features" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Markdown Features
+        Markdown features
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Markdown Features">
+    <nav class="md-nav" aria-label="Markdown features">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#syntax-highlighting" class="md-nav__link">
+  <a href="#basic-formatting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Syntax Highlighting
+        Basic formatting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#code-blocks-with-syntax-highlighting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code blocks with syntax highlighting
       
     </span>
   </a>
@@ -1522,17 +1318,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#admonitions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Admonitions
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#footnotes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1543,61 +1328,11 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#common-tasks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Common Tasks
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Common Tasks">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
-  <a href="#changing-site-title" class="md-nav__link">
+  <a href="#admonitions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Changing Site Title
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#setting-site-url" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Setting Site URL
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#controlling-feed-length" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Controlling Feed Length
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#using-custom-templates" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using Custom Templates
+        Admonitions
       
     </span>
   </a>
@@ -1606,67 +1341,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Troubleshooting
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Troubleshooting">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#port-already-in-use" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Port Already in Use
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#site-not-updating" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Site Not Updating
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#drafts-appearing-in-production" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Drafts Appearing in Production
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Next Steps
-      
-    </span>
-  </a>
   
 </li>
       
@@ -1690,278 +1364,166 @@
   
 
 
-<h1 id="using-blogmore">Using BlogMore</h1>
-<p>This guide covers the day-to-day use of BlogMore after initial setup.</p>
-<h2 id="writing-posts">Writing Posts</h2>
-<h3 id="creating-a-new-post">Creating a New Post</h3>
-<p>Create a new Markdown file in your content directory with frontmatter:</p>
+<h1 id="writing-a-post">Writing a Post</h1>
+<p>Posts are the heart of a BlogMore blog. Each post is a Markdown file with a small block of metadata at the top called <em>frontmatter</em>. This page covers everything you need to know to write, format, and publish a post.</p>
+<h2 id="your-first-post">Your first post</h2>
+<p>Create a new <code>.md</code> file inside your <a href="../setting_up_your_blog/#the-content-directory">content directory</a>. The filename becomes part of the post's URL, so choose something descriptive and lowercase:</p>
+<div class="highlight"><pre><span></span><code>posts/hello-world.md
+</code></pre></div>
+<p>At its simplest, a post looks like this:</p>
 <div class="highlight"><pre><span></span><code>---
-title: My New Post
-date: 2024-01-20
-tags: [python, tutorial]
-<span class="gu">category: programming</span>
+title: Hello World
+<span class="gu">date: 2024-01-15</span>
 <span class="gu">---</span>
 
-Your post content goes here...
+Welcome to my new blog! This is my first post.
 </code></pre></div>
-<h3 id="post-metadata">Post Metadata</h3>
-<p>Every post requires a <code>title</code> field. Other common fields include:</p>
+<p>That's all you need to get started. BlogMore will generate a full HTML page from this file, including the page title, date, and all the surrounding navigation.</p>
+<h2 id="frontmatter">Frontmatter</h2>
+<p>Frontmatter is the block of YAML at the very top of your Markdown file, enclosed between two lines of <code>---</code>. It tells BlogMore everything it needs to know about the post.</p>
+<h3 id="required-fields">Required fields</h3>
+<h4 id="title"><code>title</code></h4>
+<p>The title of the post. This appears as the page heading, in the browser tab, and in listings, feeds, and search results.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">My Thoughts on Python 3.12</span>
+</code></pre></div>
+<h3 id="optional-fields">Optional fields</h3>
+<h4 id="date"><code>date</code></h4>
+<p>The publication date of the post. Posts are sorted chronologically by this field, so it's well worth setting. Posts without a date appear after all dated posts.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2024-01-15</span>
+</code></pre></div>
+<p>See <a href="#date-formats">Date formats</a> below for all accepted formats.</p>
+<h4 id="tags"><code>tags</code></h4>
+<p>A list of tags for the post. Tags are specific topics that can span across categories. Each tag gets its own page on the site listing all posts with that tag.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">python</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">tutorial</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">beginner</span><span class="p p-Indicator">]</span>
+</code></pre></div>
+<p>Tags can be written in several ways — see <a href="#tags-formats">Tags formats</a> below.</p>
+<h4 id="category"><code>category</code></h4>
+<p>A single broad category for the post. Each category gets its own page listing all posts in it. A post can belong to at most one category.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+</code></pre></div>
+<p>See <a href="#categories-and-tags">Categories and tags</a> below for guidance on when to use each.</p>
+<h4 id="author"><code>author</code></h4>
+<p>The name of the post's author. If not set, BlogMore falls back to the <code>default_author</code> set in your <a href="../configuration/">configuration</a>.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">author</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dave Pearson</span>
+</code></pre></div>
+<h4 id="draft"><code>draft</code></h4>
+<p>Set to <code>true</code> to mark the post as a draft. Draft posts are excluded from the build by default. This is useful for work in progress that you're not ready to publish.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">draft</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<p>To include drafts during local development, pass <code>--include-drafts</code> on the command line or set <code>include_drafts: true</code> in your <a href="../configuration/">configuration</a>. See <a href="../building/#including-drafts">Building and Publishing</a> for more.</p>
+<h4 id="description"><code>description</code></h4>
+<p>A short description of the post. Used for the <code>&lt;meta name="description"&gt;</code> tag, Open Graph tags, and Twitter Card tags. If not set, BlogMore falls back to the first paragraph of the post's content.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A gentle introduction to Python decorators with practical examples.</span>
+</code></pre></div>
+<h4 id="cover"><code>cover</code></h4>
+<p>A URL or path to a cover image, used for Open Graph and Twitter Card social sharing previews.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">cover</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/images/my-post-cover.png</span>
+</code></pre></div>
+<h4 id="twitter_creator"><code>twitter_creator</code></h4>
+<p>The Twitter/X handle of the post's author. Used in Twitter Card meta tags.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">twitter_creator</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;@davep&quot;</span>
+</code></pre></div>
+<h4 id="twitter_site"><code>twitter_site</code></h4>
+<p>The Twitter/X handle of the site. Used in Twitter Card meta tags.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">twitter_site</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;@my_blog&quot;</span>
+</code></pre></div>
+<h4 id="modified"><code>modified</code></h4>
+<p>The date the post was last modified. Used in the <code>&lt;meta name="last-modified"&gt;</code> tag. Accepts the same formats as <code>date</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">modified</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2024-06-01</span>
+</code></pre></div>
+<h3 id="date-formats">Date formats</h3>
+<p>BlogMore accepts dates in several formats:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2024-01-15</span><span class="w">              </span><span class="c1"># Simple date</span>
+<span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2024-01-15 14:30:00</span><span class="w">     </span><span class="c1"># Date with time</span>
+<span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2024-01-15T14:30:00Z</span><span class="w">    </span><span class="c1"># ISO 8601 with timezone</span>
+</code></pre></div>
+<p>All formats work for both <code>date</code> and <code>modified</code>.</p>
+<h3 id="tags-formats">Tags formats</h3>
+<p>Tags can be written in three ways — choose whichever you find most readable:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Inline YAML list (recommended)</span>
+<span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">python</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">web</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">tutorial</span><span class="p p-Indicator">]</span>
+
+<span class="c1"># Comma-separated string</span>
+<span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python, web, tutorial</span>
+
+<span class="c1"># Multi-line YAML list</span>
+<span class="nt">tags</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tutorial</span>
+</code></pre></div>
+<h2 id="categories-and-tags">Categories and tags</h2>
+<p>Both categories and tags help visitors find related content, but they serve different purposes:</p>
 <ul>
-<li><code>date</code> - Publication date (YYYY-MM-DD format)</li>
-<li><code>tags</code> - List of tags for categorisation</li>
-<li><code>category</code> - A single category</li>
-<li><code>author</code> - Post author name</li>
-<li><code>draft</code> - Mark as draft (excluded by default)</li>
+<li><strong>Category</strong> — the broad subject area the post belongs to. Think of it as the section of a magazine: <code>python</code>, <code>devops</code>, <code>book-reviews</code>. A post has at most one category.</li>
+<li><strong>Tags</strong> — specific topics within a post that might cut across categories. Think of them as an index: <code>tutorial</code>, <code>beginner</code>, <code>type-hints</code>, <code>testing</code>. A post can have as many tags as you like.</li>
 </ul>
-<p>See <a href="../getting_started/#understanding-frontmatter">Getting Started</a> for complete frontmatter documentation.</p>
-<h2 id="development-workflow">Development Workflow</h2>
-<h3 id="starting-the-development-server">Starting the Development Server</h3>
-<p>Start a local server that automatically rebuilds on changes:</p>
-<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>serve<span class="w"> </span>posts/
-</code></pre></div>
-<p>Visit <code>http://localhost:8000</code> to preview your site. The site automatically rebuilds when you save changes to any Markdown file.</p>
-<h3 id="including-drafts">Including Drafts</h3>
-<p>Work on unpublished posts by marking them as drafts and including them during development:</p>
-<div class="highlight"><pre><span></span><code><span class="nn">---</span>
-<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Work in Progress</span>
-<span class="nt">draft</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="nn">---</span>
-</code></pre></div>
-<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>serve<span class="w"> </span>posts/<span class="w"> </span>--include-drafts
-</code></pre></div>
-<h3 id="using-different-ports">Using Different Ports</h3>
-<p>If port 8000 is in use, specify a different port:</p>
-<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>serve<span class="w"> </span>posts/<span class="w"> </span>--port<span class="w"> </span><span class="m">3000</span>
-</code></pre></div>
-<h2 id="building-your-site">Building Your Site</h2>
-<p>Generate a production-ready static site:</p>
-<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/
-</code></pre></div>
-<p>This creates an <code>output/</code> directory with your complete site. You can then deploy this directory to any static hosting service.</p>
-<h3 id="clean-builds">Clean Builds</h3>
-<p>Remove the output directory before building to ensure no stale files:</p>
-<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--clean-first
-</code></pre></div>
-<h2 id="publishing">Publishing</h2>
-<h3 id="publishing-to-github-pages">Publishing to GitHub Pages</h3>
-<p>Publish your site directly to GitHub Pages:</p>
-<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>publish<span class="w"> </span>posts/
-</code></pre></div>
-<p>This builds your site and pushes it to the <code>gh-pages</code> branch. See <a href="../getting_started/#publishing-to-github-pages">Getting Started - Publishing to GitHub Pages</a> for setup instructions.</p>
-<h3 id="publishing-to-other-branches">Publishing to Other Branches</h3>
-<p>Publish to any git branch:</p>
-<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>publish<span class="w"> </span>posts/<span class="w"> </span>--branch<span class="w"> </span>main
-</code></pre></div>
-<h2 id="organising-content">Organising Content</h2>
-<h3 id="using-categories">Using Categories</h3>
-<p>Categories help organise posts into distinct sections:</p>
-<div class="highlight"><pre><span></span><code><span class="nn">---</span>
-<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Python Decorators Explained</span>
-<span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="nn">---</span>
-</code></pre></div>
-<p>Visitors can view all posts in a category at <code>/category/python.html</code>.</p>
-<h3 id="using-tags">Using Tags</h3>
-<p>Tags allow cross-categorisation:</p>
+<p>A well-organised post might look like this:</p>
 <div class="highlight"><pre><span></span><code><span class="nn">---</span>
 <span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Python Decorators Explained</span>
 <span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
 <span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">tutorial</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">intermediate</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">decorators</span><span class="p p-Indicator">]</span>
 <span class="nn">---</span>
 </code></pre></div>
-<p>Tags appear on post pages and visitors can view all posts with a tag at <code>/tag/tutorial.html</code>.</p>
-<h3 id="custom-404-page">Custom 404 Page</h3>
-<p>Services such as GitHub Pages support a custom 404 page that is displayed
-whenever a visitor tries to access a URL that does not exist on your site.</p>
-<p>To create one, add a <code>404.md</code> file to the <code>pages/</code> subdirectory of your
-content directory:</p>
-<div class="highlight"><pre><span></span><code>posts/
-  pages/
-    404.md
-    about.md
-</code></pre></div>
-<p>The file uses the same frontmatter and Markdown format as any other page:</p>
-<div class="highlight"><pre><span></span><code>---
-<span class="gu">title: Page Not Found</span>
-<span class="gu">---</span>
+<p>Visitors can navigate to <code>/category/python.html</code> to see all posts in that category, or to <code>/tag/tutorial.html</code> to see all posts tagged with <code>tutorial</code>.</p>
+<h2 id="markdown-features">Markdown features</h2>
+<p>BlogMore supports standard Markdown plus several extensions. The following sections cover the most useful ones.</p>
+<h3 id="basic-formatting">Basic formatting</h3>
+<p>Standard Markdown formatting all works as expected:</p>
+<div class="highlight"><pre><span></span><code><span class="gs">**bold**</span>, <span class="ge">*italic*</span>, <span class="sb">`inline code`</span>, <span class="gd">~~strikethrough~~</span>
 
-Sorry, the page you were looking for does not exist.
+<span class="k">&gt; </span><span class="ge">Blockquote text</span>
 
-[<span class="nt">Return to the home page</span>](<span class="na">/</span>)
-</code></pre></div>
-<p>BlogMore will generate a <code>404.html</code> file in the root of your output
-directory. This file will <strong>not</strong> appear as a link in the site navigation.</p>
-<p>When testing locally with <code>blogmore serve</code>, the development server will
-automatically serve this custom page whenever a resource cannot be found,
-so you can preview the 404 experience before publishing.</p>
-<p>If <code>404.md</code> is absent, no <code>404.html</code> file is generated and the server falls
-back to its built-in 404 response.</p>
-<h2 id="customisation">Customisation</h2>
-<h3 id="using-configuration-files">Using Configuration Files</h3>
-<p>Create a <code>blogmore.yaml</code> to avoid repeating command-line options:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">content_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">posts</span>
-<span class="nt">site_title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;My</span><span class="nv"> </span><span class="s">Blog&quot;</span>
-<span class="nt">site_url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://example.com&quot;</span>
-<span class="nt">default_author</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Your</span><span class="nv"> </span><span class="s">Name&quot;</span>
-</code></pre></div>
-<p>Then use simplified commands:</p>
-<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build
-blogmore<span class="w"> </span>serve
-blogmore<span class="w"> </span>publish
-</code></pre></div>
-<p>See the <a href="../configuration/">Configuration Guide</a> for all options.</p>
-<h3 id="adding-custom-styles">Adding Custom Styles</h3>
-<p>Include additional stylesheets:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">extra_stylesheets</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://fonts.googleapis.com/css2?family=Inter</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/assets/custom.css</span>
-</code></pre></div>
-<p>Place <code>custom.css</code> in your content directory at <code>assets/custom.css</code> and BlogMore will copy it to the output.</p>
-<h3 id="adding-site-icons">Adding Site Icons</h3>
-<p>BlogMore can automatically generate favicons and platform-specific icons from a single source image. This creates icons optimised for iOS, Android, Windows, and all modern browsers.</p>
-<h4 id="quick-start">Quick Start</h4>
-<p>Place a square, high-resolution image (ideally 1024×1024 or larger) in your content directory's <code>extras/</code> subdirectory:</p>
-<div class="highlight"><pre><span></span><code>posts/
-<span class="w">  </span>├──<span class="w"> </span>extras/
-<span class="w">  </span>│<span class="w">   </span>└──<span class="w"> </span>icon.png
-<span class="w">  </span>└──<span class="w"> </span>my-first-post.md
-</code></pre></div>
-<p>BlogMore will automatically detect the icon and generate 18 icon files:</p>
-<ul>
-<li><strong>Favicon files</strong> - Multi-resolution <code>.ico</code> and PNG alternatives (16×16, 32×32, 96×96)</li>
-<li><strong>Apple Touch Icons</strong> - Optimised for iOS devices (120×120, 152×152, 167×167, 180×180)</li>
-<li><strong>Android/Chrome icons</strong> - PWA-ready with web manifest (192×192, 512×512)</li>
-<li><strong>Windows tiles</strong> - Microsoft Edge and Windows 10+ tiles (70×70, 144×144, 150×150, 310×310, 310×150)</li>
-</ul>
-<p>All generated icons are placed in the <code>/icons</code> subdirectory of your output.</p>
-<h4 id="using-a-custom-icon-filename">Using a Custom Icon Filename</h4>
-<p>If your icon has a different filename, specify it in your configuration:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">icon_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my-logo.png&quot;</span>
-</code></pre></div>
-<p>Or via command line:</p>
-<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--icon-source<span class="w"> </span>my-logo.png
-</code></pre></div>
-<h4 id="supported-source-filenames">Supported Source Filenames</h4>
-<p>BlogMore auto-detects these filenames in the <code>extras/</code> directory:</p>
-<ul>
-<li><code>icon.png</code> (recommended)</li>
-<li><code>icon.jpg</code> or <code>icon.jpeg</code></li>
-<li><code>source-icon.png</code></li>
-<li><code>app-icon.png</code></li>
-</ul>
-<h4 id="requirements">Requirements</h4>
-<ul>
-<li><strong>Format:</strong> PNG or JPEG</li>
-<li><strong>Size:</strong> 1024×1024 or larger (square)</li>
-<li><strong>Transparency:</strong> PNG with transparent backgrounds works best</li>
-</ul>
-<h4 id="what-gets-generated">What Gets Generated</h4>
-<p>When a source icon is detected, BlogMore generates:</p>
-<div class="highlight"><pre><span></span><code>output/
-  └── icons/
-      ├── favicon.ico               (16×16, 32×32, 48×48 multi-res)
-      ├── favicon-16x16.png
-      ├── favicon-32x32.png
-      ├── favicon-96x96.png
-      ├── apple-touch-icon.png      (180×180)
-      ├── apple-touch-icon-120.png  (120×120)
-      ├── apple-touch-icon-152.png  (152×152)
-      ├── apple-touch-icon-167.png  (167×167)
-      ├── apple-touch-icon-precomposed.png
-      ├── android-chrome-192x192.png
-      ├── android-chrome-512x512.png
-      ├── mstile-70x70.png
-      ├── mstile-144x144.png
-      ├── mstile-150x150.png
-      ├── mstile-310x310.png
-      ├── mstile-310x150.png
-      ├── site.webmanifest          (PWA manifest)
-      └── browserconfig.xml         (Windows tile config)
-</code></pre></div>
-<p>The necessary HTML meta tags are automatically added to all pages, but only when the icons exist.</p>
-<h3 id="customising-the-sidebar">Customising the Sidebar</h3>
-<p>Add a logo, custom links, and social media icons:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">site_logo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/images/logo.png</span>
+<span class="k">-</span><span class="w"> </span>unordered list
+<span class="k">-</span><span class="w"> </span>second item
 
-<span class="nt">links</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">About</span>
-<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/about.html</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Projects</span>
-<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/projects.html</span>
+<span class="k">1.</span> ordered list
+<span class="k">2.</span> second item
 
-<span class="nt">socials</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">site</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github</span>
-<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/username</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">site</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mastodon</span>
-<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://fosstodon.org/@username</span>
+[<span class="nt">link text</span>](<span class="na">https://example.com</span>)
+
+![<span class="nt">alt text</span>](<span class="na">/path/to/image.png</span>)
 </code></pre></div>
-<h2 id="markdown-features">Markdown Features</h2>
-<p>BlogMore supports standard Markdown plus several extensions.</p>
-<h3 id="syntax-highlighting">Syntax Highlighting</h3>
-<p>Use fenced code blocks with language specifiers:</p>
+<h3 id="code-blocks-with-syntax-highlighting">Code blocks with syntax highlighting</h3>
+<p>Use fenced code blocks with a language identifier for syntax highlighting:</p>
 <div class="highlight"><pre><span></span><code><span class="sb">```python</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Hello, </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">!&quot;</span>
 <span class="sb">```</span>
 </code></pre></div>
+<p>A wide range of languages are supported, including <code>python</code>, <code>javascript</code>, <code>typescript</code>, <code>bash</code>, <code>yaml</code>, <code>json</code>, <code>html</code>, <code>css</code>, <code>sql</code>, <code>rust</code>, <code>go</code>, and many more.</p>
 <h3 id="tables">Tables</h3>
-<div class="highlight"><pre><span></span><code>| Feature | Status |
-|---------|--------|
-| Tables  | ✓      |
-| Code    | ✓      |
+<div class="highlight"><pre><span></span><code>| Feature       | Supported |
+|---------------|-----------|
+| Code blocks   | Yes       |
+| Tables        | Yes       |
+| Footnotes     | Yes       |
+| Admonitions   | Yes       |
 </code></pre></div>
+<h3 id="footnotes">Footnotes</h3>
+<div class="highlight"><pre><span></span><code>This is a statement that needs a citation.[^1]
+
+[<span class="nl">^1</span>]: <span class="na">The source of the citation.</span>
+</code></pre></div>
+<p>The footnote marker becomes a superscript link, and the footnote text is rendered at the bottom of the post.</p>
 <h3 id="admonitions">Admonitions</h3>
-<p>Create alert boxes for important information:</p>
+<p>BlogMore supports GitHub-style alert boxes, written as blockquotes with a special tag on the first line:</p>
 <div class="highlight"><pre><span></span><code><span class="k">&gt; </span><span class="ge">[!NOTE]</span>
-<span class="k">&gt; </span><span class="ge">This is a note with useful information.</span>
+<span class="k">&gt; </span><span class="ge">Useful information that readers should know.</span>
+
+<span class="k">&gt; </span><span class="ge">[!TIP]</span>
+<span class="k">&gt; </span><span class="ge">A helpful suggestion for doing things better.</span>
+
+<span class="k">&gt; </span><span class="ge">[!IMPORTANT]</span>
+<span class="k">&gt; </span><span class="ge">Key information that readers must not miss.</span>
 
 <span class="k">&gt; </span><span class="ge">[!WARNING]</span>
-<span class="k">&gt; </span><span class="ge">This is a warning about something important.</span>
-</code></pre></div>
-<p>Available types: NOTE, TIP, IMPORTANT, WARNING, CAUTION</p>
-<h3 id="footnotes">Footnotes</h3>
-<p>Add footnotes to your posts:</p>
-<div class="highlight"><pre><span></span><code>This statement needs a citation[^1].
+<span class="k">&gt; </span><span class="ge">Urgent information that needs immediate attention.</span>
 
-[<span class="nl">^1</span>]: <span class="na">Source: Example Reference</span>
+<span class="k">&gt; </span><span class="ge">[!CAUTION]</span>
+<span class="k">&gt; </span><span class="ge">Advice about risks or negative outcomes.</span>
 </code></pre></div>
-<h2 id="common-tasks">Common Tasks</h2>
-<h3 id="changing-site-title">Changing Site Title</h3>
-<p>Update via configuration file or command line:</p>
-<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--site-title<span class="w"> </span><span class="s2">&quot;New Title&quot;</span>
-</code></pre></div>
-<h3 id="setting-site-url">Setting Site URL</h3>
-<p>Important for RSS feeds and canonical URLs:</p>
-<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--site-url<span class="w"> </span><span class="s2">&quot;https://example.com&quot;</span>
-</code></pre></div>
-<h3 id="controlling-feed-length">Controlling Feed Length</h3>
-<p>Limit the number of posts in RSS/Atom feeds:</p>
-<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--posts-per-feed<span class="w"> </span><span class="m">30</span>
-</code></pre></div>
-<h3 id="using-custom-templates">Using Custom Templates</h3>
-<p>Copy the default templates, customise them, and use them:</p>
-<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--templates<span class="w"> </span>my-templates/
-</code></pre></div>
-<h2 id="troubleshooting">Troubleshooting</h2>
-<h3 id="port-already-in-use">Port Already in Use</h3>
-<p>If port 8000 is already in use:</p>
-<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>serve<span class="w"> </span>posts/<span class="w"> </span>--port<span class="w"> </span><span class="m">8080</span>
-</code></pre></div>
-<h3 id="site-not-updating">Site Not Updating</h3>
-<p>Use clean builds to remove stale files:</p>
-<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--clean-first
-</code></pre></div>
-<h3 id="drafts-appearing-in-production">Drafts Appearing in Production</h3>
-<p>Ensure <code>include_drafts</code> is not set in your production configuration:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># blogmore.yaml</span>
-<span class="nt">include_drafts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-</code></pre></div>
-<h2 id="next-steps">Next Steps</h2>
-<ul>
-<li><a href="../command_line/">Command Line Reference</a> - Complete CLI documentation</li>
-<li><a href="../configuration/">Configuration Guide</a> - Detailed configuration options</li>
-<li><a href="../getting_started/">Getting Started</a> - Initial setup guide</li>
-</ul>
+<p>Each type is rendered with a distinct colour scheme and icon so that readers can recognise them at a glance.</p>
 
 
 
@@ -1991,7 +1553,7 @@ blogmore<span class="w"> </span>publish
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../getting_started/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Getting Started with BlogMore">
+          <a href="../setting_up_your_blog/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Setting Up Your Blog">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2001,20 +1563,20 @@ blogmore<span class="w"> </span>publish
                 Previous
               </span>
               <div class="md-ellipsis">
-                Getting Started with BlogMore
+                Setting Up Your Blog
               </div>
             </div>
           </a>
         
         
           
-          <a href="../command_line/" class="md-footer__link md-footer__link--next" aria-label="Next: Command Line Reference">
+          <a href="../writing_a_page/" class="md-footer__link md-footer__link--next" aria-label="Next: Writing a Page">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Command Line Reference
+                Writing a Page
               </div>
             </div>
             <div class="md-footer__button md-icon">

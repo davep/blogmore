@@ -12,7 +12,7 @@
       
       
       
-        <link rel="next" href="getting_started/">
+        <link rel="next" href="setting_up_your_blog/">
       
       
         
@@ -345,6 +345,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -407,14 +415,14 @@
   
   
     <li class="md-nav__item">
-      <a href="getting_started/" class="md-nav__link">
+      <a href="setting_up_your_blog/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Getting Started with BlogMore
+    Setting Up Your Blog
   
 
     
@@ -435,14 +443,126 @@
   
   
     <li class="md-nav__item">
-      <a href="using/" class="md-nav__link">
+      <a href="writing_a_post/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Using BlogMore
+    Writing a Post
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="writing_a_page/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing a Page
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="metadata_and_sidebar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metadata and Sidebar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="building/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building and Publishing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="templates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Templates
   
 
     
@@ -756,6 +876,13 @@
 <p>The fastest and most modern way to install BlogMore is with <a href="https://github.com/astral-sh/uv">uv</a>:</p>
 <div class="highlight"><pre><span></span><code>uv<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>blogmore
 </code></pre></div>
+<p>If you don't have <code>uv</code> installed you can use <a href="https://uvx.sh">uvx.sh</a> to
+perform the installation. For GNU/Linux or macOS or similar:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-LsSf<span class="w"> </span>uvx.sh/blogmore/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+</code></pre></div>
+<p>or on Windows:</p>
+<div class="highlight"><pre><span></span><code>powershell<span class="w"> </span>-ExecutionPolicy<span class="w"> </span>ByPass<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;irm https://uvx.sh/blogmore/install.ps1 | iex&quot;</span>
+</code></pre></div>
 <h3 id="using-pipx">Using pipx</h3>
 <p>You can also install BlogMore using <a href="https://pipx.pypa.io/">pipx</a>:</p>
 <div class="highlight"><pre><span></span><code>pipx<span class="w"> </span>install<span class="w"> </span>blogmore
@@ -787,7 +914,7 @@ Welcome to my new blog powered by BlogMore!
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>serve<span class="w"> </span>posts/
 </code></pre></div>
 <p>Visit <code>http://localhost:8000</code> to see your site.</p>
-<p>For a comprehensive walkthrough, see the <a href="getting_started/">Getting Started</a> guide.</p>
+<p>For a comprehensive walkthrough, see the <a href="setting_up_your_blog/">Setting Up Your Blog</a> guide.</p>
 <h2 id="getting-help">Getting Help</h2>
 <ul>
 <li><strong>Issues</strong> - Report bugs or request features on the <a href="https://github.com/davep/blogmore/issues">GitHub issue tracker</a></li>
@@ -796,9 +923,14 @@ Welcome to my new blog powered by BlogMore!
 </ul>
 <h2 id="next-steps">Next Steps</h2>
 <ul>
-<li><a href="getting_started/">Getting Started</a> - Detailed walkthrough for creating your blog</li>
-<li><a href="command_line/">Command Line</a> - Complete command-line reference</li>
-<li><a href="configuration/">Configuration</a> - Configuration file options and examples</li>
+<li><a href="setting_up_your_blog/">Setting Up Your Blog</a> - Detailed walkthrough for creating your blog</li>
+<li><a href="writing_a_post/">Writing a Post</a> - How to write and format posts</li>
+<li><a href="writing_a_page/">Writing a Page</a> - How to create static pages</li>
+<li><a href="metadata_and_sidebar/">Metadata and Sidebar</a> - Configure your site's identity and appearance</li>
+<li><a href="building/">Building and Publishing</a> - Preview, build, and publish your site</li>
+<li><a href="templates/">Templates</a> - How to customise the site templates</li>
+<li><a href="command_line/">Command Line Reference</a> - Complete command-line reference</li>
+<li><a href="configuration/">Configuration Reference</a> - Configuration file options and examples</li>
 </ul>
 
 
@@ -830,13 +962,13 @@ Welcome to my new blog powered by BlogMore!
         
         
           
-          <a href="getting_started/" class="md-footer__link md-footer__link--next" aria-label="Next: Getting Started with BlogMore">
+          <a href="setting_up_your_blog/" class="md-footer__link md-footer__link--next" aria-label="Next: Setting Up Your Blog">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Getting Started with BlogMore
+                Setting Up Your Blog
               </div>
             </div>
             <div class="md-footer__button md-icon">
