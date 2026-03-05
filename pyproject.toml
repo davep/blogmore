@@ -86,6 +86,7 @@ dev = [
     "pytest-cov>=7.0.0",
 ]
 docs = [
+    "ghp-import>=2.1.0",
     "zensical>=0.0.24",
 ]
 test = [
