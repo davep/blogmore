@@ -14,6 +14,7 @@ spell    := $(run) codespell
 test     := $(run) pytest --verbose --cov
 coverage := $(test) --cov-report html:$(reports)/html
 mkdocs   := $(run) zensical
+publish  := $(run) ghp-import --no-jekyll --push
 
 ##############################################################################
 # Setup/update packages the system requires.
@@ -86,8 +87,8 @@ rtfm:                           # Locally read the library documentation
 	$(mkdocs) serve
 
 .PHONY: publishdocs
-publishdocs:			# Set up the docs for publishing
-	$(mkdocs) gh-deploy
+publishdocs: docs			# Set up the docs for publishing
+	$(publish) site/
 
 ##############################################################################
 # Package/publish.
