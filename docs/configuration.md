@@ -278,7 +278,7 @@ When a source icon is provided or detected, BlogMore generates 18 icon files opt
 - Size: Square image, ideally 1024×1024 or larger
 - Location: Must be in the `extras/` subdirectory of your content directory
 
-See [Using BlogMore - Adding Site Icons](using.md#adding-site-icons) for detailed usage instructions.
+See [Metadata and Sidebar — Site icons](metadata_and_sidebar.md#site-icons) for detailed usage instructions.
 
 #### `with_search`
 
@@ -635,4 +635,4 @@ Error messages include the specific problem and the configuration file location.
 ## See Also
 
 - [Command Line Reference](command_line.md) - All command-line options
-- [Getting Started](getting_started.md) - Tutorial with configuration examples
+- [Getting Started](setting_up_your_blog.md) - Tutorial for creating your first blog
