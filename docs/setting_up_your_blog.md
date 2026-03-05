@@ -138,7 +138,7 @@ Or set it in your [configuration file](configuration.md):
 output: public
 ```
 
-See the [command line reference](command_line.md#-o---output-path) for all the options related to output.
+See the [command line reference](command_line.md) for all the options related to output.
 
 ## A minimal configuration file
 
