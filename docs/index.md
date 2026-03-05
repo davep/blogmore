@@ -41,6 +41,19 @@ The fastest and most modern way to install BlogMore is with [uv](https://github.
 uv tool install blogmore
 ```
 
+If you don't have `uv` installed you can use [uvx.sh](https://uvx.sh) to
+perform the installation. For GNU/Linux or macOS or similar:
+
+```sh
+curl -LsSf uvx.sh/blogmore/install.sh | sh
+```
+
+or on Windows:
+
+```sh
+powershell -ExecutionPolicy ByPass -c "irm https://uvx.sh/blogmore/install.ps1 | iex"
+```
+
 ### Using pipx
 
 You can also install BlogMore using [pipx](https://pipx.pypa.io/):
