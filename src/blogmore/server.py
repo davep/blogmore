@@ -108,6 +108,7 @@ class ContentChangeHandler(FileSystemEventHandler):
         self.debounce_seconds = debounce_seconds
         self._pending_timer: threading.Timer | None = None
         self._timer_lock = threading.Lock()
+        self._regeneration_lock = threading.Lock()
 
     def on_any_event(self, event: FileSystemEvent) -> None:
         """Handle any file system event.
@@ -129,6 +130,16 @@ class ContentChangeHandler(FileSystemEventHandler):
         ):
             return
 
+        # Ignore events originating from the output directory to avoid
+        # spurious regenerations triggered by the site being written on Linux
+        # (inotify generates events for output files that watchdog may pick up
+        # even when the output directory is not explicitly watched).
+        try:
+            path.relative_to(self.generator.output_dir)
+            return
+        except ValueError:
+            pass
+
         # Debounce: cancel any pending regeneration and schedule a new one so
         # that a burst of events (e.g. multiple files dropped at once) results
         # in only a single rebuild after the burst settles.
@@ -143,15 +154,24 @@ class ContentChangeHandler(FileSystemEventHandler):
     def _regenerate(self, path: Path) -> None:
         """Regenerate the site after a debounced change event.
 
+        A non-blocking lock prevents multiple simultaneous regenerations when
+        two change events fire in quick succession (e.g. on Linux where inotify
+        can produce many events for a single logical edit).
+
         Args:
             path: Path to the file that triggered the regeneration
         """
-        print(f"\nDetected change in {path}, regenerating site...")
+        if not self._regeneration_lock.acquire(blocking=False):
+            print("Regeneration already in progress, skipping...")
+            return
         try:
+            print(f"\nDetected change in {path}, regenerating site...")
             self.generator.generate(include_drafts=self.include_drafts)
             print("Regeneration complete!")
         except Exception as e:
             print(f"Error during regeneration: {e}", file=sys.stderr)
+        finally:
+            self._regeneration_lock.release()
 
 
 class ConfigChangeHandler(FileSystemEventHandler):

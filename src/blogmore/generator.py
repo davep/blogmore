@@ -2,6 +2,7 @@
 
 import datetime as dt
 import shutil
+import time
 import urllib.error
 from collections import defaultdict
 from importlib.resources import files
@@ -324,7 +325,20 @@ class SiteGenerator:
         # Clean output directory if requested
         if self.clean_first and self.output_dir.exists():
             print(f"Removing output directory: {self.output_dir}")
-            shutil.rmtree(self.output_dir)
+            try:
+                shutil.rmtree(self.output_dir)
+            except OSError:
+                # On Linux with concurrent operations the directory may not be
+                # fully empty yet.  Wait briefly and retry once before falling
+                # back to a best-effort removal.
+                time.sleep(0.1)
+                try:
+                    shutil.rmtree(self.output_dir)
+                except OSError:
+                    shutil.rmtree(self.output_dir, ignore_errors=True)
+                    print(
+                        "Warning: Some files could not be removed from output directory"
+                    )
 
         # Parse all pages from the pages subdirectory (must be done first so we
         # can exclude them when scanning for posts)
