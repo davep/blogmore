@@ -13,7 +13,7 @@ mypy     := $(run) mypy
 spell    := $(run) codespell
 test     := $(run) pytest --verbose --cov
 coverage := $(test) --cov-report html:$(reports)/html
-mkdocs   := $(run) mkdocs
+mkdocs   := $(run) zensical
 
 ##############################################################################
 # Setup/update packages the system requires.
@@ -83,7 +83,7 @@ docs:                           # Generate the system documentation
 
 .PHONY: rtfm
 rtfm:                           # Locally read the library documentation
-	$(mkdocs) serve --livereload
+	$(mkdocs) serve
 
 .PHONY: publishdocs
 publishdocs:			# Set up the docs for publishing
