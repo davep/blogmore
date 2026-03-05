@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed spurious regenerations and "Directory not empty" errors during
+  `blogmore serve` on Linux
+  ([#213](https://github.com/davep/blogmore/pull/213))
+
 ## v1.6.1
 
 **Released: 2026-03-04**

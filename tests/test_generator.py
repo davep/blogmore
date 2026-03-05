@@ -863,6 +863,44 @@ class TestSiteGenerator:
         assert output_dir.exists()
         assert (output_dir / "index.html").exists()
 
+    def test_clean_first_retries_on_oserror(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that clean_first retries rmtree when an OSError occurs on first attempt."""
+        import shutil
+        from unittest.mock import patch
+
+        temp_output_dir.mkdir(parents=True, exist_ok=True)
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            clean_first=True,
+        )
+
+        original_rmtree = shutil.rmtree
+        call_count = 0
+
+        def rmtree_fail_first_attempt(path: object, **kwargs: object) -> None:
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1 and not kwargs.get("ignore_errors"):
+                raise OSError("Directory not empty")
+            original_rmtree(path, **kwargs)  # type: ignore[arg-type]
+
+        with patch(
+            "blogmore.generator.shutil.rmtree", side_effect=rmtree_fail_first_attempt
+        ):
+            with patch("blogmore.generator.time.sleep"):
+                generator.generate(include_drafts=False)
+
+        # rmtree was called at least twice (once failing, once succeeding)
+        assert call_count >= 2
+        # Generation should have completed successfully despite the initial error
+        assert temp_output_dir.exists()
+        assert (temp_output_dir / "index.html").exists()
+
     def test_global_context_includes_version(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:

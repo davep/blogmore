@@ -164,6 +164,68 @@ class TestContentChangeHandler:
         # Still only one rebuild
         assert mock_regenerate.call_count == 1
 
+    def test_on_any_event_ignores_output_directory_events(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that events from the output directory are ignored."""
+        from blogmore.generator import SiteGenerator
+        from watchdog.events import FileCreatedEvent
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        handler = ContentChangeHandler(generator=generator, debounce_seconds=0.05)
+
+        with patch.object(handler, "_regenerate") as mock_regenerate:
+            # Fire an event for a file inside the output directory
+            output_file = temp_output_dir / "index.html"
+            event = FileCreatedEvent(str(output_file))
+            handler.on_any_event(event)
+
+            # Wait for any debounce timer that might have been set
+            time.sleep(0.15)
+
+        # No regeneration should have been triggered
+        assert mock_regenerate.call_count == 0
+
+    def test_regeneration_lock_prevents_concurrent_regenerations(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the regeneration lock prevents simultaneous regenerations."""
+        from blogmore.generator import SiteGenerator
+
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+
+        handler = ContentChangeHandler(generator=generator)
+
+        generate_call_count = 0
+
+        def counting_generate(include_drafts: bool) -> None:
+            nonlocal generate_call_count
+            generate_call_count += 1
+
+        generator.generate = counting_generate  # type: ignore[method-assign]
+
+        # Acquire the lock to simulate an in-progress regeneration
+        acquired = handler._regeneration_lock.acquire(blocking=False)
+        assert acquired, "Lock should be available before any regeneration"
+        try:
+            # A _regenerate call while the lock is held should be skipped
+            handler._regenerate(posts_dir / "post.md")
+        finally:
+            handler._regeneration_lock.release()
+
+        assert generate_call_count == 0, (
+            "generate() should not be called when regeneration lock is held"
+        )
+
 
 class TestQuietHTTPRequestHandler:
     """Test the QuietHTTPRequestHandler class."""
