@@ -169,7 +169,7 @@ If not specified, BlogMore auto-detects common icon filenames: `icon.png`, `icon
 
 When a source icon is provided or detected, BlogMore generates 18 optimised icon files for iOS, Android, Windows, and standard favicons.
 
-See [Using BlogMore - Adding Site Icons](using.md#adding-site-icons) for detailed usage.
+See [Metadata and Sidebar — Site icons](metadata_and_sidebar.md#site-icons) for detailed usage.
 
 #### `--with-search`
 
@@ -513,4 +513,4 @@ blogmore build --config work-blog.yaml
 ## See Also
 
 - [Configuration](configuration.md) - Detailed configuration file documentation
-- [Getting Started](getting_started.md) - Tutorial for creating your first blog
+- [Getting Started](setting_up_your_blog.md) - Tutorial for creating your first blog

@@ -6,8 +6,12 @@ repo_url: https://github.com/davep/blogmore
 nav:
   - BlogMore:
       - index.md
-      - getting_started.md
-      - using.md
+      - setting_up_your_blog.md
+      - writing_a_post.md
+      - writing_a_page.md
+      - metadata_and_sidebar.md
+      - building.md
+      - templates.md
       - command_line.md
       - "Configuration": configuration.md
   - Change Log: changelog.md

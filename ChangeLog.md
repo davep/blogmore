@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+- Consolidated and restructured the documentation. The former
+  `getting_started.md` and `using.md` pages have been replaced with a new set
+  of focused pages: *Setting Up Your Blog*, *Writing a Post*, *Writing a Page*,
+  *Metadata and Sidebar*, *Building and Publishing*, and *Templates*.
+  ([#214](https://github.com/davep/blogmore/pull/214))
+
 ## v1.6.1
 
 **Released: 2026-03-04**

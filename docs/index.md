@@ -41,6 +41,19 @@ The fastest and most modern way to install BlogMore is with [uv](https://github.
 uv tool install blogmore
 ```
 
+If you don't have `uv` installed you can use [uvx.sh](https://uvx.sh) to
+perform the installation. For GNU/Linux or macOS or similar:
+
+```sh
+curl -LsSf uvx.sh/blogmore/install.sh | sh
+```
+
+or on Windows:
+
+```sh
+powershell -ExecutionPolicy ByPass -c "irm https://uvx.sh/blogmore/install.ps1 | iex"
+```
+
 ### Using pipx
 
 You can also install BlogMore using [pipx](https://pipx.pypa.io/):
@@ -95,7 +108,7 @@ blogmore serve posts/
 
 Visit `http://localhost:8000` to see your site.
 
-For a comprehensive walkthrough, see the [Getting Started](getting_started.md) guide.
+For a comprehensive walkthrough, see the [Setting Up Your Blog](setting_up_your_blog.md) guide.
 
 ## Getting Help
 
@@ -105,6 +118,11 @@ For a comprehensive walkthrough, see the [Getting Started](getting_started.md) g
 
 ## Next Steps
 
-- [Getting Started](getting_started.md) - Detailed walkthrough for creating your blog
-- [Command Line](command_line.md) - Complete command-line reference
-- [Configuration](configuration.md) - Configuration file options and examples
+- [Setting Up Your Blog](setting_up_your_blog.md) - Detailed walkthrough for creating your blog
+- [Writing a Post](writing_a_post.md) - How to write and format posts
+- [Writing a Page](writing_a_page.md) - How to create static pages
+- [Metadata and Sidebar](metadata_and_sidebar.md) - Configure your site's identity and appearance
+- [Building and Publishing](building.md) - Preview, build, and publish your site
+- [Templates](templates.md) - How to customise the site templates
+- [Command Line Reference](command_line.md) - Complete command-line reference
+- [Configuration Reference](configuration.md) - Configuration file options and examples
