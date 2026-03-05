@@ -86,7 +86,7 @@ dev = [
     "pytest-cov>=7.0.0",
 ]
 docs = [
-    "mkdocs-material>=9.7.2",
+    "zensical>=0.0.24",
 ]
 test = [
     "pytest>=8.0.0",
