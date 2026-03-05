@@ -1,16 +1,12 @@
 # BlogMore ChangeLog
 
-## v1.6.2
+## Unreleased
 
-**Released: 2026-03-05**
+**Released: WiP**
 
 - Fixed spurious regenerations and "Directory not empty" errors during
-  `blogmore serve` on Linux (#212). Three defensive measures were added:
-  events from the output directory are now ignored (Linux `inotify` can
-  generate them even when the output directory is not explicitly watched),
-  a non-blocking lock prevents multiple simultaneous regenerations, and
-  `shutil.rmtree()` now retries with a short delay when it fails due to
-  a concurrent write. ([#213](https://github.com/davep/blogmore/pull/213))
+  `blogmore serve` on Linux
+  ([#213](https://github.com/davep/blogmore/pull/213))
 
 ## v1.6.1
 
