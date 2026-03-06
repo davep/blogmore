@@ -3,18 +3,12 @@
 {% block title %}{% if archive_title %}{{ archive_title }}{% else %}Archive{% endif %} - {{ site_title }}{% endblock %}
 
 {% block meta_tags %}
-<meta property="og:title" content="{% if archive_title %}{{ archive_title }} - {% endif %}{{ site_title }}">
-{% if site_description %}
-<meta name="description" content="{{ site_description }}">
-<meta property="og:description" content="{{ site_description }}">
-<meta name="twitter:description" content="{{ site_description }}">
-{% endif %}
-{% if site_keywords %}
-<meta name="keywords" content="{{ site_keywords|join(', ') }}">
-{% endif %}
+{% from '_listing_meta_tags.html' import listing_meta_tags with context %}
+{{ listing_meta_tags(archive_title ~ " - " ~ site_title if archive_title else site_title) }}
 {% endblock %}
 
 {% from '_pagination.html' import pagination %}
+{% from '_post_summary.html' import post_summary with context %}
 
 {% block content %}
 <div class="archive">
@@ -25,30 +19,7 @@
     {% if archive_title %}
     {# Date-based archive pages (year/month) - show full post content #}
     {% for post in posts %}
-    <article class="post-summary">
-        <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
-        {% if post.date %}
-        <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>
-        {% endif %}
-        {% if with_read_time %}
-        <div class="reading-time">{{ post.reading_time }} min read</div>
-        {% endif %}
-        {% if post.category %}
-        <div class="category">
-            <a href="/{{ category_dir }}/{{ post.safe_category }}.html" class="category-link">{{ post.category }}</a>
-        </div>
-        {% endif %}
-        <div class="post-content">
-            {{ post.html_content|safe }}
-        </div>
-        {% if post.tags %}
-        <div class="tags">
-            {% for tag, safe_tag in post.sorted_tag_pairs() %}
-            <a href="/{{ tag_dir }}/{{ safe_tag }}.html" class="tag">{{ tag }}</a>
-            {% endfor %}
-        </div>
-        {% endif %}
-    </article>
+    {{ post_summary(post) }}
     {% endfor %}
     {% else %}
     {# Main archive page - show organized list by year/month #}

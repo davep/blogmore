@@ -1,0 +1,46 @@
+{#
+    Reusable post summary macro.
+
+    Renders a single post summary article element.  Used on every page that
+    lists posts: the home page index, tag pages, category pages and
+    date-based archive pages.  Centralising the markup here means that a
+    single edit to this file changes the way posts are presented in every
+    listing context.
+
+    Parameters:
+        post: The Post object to render.
+        include_category (bool): Whether to render the post's category link.
+            Defaults to true.  Pass false on the category page, where the
+            category is already implied by the page's own heading.
+
+    Context variables used (passed via ``with context``):
+        with_read_time (bool): Whether to show the estimated reading time.
+        category_dir (str): URL path segment for category pages.
+        tag_dir (str): URL path segment for tag pages.
+#}
+{% macro post_summary(post, include_category=true) %}
+<article class="post-summary">
+    <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+    {% if post.date %}
+    <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>
+    {% endif %}
+    {% if with_read_time %}
+    <div class="reading-time">{{ post.reading_time }} min read</div>
+    {% endif %}
+    {% if include_category and post.category %}
+    <div class="category">
+        <a href="/{{ category_dir }}/{{ post.safe_category }}.html" class="category-link">{{ post.category }}</a>
+    </div>
+    {% endif %}
+    <div class="post-content">
+        {{ post.html_content|safe }}
+    </div>
+    {% if post.tags %}
+    <div class="tags">
+        {% for tag, safe_tag in post.sorted_tag_pairs() %}
+        <a href="/{{ tag_dir }}/{{ safe_tag }}.html" class="tag">{{ tag }}</a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</article>
+{% endmacro %}

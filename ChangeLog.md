@@ -8,6 +8,8 @@
   `--with-read-time` on the command line or set `with_read_time: true` in
   the configuration file to show reading time on posts.
   ([#218](https://github.com/davep/blogmore/pull/218))
+- Reduced some of the repeated boilerplate in the templates.
+  ([#221](https://github.com/davep/blogmore/pull/221))
 
 ## v1.6.2
 
