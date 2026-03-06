@@ -10,6 +10,11 @@
   ([#218](https://github.com/davep/blogmore/pull/218))
 - Reduced some of the repeated boilerplate in the templates.
   ([#221](https://github.com/davep/blogmore/pull/221))
+- The main archive page now shows a sticky right-hand sidebar table of
+  contents, listing years and months in descending order with links to the
+  corresponding sections on the page. The sidebar is hidden on mobile and
+  scrolls independently when it exceeds the viewport height.
+  ([#224](https://github.com/davep/blogmore/pull/224))
 
 ## v1.6.2
 

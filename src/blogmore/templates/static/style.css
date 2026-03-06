@@ -1397,6 +1397,83 @@ footer a:hover {
     color: var(--text-color);
 }
 
+/* Archive page two-column layout with sticky TOC */
+.archive-with-toc {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.archive-with-toc .archive {
+    flex: 1;
+    min-width: 0;
+}
+
+.archive-toc {
+    width: 160px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    font-size: 0.85em;
+    line-height: 1.4;
+}
+
+.archive-toc-years {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.archive-toc-year {
+    margin-bottom: 8px;
+}
+
+.archive-toc-year > a {
+    display: block;
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 4px 0;
+    transition: color 0.2s ease;
+}
+
+.archive-toc-year > a:hover {
+    color: var(--hover-color);
+}
+
+.archive-toc-months {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 12px;
+}
+
+.archive-toc-months li {
+    margin-bottom: 2px;
+}
+
+.archive-toc-months a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    display: block;
+    padding: 2px 0;
+    transition: color 0.2s ease;
+    font-size: 0.9em;
+}
+
+.archive-toc-months a:hover {
+    color: var(--hover-color);
+}
+
+/* Hide the TOC on mobile */
+@media (max-width: 768px) {
+    .archive-toc {
+        display: none;
+    }
+}
+
 /* Search page */
 .search-page h1 {
     margin-top: 0;
