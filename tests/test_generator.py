@@ -2500,3 +2500,208 @@ class TestCustom404Page:
         assert (temp_output_dir / CUSTOM_404_HTML).exists()
         # Should be in root, not in a subdirectory
         assert not (temp_output_dir / "pages" / CUSTOM_404_HTML).exists()
+
+
+class TestWithReadTime:
+    """Test the with_read_time feature for showing estimated reading time on posts."""
+
+    def test_reading_time_not_shown_by_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that reading time is not shown when with_read_time is False (default)."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "min read" not in index_content
+
+    def test_reading_time_shown_when_enabled(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that reading time is shown when with_read_time is True."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            with_read_time=True,
+        )
+        generator.generate(include_drafts=False)
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "min read" in index_content
+
+    def test_reading_time_not_shown_on_post_page_by_default(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that reading time is not shown on individual post pages by default."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-01-hello.md").write_text(
+            "---\ntitle: Hello\ndate: 2024-01-01\n---\n\nHello world content."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        post_file = temp_output_dir / "2024" / "01" / "01" / "hello.html"
+        assert post_file.exists()
+        content = post_file.read_text()
+        assert "min read" not in content
+
+    def test_reading_time_shown_on_post_page_when_enabled(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that reading time is shown on individual post pages when with_read_time is True."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-01-hello.md").write_text(
+            "---\ntitle: Hello\ndate: 2024-01-01\n---\n\nHello world content."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            with_read_time=True,
+        )
+        generator.generate(include_drafts=False)
+
+        post_file = temp_output_dir / "2024" / "01" / "01" / "hello.html"
+        assert post_file.exists()
+        content = post_file.read_text()
+        assert "min read" in content
+
+    def test_reading_time_not_shown_on_category_page_by_default(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that reading time is not shown on category pages by default."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-01-hello.md").write_text(
+            "---\ntitle: Hello\ndate: 2024-01-01\ncategory: Tech\n---\n\nHello world."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        category_file = temp_output_dir / "category" / "tech.html"
+        assert category_file.exists()
+        content = category_file.read_text()
+        assert "min read" not in content
+
+    def test_reading_time_shown_on_category_page_when_enabled(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that reading time is shown on category pages when with_read_time is True."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-01-hello.md").write_text(
+            "---\ntitle: Hello\ndate: 2024-01-01\ncategory: Tech\n---\n\nHello world."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            with_read_time=True,
+        )
+        generator.generate(include_drafts=False)
+
+        category_file = temp_output_dir / "category" / "tech.html"
+        assert category_file.exists()
+        content = category_file.read_text()
+        assert "min read" in content
+
+    def test_reading_time_not_shown_on_tag_page_by_default(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that reading time is not shown on tag pages by default."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-01-hello.md").write_text(
+            "---\ntitle: Hello\ndate: 2024-01-01\ntags: [python]\n---\n\nHello world."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        tag_file = temp_output_dir / "tag" / "python.html"
+        assert tag_file.exists()
+        content = tag_file.read_text()
+        assert "min read" not in content
+
+    def test_reading_time_shown_on_tag_page_when_enabled(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that reading time is shown on tag pages when with_read_time is True."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-01-hello.md").write_text(
+            "---\ntitle: Hello\ndate: 2024-01-01\ntags: [python]\n---\n\nHello world."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            with_read_time=True,
+        )
+        generator.generate(include_drafts=False)
+
+        tag_file = temp_output_dir / "tag" / "python.html"
+        assert tag_file.exists()
+        content = tag_file.read_text()
+        assert "min read" in content
+
+    def test_with_read_time_default_is_false(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that with_read_time defaults to False."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        assert generator.with_read_time is False
+
+    def test_with_read_time_in_global_context(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that with_read_time is included in the global template context."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            with_read_time=True,
+        )
+        context = generator._get_global_context()
+        assert context["with_read_time"] is True
+
+    def test_with_read_time_false_in_global_context(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that with_read_time=False is included in the global template context."""
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            with_read_time=False,
+        )
+        context = generator._get_global_context()
+        assert context["with_read_time"] is False

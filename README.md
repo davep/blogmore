@@ -384,6 +384,25 @@ and immediately show results.  For example:
 https://example.com/search.html?q=python
 ```
 
+## Reading Time
+
+Estimated reading time is disabled by default.  To enable it, pass
+`--with-read-time` on the command line or set `with_read_time: true` in the
+configuration file.
+
+```bash
+blogmore build posts/ --with-read-time
+```
+
+```yaml
+# blogmore.yaml
+with_read_time: true
+```
+
+When enabled, BlogMore calculates the approximate time to read each post based
+on 200 words per minute and displays it next to the post date on the index,
+archive, tag, category, and individual post pages.
+
 ## Markdown Features
 
 Blogmore supports all standard Markdown features plus:

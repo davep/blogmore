@@ -100,6 +100,7 @@ class SiteGenerator:
         with_sitemap: bool = False,
         minify_css: bool = False,
         minify_js: bool = False,
+        with_read_time: bool = False,
     ) -> None:
         """Initialize the site generator.
 
@@ -126,6 +127,7 @@ class SiteGenerator:
             minify_css: Whether to minify the CSS, writing it as styles.min.css
             minify_js: Whether to minify the JavaScript, writing it as theme.min.js
                        (and search.min.js if search is enabled)
+            with_read_time: Whether to show estimated reading time on posts
         """
         self.content_dir = content_dir
         self.templates_dir = templates_dir
@@ -144,6 +146,7 @@ class SiteGenerator:
         self.with_sitemap = with_sitemap
         self.minify_css = minify_css
         self.minify_js = minify_js
+        self.with_read_time = with_read_time
 
         # Default to CDN URL; updated during generate() once socials are known
         self._fontawesome_css_url: str = FONTAWESOME_CDN_CSS_URL
@@ -257,6 +260,7 @@ class SiteGenerator:
             "has_platform_icons": self._detect_generated_icons(),
             "blogmore_version": __version__,
             "with_search": self.with_search,
+            "with_read_time": self.with_read_time,
             "default_author": self.default_author,
             "fontawesome_css_url": self._fontawesome_css_url,
             "fontawesome_woff2_url": FONTAWESOME_CDN_BRANDS_WOFF2_URL,

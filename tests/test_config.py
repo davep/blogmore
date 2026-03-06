@@ -742,3 +742,23 @@ class TestSiteKeywordsConfig:
         merge_config_with_args(config, args)
 
         assert args.minify_js is True
+
+    def test_with_read_time_from_config(self) -> None:
+        """Test loading with_read_time from config."""
+        config = {"with_read_time": True}
+        args = Mock()
+        args.with_read_time = False  # default
+
+        merge_config_with_args(config, args)
+
+        assert args.with_read_time is True
+
+    def test_cli_with_read_time_overrides_config(self) -> None:
+        """Test that CLI with_read_time overrides config."""
+        config = {"with_read_time": False}
+        args = Mock()
+        args.with_read_time = True  # set via CLI
+
+        merge_config_with_args(config, args)
+
+        assert args.with_read_time is True

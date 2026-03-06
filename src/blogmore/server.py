@@ -296,6 +296,8 @@ class ConfigChangeHandler(FileSystemEventHandler):
             self.generator.with_search = config["with_search"]
         if "with_sitemap" in config:
             self.generator.with_sitemap = config["with_sitemap"]
+        if "with_read_time" in config:
+            self.generator.with_read_time = config["with_read_time"]
 
         # Update sidebar config
         self.generator.sidebar_config = sidebar_config
@@ -325,6 +327,7 @@ def serve_site(
     with_sitemap: bool = False,
     minify_css: bool = False,
     minify_js: bool = False,
+    with_read_time: bool = False,
 ) -> int:
     """Serve the generated site locally using a simple HTTP server.
 
@@ -353,6 +356,7 @@ def serve_site(
         with_sitemap: Whether to generate an XML sitemap
         minify_css: Whether to minify the CSS, writing it as styles.min.css
         minify_js: Whether to minify the JavaScript, writing it as theme.min.js
+        with_read_time: Whether to show estimated reading time on posts
 
     Returns:
         Exit code
@@ -406,6 +410,7 @@ def serve_site(
                 with_sitemap=with_sitemap,
                 minify_css=minify_css,
                 minify_js=minify_js,
+                with_read_time=with_read_time,
             )
             generator.generate(include_drafts=include_drafts)
         except Exception as e:
