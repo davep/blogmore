@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+**Released: WiP**
+
 - Estimated reading time is now optional and disabled by default. Use
   `--with-read-time` on the command line or set `with_read_time: true` in
   the configuration file to show reading time on posts.
