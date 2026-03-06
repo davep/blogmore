@@ -306,6 +306,17 @@ with_sitemap: true
 
 A `site_url` should be set when using this option so that sitemap entries contain absolute URLs (e.g. `https://example.com/2024/01/15/my-post.html`). If `site_url` is not provided, URLs will fall back to `https://example.com`.
 
+#### `with_read_time`
+
+Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on 200 words per minute) and displays it next to the post date on all post listings and individual post pages.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+with_read_time: true
+```
+
 ### Styling Options
 
 #### `minify_css`

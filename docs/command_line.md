@@ -195,6 +195,16 @@ blogmore build posts/ --with-sitemap
 
 A `--site-url` should be provided so that sitemap entries contain absolute URLs. If omitted, entries will fall back to `https://example.com`.
 
+#### `--with-read-time`
+
+Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on 200 words per minute) and displays it next to the post date on all post listings and individual post pages.
+
+Read time display is **disabled by default**. Pass this flag to opt in.
+
+```bash
+blogmore build posts/ --with-read-time
+```
+
 #### `--minify-css`
 
 Minify the generated CSS and write it as `styles.min.css` instead of `style.css`. This reduces the size of the stylesheet delivered to visitors.
@@ -297,6 +307,7 @@ The serve command also accepts all the build command options:
 - `--with-sitemap`
 - `--minify-css`
 - `--minify-js`
+- `--with-read-time`
 
 ### Examples
 
@@ -386,6 +397,7 @@ The publish command also accepts all the build command options:
 - `--with-sitemap`
 - `--minify-css`
 - `--minify-js`
+- `--with-read-time`
 
 ### How It Works
 

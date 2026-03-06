@@ -133,6 +133,13 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
         help="Minify the generated JavaScript, writing as theme.min.js (and search.min.js if search enabled)",
     )
 
+    parser.add_argument(
+        "--with-read-time",
+        action="store_true",
+        default=False,
+        help="Show estimated reading time on posts (default: disabled)",
+    )
+
 
 def create_parser() -> argparse.ArgumentParser:
     """Create and configure the argument parser for blogmore.

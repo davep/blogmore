@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Estimated reading time is now optional and disabled by default. Use
+  `--with-read-time` on the command line or set `with_read_time: true` in
+  the configuration file to show reading time on posts.
+  ([#218](https://github.com/davep/blogmore/pull/218))
+
 ## v1.6.2
 
 **Released: 2026-03-05**

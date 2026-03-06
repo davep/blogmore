@@ -59,6 +59,10 @@ posts_per_feed: 20
 # Requires site_url to be set for absolute URLs in the sitemap.
 # with_sitemap: false
 
+# Optional: Show estimated reading time on posts (default: false)
+# Displays the approximate time to read each post based on 200 words per minute.
+# with_read_time: false
+
 # Styling options
 
 # Optional: Minify the CSS, writing it as styles.min.css (default: false)
