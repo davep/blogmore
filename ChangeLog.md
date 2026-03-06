@@ -10,6 +10,9 @@
   ([#218](https://github.com/davep/blogmore/pull/218))
 - Reduced some of the repeated boilerplate in the templates.
   ([#221](https://github.com/davep/blogmore/pull/221))
+- The main archive page now shows a right-hand sidebar table of contents if
+  the viewport is wide enough. This can be used to quickly navigate the
+  archives. ([#224](https://github.com/davep/blogmore/pull/224))
 
 ## v1.6.2
 

@@ -2705,3 +2705,144 @@ class TestWithReadTime:
         )
         context = generator._get_global_context()
         assert context["with_read_time"] is False
+
+    def test_archive_page_has_table_of_contents_sidebar(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the main archive page includes the TOC sidebar navigation."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post-a.md").write_text(
+            "---\ntitle: January Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+        (content_dir / "2024-03-10-post-b.md").write_text(
+            "---\ntitle: March Post\ndate: 2024-03-10\n---\n\nContent."
+        )
+        (content_dir / "2023-11-05-post-c.md").write_text(
+            "---\ntitle: November Post\ndate: 2023-11-05\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "archive.html").read_text()
+
+        assert 'class="archive-toc"' in content
+        assert 'aria-label="Archive table of contents"' in content
+
+    def test_archive_page_table_of_contents_has_year_anchors(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the main archive page has anchor IDs on year sections and TOC year links."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-03-10-post.md").write_text(
+            "---\ntitle: A Post\ndate: 2024-03-10\n---\n\nContent."
+        )
+        (content_dir / "2023-07-20-post.md").write_text(
+            "---\ntitle: Another Post\ndate: 2023-07-20\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "archive.html").read_text()
+
+        assert 'id="archive-2024"' in content
+        assert 'id="archive-2023"' in content
+        assert 'href="#archive-2024"' in content
+        assert 'href="#archive-2023"' in content
+
+    def test_archive_page_table_of_contents_has_month_anchors(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the main archive page has anchor IDs on month sections and TOC month links."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post.md").write_text(
+            "---\ntitle: January Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+        (content_dir / "2024-03-10-post.md").write_text(
+            "---\ntitle: March Post\ndate: 2024-03-10\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "archive.html").read_text()
+
+        assert 'id="archive-2024-01"' in content
+        assert 'id="archive-2024-03"' in content
+        assert 'href="#archive-2024-01"' in content
+        assert 'href="#archive-2024-03"' in content
+
+    def test_archive_page_table_of_contents_not_shown_on_date_archive(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the TOC sidebar is not shown on date-based archive pages."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post.md").write_text(
+            "---\ntitle: January Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        year_archive = (temp_output_dir / "2024" / "index.html").read_text()
+        assert 'class="archive-toc"' not in year_archive
+
+        month_archive = (temp_output_dir / "2024" / "01" / "index.html").read_text()
+        assert 'class="archive-toc"' not in month_archive
+
+    def test_archive_page_table_of_contents_months_in_correct_order(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the TOC months appear in descending order (newest first)."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post.md").write_text(
+            "---\ntitle: January Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+        (content_dir / "2024-06-20-post.md").write_text(
+            "---\ntitle: June Post\ndate: 2024-06-20\n---\n\nContent."
+        )
+        (content_dir / "2024-12-01-post.md").write_text(
+            "---\ntitle: December Post\ndate: 2024-12-01\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            content_dir=content_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+        )
+        generator.generate(include_drafts=False)
+
+        content = (temp_output_dir / "archive.html").read_text()
+
+        december_pos = content.find('href="#archive-2024-12"')
+        june_pos = content.find('href="#archive-2024-06"')
+        january_pos = content.find('href="#archive-2024-01"')
+
+        assert december_pos < june_pos < january_pos
