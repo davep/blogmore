@@ -110,6 +110,7 @@ templates: my-templates
 ```
 
 Custom templates should include:
+
 - `base.html` - Base template
 - `index.html` - Homepage listing
 - `post.html` - Individual post page
