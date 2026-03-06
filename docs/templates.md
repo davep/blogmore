@@ -18,8 +18,10 @@ BlogMore ships with the following templates:
 | `category.html` | A listing of all posts in a particular category. |
 | `categories.html` | The full index of all categories on the site. |
 | `search.html` | The client-side search page (only generated when `--with-search` is enabled). |
-| `meta_tags.html` | A partial template included by `base.html` to render `<meta>` tags. |
-| `_pagination.html` | A partial template used by `index.html` to render page navigation. |
+| `meta_tags.html` | A partial template included by `post.html` and `page.html` to render `<meta>` tags. |
+| `_post_summary.html` | A partial template used by all listing pages (`index.html`, `tag.html`, `category.html`, `archive.html`) to render a single post summary article.  Edit this file to change how posts appear in every listing context at once. |
+| `_listing_meta_tags.html` | A partial template used by listing pages to render the standard Open Graph and SEO `<meta>` tags.  Edit this file to change the meta tags for all listing pages at once. |
+| `_pagination.html` | A partial template used by all listing pages to render page navigation. |
 | `static/style.css` | The stylesheet for the entire site. |
 | `static/theme.js` | JavaScript for the dark/light mode toggle and mobile sidebar. |
 | `static/search.js` | JavaScript for the client-side search (only used when search is enabled). |

@@ -1004,3 +1004,174 @@ class TestTemplateRenderer:
         )
         assert 'href="/category/python.html"' in html  # page 1 URL
         assert 'href="/category/python/3.html"' in html  # page 3 URL
+
+    def test_post_summary_rendered_on_index(self, sample_post: Post) -> None:
+        """Test that post-summary articles are rendered on the index page."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=1,
+            total_pages=1,
+            site_title="Test Blog",
+            category_dir="categories",
+            tag_dir="tags",
+        )
+
+        assert 'class="post-summary"' in html
+        assert sample_post.title in html
+
+    def test_post_summary_shows_category_on_index(self, sample_post: Post) -> None:
+        """Test that post summaries on the index page include the category link."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=1,
+            total_pages=1,
+            site_title="Test Blog",
+            category_dir="categories",
+            tag_dir="tags",
+        )
+
+        assert 'class="category-link"' in html
+        assert "python" in html
+
+    def test_post_summary_shows_category_on_tag_page(self, sample_post: Post) -> None:
+        """Test that post summaries on tag pages include the category link."""
+        renderer = TemplateRenderer()
+        html = renderer.render_tag_page(
+            tag="testing",
+            safe_tag="testing",
+            posts=[sample_post],
+            site_title="Test Blog",
+            category_dir="categories",
+            tag_dir="tags",
+        )
+
+        assert 'class="category-link"' in html
+
+    def test_post_summary_omits_category_on_category_page(
+        self, sample_post: Post
+    ) -> None:
+        """Test that post summaries on category pages omit the category link."""
+        renderer = TemplateRenderer()
+        html = renderer.render_category_page(
+            category="Python",
+            safe_category="python",
+            posts=[sample_post],
+            site_title="Test Blog",
+            category_dir="categories",
+            tag_dir="tags",
+        )
+
+        # Category link should not appear inside post summaries on the category page
+        assert 'class="category-link"' not in html
+
+    def test_post_summary_shows_category_on_date_archive(
+        self, sample_post: Post
+    ) -> None:
+        """Test that post summaries on date-based archive pages include the category link."""
+        renderer = TemplateRenderer()
+        html = renderer.render_archive(
+            posts=[sample_post],
+            archive_title="January 2024",
+            site_title="Test Blog",
+            base_path="/2024/01",
+            category_dir="categories",
+            tag_dir="tags",
+        )
+
+        assert 'class="post-summary"' in html
+        assert 'class="category-link"' in html
+
+    def test_post_summary_shows_reading_time_when_enabled(
+        self, sample_post: Post
+    ) -> None:
+        """Test that post summaries show reading time when with_read_time is enabled."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=1,
+            total_pages=1,
+            site_title="Test Blog",
+            with_read_time=True,
+        )
+
+        assert "reading-time" in html
+        assert "min read" in html
+
+    def test_post_summary_omits_reading_time_by_default(
+        self, sample_post: Post
+    ) -> None:
+        """Test that post summaries do not show reading time when with_read_time is not set."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=1,
+            total_pages=1,
+            site_title="Test Blog",
+        )
+
+        assert "reading-time" not in html
+
+    def test_listing_meta_tags_on_tag_page(self, sample_post: Post) -> None:
+        """Test that tag pages include standard listing meta tags."""
+        renderer = TemplateRenderer()
+        html = renderer.render_tag_page(
+            tag="python",
+            safe_tag="python",
+            posts=[sample_post],
+            site_title="Test Blog",
+            site_description="A great blog",
+            site_keywords=["python", "testing"],
+        )
+
+        assert '<meta property="og:title" content="Tag: python - Test Blog">' in html
+        assert '<meta name="description" content="A great blog">' in html
+        assert '<meta name="keywords" content="python, testing">' in html
+
+    def test_listing_meta_tags_on_category_page(self, sample_post: Post) -> None:
+        """Test that category pages include standard listing meta tags."""
+        renderer = TemplateRenderer()
+        html = renderer.render_category_page(
+            category="Python",
+            safe_category="python",
+            posts=[sample_post],
+            site_title="Test Blog",
+            site_description="A great blog",
+        )
+
+        assert (
+            '<meta property="og:title" content="Category: Python - Test Blog">' in html
+        )
+        assert '<meta name="description" content="A great blog">' in html
+
+    def test_listing_meta_tags_on_archive_page(self, sample_post: Post) -> None:
+        """Test that archive pages include standard listing meta tags."""
+        renderer = TemplateRenderer()
+        html = renderer.render_archive(
+            posts=[sample_post],
+            archive_title="January 2024",
+            site_title="Test Blog",
+            site_description="A great blog",
+            base_path="/2024/01",
+        )
+
+        assert (
+            '<meta property="og:title" content="January 2024 - Test Blog">' in html
+        )
+        assert '<meta name="description" content="A great blog">' in html
+
+    def test_listing_meta_tags_omit_description_when_absent(
+        self, sample_post: Post
+    ) -> None:
+        """Test that listing pages omit description meta tags when no description is set."""
+        renderer = TemplateRenderer()
+        html = renderer.render_tag_page(
+            tag="python",
+            safe_tag="python",
+            posts=[sample_post],
+            site_title="Test Blog",
+        )
+
+        assert '<meta name="description"' not in html
+        assert '<meta property="og:description"' not in html

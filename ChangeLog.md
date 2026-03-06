@@ -8,6 +8,14 @@
   `--with-read-time` on the command line or set `with_read_time: true` in
   the configuration file to show reading time on posts.
   ([#218](https://github.com/davep/blogmore/pull/218))
+- Removed duplicated post-summary and listing-page meta-tag markup by
+  introducing two new partial templates: `_post_summary.html` (the article
+  block shown on every listing page) and `_listing_meta_tags.html` (the Open
+  Graph / SEO meta tags for listing pages).  Customising either file now
+  affects every listing context at once — home page, tag pages, category
+  pages, and date-based archive pages — so there is no longer any need to
+  edit multiple templates to make the same change.
+  ([#220](https://github.com/davep/blogmore/pull/220))
 
 ## v1.6.2
 

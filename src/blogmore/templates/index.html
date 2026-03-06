@@ -41,6 +41,7 @@
 {% endblock %}
 
 {% from '_pagination.html' import pagination %}
+{% from '_post_summary.html' import post_summary with context %}
 
 {% block content %}
 <div class="posts-list">
@@ -49,30 +50,7 @@
 
     {% if posts %}
     {% for post in posts %}
-    <article class="post-summary">
-        <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
-        {% if post.date %}
-        <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>
-        {% endif %}
-        {% if with_read_time %}
-        <div class="reading-time">{{ post.reading_time }} min read</div>
-        {% endif %}
-        {% if post.category %}
-        <div class="category">
-            <a href="/{{ category_dir }}/{{ post.safe_category }}.html" class="category-link">{{ post.category }}</a>
-        </div>
-        {% endif %}
-        <div class="post-content">
-            {{ post.html_content|safe }}
-        </div>
-        {% if post.tags %}
-        <div class="tags">
-            {% for tag, safe_tag in post.sorted_tag_pairs() %}
-            <a href="/{{ tag_dir }}/{{ safe_tag }}.html" class="tag">{{ tag }}</a>
-            {% endfor %}
-        </div>
-        {% endif %}
-    </article>
+    {{ post_summary(post) }}
     {% endfor %}
     {% else %}
     <p>No posts yet.</p>
