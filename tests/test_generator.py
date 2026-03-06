@@ -2706,7 +2706,7 @@ class TestWithReadTime:
         context = generator._get_global_context()
         assert context["with_read_time"] is False
 
-    def test_archive_page_has_toc_sidebar(
+    def test_archive_page_has_table_of_contents_sidebar(
         self, tmp_path: Path, temp_output_dir: Path
     ) -> None:
         """Test that the main archive page includes the TOC sidebar navigation."""
@@ -2735,7 +2735,7 @@ class TestWithReadTime:
         assert 'class="archive-toc"' in content
         assert 'aria-label="Archive table of contents"' in content
 
-    def test_archive_page_toc_has_year_anchors(
+    def test_archive_page_table_of_contents_has_year_anchors(
         self, tmp_path: Path, temp_output_dir: Path
     ) -> None:
         """Test that the main archive page has anchor IDs on year sections and TOC year links."""
@@ -2763,7 +2763,7 @@ class TestWithReadTime:
         assert 'href="#archive-2024"' in content
         assert 'href="#archive-2023"' in content
 
-    def test_archive_page_toc_has_month_anchors(
+    def test_archive_page_table_of_contents_has_month_anchors(
         self, tmp_path: Path, temp_output_dir: Path
     ) -> None:
         """Test that the main archive page has anchor IDs on month sections and TOC month links."""
@@ -2791,7 +2791,7 @@ class TestWithReadTime:
         assert 'href="#archive-2024-01"' in content
         assert 'href="#archive-2024-03"' in content
 
-    def test_archive_page_toc_not_shown_on_date_archive(
+    def test_archive_page_table_of_contents_not_shown_on_date_archive(
         self, tmp_path: Path, temp_output_dir: Path
     ) -> None:
         """Test that the TOC sidebar is not shown on date-based archive pages."""
@@ -2815,7 +2815,7 @@ class TestWithReadTime:
         month_archive = (temp_output_dir / "2024" / "01" / "index.html").read_text()
         assert 'class="archive-toc"' not in month_archive
 
-    def test_archive_page_toc_months_in_correct_order(
+    def test_archive_page_table_of_contents_months_in_correct_order(
         self, tmp_path: Path, temp_output_dir: Path
     ) -> None:
         """Test that the TOC months appear in descending order (newest first)."""
