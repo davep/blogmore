@@ -1397,28 +1397,31 @@ footer a:hover {
     color: var(--text-color);
 }
 
-/* Archive page two-column layout with sticky TOC */
+/* Archive page with right-hand TOC using extra viewport space */
 .archive-with-toc {
-    display: flex;
-    flex-direction: row;
-    gap: 20px;
-    align-items: flex-start;
+    /* No special layout - archive content keeps full width */
 }
 
-.archive-with-toc .archive {
-    flex: 1;
-    min-width: 0;
-}
-
+/* Archive TOC - hidden by default, only shown when viewport has room */
 .archive-toc {
-    width: 160px;
-    flex-shrink: 0;
-    position: sticky;
-    top: 20px;
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
+    display: none;
     font-size: 0.85em;
     line-height: 1.4;
+}
+
+/* Show the TOC fixed in the space to the right of the main content area.
+   Layout: 280px (left nav sidebar) + 800px (content) + 20px (gap) = 1100px.
+   Minimum viewport to fit a 160px TOC with 20px right margin: 1280px. */
+@media (min-width: 1280px) {
+    .archive-toc {
+        display: block;
+        position: fixed;
+        left: calc(280px + 800px + 20px);
+        top: 20px;
+        width: 160px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
 }
 
 .archive-toc-years {
@@ -1465,13 +1468,6 @@ footer a:hover {
 
 .archive-toc-months a:hover {
     color: var(--hover-color);
-}
-
-/* Hide the TOC on mobile */
-@media (max-width: 768px) {
-    .archive-toc {
-        display: none;
-    }
 }
 
 /* Search page */
