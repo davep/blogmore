@@ -1,18 +1,14 @@
 # BlogMore ChangeLog
 
-## v1.8.0
+## Unreleased
 
-**Released: Unreleased**
+**Released: WiP**
 
 - Social media icons in the sidebar are now rendered at a consistent, fixed
-  width so that all icons align correctly regardless of their natural glyph
-  width. Icons are also rendered at 80% of their previous size for a more
-  compact appearance.
-  ([#226](https://github.com/davep/blogmore/pull/226))
+  width. Also reduced their default size.
+  ([#228](https://github.com/davep/blogmore/pull/228))
 - The title of the social media icons section in the sidebar can now be
-  customised. Use `--socials-title` on the command line or set
-  `socials_title` in the configuration file. The default remains "Social".
-  ([#226](https://github.com/davep/blogmore/pull/226))
+  customised. ([#228](https://github.com/davep/blogmore/pull/228))
 
 ## v1.7.0
 
