@@ -569,6 +569,40 @@ class TestGetSidebarConfig:
         assert "site_title" not in result
         assert "site_url" not in result
 
+    def test_extract_socials_title(self) -> None:
+        """Test extracting socials_title from config."""
+        config = {
+            "socials_title": "Connect",
+            "socials": [{"site": "github", "url": "https://github.com/user"}],
+        }
+        result = get_sidebar_config(config)
+        assert result["socials_title"] == "Connect"
+
+    def test_extract_all_sidebar_options_with_socials_title(self) -> None:
+        """Test that socials_title is included when all sidebar options are present."""
+        config = {
+            "site_logo": "/images/logo.png",
+            "links": [{"title": "Home", "url": "/"}],
+            "socials": [{"site": "github", "url": "https://github.com"}],
+            "socials_title": "Follow Me",
+            "site_title": "My Blog",
+        }
+        result = get_sidebar_config(config)
+        assert result == {
+            "site_logo": "/images/logo.png",
+            "links": [{"title": "Home", "url": "/"}],
+            "socials": [{"site": "github", "url": "https://github.com"}],
+            "socials_title": "Follow Me",
+        }
+
+    def test_socials_title_absent_when_not_in_config(self) -> None:
+        """Test that socials_title is absent from sidebar config when not set."""
+        config = {
+            "socials": [{"site": "github", "url": "https://github.com/user"}],
+        }
+        result = get_sidebar_config(config)
+        assert "socials_title" not in result
+
 
 class TestCleanFirstConfig:
     """Test the clean_first configuration option."""
@@ -602,6 +636,40 @@ class TestCleanFirstConfig:
         merge_config_with_args(config, args)
 
         assert args.clean_first is False
+
+
+class TestSocialsTitleConfig:
+    """Test the socials_title configuration option."""
+
+    def test_socials_title_from_config(self) -> None:
+        """Test loading socials_title from config."""
+        config = {"socials_title": "Connect"}
+        args = Mock()
+        args.socials_title = "Social"  # default
+
+        merge_config_with_args(config, args)
+
+        assert args.socials_title == "Connect"
+
+    def test_cli_socials_title_overrides_config(self) -> None:
+        """Test that CLI socials_title overrides config."""
+        config = {"socials_title": "Connect"}
+        args = Mock()
+        args.socials_title = "Follow Me"  # explicitly set via CLI
+
+        merge_config_with_args(config, args)
+
+        assert args.socials_title == "Follow Me"
+
+    def test_socials_title_defaults_to_social(self) -> None:
+        """Test that socials_title defaults to 'Social' when not in config."""
+        config = {}
+        args = Mock()
+        args.socials_title = "Social"  # default
+
+        merge_config_with_args(config, args)
+
+        assert args.socials_title == "Social"
 
 
 class TestNormalizeSiteKeywords:

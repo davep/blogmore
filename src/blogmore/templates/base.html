@@ -101,7 +101,7 @@
 
                 {% if socials %}
                 <section class="sidebar-section">
-                    <h2>Social</h2>
+                    <h2>{{ socials_title | default('Social') }}</h2>
                     <div class="sidebar-socials">
                         {% for social in socials %}
                         <a href="{{ social.url }}" title="{{ social.site }}" aria-label="{{ social.site }}"{% if social.url|is_external_link %} target="_blank" rel="noopener noreferrer"{% endif %}>

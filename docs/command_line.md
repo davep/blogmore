@@ -205,6 +205,16 @@ Read time display is **disabled by default**. Pass this flag to opt in.
 blogmore build posts/ --with-read-time
 ```
 
+#### `--socials-title`
+
+Override the title displayed above the social media icons section in the sidebar. By default the section is labelled "Social".
+
+**Default:** `Social`
+
+```bash
+blogmore build posts/ --socials-title "Connect"
+```
+
 #### `--minify-css`
 
 Minify the generated CSS and write it as `styles.min.css` instead of `style.css`. This reduces the size of the stylesheet delivered to visitors.
@@ -308,6 +318,7 @@ The serve command also accepts all the build command options:
 - `--minify-css`
 - `--minify-js`
 - `--with-read-time`
+- `--socials-title`
 
 ### Examples
 
@@ -398,6 +409,7 @@ The publish command also accepts all the build command options:
 - `--minify-css`
 - `--minify-js`
 - `--with-read-time`
+- `--socials-title`
 
 ### How It Works
 

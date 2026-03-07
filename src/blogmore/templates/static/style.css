@@ -273,7 +273,7 @@ body {
 
 .sidebar-socials a {
     color: var(--link-color);
-    font-size: 1.8em;
+    font-size: 1.44em;
     transition: color 0.2s ease, transform 0.2s ease;
     display: inline-block;
     text-decoration: none;
@@ -281,6 +281,9 @@ body {
 
 .sidebar-socials a i {
     color: inherit;
+    display: inline-block;
+    text-align: center;
+    width: 1.25em;
 }
 
 .sidebar-socials a:hover {
