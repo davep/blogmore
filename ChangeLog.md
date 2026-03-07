@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v1.7.0
 
-**Released: WiP**
+**Released: 2026-03-07**
 
 - Estimated reading time is now optional and disabled by default. Use
   `--with-read-time` on the command line or set `with_read_time: true` in
