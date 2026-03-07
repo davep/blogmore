@@ -188,6 +188,7 @@ All command-line options can be configured in the YAML file:
 - `no_watch` - Disable file watching in serve mode (default: `false`)
 - `branch` - Git branch for publish command (default: `gh-pages`)
 - `remote` - Git remote for publish command (default: `origin`)
+- `socials_title` - Title for the social media icons section in the sidebar (default: `"Social"`)
 
 **Note:** The `--config` option itself cannot be set in a configuration file.
 

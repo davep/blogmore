@@ -140,6 +140,12 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
         help="Show estimated reading time on posts (default: disabled)",
     )
 
+    parser.add_argument(
+        "--socials-title",
+        default="Social",
+        help="Title for the social media icons section in the sidebar (default: Social)",
+    )
+
 
 def create_parser() -> argparse.ArgumentParser:
     """Create and configure the argument parser for blogmore.

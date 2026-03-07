@@ -115,6 +115,7 @@ def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
         "minify_css": False,
         "minify_js": False,
         "with_read_time": False,
+        "socials_title": "Social",
     }
 
     # For each config key, update args if the arg value is still at its default
@@ -165,7 +166,7 @@ def get_sidebar_config(config: dict[str, Any]) -> dict[str, Any]:
     """
     sidebar_config: dict[str, Any] = {}
 
-    for key in ("site_logo", "links", "socials"):
+    for key in ("site_logo", "links", "socials", "socials_title"):
         if key in config:
             sidebar_config[key] = config[key]
 

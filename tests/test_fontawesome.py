@@ -371,3 +371,57 @@ class TestFontAwesomeOptimizerInGenerator:
         # HTML should reference the full CDN URL
         index_html = (temp_output_dir / "index.html").read_text()
         assert FONTAWESOME_CDN_CSS_URL in index_html
+
+    def test_socials_uses_custom_title(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the socials section uses socials_title from sidebar config."""
+        from blogmore.generator import SiteGenerator
+
+        sidebar_config = {
+            "socials": [{"site": "github", "url": "https://github.com/example"}],
+            "socials_title": "Follow Me",
+        }
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            sidebar_config=sidebar_config,
+        )
+
+        with patch.object(
+            FontAwesomeOptimizer,
+            "fetch_icon_metadata",
+            return_value=STUB_METADATA,
+        ):
+            generator.generate(include_drafts=False)
+
+        index_html = (temp_output_dir / "index.html").read_text()
+        assert "<h2>Follow Me</h2>" in index_html
+        assert "<h2>Social</h2>" not in index_html
+
+    def test_socials_uses_default_title_when_not_set(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the socials section uses 'Social' as title when not configured."""
+        from blogmore.generator import SiteGenerator
+
+        sidebar_config = {
+            "socials": [{"site": "github", "url": "https://github.com/example"}],
+        }
+        generator = SiteGenerator(
+            content_dir=posts_dir,
+            templates_dir=None,
+            output_dir=temp_output_dir,
+            sidebar_config=sidebar_config,
+        )
+
+        with patch.object(
+            FontAwesomeOptimizer,
+            "fetch_icon_metadata",
+            return_value=STUB_METADATA,
+        ):
+            generator.generate(include_drafts=False)
+
+        index_html = (temp_output_dir / "index.html").read_text()
+        assert "<h2>Social</h2>" in index_html

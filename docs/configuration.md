@@ -421,6 +421,17 @@ socials:
 
 **Supported platforms:** Any Font Awesome brand icon name works (e.g., `github`, `mastodon`, `twitter`, `linkedin`, `youtube`, `facebook`, `instagram`, `bluesky`, `threads`, `lastfm`, `steam`, etc.).
 
+#### `socials_title`
+
+Override the title displayed above the social media icons section in the sidebar. By default the section is labelled "Social".
+
+**Type:** String  
+**Default:** `"Social"`
+
+```yaml
+socials_title: "Connect"
+```
+
 ### Serve Command Options
 
 Options specific to the `serve` command. These are only used when running `blogmore serve`.

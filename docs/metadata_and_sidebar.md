@@ -206,6 +206,17 @@ The `site` value maps directly to a [Font Awesome brand icon](https://fontawesom
 
 `github`, `mastodon`, `bluesky`, `twitter`, `threads`, `linkedin`, `youtube`, `instagram`, `facebook`, `lastfm`, `steam`, and many more.
 
+To change the section title from the default "Social", use `socials_title`:
+
+```yaml
+socials_title: "Connect"
+socials:
+  - site: github
+    url: https://github.com/davep
+```
+
+The same can be set from the command line with `--socials-title`.
+
 ## See also
 
 - [Command Line Reference](command_line.md) — all command-line options

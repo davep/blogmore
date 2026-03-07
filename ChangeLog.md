@@ -1,5 +1,15 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Social media icons in the sidebar are now rendered at a consistent, fixed
+  width. Also reduced their default size.
+  ([#228](https://github.com/davep/blogmore/pull/228))
+- The title of the social media icons section in the sidebar can now be
+  customised. ([#228](https://github.com/davep/blogmore/pull/228))
+
 ## v1.7.0
 
 **Released: 2026-03-07**

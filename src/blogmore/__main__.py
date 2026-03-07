@@ -51,6 +51,10 @@ def main() -> int:
         print(f"Error: Invalid configuration file: {e}", file=sys.stderr)
         return 1
 
+    # Apply socials_title from args (CLI overrides config file value)
+    if hasattr(args, "socials_title"):
+        sidebar_config["socials_title"] = args.socials_title
+
     # Normalize site_keywords: CLI provides a string, config provides a list or string
     site_keywords = normalize_site_keywords(getattr(args, "site_keywords", None))
 
@@ -265,9 +269,10 @@ def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
         "minify_css": False,
         "minify_js": False,
         "with_read_time": False,
+        "socials_title": "Social",
     }
 
-    overrides = {}
+    overrides: dict[str, Any] = {}
 
     # Check each argument to see if it differs from the default
     for arg_name, default_value in defaults.items():
