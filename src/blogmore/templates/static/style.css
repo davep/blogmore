@@ -268,12 +268,13 @@ body {
 .sidebar-socials {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 4px;
 }
 
 .sidebar-socials a {
     color: var(--link-color);
     font-size: 1.44em;
+    line-height: 1;
     transition: color 0.2s ease, transform 0.2s ease;
     display: inline-block;
     text-decoration: none;
