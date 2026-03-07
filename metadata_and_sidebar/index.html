@@ -1254,6 +1254,13 @@
 </code></pre></div>
 <p>The <code>site</code> value maps directly to a <a href="https://fontawesome.com/icons?d=gallery&amp;s=brands">Font Awesome brand icon</a> name. Any Font Awesome brand icon name works, including:</p>
 <p><code>github</code>, <code>mastodon</code>, <code>bluesky</code>, <code>twitter</code>, <code>threads</code>, <code>linkedin</code>, <code>youtube</code>, <code>instagram</code>, <code>facebook</code>, <code>lastfm</code>, <code>steam</code>, and many more.</p>
+<p>To change the section title from the default "Social", use <code>socials_title</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">socials_title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Connect&quot;</span>
+<span class="nt">socials</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">site</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github</span>
+<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/davep</span>
+</code></pre></div>
+<p>The same can be set from the command line with <code>--socials-title</code>.</p>
 <h2 id="see-also">See also</h2>
 <ul>
 <li><a href="../command_line/">Command Line Reference</a> — all command-line options</li>
