@@ -954,6 +954,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#with_read_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        with_read_time
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1684,6 +1695,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#with_read_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        with_read_time
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2088,14 +2110,16 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <strong>Default:</strong> None (uses bundled templates)</p>
 <div class="highlight"><pre><span></span><code><span class="nt">templates</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-templates</span>
 </code></pre></div>
-<p>Custom templates should include:
-- <code>base.html</code> - Base template
-- <code>index.html</code> - Homepage listing
-- <code>post.html</code> - Individual post page
-- <code>archive.html</code> - Archive page
-- <code>tag.html</code> - Tag listing page
-- <code>category.html</code> - Category listing page
-- <code>static/style.css</code> - Stylesheet</p>
+<p>Custom templates should include:</p>
+<ul>
+<li><code>base.html</code> - Base template</li>
+<li><code>index.html</code> - Homepage listing</li>
+<li><code>post.html</code> - Individual post page</li>
+<li><code>archive.html</code> - Archive page</li>
+<li><code>tag.html</code> - Tag listing page</li>
+<li><code>category.html</code> - Category listing page</li>
+<li><code>static/style.css</code> - Stylesheet</li>
+</ul>
 <h3 id="site-metadata">Site Metadata</h3>
 <h4 id="site_title"><code>site_title</code></h4>
 <p>The title of your blog, displayed in the header and browser title bar.</p>
@@ -2207,6 +2231,12 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <div class="highlight"><pre><span></span><code><span class="nt">with_sitemap</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 <p>A <code>site_url</code> should be set when using this option so that sitemap entries contain absolute URLs (e.g. <code>https://example.com/2024/01/15/my-post.html</code>). If <code>site_url</code> is not provided, URLs will fall back to <code>https://example.com</code>.</p>
+<h4 id="with_read_time"><code>with_read_time</code></h4>
+<p>Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on 200 words per minute) and displays it next to the post date on all post listings and individual post pages.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">with_read_time</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
 <h3 id="styling-options">Styling Options</h3>
 <h4 id="minify_css"><code>minify_css</code></h4>
 <p>Minify the generated CSS and write it as <code>styles.min.css</code> instead of <code>style.css</code>. This reduces the size of the stylesheet delivered to visitors.</p>

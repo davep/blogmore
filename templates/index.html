@@ -933,11 +933,19 @@
 </tr>
 <tr>
 <td><code>meta_tags.html</code></td>
-<td>A partial template included by <code>base.html</code> to render <code>&lt;meta&gt;</code> tags.</td>
+<td>A partial template included by <code>post.html</code> and <code>page.html</code> to render <code>&lt;meta&gt;</code> tags.</td>
+</tr>
+<tr>
+<td><code>_post_summary.html</code></td>
+<td>A partial template used by all listing pages (<code>index.html</code>, <code>tag.html</code>, <code>category.html</code>, <code>archive.html</code>) to render a single post summary article.  Edit this file to change how posts appear in every listing context at once.</td>
+</tr>
+<tr>
+<td><code>_listing_meta_tags.html</code></td>
+<td>A partial template used by listing pages to render the standard Open Graph and SEO <code>&lt;meta&gt;</code> tags.  Edit this file to change the meta tags for all listing pages at once.</td>
 </tr>
 <tr>
 <td><code>_pagination.html</code></td>
-<td>A partial template used by <code>index.html</code> to render page navigation.</td>
+<td>A partial template used by all listing pages to render page navigation.</td>
 </tr>
 <tr>
 <td><code>static/style.css</code></td>

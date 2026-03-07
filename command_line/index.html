@@ -882,6 +882,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-with-read-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --with-read-time
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-minify-css" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1655,6 +1666,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-with-read-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --with-read-time
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-minify-css" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2164,6 +2186,11 @@ blogmore<span class="w"> </span>gen<span class="w"> </span>&lt;content_dir&gt;<s
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--with-sitemap
 </code></pre></div>
 <p>A <code>--site-url</code> should be provided so that sitemap entries contain absolute URLs. If omitted, entries will fall back to <code>https://example.com</code>.</p>
+<h4 id="-with-read-time"><code>--with-read-time</code></h4>
+<p>Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on 200 words per minute) and displays it next to the post date on all post listings and individual post pages.</p>
+<p>Read time display is <strong>disabled by default</strong>. Pass this flag to opt in.</p>
+<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--with-read-time
+</code></pre></div>
 <h4 id="-minify-css"><code>--minify-css</code></h4>
 <p>Minify the generated CSS and write it as <code>styles.min.css</code> instead of <code>style.css</code>. This reduces the size of the stylesheet delivered to visitors.</p>
 <p>CSS minification is <strong>disabled by default</strong>. Pass this flag to opt in.</p>
@@ -2229,7 +2256,8 @@ blogmore<span class="w"> </span>serve
 - <code>--with-search</code>
 - <code>--with-sitemap</code>
 - <code>--minify-css</code>
-- <code>--minify-js</code></p>
+- <code>--minify-js</code>
+- <code>--with-read-time</code></p>
 <h3 id="examples_1">Examples</h3>
 <p>Basic development server:
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>serve<span class="w"> </span>posts/
@@ -2289,7 +2317,8 @@ blogmore<span class="w"> </span>serve
 - <code>--with-search</code>
 - <code>--with-sitemap</code>
 - <code>--minify-css</code>
-- <code>--minify-js</code></p>
+- <code>--minify-js</code>
+- <code>--with-read-time</code></p>
 <h3 id="how-it-works">How It Works</h3>
 <p>When you run <code>publish</code>, BlogMore:</p>
 <ol>
