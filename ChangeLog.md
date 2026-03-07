@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v1.8.0
 
-**Released: WiP**
+**Released: 2026-03-07**
 
 - Social media icons in the sidebar are now rendered at a consistent, fixed
   width. Also reduced their default size.
