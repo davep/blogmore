@@ -1,20 +1,20 @@
-app      := blogmore
-src      := src/
-reports  := .reports
-run      := uv run
-sync     := uv sync --group dev --group test --group docs
-build    := uv build
-publish  := uv publish --username=__token__ --keyring-provider=subprocess
-python   := $(run) python
-ruff     := $(run) ruff
-lint     := $(ruff) check
-fmt      := $(ruff) format
-mypy     := $(run) mypy
-spell    := $(run) codespell
-test     := $(run) pytest --verbose --cov
-coverage := $(test) --cov-report html:$(reports)/html
-mkdocs   := $(run) zensical
-publish  := $(run) ghp-import --no-jekyll --push
+app          := blogmore
+src          := src/
+reports      := .reports
+run          := uv run
+sync         := uv sync --group dev --group test --group docs
+build        := uv build
+publish-app  := uv publish --username=__token__ --keyring-provider=subprocess
+python       := $(run) python
+ruff         := $(run) ruff
+lint         := $(ruff) check
+fmt          := $(ruff) format
+mypy         := $(run) mypy
+spell        := $(run) codespell
+test         := $(run) pytest --verbose --cov
+coverage     := $(test) --cov-report html:$(reports)/html
+mkdocs       := $(run) zensical
+publish-docs := $(run) ghp-import --no-jekyll --push
 
 ##############################################################################
 # Setup/update packages the system requires.
@@ -88,7 +88,7 @@ rtfm:                           # Locally read the library documentation
 
 .PHONY: publishdocs
 publishdocs: docs			# Set up the docs for publishing
-	$(publish) site/
+	$(publish-docs) site/
 
 ##############################################################################
 # Package/publish.
@@ -102,11 +102,11 @@ spackage:			# Create a source package for the library
 
 .PHONY: testdist
 testdist: package			# Perform a test distribution
-	$(publish) --index testpypi
+	$(publish-app) --index testpypi
 
 .PHONY: dist
 dist: package			# Upload to pypi
-	$(publish)
+	$(publish-app)
 
 ##############################################################################
 # Utility.
