@@ -2,9 +2,8 @@
 
 from pathlib import Path
 
-import pytest
-
 from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN
+from blogmore.site_config import SiteConfig
 from blogmore.sitemap import (
     EXCLUDED_PAGES,
     SITEMAP_FILENAME,
@@ -220,13 +219,14 @@ class TestSitemapIntegrationWithGenerator:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
-            with_sitemap=False,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=False,
+            )
         )
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         assert not (temp_output_dir / "sitemap.xml").exists()
 
@@ -237,13 +237,14 @@ class TestSitemapIntegrationWithGenerator:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
-            with_sitemap=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+            )
         )
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         assert (temp_output_dir / "sitemap.xml").exists()
 
@@ -254,13 +255,14 @@ class TestSitemapIntegrationWithGenerator:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
-            with_sitemap=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+            )
         )
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         content = (temp_output_dir / "sitemap.xml").read_text()
         # The fixture has a post dated 2024-01-15
@@ -273,14 +275,15 @@ class TestSitemapIntegrationWithGenerator:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
-            with_sitemap=True,
-            with_search=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+                with_search=True,
+            )
         )
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         content = (temp_output_dir / "sitemap.xml").read_text()
         assert "search.html" not in content
@@ -292,13 +295,14 @@ class TestSitemapIntegrationWithGenerator:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
-            with_sitemap=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+            )
         )
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         content = (temp_output_dir / "sitemap.xml").read_text()
         assert "https://example.com/index.html" in content
@@ -318,13 +322,14 @@ class TestSitemapIntegrationWithGenerator:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
-            with_sitemap=True,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+            )
         )
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         assert (temp_output_dir / CUSTOM_404_HTML).exists()
         content = (temp_output_dir / "sitemap.xml").read_text()

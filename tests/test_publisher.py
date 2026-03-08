@@ -2,7 +2,7 @@
 
 import subprocess
 from pathlib import Path
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -137,11 +137,10 @@ class TestPublishSite:
             "blogmore.publisher.check_git_available", return_value=True
         ), patch(
             "blogmore.publisher.check_is_git_repository", return_value=False
+        ), pytest.raises(
+            PublishError, match="Not in a git repository"
         ):
-            with pytest.raises(
-                PublishError, match="Not in a git repository"
-            ):
-                publish_site(output_dir)
+            publish_site(output_dir)
 
     def test_publish_site_output_dir_not_exists(self, tmp_path: Path) -> None:
         """Test error when output directory doesn't exist."""
@@ -153,11 +152,10 @@ class TestPublishSite:
             "blogmore.publisher.check_is_git_repository", return_value=True
         ), patch(
             "blogmore.publisher.get_git_root", return_value=tmp_path
+        ), pytest.raises(
+            PublishError, match="Output directory not found"
         ):
-            with pytest.raises(
-                PublishError, match="Output directory not found"
-            ):
-                publish_site(output_dir)
+            publish_site(output_dir)
 
     def test_publish_site_output_dir_empty(self, tmp_path: Path) -> None:
         """Test error when output directory is empty."""
@@ -170,11 +168,10 @@ class TestPublishSite:
             "blogmore.publisher.check_is_git_repository", return_value=True
         ), patch(
             "blogmore.publisher.get_git_root", return_value=tmp_path
+        ), pytest.raises(
+            PublishError, match="Output directory is empty"
         ):
-            with pytest.raises(
-                PublishError, match="Output directory is empty"
-            ):
-                publish_site(output_dir)
+            publish_site(output_dir)
 
     @patch("blogmore.publisher.subprocess.run")
     @patch("blogmore.publisher.shutil.rmtree")

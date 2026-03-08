@@ -3,7 +3,7 @@
 import shutil
 from pathlib import Path
 
-import pytest
+from blogmore.site_config import SiteConfig
 
 
 class TestEndToEndWorkflow:
@@ -29,15 +29,16 @@ class TestEndToEndWorkflow:
 
         # Generate the site
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_title="My Test Blog",
-            site_url="https://test.example.com",
-            with_search=True,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_title="My Test Blog",
+                site_url="https://test.example.com",
+                with_search=True,
+            )
         )
 
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Verify all expected outputs exist
         assert (temp_output_dir / "index.html").exists()
@@ -89,12 +90,13 @@ class TestEndToEndWorkflow:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
         )
 
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Search files should NOT be present when with_search is False (the default)
         assert not (temp_output_dir / "search.html").exists()
@@ -113,24 +115,26 @@ class TestEndToEndWorkflow:
 
         # First build WITH search enabled
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            with_search=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+            )
         )
-        generator.generate(include_drafts=False)
+        generator.generate()
         assert (temp_output_dir / "search.html").exists()
         assert (temp_output_dir / "search_index.json").exists()
         assert (temp_output_dir / "static" / "search.js").exists()
 
         # Rebuild WITHOUT search - stale files must be removed
         generator2 = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            with_search=False,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=False,
+            )
         )
-        generator2.generate(include_drafts=False)
+        generator2.generate()
         assert not (temp_output_dir / "search.html").exists()
         assert not (temp_output_dir / "search_index.json").exists()
         assert not (temp_output_dir / "static" / "search.js").exists()
@@ -142,17 +146,18 @@ class TestEndToEndWorkflow:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
         )
 
         # First generation
-        generator.generate(include_drafts=False)
+        generator.generate()
         first_index = (temp_output_dir / "index.html").read_text()
 
         # Second generation
-        generator.generate(include_drafts=False)
+        generator.generate()
         second_index = (temp_output_dir / "index.html").read_text()
 
         # Content should be similar (may have timestamp differences)
@@ -164,18 +169,26 @@ class TestEndToEndWorkflow:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
         )
 
         # Generate without drafts
-        generator.generate(include_drafts=False)
+        generator.generate()
         index_without_drafts = (temp_output_dir / "index.html").read_text()
         assert "Draft Post" not in index_without_drafts
 
         # Generate with drafts
-        generator.generate(include_drafts=True)
+        drafts_generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                include_drafts=True,
+            )
+        )
+        drafts_generator.generate()
         index_with_drafts = (temp_output_dir / "index.html").read_text()
         assert "Draft Post" in index_with_drafts
 
@@ -205,13 +218,15 @@ class TestEndToEndWorkflow:
         )
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=templates_dir,
-            output_dir=temp_output_dir,
-            site_title="Custom Blog",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                templates_dir=templates_dir,
+                output_dir=temp_output_dir,
+                site_title="Custom Blog",
+            )
         )
 
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Verify custom template was used
         index_content = (temp_output_dir / "index.html").read_text()
@@ -261,13 +276,14 @@ class TestEndToEndWorkflow:
         empty_dir.mkdir()
 
         generator = SiteGenerator(
-            content_dir=empty_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=empty_dir,
+                output_dir=temp_output_dir,
+            )
         )
 
         # Should generate without errors
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Should have basic structure
         assert (temp_output_dir / "index.html").exists()
@@ -280,12 +296,13 @@ class TestEndToEndWorkflow:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
         )
 
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Check complex post rendering
         complex_post = (
@@ -306,13 +323,14 @@ class TestEndToEndWorkflow:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://test.example.com",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://test.example.com",
+            )
         )
 
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Check main RSS feed
         rss_content = (temp_output_dir / "feed.xml").read_text()
@@ -336,7 +354,6 @@ class TestEndToEndWorkflow:
     ) -> None:
         """Test pagination workflow with many posts."""
         from blogmore.generator import SiteGenerator
-        from blogmore.parser import PostParser
 
         # Create many posts to trigger pagination
         many_posts_dir = tmp_path / "many_posts"
@@ -358,12 +375,13 @@ This is post number {i}.
             )
 
         generator = SiteGenerator(
-            content_dir=many_posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=many_posts_dir,
+                output_dir=temp_output_dir,
+            )
         )
 
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Verify index exists
         assert (temp_output_dir / "index.html").exists()
@@ -403,12 +421,13 @@ int main() {
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+            )
         )
 
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Check that special characters are properly escaped
         post_html = (

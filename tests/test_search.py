@@ -4,8 +4,6 @@ import datetime as dt
 import json
 from pathlib import Path
 
-import pytest
-
 from blogmore.parser import Post
 from blogmore.search import build_search_index, strip_html, write_search_index
 

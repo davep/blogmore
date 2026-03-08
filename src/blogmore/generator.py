@@ -32,8 +32,8 @@ from blogmore.parser import (
 )
 from blogmore.renderer import TemplateRenderer
 from blogmore.search import write_search_index
+from blogmore.site_config import SiteConfig
 from blogmore.sitemap import write_sitemap
-from blogmore.utils import normalize_site_url
 
 CSS_FILENAME = "style.css"
 CSS_MINIFIED_FILENAME = "styles.min.css"
@@ -80,81 +80,41 @@ class SiteGenerator:
     # Feed constants - posts per feed
     POSTS_PER_FEED = 20
 
-    def __init__(
-        self,
-        content_dir: Path,
-        templates_dir: Path | None,
-        output_dir: Path,
-        site_title: str = "My Blog",
-        site_subtitle: str = "",
-        site_description: str = "",
-        site_keywords: list[str] | None = None,
-        site_url: str = "",
-        posts_per_feed: int = 20,
-        extra_stylesheets: list[str] | None = None,
-        default_author: str | None = None,
-        sidebar_config: dict[str, Any] | None = None,
-        clean_first: bool = False,
-        icon_source: str | None = None,
-        with_search: bool = False,
-        with_sitemap: bool = False,
-        minify_css: bool = False,
-        minify_js: bool = False,
-        with_read_time: bool = False,
-    ) -> None:
+    def __init__(self, site_config: SiteConfig) -> None:
         """Initialize the site generator.
 
         Args:
-            content_dir: Directory containing markdown posts
-            templates_dir: Optional directory containing custom Jinja2 templates.
-                          If not provided, uses bundled templates.
-            output_dir: Directory where generated site will be written
-            site_title: Title of the blog site
-            site_subtitle: Subtitle of the blog site
-            site_description: Default description used in metadata for pages that
-                              have no description of their own
-            site_keywords: Default keywords used in metadata for pages that have no
-                           keywords of their own
-            site_url: Base URL of the site
-            posts_per_feed: Maximum number of posts to include in feeds (default: 20)
-            extra_stylesheets: Optional list of URLs for additional stylesheets
-            default_author: Default author name for posts without author in frontmatter
-            sidebar_config: Optional sidebar configuration (site_logo, links, socials)
-            clean_first: Whether to remove the output directory before generating
-            icon_source: Optional source icon filename in extras/ directory
-            with_search: Whether to generate a search index and search page
-            with_sitemap: Whether to generate an XML sitemap
-            minify_css: Whether to minify the CSS, writing it as styles.min.css
-            minify_js: Whether to minify the JavaScript, writing it as theme.min.js
-                       (and search.min.js if search is enabled)
-            with_read_time: Whether to show estimated reading time on posts
+            site_config: Configuration for the site to be generated.  The
+                ``content_dir`` field must not be ``None``.
         """
-        self.content_dir = content_dir
-        self.templates_dir = templates_dir
-        self.output_dir = output_dir
-        self.site_title = site_title
-        self.site_subtitle = site_subtitle
-        self.site_description = site_description
-        self.site_keywords = site_keywords
-        self.site_url = normalize_site_url(site_url)
-        self.posts_per_feed = posts_per_feed
-        self.default_author = default_author
-        self.sidebar_config = sidebar_config or {}
-        self.clean_first = clean_first
-        self.icon_source = icon_source
-        self.with_search = with_search
-        self.with_sitemap = with_sitemap
-        self.minify_css = minify_css
-        self.minify_js = minify_js
-        self.with_read_time = with_read_time
+        if site_config.content_dir is None:
+            raise ValueError(
+                "site_config.content_dir must be provided for site generation"
+            )
+        self.site_config = site_config
 
         # Default to CDN URL; updated during generate() once socials are known
         self._fontawesome_css_url: str = FONTAWESOME_CDN_CSS_URL
 
-        self.parser = PostParser(site_url=self.site_url)
+        self.parser = PostParser(site_url=site_config.site_url)
         self.renderer = TemplateRenderer(
-            templates_dir, extra_stylesheets, self.site_url
+            site_config.templates_dir,
+            site_config.extra_stylesheets,
+            site_config.site_url,
         )
+
+    @property
+    def _content_dir(self) -> Path:
+        """Return the content directory as a ``Path``, guaranteed non-``None``.
+
+        ``__init__`` validates that ``site_config.content_dir`` is not ``None``,
+        so this property is always safe to call on a constructed instance.
+
+        Returns:
+            The resolved content directory path.
+        """
+        assert self.site_config.content_dir is not None
+        return self.site_config.content_dir
 
     def _detect_favicon(self) -> str | None:
         """Detect if a favicon file exists in the icons or extras directory.
@@ -167,14 +127,14 @@ class SiteGenerator:
             The favicon URL (relative to site root) if found, None otherwise
         """
         # First check icons directory (generated icons)
-        icons_dir = self.output_dir / "icons"
+        icons_dir = self.site_config.output_dir / "icons"
         if icons_dir.exists():
             favicon_path = icons_dir / "favicon.ico"
             if favicon_path.is_file():
                 return "/icons/favicon.ico"
 
         # Fall back to extras directory (existing behavior)
-        extras_dir = self.content_dir / "extras"
+        extras_dir = self._content_dir / "extras"
         if not extras_dir.exists():
             return None
 
@@ -195,7 +155,7 @@ class SiteGenerator:
         Returns:
             True if generated icons exist, False otherwise
         """
-        icons_dir = self.output_dir / "icons"
+        icons_dir = self.site_config.output_dir / "icons"
         if not icons_dir.exists():
             return False
 
@@ -205,17 +165,17 @@ class SiteGenerator:
 
     def _generate_icons(self) -> None:
         """Generate icons from a source image if present."""
-        extras_dir = self.content_dir / "extras"
+        extras_dir = self._content_dir / "extras"
 
         # Look for a source icon (using configured name if provided)
-        source_icon = detect_source_icon(extras_dir, self.icon_source)
+        source_icon = detect_source_icon(extras_dir, self.site_config.icon_source)
 
         if source_icon:
             print(f"Found source icon: {source_icon.name}")
             print("Generating favicon and Apple touch icons...")
 
             # Generate to /icons subdirectory
-            icons_output_dir = self.output_dir / "icons"
+            icons_output_dir = self.site_config.output_dir / "icons"
             generator = IconGenerator(source_icon, icons_output_dir)
             generated = generator.generate_all()
 
@@ -226,7 +186,9 @@ class SiteGenerator:
 
                 # Copy favicon.ico to the root for backward compatibility
                 if favicon_ico := generated.get("favicon.ico"):
-                    shutil.copy2(favicon_ico, self.output_dir / "favicon.ico")
+                    shutil.copy2(
+                        favicon_ico, self.site_config.output_dir / "favicon.ico"
+                    )
                     print("  - favicon.ico (root copy for backward compatibility)")
             else:
                 print("Warning: No icons were generated")
@@ -235,33 +197,33 @@ class SiteGenerator:
         """Get the global context available to all templates."""
         styles_css_url = (
             f"/static/{CSS_MINIFIED_FILENAME}"
-            if self.minify_css
+            if self.site_config.minify_css
             else f"/static/{CSS_FILENAME}"
         )
         theme_js_url = (
             f"/static/{THEME_JS_MINIFIED_FILENAME}"
-            if self.minify_js
+            if self.site_config.minify_js
             else f"/static/{THEME_JS_FILENAME}"
         )
         search_js_url = (
             f"/static/{SEARCH_JS_MINIFIED_FILENAME}"
-            if self.minify_js
+            if self.site_config.minify_js
             else f"/static/{SEARCH_JS_FILENAME}"
         )
         context = {
-            "site_title": self.site_title,
-            "site_subtitle": self.site_subtitle,
-            "site_description": self.site_description,
-            "site_keywords": self.site_keywords,
-            "site_url": self.site_url,
+            "site_title": self.site_config.site_title,
+            "site_subtitle": self.site_config.site_subtitle,
+            "site_description": self.site_config.site_description,
+            "site_keywords": self.site_config.site_keywords,
+            "site_url": self.site_config.site_url,
             "tag_dir": self.TAG_DIR,
             "category_dir": self.CATEGORY_DIR,
             "favicon_url": self._detect_favicon(),
             "has_platform_icons": self._detect_generated_icons(),
             "blogmore_version": __version__,
-            "with_search": self.with_search,
-            "with_read_time": self.with_read_time,
-            "default_author": self.default_author,
+            "with_search": self.site_config.with_search,
+            "with_read_time": self.site_config.with_read_time,
+            "default_author": self.site_config.default_author,
             "fontawesome_css_url": self._fontawesome_css_url,
             "fontawesome_woff2_url": FONTAWESOME_CDN_BRANDS_WOFF2_URL,
             "styles_css_url": styles_css_url,
@@ -269,7 +231,7 @@ class SiteGenerator:
             "search_js_url": search_js_url,
         }
         # Merge sidebar config into context
-        context.update(self.sidebar_config)
+        context.update(self.site_config.sidebar_config)
         return context
 
     @staticmethod
@@ -317,58 +279,56 @@ class SiteGenerator:
         Returns:
             The fully-qualified canonical URL for the given file.
         """
-        relative = output_path.relative_to(self.output_dir)
-        return f"{self.site_url}/{relative.as_posix()}"
+        relative = output_path.relative_to(self.site_config.output_dir)
+        return f"{self.site_config.site_url}/{relative.as_posix()}"
 
-    def generate(self, include_drafts: bool = False) -> None:
-        """Generate the complete static site.
+    def generate(self) -> None:
+        """Generate the complete static site."""
+        content_dir = self._content_dir
 
-        Args:
-            include_drafts: Whether to include posts marked as drafts
-        """
         # Clean output directory if requested
-        if self.clean_first and self.output_dir.exists():
-            print(f"Removing output directory: {self.output_dir}")
+        if self.site_config.clean_first and self.site_config.output_dir.exists():
+            print(f"Removing output directory: {self.site_config.output_dir}")
             try:
-                shutil.rmtree(self.output_dir)
+                shutil.rmtree(self.site_config.output_dir)
             except OSError:
                 # On Linux with concurrent operations the directory may not be
                 # fully empty yet.  Wait briefly and retry once before falling
                 # back to a best-effort removal.
                 time.sleep(0.1)
                 try:
-                    shutil.rmtree(self.output_dir)
+                    shutil.rmtree(self.site_config.output_dir)
                 except OSError:
-                    shutil.rmtree(self.output_dir, ignore_errors=True)
+                    shutil.rmtree(self.site_config.output_dir, ignore_errors=True)
                     print(
                         "Warning: Some files could not be removed from output directory"
                     )
 
         # Parse all pages from the pages subdirectory (must be done first so we
         # can exclude them when scanning for posts)
-        pages_dir = self.content_dir / "pages"
+        pages_dir = content_dir / "pages"
         pages = self.parser.parse_pages_directory(pages_dir)
         page_404 = self.parser.parse_404_page(pages_dir)
 
         # Parse all posts, excluding the pages subdirectory
-        print(f"Parsing posts from {self.content_dir}...")
+        print(f"Parsing posts from {content_dir}...")
         posts = self.parser.parse_directory(
-            self.content_dir,
-            include_drafts=include_drafts,
+            content_dir,
+            include_drafts=self.site_config.include_drafts,
             exclude_dirs=[pages_dir],
         )
         print(f"Found {len(posts)} posts")
 
         # Apply default author to posts that don't have one
-        if self.default_author:
+        if self.site_config.default_author:
             for post in posts:
                 if post.metadata is not None and "author" not in post.metadata:
-                    post.metadata["author"] = self.default_author
+                    post.metadata["author"] = self.site_config.default_author
         if pages:
             print(f"Found {len(pages)} pages")
 
         # Create output directory
-        self.output_dir.mkdir(parents=True, exist_ok=True)
+        self.site_config.output_dir.mkdir(parents=True, exist_ok=True)
 
         # Generate icons from source image BEFORE generating HTML pages
         # so that the has_apple_touch_icons flag is correctly set
@@ -429,7 +389,7 @@ class SiteGenerator:
         self._generate_feeds(posts)
 
         # Generate search index and search page (only when enabled)
-        if self.with_search:
+        if self.site_config.with_search:
             print("Generating search index and search page...")
             self._generate_search_index(posts)
             self._generate_search_page(pages)
@@ -453,11 +413,11 @@ class SiteGenerator:
         self._copy_extras()
 
         # Generate XML sitemap (only when enabled)
-        if self.with_sitemap:
+        if self.site_config.with_sitemap:
             print("Generating XML sitemap...")
             self._generate_sitemap()
 
-        print(f"Site generation complete! Output: {self.output_dir}")
+        print(f"Site generation complete! Output: {self.site_config.output_dir}")
 
     def _prepare_fontawesome_css(self) -> str | None:
         """Determine the FontAwesome CSS URL and optionally build optimised CSS.
@@ -472,7 +432,7 @@ class SiteGenerator:
             or ``None`` if no social icons are configured or if the metadata
             fetch failed (in the latter case the full CDN URL is used instead).
         """
-        socials: list[Any] = self.sidebar_config.get("socials", [])
+        socials: list[Any] = self.site_config.sidebar_config.get("socials", [])
         if not socials:
             # No social icons — no FontAwesome CSS needed at all.
             self._fontawesome_css_url = ""
@@ -506,7 +466,7 @@ class SiteGenerator:
         Args:
             css_content: CSS text to write.
         """
-        static_dir = self.output_dir / "static"
+        static_dir = self.site_config.output_dir / "static"
         static_dir.mkdir(parents=True, exist_ok=True)
         css_path = static_dir / "fontawesome.css"
         css_path.write_text(css_content, encoding="utf-8")
@@ -525,8 +485,8 @@ class SiteGenerator:
         css_source: str | None = None
 
         # Prefer custom style.css if a templates directory is configured
-        if self.templates_dir is not None:
-            custom_css = self.templates_dir / "static" / CSS_FILENAME
+        if self.site_config.templates_dir is not None:
+            custom_css = self.site_config.templates_dir / "static" / CSS_FILENAME
             if custom_css.is_file():
                 css_source = custom_css.read_text(encoding="utf-8")
 
@@ -565,8 +525,8 @@ class SiteGenerator:
         js_source: str | None = None
 
         # Prefer custom JS file if a templates directory is configured
-        if self.templates_dir is not None:
-            custom_js = self.templates_dir / "static" / js_filename
+        if self.site_config.templates_dir is not None:
+            custom_js = self.site_config.templates_dir / "static" / js_filename
             if custom_js.is_file():
                 js_source = custom_js.read_text(encoding="utf-8")
 
@@ -626,12 +586,12 @@ class SiteGenerator:
             slug = remove_date_prefix(post.slug)
 
             # Create directory structure
-            post_dir = self.output_dir / str(year) / month / day
+            post_dir = self.site_config.output_dir / str(year) / month / day
             post_dir.mkdir(parents=True, exist_ok=True)
             output_path = post_dir / f"{slug}.html"
         else:
             # Fallback for posts without dates
-            output_path = self.output_dir / f"{post.slug}.html"
+            output_path = self.site_config.output_dir / f"{post.slug}.html"
 
         context["canonical_url"] = self._canonical_url_for_path(output_path)
         html = self.renderer.render_post(post, **context)
@@ -641,7 +601,7 @@ class SiteGenerator:
         """Generate a single static page."""
         context = self._get_global_context()
         context["pages"] = pages
-        output_path = self.output_dir / f"{page.slug}.html"
+        output_path = self.site_config.output_dir / f"{page.slug}.html"
         context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_page(page, **context)
@@ -652,7 +612,7 @@ class SiteGenerator:
         """Generate the custom 404 page in the root of the output directory."""
         context = self._get_global_context()
         context["pages"] = pages
-        output_path = self.output_dir / CUSTOM_404_HTML
+        output_path = self.site_config.output_dir / CUSTOM_404_HTML
         context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_page(page, **context)
@@ -675,10 +635,10 @@ class SiteGenerator:
         for page_num, page_posts in enumerate(paginated_posts, start=1):
             if page_num == 1:
                 # First page is at root
-                output_path = self.output_dir / "index.html"
+                output_path = self.site_config.output_dir / "index.html"
             else:
                 # Additional pages in page/ directory
-                page_dir = self.output_dir / "page"
+                page_dir = self.site_config.output_dir / "page"
                 page_dir.mkdir(exist_ok=True)
                 output_path = page_dir / f"{page_num}.html"
 
@@ -698,7 +658,7 @@ class SiteGenerator:
         """Generate the archive page."""
         context = self._get_global_context()
         context["pages"] = pages
-        output_path = self.output_dir / "archive.html"
+        output_path = self.site_config.output_dir / "archive.html"
         context["canonical_url"] = self._canonical_url_for_path(output_path)
         html = self.renderer.render_archive(
             posts, page=1, total_pages=1, base_path="/archive", **context
@@ -727,7 +687,7 @@ class SiteGenerator:
 
         # Generate year archives with pagination
         for year, year_posts in posts_by_year.items():
-            year_dir = self.output_dir / str(year)
+            year_dir = self.site_config.output_dir / str(year)
             year_dir.mkdir(parents=True, exist_ok=True)
 
             # Paginate posts
@@ -771,7 +731,7 @@ class SiteGenerator:
 
         # Generate month archives with pagination
         for (year, month), month_posts in posts_by_month.items():
-            month_dir = self.output_dir / str(year) / f"{month:02d}"
+            month_dir = self.site_config.output_dir / str(year) / f"{month:02d}"
             month_dir.mkdir(parents=True, exist_ok=True)
 
             month_name = dt.datetime(year, month, 1).strftime("%B %Y")
@@ -817,7 +777,9 @@ class SiteGenerator:
 
         # Generate day archives with pagination
         for (year, month, day), day_posts in posts_by_day.items():
-            day_dir = self.output_dir / str(year) / f"{month:02d}" / f"{day:02d}"
+            day_dir = (
+                self.site_config.output_dir / str(year) / f"{month:02d}" / f"{day:02d}"
+            )
             day_dir.mkdir(parents=True, exist_ok=True)
 
             date_str = dt.datetime(year, month, day).strftime("%B %d, %Y")
@@ -868,7 +830,7 @@ class SiteGenerator:
         posts_by_tag = self._group_posts_by_tag(posts)
 
         # Create tag directory
-        tag_dir = self.output_dir / self.TAG_DIR
+        tag_dir = self.site_config.output_dir / self.TAG_DIR
         tag_dir.mkdir(exist_ok=True)
 
         # Generate paginated pages for each tag
@@ -998,7 +960,7 @@ class SiteGenerator:
         # Render the tags page
         context = self._get_global_context()
         context["pages"] = pages
-        output_path = self.output_dir / "tags.html"
+        output_path = self.site_config.output_dir / "tags.html"
         context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_tags_page(tag_data, **context)
@@ -1066,7 +1028,7 @@ class SiteGenerator:
         # Render the categories page
         context = self._get_global_context()
         context["pages"] = pages
-        output_path = self.output_dir / "categories.html"
+        output_path = self.site_config.output_dir / "categories.html"
         context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_categories_page(category_data, **context)
@@ -1080,7 +1042,7 @@ class SiteGenerator:
         posts_by_category = self._group_posts_by_category(posts)
 
         # Create category directory
-        category_dir = self.output_dir / self.CATEGORY_DIR
+        category_dir = self.site_config.output_dir / self.CATEGORY_DIR
         category_dir.mkdir(exist_ok=True)
 
         # Generate paginated pages for each category
@@ -1163,10 +1125,10 @@ class SiteGenerator:
             posts: List of all posts
         """
         feed_gen = BlogFeedGenerator(
-            output_dir=self.output_dir,
-            site_title=self.site_title,
-            site_url=self.site_url,
-            max_posts=self.posts_per_feed,
+            output_dir=self.site_config.output_dir,
+            site_title=self.site_config.site_title,
+            site_url=self.site_config.site_url,
+            max_posts=self.site_config.posts_per_feed,
         )
 
         # Generate main index feeds
@@ -1189,7 +1151,7 @@ class SiteGenerator:
         Args:
             posts: List of all posts to index.
         """
-        write_search_index(posts, self.output_dir)
+        write_search_index(posts, self.site_config.output_dir)
 
     def _generate_search_page(self, pages: list[Page]) -> None:
         """Generate the search page.
@@ -1199,7 +1161,7 @@ class SiteGenerator:
         """
         context = self._get_global_context()
         context["pages"] = pages
-        output_path = self.output_dir / "search.html"
+        output_path = self.site_config.output_dir / "search.html"
         context["canonical_url"] = self._canonical_url_for_path(output_path)
         html = self.renderer.render_search_page(**context)
         output_path.write_text(html, encoding="utf-8")
@@ -1213,7 +1175,7 @@ class SiteGenerator:
         in the output directory.
         """
         for filename in ("search.html", "search_index.json"):
-            stale_path = self.output_dir / filename
+            stale_path = self.site_config.output_dir / filename
             if stale_path.exists():
                 stale_path.unlink()
 
@@ -1224,7 +1186,7 @@ class SiteGenerator:
         containing an entry for every generated HTML page except
         ``search.html``.
         """
-        write_sitemap(self.output_dir, self.site_url)
+        write_sitemap(self.site_config.output_dir, self.site_config.site_url)
 
     def _copy_static_assets(self) -> None:
         """Copy static assets (CSS, JS, images) to output directory.
@@ -1236,7 +1198,7 @@ class SiteGenerator:
         written as ``theme.min.js`` (and ``search.js`` as ``search.min.js`` if
         search is enabled); the originals are not written.
         """
-        output_static = self.output_dir / "static"
+        output_static = self.site_config.output_dir / "static"
 
         # Clear output static directory if it exists
         if output_static.exists():
@@ -1251,15 +1213,24 @@ class SiteGenerator:
                 for item in bundled_static.iterdir():
                     if item.is_file():
                         # Only copy search.js when search is enabled
-                        if item.name == SEARCH_JS_FILENAME and not self.with_search:
+                        if (
+                            item.name == SEARCH_JS_FILENAME
+                            and not self.site_config.with_search
+                        ):
                             continue
                         # When minifying CSS, skip the original style.css
-                        if item.name == CSS_FILENAME and self.minify_css:
+                        if item.name == CSS_FILENAME and self.site_config.minify_css:
                             continue
                         # When minifying JS, skip original JS files
-                        if item.name == THEME_JS_FILENAME and self.minify_js:
+                        if (
+                            item.name == THEME_JS_FILENAME
+                            and self.site_config.minify_js
+                        ):
                             continue
-                        if item.name == SEARCH_JS_FILENAME and self.minify_js:
+                        if (
+                            item.name == SEARCH_JS_FILENAME
+                            and self.site_config.minify_js
+                        ):
                             continue
                         # Read content and write to output
                         content = item.read_bytes()
@@ -1270,19 +1241,28 @@ class SiteGenerator:
             print(f"Warning: Could not copy bundled static assets: {e}")
 
         # Then, copy custom static assets (if provided), which will override bundled ones
-        if self.templates_dir is not None:
-            custom_static_dir = self.templates_dir / "static"
+        if self.site_config.templates_dir is not None:
+            custom_static_dir = self.site_config.templates_dir / "static"
             if custom_static_dir.exists():
                 for item in custom_static_dir.rglob("*"):
                     if item.is_file():
                         relative_path = item.relative_to(custom_static_dir)
                         # When minifying CSS, skip the original style.css from custom dir too
-                        if relative_path.name == CSS_FILENAME and self.minify_css:
+                        if (
+                            relative_path.name == CSS_FILENAME
+                            and self.site_config.minify_css
+                        ):
                             continue
                         # When minifying JS, skip original JS files from custom dir too
-                        if relative_path.name == THEME_JS_FILENAME and self.minify_js:
+                        if (
+                            relative_path.name == THEME_JS_FILENAME
+                            and self.site_config.minify_js
+                        ):
                             continue
-                        if relative_path.name == SEARCH_JS_FILENAME and self.minify_js:
+                        if (
+                            relative_path.name == SEARCH_JS_FILENAME
+                            and self.site_config.minify_js
+                        ):
                             continue
                         output_file = output_static / relative_path
                         output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -1290,25 +1270,25 @@ class SiteGenerator:
                 print(f"Copied custom static assets from {custom_static_dir}")
 
         # Minify CSS if requested
-        if self.minify_css:
+        if self.site_config.minify_css:
             self._write_minified_css(output_static)
 
         # Minify JS if requested
-        if self.minify_js:
+        if self.site_config.minify_js:
             self._write_minified_js(
                 output_static, THEME_JS_FILENAME, THEME_JS_MINIFIED_FILENAME
             )
-            if self.with_search:
+            if self.site_config.with_search:
                 self._write_minified_js(
                     output_static, SEARCH_JS_FILENAME, SEARCH_JS_MINIFIED_FILENAME
                 )
 
     def _copy_attachments(self) -> None:
         """Copy post attachments (images, files, etc.) from the attachments directory to output directory."""
-        attachments_dir = self.content_dir / "attachments"
+        attachments_dir = self._content_dir / "attachments"
 
         if not attachments_dir.exists():
-            print(f"No attachments directory found in {self.content_dir}")
+            print(f"No attachments directory found in {self._content_dir}")
             return
 
         # Count how many attachments we copy
@@ -1323,7 +1303,9 @@ class SiteGenerator:
                     # Calculate relative path from attachments directory to preserve structure
                     relative_path = file_path.relative_to(attachments_dir)
                     # Copy to output_dir/attachments/... to preserve the attachments directory structure
-                    output_path = self.output_dir / "attachments" / relative_path
+                    output_path = (
+                        self.site_config.output_dir / "attachments" / relative_path
+                    )
 
                     # Create parent directories if they don't exist
                     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1351,7 +1333,7 @@ class SiteGenerator:
         directory structure relative to the extras directory. If a file would
         override an existing file, it is allowed but a message is printed.
         """
-        extras_dir = self.content_dir / "extras"
+        extras_dir = self._content_dir / "extras"
 
         if not extras_dir.exists():
             return
@@ -1369,7 +1351,7 @@ class SiteGenerator:
                     # Calculate relative path from extras directory to preserve structure
                     relative_path = file_path.relative_to(extras_dir)
                     # Copy to output_dir root, preserving directory structure
-                    output_path = self.output_dir / relative_path
+                    output_path = self.site_config.output_dir / relative_path
 
                     # Check if file already exists
                     file_exists = output_path.exists()
