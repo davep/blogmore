@@ -1,12 +1,11 @@
 """Configuration file loading and merging for blogmore."""
 
-import dataclasses
 from pathlib import Path
 from typing import Any
 
 import yaml
 
-from blogmore.site_config import SiteConfig
+from blogmore.site_config import site_config_defaults
 
 DEFAULT_CONFIG_FILES = ["blogmore.yaml", "blogmore.yml"]
 
@@ -94,14 +93,7 @@ def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
         args: argparse Namespace containing command-line arguments
     """
     # Build defaults from SiteConfig (single source of truth for site config fields).
-    # Fields with a scalar default are included directly; fields using
-    # default_factory (e.g. sidebar_config) are automatically excluded because
-    # their field.default is dataclasses.MISSING.
-    defaults: dict[str, Any] = {
-        field.name: field.default
-        for field in dataclasses.fields(SiteConfig)
-        if field.default is not dataclasses.MISSING
-    }
+    defaults: dict[str, Any] = site_config_defaults()
     # SiteConfig uses templates_dir but the CLI arg is named templates.
     defaults["templates"] = defaults.pop("templates_dir")
     # SiteConfig.output_dir is a required field with no default; the CLI arg

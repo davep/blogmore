@@ -1,20 +1,16 @@
 """Command-line interface argument parsing for blogmore."""
 
 import argparse
-import dataclasses
 from pathlib import Path
 from typing import Any
 
 from . import __version__
-from .site_config import SiteConfig
+from .site_config import site_config_defaults
 
 # Default values for CLI arguments that also appear in SiteConfig.
-# These are derived from SiteConfig so there is a single source of truth.
-_SITE_CONFIG_DEFAULTS: dict[str, Any] = {
-    field.name: field.default
-    for field in dataclasses.fields(SiteConfig)
-    if field.default is not dataclasses.MISSING
-}
+# Derived via the central site_config_defaults() function so there is a
+# single source of truth.
+_SITE_CONFIG_DEFAULTS: dict[str, Any] = site_config_defaults()
 
 
 def add_common_arguments(parser: argparse.ArgumentParser) -> None:
