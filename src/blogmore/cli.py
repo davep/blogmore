@@ -2,8 +2,15 @@
 
 import argparse
 from pathlib import Path
+from typing import Any
 
 from . import __version__
+from .site_config import site_config_defaults
+
+# Default values for CLI arguments that also appear in SiteConfig.
+# Derived via the central site_config_defaults() function so there is a
+# single source of truth.
+_SITE_CONFIG_DEFAULTS: dict[str, Any] = site_config_defaults()
 
 
 def add_common_arguments(parser: argparse.ArgumentParser) -> None:
@@ -38,31 +45,31 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
 
     parser.add_argument(
         "--site-title",
-        default="My Blog",
+        default=_SITE_CONFIG_DEFAULTS["site_title"],
         help="Title of the blog site (default: My Blog)",
     )
 
     parser.add_argument(
         "--site-subtitle",
-        default="",
+        default=_SITE_CONFIG_DEFAULTS["site_subtitle"],
         help="Subtitle of the blog site (optional)",
     )
 
     parser.add_argument(
         "--site-description",
-        default="",
+        default=_SITE_CONFIG_DEFAULTS["site_description"],
         help="Default description for pages that have no description of their own (optional)",
     )
 
     parser.add_argument(
         "--site-keywords",
-        default=None,
+        default=_SITE_CONFIG_DEFAULTS["site_keywords"],
         help="Default keywords for pages as a comma-separated list (optional)",
     )
 
     parser.add_argument(
         "--site-url",
-        default="",
+        default=_SITE_CONFIG_DEFAULTS["site_url"],
         help="Base URL of the site (optional)",
     )
 
@@ -75,7 +82,7 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--posts-per-feed",
         type=int,
-        default=20,
+        default=_SITE_CONFIG_DEFAULTS["posts_per_feed"],
         help="Maximum number of posts to include in feeds (default: 20)",
     )
 
@@ -88,7 +95,7 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
 
     parser.add_argument(
         "--default-author",
-        default=None,
+        default=_SITE_CONFIG_DEFAULTS["default_author"],
         help="Default author name for posts that don't specify an author",
     )
 
@@ -101,42 +108,42 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--icon-source",
         type=str,
-        default=None,
+        default=_SITE_CONFIG_DEFAULTS["icon_source"],
         help="Source icon filename in extras/ directory (e.g., 'my-logo.png')",
     )
 
     parser.add_argument(
         "--with-search",
         action="store_true",
-        default=False,
+        default=_SITE_CONFIG_DEFAULTS["with_search"],
         help="Generate a client-side search index and search page (default: disabled)",
     )
 
     parser.add_argument(
         "--with-sitemap",
         action="store_true",
-        default=False,
+        default=_SITE_CONFIG_DEFAULTS["with_sitemap"],
         help="Generate an XML sitemap (sitemap.xml) in the output directory (default: disabled)",
     )
 
     parser.add_argument(
         "--minify-css",
         action="store_true",
-        default=False,
+        default=_SITE_CONFIG_DEFAULTS["minify_css"],
         help="Minify the generated CSS, writing it as styles.min.css (default: disabled)",
     )
 
     parser.add_argument(
         "--minify-js",
         action="store_true",
-        default=False,
+        default=_SITE_CONFIG_DEFAULTS["minify_js"],
         help="Minify the generated JavaScript, writing as theme.min.js (and search.min.js if search enabled)",
     )
 
     parser.add_argument(
         "--with-read-time",
         action="store_true",
-        default=False,
+        default=_SITE_CONFIG_DEFAULTS["with_read_time"],
         help="Show estimated reading time on posts (default: disabled)",
     )
 

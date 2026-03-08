@@ -2,6 +2,7 @@
 
 ##############################################################################
 # Python imports.
+import dataclasses
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -86,6 +87,22 @@ class SiteConfig:
     def __post_init__(self) -> None:
         """Normalise fields after initialisation."""
         self.site_url = normalize_site_url(self.site_url)
+
+
+def site_config_defaults() -> dict[str, Any]:
+    """Return the default values for all SiteConfig fields that have scalar defaults.
+
+    Fields that use ``default_factory`` (such as ``sidebar_config``) and
+    required fields with no default (such as ``output_dir``) are excluded.
+
+    Returns:
+        Mapping from field name to its default value.
+    """
+    return {
+        f.name: f.default
+        for f in dataclasses.fields(SiteConfig)
+        if f.default is not dataclasses.MISSING
+    }
 
 
 ### site_config.py ends here
