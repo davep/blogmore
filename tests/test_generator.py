@@ -2,11 +2,9 @@
 
 from pathlib import Path
 
-import pytest
-
 from blogmore.generator import SiteGenerator, paginate_posts, sanitize_for_url
-from blogmore.site_config import SiteConfig
 from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN, Post
+from blogmore.site_config import SiteConfig
 
 
 class TestSanitizeForUrl:
@@ -518,9 +516,7 @@ class TestSiteGenerator:
         self, tmp_path: Path, temp_output_dir: Path
     ) -> None:
         """Test that default_author works with posts that have empty metadata dict."""
-        import datetime as dt
 
-        from blogmore.parser import Post
 
         # Create a temporary content directory
         content_dir = tmp_path / "content"
@@ -932,9 +928,8 @@ class TestSiteGenerator:
 
         with patch(
             "blogmore.generator.shutil.rmtree", side_effect=rmtree_fail_first_attempt
-        ):
-            with patch("blogmore.generator.time.sleep"):
-                generator.generate(include_drafts=False)
+        ), patch("blogmore.generator.time.sleep"):
+            generator.generate(include_drafts=False)
 
         # rmtree was called at least twice (once failing, once succeeding)
         assert call_count >= 2

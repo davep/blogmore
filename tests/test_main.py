@@ -42,8 +42,9 @@ class TestContentChangeHandler:
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
         """Test that directory events are ignored."""
-        from blogmore.generator import SiteGenerator
         from watchdog.events import DirCreatedEvent
+
+        from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
             site_config=SiteConfig(
@@ -64,8 +65,9 @@ class TestContentChangeHandler:
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
         """Test that hidden files are ignored."""
-        from blogmore.generator import SiteGenerator
         from watchdog.events import FileCreatedEvent
+
+        from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
             site_config=SiteConfig(
@@ -86,8 +88,9 @@ class TestContentChangeHandler:
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
         """Test that temporary files are ignored."""
-        from blogmore.generator import SiteGenerator
         from watchdog.events import FileCreatedEvent
+
+        from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
             site_config=SiteConfig(
@@ -107,10 +110,11 @@ class TestContentChangeHandler:
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
         """Test that multiple rapid events result in only one rebuild."""
-        from unittest.mock import MagicMock, patch
+        from unittest.mock import patch
+
+        from watchdog.events import FileCreatedEvent
 
         from blogmore.generator import SiteGenerator
-        from watchdog.events import FileCreatedEvent
 
         generator = SiteGenerator(
             site_config=SiteConfig(
@@ -138,10 +142,11 @@ class TestContentChangeHandler:
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
         """Test that a new event resets the debounce timer."""
-        from unittest.mock import MagicMock, patch
+        from unittest.mock import patch
+
+        from watchdog.events import FileCreatedEvent
 
         from blogmore.generator import SiteGenerator
-        from watchdog.events import FileCreatedEvent
 
         generator = SiteGenerator(
             site_config=SiteConfig(
@@ -175,8 +180,9 @@ class TestContentChangeHandler:
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
         """Test that events from the output directory are ignored."""
-        from blogmore.generator import SiteGenerator
         from watchdog.events import FileCreatedEvent
+
+        from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
             site_config=SiteConfig(
@@ -969,7 +975,7 @@ class TestConfigFileIntegration:
             # Create config with tilde paths
             config_file = work_dir / "blogmore.yaml"
             config = {
-                "output": f"~/.blogmore-test-temp/output",
+                "output": "~/.blogmore-test-temp/output",
             }
             with open(config_file, "w") as f:
                 yaml.dump(config, f)
@@ -1126,8 +1132,9 @@ class TestConfigChangeHandler:
         self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
     ) -> None:
         """Test that directory events are ignored."""
-        from blogmore.generator import SiteGenerator
         from watchdog.events import DirCreatedEvent
+
+        from blogmore.generator import SiteGenerator
 
         config_file = tmp_path / "blogmore.yaml"
         config_file.write_text("site_title: Test Blog\n")
@@ -1156,8 +1163,9 @@ class TestConfigChangeHandler:
         self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
     ) -> None:
         """Test that events for unrelated files are ignored."""
-        from blogmore.generator import SiteGenerator
         from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
 
         config_file = tmp_path / "blogmore.yaml"
         config_file.write_text("site_title: Test Blog\n")
@@ -1188,8 +1196,9 @@ class TestConfigChangeHandler:
     ) -> None:
         """Test that config changes trigger reload and regeneration."""
 
-        from blogmore.generator import SiteGenerator
         from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
 
         config_file = tmp_path / "blogmore.yaml"
         config_data = {
@@ -1244,8 +1253,9 @@ class TestConfigChangeHandler:
     ) -> None:
         """Test that CLI overrides are preserved when config is reloaded."""
 
-        from blogmore.generator import SiteGenerator
         from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
 
         config_file = tmp_path / "blogmore.yaml"
         config_data = {
@@ -1302,8 +1312,9 @@ class TestConfigChangeHandler:
     ) -> None:
         """Test that extra_stylesheets are updated correctly."""
 
-        from blogmore.generator import SiteGenerator
         from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
 
         config_file = tmp_path / "blogmore.yaml"
         config_data = {
@@ -1352,8 +1363,9 @@ class TestConfigChangeHandler:
     ) -> None:
         """Test that sidebar configuration is updated correctly."""
 
-        from blogmore.generator import SiteGenerator
         from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
 
         config_file = tmp_path / "blogmore.yaml"
         config_data = {
@@ -1408,8 +1420,9 @@ class TestConfigChangeHandler:
     ) -> None:
         """Test that rapid config changes are debounced into a single rebuild."""
 
-        from blogmore.generator import SiteGenerator
         from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
 
         config_file = tmp_path / "blogmore.yaml"
         config_file.write_text("site_title: Test Blog\n")

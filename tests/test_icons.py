@@ -3,7 +3,6 @@
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
 
-import pytest
 from PIL import Image
 
 from blogmore.icons import IconGenerator, detect_source_icon

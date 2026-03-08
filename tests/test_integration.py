@@ -3,8 +3,6 @@
 import shutil
 from pathlib import Path
 
-import pytest
-
 from blogmore.site_config import SiteConfig
 
 
@@ -349,7 +347,6 @@ class TestEndToEndWorkflow:
     ) -> None:
         """Test pagination workflow with many posts."""
         from blogmore.generator import SiteGenerator
-        from blogmore.parser import PostParser
 
         # Create many posts to trigger pagination
         many_posts_dir = tmp_path / "many_posts"

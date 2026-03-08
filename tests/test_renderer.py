@@ -3,8 +3,6 @@
 import datetime as dt
 from pathlib import Path
 
-import pytest
-
 from blogmore.parser import Page, Post
 from blogmore.renderer import TemplateRenderer
 

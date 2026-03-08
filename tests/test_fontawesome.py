@@ -16,7 +16,6 @@ from blogmore.fontawesome import (
 )
 from blogmore.site_config import SiteConfig
 
-
 # Minimal stub metadata for use across tests
 STUB_METADATA: dict[str, Any] = {
     "github": {"unicode": "f09b", "styles": ["brands"]},

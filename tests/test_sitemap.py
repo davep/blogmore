@@ -2,8 +2,6 @@
 
 from pathlib import Path
 
-import pytest
-
 from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN
 from blogmore.site_config import SiteConfig
 from blogmore.sitemap import (
