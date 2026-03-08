@@ -6,15 +6,15 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from blogmore.utils import normalize_site_url
+
 
 @dataclass
 class SiteConfig:
-    """Configuration for static site generation.
+    """Configuration describing a static blog site.
 
-    This dataclass holds all parameters required to describe and generate a
-    static blog site.  It is passed to ``SiteGenerator`` and ``serve_site``
-    so that callers do not need to manage large lists of individual keyword
-    arguments.
+    Holds all parameters required to describe the content, presentation and
+    build options for a site.
     """
 
     output_dir: Path
@@ -23,8 +23,7 @@ class SiteConfig:
     content_dir: Path | None = None
     """Directory containing Markdown posts.
 
-    Required for site generation; may be ``None`` when serving an
-    already-generated site without rebuilding.
+    May be ``None`` when serving an already-generated site without rebuilding.
     """
 
     templates_dir: Path | None = None
@@ -80,6 +79,13 @@ class SiteConfig:
 
     with_read_time: bool = False
     """Whether to show estimated reading time on posts."""
+
+    include_drafts: bool = False
+    """Whether to include draft posts in generation."""
+
+    def __post_init__(self) -> None:
+        """Normalise fields after initialisation."""
+        self.site_url = normalize_site_url(self.site_url)
 
 
 ### site_config.py ends here
