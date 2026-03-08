@@ -88,7 +88,9 @@ class SiteGenerator:
                 ``content_dir`` field must not be ``None``.
         """
         if site_config.content_dir is None:
-            raise ValueError("site_config.content_dir must be provided for site generation")
+            raise ValueError(
+                "site_config.content_dir must be provided for site generation"
+            )
         self.site_config = site_config
 
         # Default to CDN URL; updated during generate() once socials are known
@@ -96,7 +98,9 @@ class SiteGenerator:
 
         self.parser = PostParser(site_url=site_config.site_url)
         self.renderer = TemplateRenderer(
-            site_config.templates_dir, site_config.extra_stylesheets, site_config.site_url
+            site_config.templates_dir,
+            site_config.extra_stylesheets,
+            site_config.site_url,
         )
 
     @property
@@ -182,7 +186,9 @@ class SiteGenerator:
 
                 # Copy favicon.ico to the root for backward compatibility
                 if favicon_ico := generated.get("favicon.ico"):
-                    shutil.copy2(favicon_ico, self.site_config.output_dir / "favicon.ico")
+                    shutil.copy2(
+                        favicon_ico, self.site_config.output_dir / "favicon.ico"
+                    )
                     print("  - favicon.ico (root copy for backward compatibility)")
             else:
                 print("Warning: No icons were generated")
@@ -771,7 +777,9 @@ class SiteGenerator:
 
         # Generate day archives with pagination
         for (year, month, day), day_posts in posts_by_day.items():
-            day_dir = self.site_config.output_dir / str(year) / f"{month:02d}" / f"{day:02d}"
+            day_dir = (
+                self.site_config.output_dir / str(year) / f"{month:02d}" / f"{day:02d}"
+            )
             day_dir.mkdir(parents=True, exist_ok=True)
 
             date_str = dt.datetime(year, month, day).strftime("%B %d, %Y")
@@ -1205,15 +1213,24 @@ class SiteGenerator:
                 for item in bundled_static.iterdir():
                     if item.is_file():
                         # Only copy search.js when search is enabled
-                        if item.name == SEARCH_JS_FILENAME and not self.site_config.with_search:
+                        if (
+                            item.name == SEARCH_JS_FILENAME
+                            and not self.site_config.with_search
+                        ):
                             continue
                         # When minifying CSS, skip the original style.css
                         if item.name == CSS_FILENAME and self.site_config.minify_css:
                             continue
                         # When minifying JS, skip original JS files
-                        if item.name == THEME_JS_FILENAME and self.site_config.minify_js:
+                        if (
+                            item.name == THEME_JS_FILENAME
+                            and self.site_config.minify_js
+                        ):
                             continue
-                        if item.name == SEARCH_JS_FILENAME and self.site_config.minify_js:
+                        if (
+                            item.name == SEARCH_JS_FILENAME
+                            and self.site_config.minify_js
+                        ):
                             continue
                         # Read content and write to output
                         content = item.read_bytes()
@@ -1231,12 +1248,21 @@ class SiteGenerator:
                     if item.is_file():
                         relative_path = item.relative_to(custom_static_dir)
                         # When minifying CSS, skip the original style.css from custom dir too
-                        if relative_path.name == CSS_FILENAME and self.site_config.minify_css:
+                        if (
+                            relative_path.name == CSS_FILENAME
+                            and self.site_config.minify_css
+                        ):
                             continue
                         # When minifying JS, skip original JS files from custom dir too
-                        if relative_path.name == THEME_JS_FILENAME and self.site_config.minify_js:
+                        if (
+                            relative_path.name == THEME_JS_FILENAME
+                            and self.site_config.minify_js
+                        ):
                             continue
-                        if relative_path.name == SEARCH_JS_FILENAME and self.site_config.minify_js:
+                        if (
+                            relative_path.name == SEARCH_JS_FILENAME
+                            and self.site_config.minify_js
+                        ):
                             continue
                         output_file = output_static / relative_path
                         output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -1277,7 +1303,9 @@ class SiteGenerator:
                     # Calculate relative path from attachments directory to preserve structure
                     relative_path = file_path.relative_to(attachments_dir)
                     # Copy to output_dir/attachments/... to preserve the attachments directory structure
-                    output_path = self.site_config.output_dir / "attachments" / relative_path
+                    output_path = (
+                        self.site_config.output_dir / "attachments" / relative_path
+                    )
 
                     # Create parent directories if they don't exist
                     output_path.parent.mkdir(parents=True, exist_ok=True)

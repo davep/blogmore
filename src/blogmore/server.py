@@ -349,7 +349,9 @@ def serve_site(
         site_config = dataclasses.replace(
             site_config,
             content_dir=content_dir.resolve(),
-            templates_dir=templates_dir.resolve() if templates_dir is not None else None,
+            templates_dir=templates_dir.resolve()
+            if templates_dir is not None
+            else None,
             output_dir=output_dir.resolve(),
         )
         output_dir = site_config.output_dir
