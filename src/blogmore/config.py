@@ -1,9 +1,12 @@
 """Configuration file loading and merging for blogmore."""
 
+import dataclasses
 from pathlib import Path
 from typing import Any
 
 import yaml
+
+from blogmore.site_config import SiteConfig
 
 DEFAULT_CONFIG_FILES = ["blogmore.yaml", "blogmore.yml"]
 
@@ -90,33 +93,30 @@ def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
         config: Dictionary containing configuration file values
         args: argparse Namespace containing command-line arguments
     """
-    # Define defaults for each argument to determine if CLI value was explicitly set
-    defaults = {
-        "site_title": "My Blog",
-        "site_subtitle": "",
-        "site_description": "",
-        "site_keywords": None,
-        "site_url": "",
-        "output": Path("output"),
-        "templates": None,
-        "include_drafts": False,
-        "posts_per_feed": 20,
-        "extra_stylesheets": None,
-        "port": 8000,
-        "no_watch": False,
-        "content_dir": None,
-        "default_author": None,
-        "clean_first": False,
-        "branch": "gh-pages",
-        "remote": "origin",
-        "icon_source": None,
-        "with_search": False,
-        "with_sitemap": False,
-        "minify_css": False,
-        "minify_js": False,
-        "with_read_time": False,
-        "socials_title": "Social",
+    # Build defaults from SiteConfig (single source of truth for site config fields).
+    # Fields with a scalar default are included directly; fields using
+    # default_factory (e.g. sidebar_config) are automatically excluded because
+    # their field.default is dataclasses.MISSING.
+    defaults: dict[str, Any] = {
+        field.name: field.default
+        for field in dataclasses.fields(SiteConfig)
+        if field.default is not dataclasses.MISSING
     }
+    # SiteConfig uses templates_dir but the CLI arg is named templates.
+    defaults["templates"] = defaults.pop("templates_dir")
+    # SiteConfig.output_dir is a required field with no default; the CLI arg
+    # output defaults to Path("output").
+    defaults["output"] = Path("output")
+    # Defaults for CLI-only arguments that have no SiteConfig equivalent.
+    defaults.update(
+        {
+            "port": 8000,
+            "no_watch": False,
+            "branch": "gh-pages",
+            "remote": "origin",
+            "socials_title": "Social",
+        }
+    )
 
     # For each config key, update args if the arg value is still at its default
     for config_key, config_value in config.items():

@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## v1.8.1
+
+**Released: 2026-03-08**
+
+- Refactored configuration defaults so that `SiteConfig` is the single
+  source of truth. `config.py` and `cli.py` now derive their shared
+  defaults from `SiteConfig` fields rather than duplicating the values.
+  ([#231](https://github.com/davep/blogmore/pull/231))
+
 ## v1.8.0
 
 **Released: 2026-03-07**
