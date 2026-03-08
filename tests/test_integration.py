@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pytest
 
+from blogmore.site_config import SiteConfig
+
 
 class TestEndToEndWorkflow:
     """Test complete end-to-end workflows."""
@@ -29,12 +31,13 @@ class TestEndToEndWorkflow:
 
         # Generate the site
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_title="My Test Blog",
-            site_url="https://test.example.com",
-            with_search=True,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_title="My Test Blog",
+                site_url="https://test.example.com",
+                with_search=True,
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -89,9 +92,10 @@ class TestEndToEndWorkflow:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -113,10 +117,11 @@ class TestEndToEndWorkflow:
 
         # First build WITH search enabled
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            with_search=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+            )
         )
         generator.generate(include_drafts=False)
         assert (temp_output_dir / "search.html").exists()
@@ -125,10 +130,11 @@ class TestEndToEndWorkflow:
 
         # Rebuild WITHOUT search - stale files must be removed
         generator2 = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            with_search=False,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=False,
+            )
         )
         generator2.generate(include_drafts=False)
         assert not (temp_output_dir / "search.html").exists()
@@ -142,9 +148,10 @@ class TestEndToEndWorkflow:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
         )
 
         # First generation
@@ -164,9 +171,10 @@ class TestEndToEndWorkflow:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
         )
 
         # Generate without drafts
@@ -205,10 +213,12 @@ class TestEndToEndWorkflow:
         )
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=templates_dir,
-            output_dir=temp_output_dir,
-            site_title="Custom Blog",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                templates_dir=templates_dir,
+                output_dir=temp_output_dir,
+                site_title="Custom Blog",
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -261,9 +271,10 @@ class TestEndToEndWorkflow:
         empty_dir.mkdir()
 
         generator = SiteGenerator(
-            content_dir=empty_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=empty_dir,
+                output_dir=temp_output_dir,
+            )
         )
 
         # Should generate without errors
@@ -280,9 +291,10 @@ class TestEndToEndWorkflow:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -306,10 +318,11 @@ class TestEndToEndWorkflow:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://test.example.com",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://test.example.com",
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -358,9 +371,10 @@ This is post number {i}.
             )
 
         generator = SiteGenerator(
-            content_dir=many_posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=many_posts_dir,
+                output_dir=temp_output_dir,
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -403,9 +417,10 @@ int main() {
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+            )
         )
 
         generator.generate(include_drafts=False)

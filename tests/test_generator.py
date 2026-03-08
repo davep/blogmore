@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from blogmore.generator import SiteGenerator, paginate_posts, sanitize_for_url
+from blogmore.site_config import SiteConfig
 from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN, Post
 
 
@@ -81,11 +82,12 @@ class TestSiteGenerator:
     def test_init(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """Test initializing SiteGenerator."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_title="Test Blog",
-            site_url="https://example.com",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_title="Test Blog",
+                site_url="https://example.com"
+            )
         )
 
         assert generator.content_dir == posts_dir
@@ -98,11 +100,12 @@ class TestSiteGenerator:
     ) -> None:
         """Test that SiteGenerator normalizes site_url with trailing slash."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_title="Test Blog",
-            site_url="https://example.com/",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_title="Test Blog",
+                site_url="https://example.com/"
+            )
         )
 
         # Trailing slash should be removed
@@ -116,9 +119,11 @@ class TestSiteGenerator:
         templates_dir.mkdir()
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=templates_dir,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                templates_dir=templates_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         assert generator.templates_dir == templates_dir
@@ -126,11 +131,12 @@ class TestSiteGenerator:
     def test_generate_basic(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """Test basic site generation."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_title="Test Blog",
-            site_url="https://example.com",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_title="Test Blog",
+                site_url="https://example.com"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -144,9 +150,10 @@ class TestSiteGenerator:
     def test_generate_with_drafts(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """Test generating site including drafts."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=True)
@@ -159,9 +166,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that individual post HTML files are created."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -180,9 +188,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that archive page is created."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -194,9 +203,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that tag pages are created."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -213,9 +223,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that category pages are created."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -232,10 +243,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that RSS and Atom feeds are created."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -251,9 +263,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that static files are copied."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -284,9 +297,10 @@ class TestSiteGenerator:
         shutil.copytree(pages_dir, pages_dest)
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -307,9 +321,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that drafts are excluded by default."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -323,10 +338,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test generating with extra stylesheets."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            extra_stylesheets=["https://example.com/custom.css"],
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                extra_stylesheets=["https://example.com/custom.css"]
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -340,10 +356,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test generating with custom posts_per_feed setting."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            posts_per_feed=5,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                posts_per_feed=5
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -360,9 +377,10 @@ class TestSiteGenerator:
         old_file.write_text("This should be preserved")
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -378,9 +396,10 @@ class TestSiteGenerator:
         empty_dir.mkdir()
 
         generator = SiteGenerator(
-            content_dir=empty_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=empty_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -394,9 +413,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that tags overview page is created."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -413,9 +433,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that categories overview page is created."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -432,10 +453,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that default_author is applied to posts without author."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            default_author="Default Author Name",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                default_author="Default Author Name"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -453,9 +475,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that posts without author remain without author when no default is set."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -473,10 +496,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that default_author doesn't override existing author in post."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            default_author="Default Author Name",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                default_author="Default Author Name"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -509,10 +533,11 @@ class TestSiteGenerator:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            default_author="Default Author",
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                default_author="Default Author"
+            )
         )
 
         # Generate and verify
@@ -529,10 +554,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that default_author appears in the author meta tag on the index page."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            default_author="Site Author",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                default_author="Site Author"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -548,9 +574,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that no author meta tag appears on the index page when default_author is not set."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -572,9 +599,10 @@ class TestSiteGenerator:
         favicon_file.write_text("fake favicon content")
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         # Test the _detect_favicon method
@@ -590,9 +618,10 @@ class TestSiteGenerator:
         favicon_file.write_text("fake favicon content")
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         assert generator._detect_favicon() == "/favicon.png"
@@ -607,9 +636,10 @@ class TestSiteGenerator:
         favicon_file.write_text("fake favicon content")
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         assert generator._detect_favicon() == "/favicon.svg"
@@ -622,9 +652,10 @@ class TestSiteGenerator:
         content_dir.mkdir()
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         assert generator._detect_favicon() is None
@@ -641,9 +672,10 @@ class TestSiteGenerator:
         (extras_dir / "robots.txt").write_text("User-agent: *")
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         assert generator._detect_favicon() is None
@@ -661,9 +693,10 @@ class TestSiteGenerator:
         (extras_dir / "favicon.png").write_text("png")
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         # .ico should be preferred (first in list)
@@ -688,9 +721,10 @@ class TestSiteGenerator:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -715,9 +749,10 @@ class TestSiteGenerator:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -745,9 +780,10 @@ class TestSiteGenerator:
         img.save(source_icon)
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator._generate_icons()
@@ -779,9 +815,10 @@ class TestSiteGenerator:
         (temp_output_dir / "favicon.ico").write_bytes(b"fake ico")
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -802,10 +839,11 @@ class TestSiteGenerator:
 
         # Generate with clean_first=True
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            clean_first=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                clean_first=True
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -827,10 +865,11 @@ class TestSiteGenerator:
 
         # Generate with clean_first=False (default)
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            clean_first=False,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                clean_first=False
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -850,10 +889,11 @@ class TestSiteGenerator:
 
         # Generate with clean_first=True on non-existent directory
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=output_dir,
-            clean_first=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=output_dir,
+                clean_first=True
+            )
         )
 
         # Should not raise an error
@@ -873,10 +913,11 @@ class TestSiteGenerator:
         temp_output_dir.mkdir(parents=True, exist_ok=True)
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            clean_first=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                clean_first=True
+            )
         )
 
         original_rmtree = shutil.rmtree
@@ -908,10 +949,11 @@ class TestSiteGenerator:
         from blogmore import __version__
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_title="Test Blog",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_title="Test Blog"
+            )
         )
 
         context = generator._get_global_context()
@@ -924,10 +966,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that site_description is included in the global context."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_description="A great blog about things",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_description="A great blog about things"
+            )
         )
 
         context = generator._get_global_context()
@@ -939,9 +982,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that site_description defaults to an empty string."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         assert generator.site_description == ""
@@ -951,10 +995,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that site_description appears in the index page meta tags."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_description="My site description",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_description="My site description"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -968,9 +1013,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that no description meta tag appears in index when site_description is empty."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -983,10 +1029,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that site_description appears in the archive page meta tags."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_description="My site description",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_description="My site description"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -999,10 +1046,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that site_description appears in the tags page meta tags."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_description="My site description",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_description="My site description"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1015,10 +1063,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that site_description appears in the categories page meta tags."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_description="My site description",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_description="My site description"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1042,10 +1091,11 @@ class TestSiteGenerator:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_description="Default site description",
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_description="Default site description"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1060,10 +1110,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that a post's own description takes precedence over site_description."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_description="Default site description",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_description="Default site description"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1084,10 +1135,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that site_keywords appear in the index page meta tags."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_keywords=["python", "web", "programming"],
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_keywords=["python", "web", "programming"]
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1100,10 +1152,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that site_keywords appear in the archive page meta tags."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_keywords=["python", "web"],
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_keywords=["python", "web"]
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1116,10 +1169,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that site_keywords appear in tag pages."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_keywords=["blog", "posts"],
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_keywords=["blog", "posts"]
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1132,9 +1186,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that no keywords meta tag appears when site_keywords is not set."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1147,10 +1202,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that a post's own tags are used as keywords, not site_keywords."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_keywords=["site-wide-keyword"],
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_keywords=["site-wide-keyword"]
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1176,10 +1232,11 @@ class TestSiteGenerator:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_keywords=["fallback", "keyword"],
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_keywords=["fallback", "keyword"]
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1195,10 +1252,11 @@ class TestSiteGenerator:
         """Test that site_keywords is included in the global template context."""
         keywords = ["python", "web"]
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_keywords=keywords,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_keywords=keywords
+            )
         )
 
         context = generator._get_global_context()
@@ -1209,9 +1267,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that site_keywords is None in global context when not set."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         context = generator._get_global_context()
@@ -1222,9 +1281,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that the index page has og:type set to website."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1237,10 +1297,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that the index page has og:url set to the site root URL."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1253,10 +1314,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that the index page has og:site_name set to the site title."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_title="My Awesome Blog",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_title="My Awesome Blog"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1269,9 +1331,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that index page has twitter:card set to summary when no image is available."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1284,10 +1347,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that index page uses summary_large_image twitter:card when site_logo is set."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            sidebar_config={"site_logo": "/images/logo.png"},
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                sidebar_config={"site_logo": "/images/logo.png"}
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1300,10 +1364,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that the index page has twitter:title set to the site title."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_title="My Blog",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_title="My Blog"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1316,11 +1381,12 @@ class TestSiteGenerator:
     ) -> None:
         """Test that twitter:title includes subtitle when site_subtitle is set."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_title="My Blog",
-            site_subtitle="Thoughts and ideas",
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_title="My Blog",
+                site_subtitle="Thoughts and ideas"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1336,10 +1402,11 @@ class TestSiteGenerator:
     ) -> None:
         """Test that og:image uses site_logo when it is an absolute URL."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            sidebar_config={"site_logo": "https://cdn.example.com/logo.png"},
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                sidebar_config={"site_logo": "https://cdn.example.com/logo.png"}
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1359,11 +1426,12 @@ class TestSiteGenerator:
     ) -> None:
         """Test that og:image prepends site_url when site_logo is a root-relative URL."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
-            sidebar_config={"site_logo": "/images/logo.png"},
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                sidebar_config={"site_logo": "/images/logo.png"}
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1383,11 +1451,12 @@ class TestSiteGenerator:
     ) -> None:
         """Test that og:image prepends site_url with slash when site_logo is a bare relative path."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
-            sidebar_config={"site_logo": "images/logo.png"},
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                sidebar_config={"site_logo": "images/logo.png"}
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1420,10 +1489,11 @@ class TestSiteGenerator:
         (icons_dir / "android-chrome-512x512.png").write_bytes(b"fake png")
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com"
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1457,11 +1527,12 @@ class TestSiteGenerator:
         (icons_dir / "android-chrome-512x512.png").write_bytes(b"fake png")
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
-            sidebar_config={"site_logo": "/images/logo.png"},
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                sidebar_config={"site_logo": "/images/logo.png"}
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1481,9 +1552,10 @@ class TestSiteGenerator:
     ) -> None:
         """Test that no og:image appears when site_logo is not set and no platform icons exist."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1501,9 +1573,10 @@ class TestMinifyCss:
     ) -> None:
         """Test that CSS is not minified by default."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1516,10 +1589,11 @@ class TestMinifyCss:
     ) -> None:
         """Test that minify_css generates styles.min.css and not style.css."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            minify_css=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                minify_css=True
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1535,17 +1609,19 @@ class TestMinifyCss:
         minified_output = tmp_path / "minified"
 
         normal_generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=normal_output,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=normal_output
+            )
         )
         normal_generator.generate(include_drafts=False)
 
         minified_generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=minified_output,
-            minify_css=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=minified_output,
+                minify_css=True
+            )
         )
         minified_generator.generate(include_drafts=False)
 
@@ -1558,10 +1634,11 @@ class TestMinifyCss:
     ) -> None:
         """Test that pages reference styles.min.css when minify_css is enabled."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            minify_css=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                minify_css=True
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1575,9 +1652,10 @@ class TestMinifyCss:
     ) -> None:
         """Test that pages reference style.css when minify_css is disabled."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1597,10 +1675,12 @@ class TestMinifyCss:
         custom_css.write_text("body  {  color:  red;  }", encoding="utf-8")
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=templates_dir,
-            output_dir=temp_output_dir,
-            minify_css=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                templates_dir=templates_dir,
+                output_dir=temp_output_dir,
+                minify_css=True
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1622,9 +1702,10 @@ class TestMinifyJs:
     ) -> None:
         """Test that JavaScript is not minified by default."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1637,10 +1718,11 @@ class TestMinifyJs:
     ) -> None:
         """Test that minify_js generates theme.min.js and not theme.js."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            minify_js=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                minify_js=True
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1656,17 +1738,19 @@ class TestMinifyJs:
         minified_output = tmp_path / "minified"
 
         normal_generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=normal_output,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=normal_output
+            )
         )
         normal_generator.generate(include_drafts=False)
 
         minified_generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=minified_output,
-            minify_js=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=minified_output,
+                minify_js=True
+            )
         )
         minified_generator.generate(include_drafts=False)
 
@@ -1679,10 +1763,11 @@ class TestMinifyJs:
     ) -> None:
         """Test that pages reference theme.min.js when minify_js is enabled."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            minify_js=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                minify_js=True
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1696,9 +1781,10 @@ class TestMinifyJs:
     ) -> None:
         """Test that pages reference theme.js when minify_js is disabled."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1712,11 +1798,12 @@ class TestMinifyJs:
     ) -> None:
         """Test that search.min.js is not generated when search is disabled."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            minify_js=True,
-            with_search=False,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                minify_js=True,
+                with_search=False
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1729,11 +1816,12 @@ class TestMinifyJs:
     ) -> None:
         """Test that search.min.js is generated when both minify_js and with_search are enabled."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            minify_js=True,
-            with_search=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                minify_js=True,
+                with_search=True
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1746,11 +1834,12 @@ class TestMinifyJs:
     ) -> None:
         """Test that search page references search.min.js when minify_js is enabled."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            minify_js=True,
-            with_search=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                minify_js=True,
+                with_search=True
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1773,10 +1862,12 @@ class TestMinifyJs:
         )
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=templates_dir,
-            output_dir=temp_output_dir,
-            minify_js=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                templates_dir=templates_dir,
+                output_dir=temp_output_dir,
+                minify_js=True
+            )
         )
 
         generator.generate(include_drafts=False)
@@ -1812,9 +1903,10 @@ class TestPrevNextHeadLinkTags:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -1841,9 +1933,10 @@ class TestPrevNextHeadLinkTags:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -1870,9 +1963,10 @@ class TestPrevNextHeadLinkTags:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -1896,9 +1990,10 @@ class TestPrevNextHeadLinkTags:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -1927,9 +2022,10 @@ class TestPaginationHeadLinkTags:
             )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -1953,9 +2049,10 @@ class TestPaginationHeadLinkTags:
             )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -1980,9 +2077,10 @@ class TestPaginationHeadLinkTags:
             )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2006,9 +2104,10 @@ class TestPaginationHeadLinkTags:
             )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2032,9 +2131,10 @@ class TestPaginationHeadLinkTags:
             )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2058,9 +2158,10 @@ class TestPaginationHeadLinkTags:
             )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2084,9 +2185,10 @@ class TestPaginationHeadLinkTags:
             )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2111,9 +2213,10 @@ class TestPaginationHeadLinkTags:
             )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2136,9 +2239,10 @@ class TestPaginationHeadLinkTags:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2168,10 +2272,11 @@ class TestCanonicalLinkTags:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com"
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2198,10 +2303,11 @@ class TestCanonicalLinkTags:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com"
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2225,10 +2331,11 @@ class TestCanonicalLinkTags:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com"
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2252,10 +2359,11 @@ class TestCanonicalLinkTags:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com"
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2279,10 +2387,11 @@ class TestCanonicalLinkTags:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com"
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2306,10 +2415,11 @@ class TestCanonicalLinkTags:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com"
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2334,10 +2444,11 @@ class TestCanonicalLinkTags:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com"
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2362,10 +2473,11 @@ class TestCanonicalLinkTags:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com"
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2390,10 +2502,11 @@ class TestCanonicalLinkTags:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com"
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2424,9 +2537,10 @@ class TestCustom404Page:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2442,9 +2556,10 @@ class TestCustom404Page:
         content_dir.mkdir()
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2466,9 +2581,10 @@ class TestCustom404Page:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2491,9 +2607,10 @@ class TestCustom404Page:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2510,9 +2627,10 @@ class TestWithReadTime:
     ) -> None:
         """Test that reading time is not shown when with_read_time is False (default)."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2524,10 +2642,11 @@ class TestWithReadTime:
     ) -> None:
         """Test that reading time is shown when with_read_time is True."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            with_read_time=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_read_time=True
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2545,9 +2664,10 @@ class TestWithReadTime:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2567,10 +2687,11 @@ class TestWithReadTime:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            with_read_time=True,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                with_read_time=True
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2590,9 +2711,10 @@ class TestWithReadTime:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2612,10 +2734,11 @@ class TestWithReadTime:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            with_read_time=True,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                with_read_time=True
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2635,9 +2758,10 @@ class TestWithReadTime:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2657,10 +2781,11 @@ class TestWithReadTime:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            with_read_time=True,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                with_read_time=True
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2674,9 +2799,10 @@ class TestWithReadTime:
     ) -> None:
         """Test that with_read_time defaults to False."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
         assert generator.with_read_time is False
 
@@ -2685,10 +2811,11 @@ class TestWithReadTime:
     ) -> None:
         """Test that with_read_time is included in the global template context."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            with_read_time=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_read_time=True
+            )
         )
         context = generator._get_global_context()
         assert context["with_read_time"] is True
@@ -2698,10 +2825,11 @@ class TestWithReadTime:
     ) -> None:
         """Test that with_read_time=False is included in the global template context."""
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            with_read_time=False,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_read_time=False
+            )
         )
         context = generator._get_global_context()
         assert context["with_read_time"] is False
@@ -2724,9 +2852,10 @@ class TestWithReadTime:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2750,9 +2879,10 @@ class TestWithReadTime:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2778,9 +2908,10 @@ class TestWithReadTime:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2803,9 +2934,10 @@ class TestWithReadTime:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -2833,9 +2965,10 @@ class TestWithReadTime:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir
+            )
         )
         generator.generate(include_drafts=False)
 

@@ -11,6 +11,7 @@ import yaml
 from blogmore.__main__ import main
 from blogmore.parser import CUSTOM_404_HTML
 from blogmore.server import ConfigChangeHandler, ContentChangeHandler, serve_site
+from blogmore.site_config import SiteConfig
 
 
 class TestContentChangeHandler:
@@ -21,9 +22,10 @@ class TestContentChangeHandler:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         handler = ContentChangeHandler(
@@ -44,9 +46,10 @@ class TestContentChangeHandler:
         from watchdog.events import DirCreatedEvent
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         handler = ContentChangeHandler(generator=generator)
@@ -65,9 +68,10 @@ class TestContentChangeHandler:
         from watchdog.events import FileCreatedEvent
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         handler = ContentChangeHandler(generator=generator)
@@ -86,9 +90,10 @@ class TestContentChangeHandler:
         from watchdog.events import FileCreatedEvent
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         handler = ContentChangeHandler(generator=generator)
@@ -108,9 +113,10 @@ class TestContentChangeHandler:
         from watchdog.events import FileCreatedEvent
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         handler = ContentChangeHandler(generator=generator, debounce_seconds=0.05)
@@ -138,9 +144,10 @@ class TestContentChangeHandler:
         from watchdog.events import FileCreatedEvent
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         handler = ContentChangeHandler(generator=generator, debounce_seconds=0.1)
@@ -172,9 +179,10 @@ class TestContentChangeHandler:
         from watchdog.events import FileCreatedEvent
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         handler = ContentChangeHandler(generator=generator, debounce_seconds=0.05)
@@ -198,9 +206,10 @@ class TestContentChangeHandler:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         handler = ContentChangeHandler(generator=generator)
@@ -319,7 +328,7 @@ class TestQuietHTTPRequestHandler:
         # Mock serve_forever to raise KeyboardInterrupt immediately
         mock_server_instance.serve_forever.side_effect = KeyboardInterrupt()
 
-        result = serve_site(output_dir=temp_output_dir, watch=False)
+        result = serve_site(site_config=SiteConfig(output_dir=temp_output_dir), watch=False)
 
         assert result == 0
 
@@ -344,9 +353,11 @@ class TestQuietHTTPRequestHandler:
         mock_server_instance.serve_forever.side_effect = KeyboardInterrupt()
 
         result = serve_site(
-            output_dir=temp_output_dir,
-            content_dir=posts_dir,
-            watch=False,
+            site_config=SiteConfig(
+                output_dir=temp_output_dir,
+                content_dir=posts_dir
+            ),
+            watch=False
         )
 
         assert result == 0
@@ -356,18 +367,17 @@ class TestQuietHTTPRequestHandler:
     def test_serve_content_dir_not_found(self, temp_output_dir: Path) -> None:
         """Test serving with non-existent content directory."""
         result = serve_site(
-            output_dir=temp_output_dir,
-            content_dir=Path("nonexistent"),
+            site_config=SiteConfig(
+                output_dir=temp_output_dir,
+                content_dir=Path("nonexistent")
+            ),
         )
 
         assert result == 1
 
     def test_serve_output_dir_not_found_no_content(self) -> None:
         """Test serving with non-existent output and no content directory."""
-        result = serve_site(
-            output_dir=Path("nonexistent"),
-            content_dir=None,
-        )
+        result = serve_site(site_config=SiteConfig(output_dir=Path("nonexistent")))
 
         assert result == 1
 
@@ -382,7 +392,7 @@ class TestQuietHTTPRequestHandler:
         # Mock server to raise OSError
         mock_server.side_effect = OSError("Address already in use")
 
-        result = serve_site(output_dir=temp_output_dir, watch=False)
+        result = serve_site(site_config=SiteConfig(output_dir=temp_output_dir), watch=False)
 
         assert result == 1
 
@@ -416,7 +426,7 @@ class TestQuietHTTPRequestHandler:
 
         mock_server.side_effect = capture_args
 
-        result = serve_site(output_dir=temp_output_dir, watch=False)
+        result = serve_site(site_config=SiteConfig(output_dir=temp_output_dir), watch=False)
 
         assert result == 0
         assert len(captured_handler) == 1
@@ -938,8 +948,8 @@ class TestConfigFileIntegration:
                 # Verify serve was called with config values
                 call_kwargs = mock_serve.call_args[1]
                 assert call_kwargs["port"] == 9000
-                assert call_kwargs["site_title"] == "Serve Config Blog"
-                assert call_kwargs["output_dir"] == temp_output_dir
+                assert call_kwargs["site_config"].site_title == "Serve Config Blog"
+                assert call_kwargs["site_config"].output_dir == temp_output_dir
 
     def test_main_with_tilde_in_config_paths(
         self, posts_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -1091,9 +1101,10 @@ class TestConfigChangeHandler:
         config_file.write_text("site_title: Test Blog\n")
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         cli_overrides = {"site_title": "CLI Title"}
@@ -1122,9 +1133,10 @@ class TestConfigChangeHandler:
         config_file.write_text("site_title: Test Blog\n")
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         handler = ConfigChangeHandler(
@@ -1151,9 +1163,10 @@ class TestConfigChangeHandler:
         config_file.write_text("site_title: Test Blog\n")
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         handler = ConfigChangeHandler(
@@ -1188,9 +1201,10 @@ class TestConfigChangeHandler:
             yaml.dump(config_data, f)
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         # Mock the generate method to verify it's called
@@ -1243,10 +1257,11 @@ class TestConfigChangeHandler:
             yaml.dump(config_data, f)
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_title="CLI Title",  # This should be preserved
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_title="CLI Title"
+            )
         )
 
         cli_overrides = {"site_title": "CLI Title"}
@@ -1298,9 +1313,10 @@ class TestConfigChangeHandler:
             yaml.dump(config_data, f)
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         with patch.object(generator, "generate") as mock_generate:
@@ -1348,9 +1364,10 @@ class TestConfigChangeHandler:
             yaml.dump(config_data, f)
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         with patch.object(generator, "generate") as mock_generate:
@@ -1398,9 +1415,10 @@ class TestConfigChangeHandler:
         config_file.write_text("site_title: Test Blog\n")
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir
+            )
         )
 
         with patch.object(generator, "generate") as mock_generate:

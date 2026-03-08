@@ -14,6 +14,7 @@ from blogmore.fontawesome import (
     FONTAWESOME_METADATA_URL,
     FontAwesomeOptimizer,
 )
+from blogmore.site_config import SiteConfig
 
 
 # Minimal stub metadata for use across tests
@@ -256,10 +257,10 @@ class TestFontAwesomeOptimizerInGenerator:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            sidebar_config={},
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
         )
 
         with patch("blogmore.generator.FontAwesomeOptimizer") as mock_cls:
@@ -286,10 +287,11 @@ class TestFontAwesomeOptimizerInGenerator:
             ]
         }
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            sidebar_config=sidebar_config,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                sidebar_config=sidebar_config,
+            )
         )
 
         with patch.object(
@@ -320,10 +322,11 @@ class TestFontAwesomeOptimizerInGenerator:
             "socials": [{"site": "github", "url": "https://github.com/example"}]
         }
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            sidebar_config=sidebar_config,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                sidebar_config=sidebar_config,
+            )
         )
 
         with patch.object(
@@ -352,10 +355,11 @@ class TestFontAwesomeOptimizerInGenerator:
             "socials": [{"site": "github", "url": "https://github.com/example"}]
         }
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            sidebar_config=sidebar_config,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                sidebar_config=sidebar_config,
+            )
         )
 
         with patch.object(
@@ -383,10 +387,11 @@ class TestFontAwesomeOptimizerInGenerator:
             "socials_title": "Follow Me",
         }
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            sidebar_config=sidebar_config,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                sidebar_config=sidebar_config,
+            )
         )
 
         with patch.object(
@@ -410,10 +415,11 @@ class TestFontAwesomeOptimizerInGenerator:
             "socials": [{"site": "github", "url": "https://github.com/example"}],
         }
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            sidebar_config=sidebar_config,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                sidebar_config=sidebar_config,
+            )
         )
 
         with patch.object(

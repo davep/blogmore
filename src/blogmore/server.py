@@ -1,5 +1,6 @@
 """Local server and file watching functionality for blogmore."""
 
+import dataclasses
 import functools
 import http.server
 import socketserver
@@ -14,6 +15,7 @@ from watchdog.observers import Observer
 from blogmore.config import get_sidebar_config, load_config, normalize_site_keywords
 from blogmore.generator import SiteGenerator
 from blogmore.parser import CUSTOM_404_HTML
+from blogmore.site_config import SiteConfig
 
 
 class ReusingTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -304,59 +306,24 @@ class ConfigChangeHandler(FileSystemEventHandler):
 
 
 def serve_site(
-    output_dir: Path,
+    site_config: SiteConfig,
     port: int = 8000,
-    content_dir: Path | None = None,
-    templates_dir: Path | None = None,
-    site_title: str = "My Blog",
-    site_subtitle: str = "",
-    site_description: str = "",
-    site_keywords: list[str] | None = None,
-    site_url: str = "",
     include_drafts: bool = False,
     watch: bool = True,
-    posts_per_feed: int = 20,
-    extra_stylesheets: list[str] | None = None,
-    default_author: str | None = None,
-    sidebar_config: dict[str, Any] | None = None,
     config_path: Path | None = None,
     cli_overrides: dict[str, Any] | None = None,
-    clean_first: bool = False,
-    icon_source: str | None = None,
-    with_search: bool = False,
-    with_sitemap: bool = False,
-    minify_css: bool = False,
-    minify_js: bool = False,
-    with_read_time: bool = False,
 ) -> int:
     """Serve the generated site locally using a simple HTTP server.
 
     Args:
-        output_dir: Directory containing the generated site
+        site_config: Site configuration holding all generation parameters.
+            When ``site_config.content_dir`` is not ``None`` the site will be
+            (re-)generated before serving.
         port: Port to serve on (default: 8000)
-        content_dir: Directory containing markdown posts (optional, for generation)
-        templates_dir: Optional directory containing custom templates.
-                      If not provided, uses bundled templates.
-        site_title: Title of the blog site
-        site_subtitle: Subtitle of the blog site
-        site_description: Default description used in metadata for pages with no description
-        site_keywords: Default keywords used in metadata for pages with no keywords
-        site_url: Base URL of the site
         include_drafts: Whether to include drafts
         watch: Whether to watch for changes and regenerate (default: True)
-        posts_per_feed: Maximum number of posts to include in feeds (default: 20)
-        extra_stylesheets: Optional list of URLs for additional stylesheets
-        default_author: Default author name for posts without author in frontmatter
-        sidebar_config: Optional sidebar configuration (site_logo, links, socials)
         config_path: Path to the configuration file being used (if any)
         cli_overrides: Dictionary of CLI arguments that override config values
-        clean_first: Whether to remove the output directory before generating
-        icon_source: Optional source icon filename in extras/ directory
-        with_search: Whether to generate a search index and search page
-        with_sitemap: Whether to generate an XML sitemap
-        minify_css: Whether to minify the CSS, writing it as styles.min.css
-        minify_js: Whether to minify the JavaScript, writing it as theme.min.js
-        with_read_time: Whether to show estimated reading time on posts
 
     Returns:
         Exit code
@@ -365,7 +332,12 @@ def serve_site(
     generator = None
     observer = None
 
-    if content_dir is not None:
+    output_dir = site_config.output_dir
+
+    if site_config.content_dir is not None:
+        content_dir = site_config.content_dir
+        templates_dir = site_config.templates_dir
+
         # Validate content directory
         if not content_dir.exists():
             print(
@@ -383,35 +355,18 @@ def serve_site(
             return 1
 
         # Convert to absolute paths before changing directory
-        content_dir = content_dir.resolve()
-        if templates_dir is not None:
-            templates_dir = templates_dir.resolve()
-        output_dir = output_dir.resolve()
+        site_config = dataclasses.replace(
+            site_config,
+            content_dir=content_dir.resolve(),
+            templates_dir=templates_dir.resolve() if templates_dir is not None else None,
+            output_dir=output_dir.resolve(),
+        )
+        output_dir = site_config.output_dir
 
         # Generate the site
-        print(f"Generating site from {content_dir}...")
+        print(f"Generating site from {site_config.content_dir}...")
         try:
-            generator = SiteGenerator(
-                content_dir=content_dir,
-                templates_dir=templates_dir,
-                output_dir=output_dir,
-                site_title=site_title,
-                site_subtitle=site_subtitle,
-                site_description=site_description,
-                site_keywords=site_keywords,
-                site_url=site_url,
-                posts_per_feed=posts_per_feed,
-                extra_stylesheets=extra_stylesheets,
-                default_author=default_author,
-                sidebar_config=sidebar_config,
-                clean_first=clean_first,
-                icon_source=icon_source,
-                with_search=with_search,
-                with_sitemap=with_sitemap,
-                minify_css=minify_css,
-                minify_js=minify_js,
-                with_read_time=with_read_time,
-            )
+            generator = SiteGenerator(site_config=site_config)
             generator.generate(include_drafts=include_drafts)
         except Exception as e:
             print(f"Error generating site: {e}", file=sys.stderr)
@@ -423,14 +378,18 @@ def serve_site(
             handler = ContentChangeHandler(generator, include_drafts=include_drafts)
 
             # Watch content directory
-            observer.schedule(handler, str(content_dir), recursive=True)
+            observer.schedule(handler, str(site_config.content_dir), recursive=True)
 
             # Watch templates directory if custom templates are provided
-            if templates_dir is not None:
-                observer.schedule(handler, str(templates_dir), recursive=True)
-                print(f"Watching for changes in {content_dir} and {templates_dir}...")
+            if site_config.templates_dir is not None:
+                observer.schedule(
+                    handler, str(site_config.templates_dir), recursive=True
+                )
+                print(
+                    f"Watching for changes in {site_config.content_dir} and {site_config.templates_dir}..."
+                )
             else:
-                print(f"Watching for changes in {content_dir}...")
+                print(f"Watching for changes in {site_config.content_dir}...")
 
             # Watch configuration file if one is being used
             if config_path is not None and config_path.exists():

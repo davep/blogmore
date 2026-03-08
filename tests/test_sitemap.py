@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN
+from blogmore.site_config import SiteConfig
 from blogmore.sitemap import (
     EXCLUDED_PAGES,
     SITEMAP_FILENAME,
@@ -220,11 +221,12 @@ class TestSitemapIntegrationWithGenerator:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
-            with_sitemap=False,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=False,
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -237,11 +239,12 @@ class TestSitemapIntegrationWithGenerator:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
-            with_sitemap=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -254,11 +257,12 @@ class TestSitemapIntegrationWithGenerator:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
-            with_sitemap=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -273,12 +277,13 @@ class TestSitemapIntegrationWithGenerator:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
-            with_sitemap=True,
-            with_search=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+                with_search=True,
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -292,11 +297,12 @@ class TestSitemapIntegrationWithGenerator:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            content_dir=posts_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
-            with_sitemap=True,
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+            )
         )
         generator.generate(include_drafts=False)
 
@@ -318,11 +324,12 @@ class TestSitemapIntegrationWithGenerator:
         )
 
         generator = SiteGenerator(
-            content_dir=content_dir,
-            templates_dir=None,
-            output_dir=temp_output_dir,
-            site_url="https://example.com",
-            with_sitemap=True,
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+            )
         )
         generator.generate(include_drafts=False)
 

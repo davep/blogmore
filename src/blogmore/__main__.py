@@ -16,6 +16,7 @@ from blogmore.config import (
 from blogmore.generator import SiteGenerator
 from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
+from blogmore.site_config import SiteConfig
 
 
 def main() -> int:
@@ -58,33 +59,38 @@ def main() -> int:
     # Normalize site_keywords: CLI provides a string, config provides a list or string
     site_keywords = normalize_site_keywords(getattr(args, "site_keywords", None))
 
+    # Build the shared site configuration object
+    site_config = SiteConfig(
+        content_dir=args.content_dir,
+        output_dir=args.output,
+        templates_dir=args.templates,
+        site_title=args.site_title,
+        site_subtitle=args.site_subtitle,
+        site_description=args.site_description,
+        site_keywords=site_keywords,
+        site_url=args.site_url,
+        posts_per_feed=args.posts_per_feed,
+        extra_stylesheets=args.extra_stylesheets,
+        default_author=args.default_author,
+        sidebar_config=sidebar_config,
+        clean_first=args.clean_first,
+        icon_source=args.icon_source,
+        with_search=args.with_search,
+        with_sitemap=args.with_sitemap,
+        minify_css=args.minify_css,
+        minify_js=args.minify_js,
+        with_read_time=args.with_read_time,
+    )
+
     # Handle serve command
     if args.command in ("serve", "test"):
         return serve_site(
-            output_dir=args.output,
+            site_config=site_config,
             port=args.port,
-            content_dir=args.content_dir,
-            templates_dir=args.templates,
-            site_title=args.site_title,
-            site_subtitle=args.site_subtitle,
-            site_description=args.site_description,
-            site_keywords=site_keywords,
-            site_url=args.site_url,
             include_drafts=args.include_drafts,
             watch=not args.no_watch,
-            posts_per_feed=args.posts_per_feed,
-            extra_stylesheets=args.extra_stylesheets,
-            default_author=args.default_author,
-            sidebar_config=sidebar_config,
             config_path=config_path,
             cli_overrides=cli_overrides,
-            clean_first=args.clean_first,
-            icon_source=args.icon_source,
-            with_search=args.with_search,
-            with_sitemap=args.with_sitemap,
-            minify_css=args.minify_css,
-            minify_js=args.minify_js,
-            with_read_time=args.with_read_time,
         )
 
     # Handle build command (and its aliases: generate, gen)
@@ -115,27 +121,7 @@ def main() -> int:
 
         # Generate the site
         try:
-            generator = SiteGenerator(
-                content_dir=args.content_dir,
-                templates_dir=args.templates,
-                output_dir=args.output,
-                site_title=args.site_title,
-                site_subtitle=args.site_subtitle,
-                site_description=args.site_description,
-                site_keywords=site_keywords,
-                site_url=args.site_url,
-                posts_per_feed=args.posts_per_feed,
-                extra_stylesheets=args.extra_stylesheets,
-                default_author=args.default_author,
-                sidebar_config=sidebar_config,
-                clean_first=args.clean_first,
-                icon_source=args.icon_source,
-                with_search=args.with_search,
-                with_sitemap=args.with_sitemap,
-                minify_css=args.minify_css,
-                minify_js=args.minify_js,
-                with_read_time=args.with_read_time,
-            )
+            generator = SiteGenerator(site_config=site_config)
             generator.generate(include_drafts=args.include_drafts)
             return 0
         except Exception as e:
@@ -171,27 +157,7 @@ def main() -> int:
         # Generate the site first
         try:
             print("Building site before publishing...")
-            generator = SiteGenerator(
-                content_dir=args.content_dir,
-                templates_dir=args.templates,
-                output_dir=args.output,
-                site_title=args.site_title,
-                site_subtitle=args.site_subtitle,
-                site_description=args.site_description,
-                site_keywords=site_keywords,
-                site_url=args.site_url,
-                posts_per_feed=args.posts_per_feed,
-                extra_stylesheets=args.extra_stylesheets,
-                default_author=args.default_author,
-                sidebar_config=sidebar_config,
-                clean_first=args.clean_first,
-                icon_source=args.icon_source,
-                with_search=args.with_search,
-                with_sitemap=args.with_sitemap,
-                minify_css=args.minify_css,
-                minify_js=args.minify_js,
-                with_read_time=args.with_read_time,
-            )
+            generator = SiteGenerator(site_config=site_config)
             generator.generate(include_drafts=args.include_drafts)
             print("Site built successfully")
         except Exception as e:

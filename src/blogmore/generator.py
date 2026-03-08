@@ -32,6 +32,7 @@ from blogmore.parser import (
 )
 from blogmore.renderer import TemplateRenderer
 from blogmore.search import write_search_index
+from blogmore.site_config import SiteConfig
 from blogmore.sitemap import write_sitemap
 from blogmore.utils import normalize_site_url
 
@@ -80,80 +81,40 @@ class SiteGenerator:
     # Feed constants - posts per feed
     POSTS_PER_FEED = 20
 
-    def __init__(
-        self,
-        content_dir: Path,
-        templates_dir: Path | None,
-        output_dir: Path,
-        site_title: str = "My Blog",
-        site_subtitle: str = "",
-        site_description: str = "",
-        site_keywords: list[str] | None = None,
-        site_url: str = "",
-        posts_per_feed: int = 20,
-        extra_stylesheets: list[str] | None = None,
-        default_author: str | None = None,
-        sidebar_config: dict[str, Any] | None = None,
-        clean_first: bool = False,
-        icon_source: str | None = None,
-        with_search: bool = False,
-        with_sitemap: bool = False,
-        minify_css: bool = False,
-        minify_js: bool = False,
-        with_read_time: bool = False,
-    ) -> None:
+    def __init__(self, site_config: SiteConfig) -> None:
         """Initialize the site generator.
 
         Args:
-            content_dir: Directory containing markdown posts
-            templates_dir: Optional directory containing custom Jinja2 templates.
-                          If not provided, uses bundled templates.
-            output_dir: Directory where generated site will be written
-            site_title: Title of the blog site
-            site_subtitle: Subtitle of the blog site
-            site_description: Default description used in metadata for pages that
-                              have no description of their own
-            site_keywords: Default keywords used in metadata for pages that have no
-                           keywords of their own
-            site_url: Base URL of the site
-            posts_per_feed: Maximum number of posts to include in feeds (default: 20)
-            extra_stylesheets: Optional list of URLs for additional stylesheets
-            default_author: Default author name for posts without author in frontmatter
-            sidebar_config: Optional sidebar configuration (site_logo, links, socials)
-            clean_first: Whether to remove the output directory before generating
-            icon_source: Optional source icon filename in extras/ directory
-            with_search: Whether to generate a search index and search page
-            with_sitemap: Whether to generate an XML sitemap
-            minify_css: Whether to minify the CSS, writing it as styles.min.css
-            minify_js: Whether to minify the JavaScript, writing it as theme.min.js
-                       (and search.min.js if search is enabled)
-            with_read_time: Whether to show estimated reading time on posts
+            site_config: Configuration for the site to be generated.  The
+                ``content_dir`` field must not be ``None``.
         """
-        self.content_dir = content_dir
-        self.templates_dir = templates_dir
-        self.output_dir = output_dir
-        self.site_title = site_title
-        self.site_subtitle = site_subtitle
-        self.site_description = site_description
-        self.site_keywords = site_keywords
-        self.site_url = normalize_site_url(site_url)
-        self.posts_per_feed = posts_per_feed
-        self.default_author = default_author
-        self.sidebar_config = sidebar_config or {}
-        self.clean_first = clean_first
-        self.icon_source = icon_source
-        self.with_search = with_search
-        self.with_sitemap = with_sitemap
-        self.minify_css = minify_css
-        self.minify_js = minify_js
-        self.with_read_time = with_read_time
+        if site_config.content_dir is None:
+            raise ValueError("site_config.content_dir must be provided for site generation")
+        self.content_dir: Path = site_config.content_dir
+        self.templates_dir = site_config.templates_dir
+        self.output_dir = site_config.output_dir
+        self.site_title = site_config.site_title
+        self.site_subtitle = site_config.site_subtitle
+        self.site_description = site_config.site_description
+        self.site_keywords = site_config.site_keywords
+        self.site_url = normalize_site_url(site_config.site_url)
+        self.posts_per_feed = site_config.posts_per_feed
+        self.default_author = site_config.default_author
+        self.sidebar_config = site_config.sidebar_config
+        self.clean_first = site_config.clean_first
+        self.icon_source = site_config.icon_source
+        self.with_search = site_config.with_search
+        self.with_sitemap = site_config.with_sitemap
+        self.minify_css = site_config.minify_css
+        self.minify_js = site_config.minify_js
+        self.with_read_time = site_config.with_read_time
 
         # Default to CDN URL; updated during generate() once socials are known
         self._fontawesome_css_url: str = FONTAWESOME_CDN_CSS_URL
 
         self.parser = PostParser(site_url=self.site_url)
         self.renderer = TemplateRenderer(
-            templates_dir, extra_stylesheets, self.site_url
+            site_config.templates_dir, site_config.extra_stylesheets, self.site_url
         )
 
     def _detect_favicon(self) -> str | None:
