@@ -1,15 +1,5 @@
 # BlogMore ChangeLog
 
-## v1.9.0
-
-**Unreleased**
-
-- The large overlapping parameter lists of `SiteGenerator` and `serve_site`
-  have been consolidated into a single `SiteConfig` dataclass.  Code that
-  constructs either should now create a `SiteConfig` and pass it as the
-  `site_config` argument.
-  ([#TBD](https://github.com/davep/blogmore/pull/TBD))
-
 ## v1.8.0
 
 **Released: 2026-03-07**
