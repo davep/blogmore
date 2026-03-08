@@ -38,7 +38,7 @@ class TestEndToEndWorkflow:
             )
         )
 
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Verify all expected outputs exist
         assert (temp_output_dir / "index.html").exists()
@@ -96,7 +96,7 @@ class TestEndToEndWorkflow:
             )
         )
 
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Search files should NOT be present when with_search is False (the default)
         assert not (temp_output_dir / "search.html").exists()
@@ -121,7 +121,7 @@ class TestEndToEndWorkflow:
                 with_search=True,
             )
         )
-        generator.generate(include_drafts=False)
+        generator.generate()
         assert (temp_output_dir / "search.html").exists()
         assert (temp_output_dir / "search_index.json").exists()
         assert (temp_output_dir / "static" / "search.js").exists()
@@ -134,7 +134,7 @@ class TestEndToEndWorkflow:
                 with_search=False,
             )
         )
-        generator2.generate(include_drafts=False)
+        generator2.generate()
         assert not (temp_output_dir / "search.html").exists()
         assert not (temp_output_dir / "search_index.json").exists()
         assert not (temp_output_dir / "static" / "search.js").exists()
@@ -153,11 +153,11 @@ class TestEndToEndWorkflow:
         )
 
         # First generation
-        generator.generate(include_drafts=False)
+        generator.generate()
         first_index = (temp_output_dir / "index.html").read_text()
 
         # Second generation
-        generator.generate(include_drafts=False)
+        generator.generate()
         second_index = (temp_output_dir / "index.html").read_text()
 
         # Content should be similar (may have timestamp differences)
@@ -176,12 +176,19 @@ class TestEndToEndWorkflow:
         )
 
         # Generate without drafts
-        generator.generate(include_drafts=False)
+        generator.generate()
         index_without_drafts = (temp_output_dir / "index.html").read_text()
         assert "Draft Post" not in index_without_drafts
 
         # Generate with drafts
-        generator.generate(include_drafts=True)
+        drafts_generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                include_drafts=True,
+            )
+        )
+        drafts_generator.generate()
         index_with_drafts = (temp_output_dir / "index.html").read_text()
         assert "Draft Post" in index_with_drafts
 
@@ -219,7 +226,7 @@ class TestEndToEndWorkflow:
             )
         )
 
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Verify custom template was used
         index_content = (temp_output_dir / "index.html").read_text()
@@ -276,7 +283,7 @@ class TestEndToEndWorkflow:
         )
 
         # Should generate without errors
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Should have basic structure
         assert (temp_output_dir / "index.html").exists()
@@ -295,7 +302,7 @@ class TestEndToEndWorkflow:
             )
         )
 
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Check complex post rendering
         complex_post = (
@@ -323,7 +330,7 @@ class TestEndToEndWorkflow:
             )
         )
 
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Check main RSS feed
         rss_content = (temp_output_dir / "feed.xml").read_text()
@@ -374,7 +381,7 @@ This is post number {i}.
             )
         )
 
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Verify index exists
         assert (temp_output_dir / "index.html").exists()
@@ -420,7 +427,7 @@ int main() {
             )
         )
 
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         # Check that special characters are properly escaped
         post_html = (

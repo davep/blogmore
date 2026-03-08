@@ -30,12 +30,11 @@ class TestContentChangeHandler:
 
         handler = ContentChangeHandler(
             generator=generator,
-            include_drafts=False,
             debounce_seconds=0.5,
         )
 
         assert handler.generator == generator
-        assert handler.include_drafts is False
+        assert handler.generator.site_config.include_drafts is False
         assert handler.debounce_seconds == 0.5
 
     def test_on_any_event_ignores_directories(
@@ -222,7 +221,7 @@ class TestContentChangeHandler:
 
         generate_call_count = 0
 
-        def counting_generate(include_drafts: bool) -> None:
+        def counting_generate() -> None:
             nonlocal generate_call_count
             generate_call_count += 1
 
@@ -1117,14 +1116,13 @@ class TestConfigChangeHandler:
         handler = ConfigChangeHandler(
             config_path=config_file,
             generator=generator,
-            include_drafts=False,
             cli_overrides=cli_overrides,
             debounce_seconds=0.5,
         )
 
         assert handler.config_path == config_file.resolve()
         assert handler.generator == generator
-        assert handler.include_drafts is False
+        assert handler.generator.site_config.include_drafts is False
         assert handler.cli_overrides == cli_overrides
         assert handler.debounce_seconds == 0.5
 
@@ -1149,7 +1147,6 @@ class TestConfigChangeHandler:
         handler = ConfigChangeHandler(
             config_path=config_file,
             generator=generator,
-            include_drafts=False,
             cli_overrides={},
         )
 
@@ -1180,7 +1177,6 @@ class TestConfigChangeHandler:
         handler = ConfigChangeHandler(
             config_path=config_file,
             generator=generator,
-            include_drafts=False,
             cli_overrides={},
         )
 
@@ -1221,7 +1217,6 @@ class TestConfigChangeHandler:
             handler = ConfigChangeHandler(
                 config_path=config_file,
                 generator=generator,
-                include_drafts=False,
                 cli_overrides={},
                 debounce_seconds=0.05,
             )
@@ -1241,12 +1236,12 @@ class TestConfigChangeHandler:
             time.sleep(0.2)
 
             # Verify generate was called
-            mock_generate.assert_called_once_with(include_drafts=False)
+            mock_generate.assert_called_once_with()
 
             # Verify generator attributes were updated
-            assert generator.site_title == "Updated Title"
-            assert generator.site_subtitle == "Updated Subtitle"
-            assert generator.posts_per_feed == 50
+            assert generator.site_config.site_title == "Updated Title"
+            assert generator.site_config.site_subtitle == "Updated Subtitle"
+            assert generator.site_config.posts_per_feed == 50
 
     def test_on_any_event_cli_overrides_preserved(
         self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
@@ -1280,7 +1275,6 @@ class TestConfigChangeHandler:
             handler = ConfigChangeHandler(
                 config_path=config_file,
                 generator=generator,
-                include_drafts=False,
                 cli_overrides=cli_overrides,
                 debounce_seconds=0.05,
             )
@@ -1300,12 +1294,12 @@ class TestConfigChangeHandler:
             time.sleep(0.2)
 
             # Verify generate was called
-            mock_generate.assert_called_once_with(include_drafts=False)
+            mock_generate.assert_called_once_with()
 
             # Verify CLI override was preserved but config values were updated
-            assert generator.site_title == "CLI Title"  # CLI override preserved
-            assert generator.site_subtitle == "Updated Subtitle"  # Config updated
-            assert generator.posts_per_feed == 50  # Config updated
+            assert generator.site_config.site_title == "CLI Title"  # CLI override preserved
+            assert generator.site_config.site_subtitle == "Updated Subtitle"  # Config updated
+            assert generator.site_config.posts_per_feed == 50  # Config updated
 
     def test_on_any_event_updates_extra_stylesheets(
         self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
@@ -1334,7 +1328,6 @@ class TestConfigChangeHandler:
             handler = ConfigChangeHandler(
                 config_path=config_file,
                 generator=generator,
-                include_drafts=False,
                 cli_overrides={},
                 debounce_seconds=0.05,
             )
@@ -1386,7 +1379,6 @@ class TestConfigChangeHandler:
             handler = ConfigChangeHandler(
                 config_path=config_file,
                 generator=generator,
-                include_drafts=False,
                 cli_overrides={},
                 debounce_seconds=0.05,
             )
@@ -1409,9 +1401,9 @@ class TestConfigChangeHandler:
             time.sleep(0.2)
 
             # Verify sidebar config was updated
-            assert generator.sidebar_config["site_logo"] == "/images/newlogo.png"
-            assert len(generator.sidebar_config["links"]) == 2
-            assert generator.sidebar_config["socials"] == [
+            assert generator.site_config.sidebar_config["site_logo"] == "/images/newlogo.png"
+            assert len(generator.site_config.sidebar_config["links"]) == 2
+            assert generator.site_config.sidebar_config["socials"] == [
                 {"site": "github", "url": "https://github.com/user"}
             ]
 
@@ -1438,7 +1430,6 @@ class TestConfigChangeHandler:
             handler = ConfigChangeHandler(
                 config_path=config_file,
                 generator=generator,
-                include_drafts=False,
                 cli_overrides={},
                 debounce_seconds=0.1,
             )

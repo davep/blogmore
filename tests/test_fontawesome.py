@@ -263,7 +263,7 @@ class TestFontAwesomeOptimizerInGenerator:
         )
 
         with patch("blogmore.generator.FontAwesomeOptimizer") as mock_cls:
-            generator.generate(include_drafts=False)
+            generator.generate()
 
         # Optimizer should not have been constructed at all
         mock_cls.assert_not_called()
@@ -298,7 +298,7 @@ class TestFontAwesomeOptimizerInGenerator:
             "fetch_icon_metadata",
             return_value=STUB_METADATA,
         ):
-            generator.generate(include_drafts=False)
+            generator.generate()
 
         # Optimised CSS file must exist
         css_file = temp_output_dir / "static" / "fontawesome.css"
@@ -333,7 +333,7 @@ class TestFontAwesomeOptimizerInGenerator:
             "fetch_icon_metadata",
             return_value=STUB_METADATA,
         ):
-            generator.generate(include_drafts=False)
+            generator.generate()
 
         index_html = (temp_output_dir / "index.html").read_text()
         expected_preload = (
@@ -366,7 +366,7 @@ class TestFontAwesomeOptimizerInGenerator:
             "fetch_icon_metadata",
             side_effect=urllib.error.URLError("unreachable"),
         ):
-            generator.generate(include_drafts=False)
+            generator.generate()
 
         # No local CSS file should be created
         assert not (temp_output_dir / "static" / "fontawesome.css").exists()
@@ -398,7 +398,7 @@ class TestFontAwesomeOptimizerInGenerator:
             "fetch_icon_metadata",
             return_value=STUB_METADATA,
         ):
-            generator.generate(include_drafts=False)
+            generator.generate()
 
         index_html = (temp_output_dir / "index.html").read_text()
         assert "<h2>Follow Me</h2>" in index_html
@@ -426,7 +426,7 @@ class TestFontAwesomeOptimizerInGenerator:
             "fetch_icon_metadata",
             return_value=STUB_METADATA,
         ):
-            generator.generate(include_drafts=False)
+            generator.generate()
 
         index_html = (temp_output_dir / "index.html").read_text()
         assert "<h2>Social</h2>" in index_html

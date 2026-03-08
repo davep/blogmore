@@ -80,6 +80,7 @@ def main() -> int:
         minify_css=args.minify_css,
         minify_js=args.minify_js,
         with_read_time=args.with_read_time,
+        include_drafts=args.include_drafts,
     )
 
     # Handle serve command
@@ -87,7 +88,6 @@ def main() -> int:
         return serve_site(
             site_config=site_config,
             port=args.port,
-            include_drafts=args.include_drafts,
             watch=not args.no_watch,
             config_path=config_path,
             cli_overrides=cli_overrides,
@@ -122,7 +122,7 @@ def main() -> int:
         # Generate the site
         try:
             generator = SiteGenerator(site_config=site_config)
-            generator.generate(include_drafts=args.include_drafts)
+            generator.generate()
             return 0
         except Exception as e:
             print(f"Error generating site: {e}", file=sys.stderr)
@@ -158,7 +158,7 @@ def main() -> int:
         try:
             print("Building site before publishing...")
             generator = SiteGenerator(site_config=site_config)
-            generator.generate(include_drafts=args.include_drafts)
+            generator.generate()
             print("Site built successfully")
         except Exception as e:
             print(f"Error generating site: {e}", file=sys.stderr)

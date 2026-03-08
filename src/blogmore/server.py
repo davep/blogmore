@@ -94,19 +94,16 @@ class ContentChangeHandler(FileSystemEventHandler):
     def __init__(
         self,
         generator: SiteGenerator,
-        include_drafts: bool = False,
         debounce_seconds: float = 0.5,
     ) -> None:
         """Initialize the content change handler.
 
         Args:
             generator: The site generator to use for regeneration
-            include_drafts: Whether to include drafts in generation
             debounce_seconds: Time to wait after the last change before regenerating
         """
         super().__init__()
         self.generator = generator
-        self.include_drafts = include_drafts
         self.debounce_seconds = debounce_seconds
         self._pending_timer: threading.Timer | None = None
         self._timer_lock = threading.Lock()
@@ -137,7 +134,7 @@ class ContentChangeHandler(FileSystemEventHandler):
         # (inotify generates events for output files that watchdog may pick up
         # even when the output directory is not explicitly watched).
         try:
-            path.relative_to(self.generator.output_dir)
+            path.relative_to(self.generator.site_config.output_dir)
             return
         except ValueError:
             pass
@@ -168,7 +165,7 @@ class ContentChangeHandler(FileSystemEventHandler):
             return
         try:
             print(f"\nDetected change in {path}, regenerating site...")
-            self.generator.generate(include_drafts=self.include_drafts)
+            self.generator.generate()
             print("Regeneration complete!")
         except Exception as e:
             print(f"Error during regeneration: {e}", file=sys.stderr)
@@ -183,7 +180,6 @@ class ConfigChangeHandler(FileSystemEventHandler):
         self,
         config_path: Path,
         generator: SiteGenerator,
-        include_drafts: bool,
         cli_overrides: dict[str, Any],
         debounce_seconds: float = 0.5,
     ) -> None:
@@ -192,14 +188,12 @@ class ConfigChangeHandler(FileSystemEventHandler):
         Args:
             config_path: Path to the configuration file being watched
             generator: The site generator to use for regeneration
-            include_drafts: Whether to include drafts in generation
             cli_overrides: Dictionary of CLI arguments that should override config
             debounce_seconds: Time to wait before regenerating after a change
         """
         super().__init__()
         self.config_path = config_path.resolve()
         self.generator = generator
-        self.include_drafts = include_drafts
         self.cli_overrides = cli_overrides
         self.debounce_seconds = debounce_seconds
         self._pending_timer: threading.Timer | None = None
@@ -255,7 +249,7 @@ class ConfigChangeHandler(FileSystemEventHandler):
             self._update_generator(config, sidebar_config)
 
             # Regenerate the site
-            self.generator.generate(include_drafts=self.include_drafts)
+            self.generator.generate()
             print("Configuration reloaded and regeneration complete!")
         except Exception as e:
             print(f"Error reloading config or regenerating: {e}", file=sys.stderr)
@@ -263,52 +257,49 @@ class ConfigChangeHandler(FileSystemEventHandler):
     def _update_generator(
         self, config: dict[str, Any], sidebar_config: dict[str, Any]
     ) -> None:
-        """Update generator attributes with new configuration values.
+        """Update the generator's site configuration with new values.
 
         Args:
             config: The loaded configuration dictionary
             sidebar_config: The sidebar configuration
         """
-        # Update generator attributes with new config values
-        if "site_title" in config:
-            self.generator.site_title = config["site_title"]
-        if "site_subtitle" in config:
-            self.generator.site_subtitle = config["site_subtitle"]
-        if "site_description" in config:
-            self.generator.site_description = config["site_description"]
+        update_kwargs: dict[str, Any] = {"sidebar_config": sidebar_config}
+
+        for key in (
+            "site_title",
+            "site_subtitle",
+            "site_description",
+            "site_url",
+            "posts_per_feed",
+            "default_author",
+            "icon_source",
+            "with_search",
+            "with_sitemap",
+            "with_read_time",
+        ):
+            if key in config:
+                update_kwargs[key] = config[key]
+
         if "site_keywords" in config:
-            self.generator.site_keywords = normalize_site_keywords(
+            update_kwargs["site_keywords"] = normalize_site_keywords(
                 config["site_keywords"]
             )
-        if "site_url" in config:
-            self.generator.site_url = config["site_url"]
-        if "posts_per_feed" in config:
-            self.generator.posts_per_feed = config["posts_per_feed"]
+
         if "extra_stylesheets" in config:
             stylesheets = config["extra_stylesheets"]
             if isinstance(stylesheets, str):
                 self.generator.renderer.extra_stylesheets = [stylesheets]
             elif isinstance(stylesheets, list):
                 self.generator.renderer.extra_stylesheets = stylesheets
-        if "default_author" in config:
-            self.generator.default_author = config["default_author"]
-        if "icon_source" in config:
-            self.generator.icon_source = config["icon_source"]
-        if "with_search" in config:
-            self.generator.with_search = config["with_search"]
-        if "with_sitemap" in config:
-            self.generator.with_sitemap = config["with_sitemap"]
-        if "with_read_time" in config:
-            self.generator.with_read_time = config["with_read_time"]
 
-        # Update sidebar config
-        self.generator.sidebar_config = sidebar_config
+        self.generator.site_config = dataclasses.replace(
+            self.generator.site_config, **update_kwargs
+        )
 
 
 def serve_site(
     site_config: SiteConfig,
     port: int = 8000,
-    include_drafts: bool = False,
     watch: bool = True,
     config_path: Path | None = None,
     cli_overrides: dict[str, Any] | None = None,
@@ -318,9 +309,9 @@ def serve_site(
     Args:
         site_config: Site configuration holding all generation parameters.
             When ``site_config.content_dir`` is not ``None`` the site will be
-            (re-)generated before serving.
+            (re-)generated before serving.  ``site_config.include_drafts``
+            controls whether draft posts are included.
         port: Port to serve on (default: 8000)
-        include_drafts: Whether to include drafts
         watch: Whether to watch for changes and regenerate (default: True)
         config_path: Path to the configuration file being used (if any)
         cli_overrides: Dictionary of CLI arguments that override config values
@@ -367,7 +358,7 @@ def serve_site(
         print(f"Generating site from {site_config.content_dir}...")
         try:
             generator = SiteGenerator(site_config=site_config)
-            generator.generate(include_drafts=include_drafts)
+            generator.generate()
         except Exception as e:
             print(f"Error generating site: {e}", file=sys.stderr)
             return 1
@@ -375,7 +366,7 @@ def serve_site(
         # Set up file watching if requested
         if watch:
             observer = Observer()
-            handler = ContentChangeHandler(generator, include_drafts=include_drafts)
+            handler = ContentChangeHandler(generator)
 
             # Watch content directory
             observer.schedule(handler, str(site_config.content_dir), recursive=True)
@@ -396,7 +387,6 @@ def serve_site(
                 config_handler = ConfigChangeHandler(
                     config_path=config_path,
                     generator=generator,
-                    include_drafts=include_drafts,
                     cli_overrides=cli_overrides or {},
                 )
                 # Watch the directory containing the config file

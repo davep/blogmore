@@ -226,7 +226,7 @@ class TestSitemapIntegrationWithGenerator:
                 with_sitemap=False,
             )
         )
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         assert not (temp_output_dir / "sitemap.xml").exists()
 
@@ -244,7 +244,7 @@ class TestSitemapIntegrationWithGenerator:
                 with_sitemap=True,
             )
         )
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         assert (temp_output_dir / "sitemap.xml").exists()
 
@@ -262,7 +262,7 @@ class TestSitemapIntegrationWithGenerator:
                 with_sitemap=True,
             )
         )
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         content = (temp_output_dir / "sitemap.xml").read_text()
         # The fixture has a post dated 2024-01-15
@@ -283,7 +283,7 @@ class TestSitemapIntegrationWithGenerator:
                 with_search=True,
             )
         )
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         content = (temp_output_dir / "sitemap.xml").read_text()
         assert "search.html" not in content
@@ -302,7 +302,7 @@ class TestSitemapIntegrationWithGenerator:
                 with_sitemap=True,
             )
         )
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         content = (temp_output_dir / "sitemap.xml").read_text()
         assert "https://example.com/index.html" in content
@@ -329,7 +329,7 @@ class TestSitemapIntegrationWithGenerator:
                 with_sitemap=True,
             )
         )
-        generator.generate(include_drafts=False)
+        generator.generate()
 
         assert (temp_output_dir / CUSTOM_404_HTML).exists()
         content = (temp_output_dir / "sitemap.xml").read_text()
