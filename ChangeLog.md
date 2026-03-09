@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-**Released: 2026-03-07**
+**Released: WiP**
 
 - Added configurable post output path scheme via the `post_path`
   configuration option. ([#237](https://github.com/davep/blogmore/pull/237))
