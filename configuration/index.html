@@ -965,6 +965,78 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#post_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        post_path
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="post_path">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#available-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Safety
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-clash-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path clash detection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1717,6 +1789,78 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#post_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        post_path
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="post_path">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#available-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Safety
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-clash-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path clash detection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2259,6 +2403,99 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <strong>Default:</strong> <code>false</code></p>
 <div class="highlight"><pre><span></span><code><span class="nt">with_read_time</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
+<h4 id="post_path"><code>post_path</code></h4>
+<p>Format string that controls the output path (and therefore the URL) of every blog post.  This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
+<p><strong>Type:</strong> String<br />
+<strong>Default:</strong> <code>{year}/{month}/{day}/{slug}.html</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">post_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{year}/{month}/{day}/{slug}.html&quot;</span>
+</code></pre></div>
+<h5 id="how-it-works">How it works</h5>
+<p>The format string uses Python-style <code>{variable}</code> placeholders that are substituted with values derived from each post.  The result is joined onto the <code>output</code> directory, so the path is always relative to your site root.</p>
+<h5 id="available-variables">Available variables</h5>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{slug}</code></td>
+<td>Post slug (date prefix stripped if present). <strong>Required.</strong></td>
+<td><code>my-first-post</code></td>
+</tr>
+<tr>
+<td><code>{year}</code></td>
+<td>4-digit year</td>
+<td><code>2024</code></td>
+</tr>
+<tr>
+<td><code>{month}</code></td>
+<td>2-digit zero-padded month</td>
+<td><code>01</code></td>
+</tr>
+<tr>
+<td><code>{day}</code></td>
+<td>2-digit zero-padded day</td>
+<td><code>15</code></td>
+</tr>
+<tr>
+<td><code>{hour}</code></td>
+<td>2-digit zero-padded 24-hour hour</td>
+<td><code>09</code></td>
+</tr>
+<tr>
+<td><code>{minute}</code></td>
+<td>2-digit zero-padded minute</td>
+<td><code>30</code></td>
+</tr>
+<tr>
+<td><code>{second}</code></td>
+<td>2-digit zero-padded second</td>
+<td><code>05</code></td>
+</tr>
+<tr>
+<td><code>{category}</code></td>
+<td>Category of the post, slugified for safe URL use</td>
+<td><code>python</code></td>
+</tr>
+<tr>
+<td><code>{author}</code></td>
+<td>Author of the post, slugified for safe URL use</td>
+<td><code>dave-pearson</code></td>
+</tr>
+</tbody>
+</table>
+<p>The <code>{slug}</code> variable is <strong>required</strong> — every post must produce a unique path, and the slug is the most reliable way to achieve that.</p>
+<p>For posts without a date the date/time variables (<code>{year}</code>, <code>{month}</code>, <code>{day}</code>, <code>{hour}</code>, <code>{minute}</code>, <code>{second}</code>) are substituted with empty strings.  Posts with no category or author similarly produce an empty string for those variables.  Consecutive forward slashes that result from empty substitutions are automatically collapsed.</p>
+<h5 id="safety">Safety</h5>
+<p>BlogMore always ensures the resolved path remains inside the <code>output</code> directory.  A <code>post_path</code> value containing <code>..</code> segments or other path-traversal constructs is detected and rejected at startup with an error message.</p>
+<h5 id="path-clash-detection">Path clash detection</h5>
+<p>If two or more posts would produce the <strong>same output path</strong> (which can easily happen when using a template that omits date variables), BlogMore prints a prominent <code>WARNING</code> before generating the site.  The <strong>newest post</strong> (by date) always wins; older posts that would have overwritten the same file are silently skipped.</p>
+<div class="highlight"><pre><span></span><code>WARNING: Post path clash detected!  Multiple posts would be written to the same output file.
+  Output path : output/post.html
+  Winner (newest) : &#39;My Newer Post&#39;
+  Ignored (older): &#39;My Older Post&#39;
+</code></pre></div>
+<p>Use <code>clean_first: true</code> together with a template that guarantees unique paths to avoid unexpected results.</p>
+<h5 id="examples">Examples</h5>
+<p>Default layout — year/month/day subdirectories:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">post_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{year}/{month}/{day}/{slug}.html&quot;</span>
+</code></pre></div>
+<p>Every post in its own directory (clean URLs):</p>
+<div class="highlight"><pre><span></span><code><span class="nt">post_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{year}/{month}/{day}/{slug}/index.html&quot;</span>
+</code></pre></div>
+<p>All posts under a single flat <code>/posts/</code> directory:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">post_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;posts/{slug}.html&quot;</span>
+</code></pre></div>
+<p>Posts organised by category then slug:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">post_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{category}/{slug}.html&quot;</span>
+</code></pre></div>
+<p>Posts organised by author, then year and slug:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">post_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{author}/{year}/{slug}.html&quot;</span>
+</code></pre></div>
 <h3 id="styling-options">Styling Options</h3>
 <h4 id="minify_css"><code>minify_css</code></h4>
 <p>Minify the generated CSS and write it as <code>styles.min.css</code> instead of <code>style.css</code>. This reduces the size of the stylesheet delivered to visitors.</p>
@@ -2388,6 +2625,7 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <span class="nt">default_author</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dave</span><span class="nv"> </span><span class="s">Pearson&quot;</span>
 <span class="nt">icon_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;icon.png&quot;</span>
 <span class="nt">with_search</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">post_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{year}/{month}/{day}/{slug}.html&quot;</span>
 
 <span class="c1"># Styling</span>
 <span class="nt">minify_css</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
