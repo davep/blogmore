@@ -15,6 +15,7 @@ from watchdog.observers import Observer
 from blogmore.config import get_sidebar_config, load_config, normalize_site_keywords
 from blogmore.generator import SiteGenerator
 from blogmore.parser import CUSTOM_404_HTML
+from blogmore.post_path import DEFAULT_POST_PATH, validate_post_path_template
 from blogmore.site_config import SiteConfig
 
 
@@ -291,6 +292,23 @@ class ConfigChangeHandler(FileSystemEventHandler):
                 self.generator.renderer.extra_stylesheets = [stylesheets]
             elif isinstance(stylesheets, list):
                 self.generator.renderer.extra_stylesheets = stylesheets
+
+        raw_post_path = config.get("post_path", DEFAULT_POST_PATH)
+        if isinstance(raw_post_path, str):
+            try:
+                validate_post_path_template(raw_post_path)
+                update_kwargs["post_path"] = raw_post_path
+            except ValueError as error:
+                print(
+                    f"Warning: Invalid post_path in configuration file: {error}",
+                    file=sys.stderr,
+                )
+        else:
+            print(
+                "Warning: post_path in the configuration file must be a string; "
+                "using the default.",
+                file=sys.stderr,
+            )
 
         self.generator.site_config = dataclasses.replace(
             self.generator.site_config, **update_kwargs
