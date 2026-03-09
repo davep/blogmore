@@ -2,14 +2,10 @@
 
 ## Unreleased
 
-- Added configurable post output path scheme via the `post_path` configuration
-  option. The URL and file path of every blog post can now be tailored using a
-  simple format string with variables such as `{year}`, `{month}`, `{day}`,
-  `{category}`, `{author}`, and `{slug}`. The default behaviour is unchanged
-  (`{year}/{month}/{day}/{slug}.html`). A safety check prevents paths from
-  escaping the output directory, and a prominent warning is emitted whenever
-  two posts would resolve to the same output file (the newest post always
-  wins). ([#{{PR_NUMBER}}](https://github.com/davep/blogmore/pull/{{PR_NUMBER}}))
+**Released: 2026-03-07**
+
+- Added configurable post output path scheme via the `post_path`
+  configuration option. ([#237](https://github.com/davep/blogmore/pull/237))
 
 ## v1.8.0
 
