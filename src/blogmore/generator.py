@@ -27,9 +27,9 @@ from blogmore.parser import (
     Post,
     PostParser,
     post_sort_key,
-    remove_date_prefix,
     sanitize_for_url,
 )
+from blogmore.post_path import compute_output_path
 from blogmore.renderer import TemplateRenderer
 from blogmore.search import write_search_index
 from blogmore.site_config import SiteConfig
@@ -342,8 +342,16 @@ class SiteGenerator:
 
         # Generate individual post pages
         print("Generating post pages...")
+        post_output_paths = self._resolve_post_output_paths(posts)
+        generated_paths: set[str] = set()
         for post in posts:
-            self._generate_post_page(post, posts, pages)
+            output_path = post_output_paths[id(post)]
+            path_key = str(output_path)
+            if path_key in generated_paths:
+                # A newer post has already claimed this path; skip this older one.
+                continue
+            generated_paths.add(path_key)
+            self._generate_post_page(post, posts, pages, output_path)
 
         # Generate static pages
         if pages:
@@ -548,10 +556,76 @@ class SiteGenerator:
         output_path.write_text(minified, encoding="utf-8")
         print(f"Generated minified JS as {js_minified_filename}")
 
+    def _resolve_post_output_paths(self, posts: list[Post]) -> dict[int, Path]:
+        """Resolve the output path for every post and detect path clashes.
+
+        For each post the method:
+
+        1. Computes the absolute output file path using the configured
+           ``post_path`` template.
+        2. Sets ``post.url_path`` so that templates and feeds always use the
+           correct URL regardless of the configured format.
+        3. Groups posts by output path and emits a prominent ``WARNING`` for
+           any group that contains more than one post (i.e. a path clash).
+           The *newest* post (first in the already-sorted list) wins; older
+           posts that share the same path will be skipped during generation.
+
+        Args:
+            posts: All posts sorted by date, newest first.
+
+        Returns:
+            Mapping from ``id(post)`` to the post's resolved output path.
+        """
+        post_output_paths: dict[int, Path] = {}
+        # Preserve insertion order so we can identify the winner easily.
+        path_to_post_ids: dict[str, list[int]] = defaultdict(list)
+        post_by_id: dict[int, Post] = {id(post): post for post in posts}
+
+        for post in posts:
+            output_path = compute_output_path(
+                self.site_config.output_dir, post, self.site_config.post_path
+            )
+            post_output_paths[id(post)] = output_path
+
+            # Set the post's URL so all templates/feeds reflect the configured scheme.
+            relative = output_path.relative_to(self.site_config.output_dir)
+            post.url_path = "/" + relative.as_posix()
+
+            path_to_post_ids[str(output_path)].append(id(post))
+
+        # Detect and warn about path clashes.
+        for path_str, clashing_ids in path_to_post_ids.items():
+            if len(clashing_ids) > 1:
+                clashing_posts = [post_by_id[pid] for pid in clashing_ids]
+                winner = clashing_posts[0]  # newest (list is sorted newest-first)
+                losers = clashing_posts[1:]
+                print(
+                    "\nWARNING: Post path clash detected!  "
+                    "Multiple posts would be written to the same output file."
+                )
+                print(f"  Output path : {path_str}")
+                print(f"  Winner (newest) : '{winner.title}'")
+                for loser in losers:
+                    print(f"  Ignored (older): '{loser.title}'")
+                print()
+
+        return post_output_paths
+
     def _generate_post_page(
-        self, post: Post, all_posts: list[Post], pages: list[Page]
+        self,
+        post: Post,
+        all_posts: list[Post],
+        pages: list[Page],
+        output_path: Path,
     ) -> None:
-        """Generate a single post page."""
+        """Generate a single post page.
+
+        Args:
+            post: The post to generate a page for.
+            all_posts: All posts (sorted newest first), used for prev/next navigation.
+            pages: All static pages, passed to the template context.
+            output_path: The pre-resolved absolute output file path for this post.
+        """
         context = self._get_global_context()
         context["all_posts"] = all_posts
         context["pages"] = pages
@@ -575,24 +649,7 @@ class SiteGenerator:
             context["prev_post"] = None
             context["next_post"] = None
 
-        # Determine output path based on date
-        if post.date:
-            # Create year/month/day directory structure
-            year = post.date.year
-            month = f"{post.date.month:02d}"
-            day = f"{post.date.day:02d}"
-
-            # Remove date prefix from slug if present
-            slug = remove_date_prefix(post.slug)
-
-            # Create directory structure
-            post_dir = self.site_config.output_dir / str(year) / month / day
-            post_dir.mkdir(parents=True, exist_ok=True)
-            output_path = post_dir / f"{slug}.html"
-        else:
-            # Fallback for posts without dates
-            output_path = self.site_config.output_dir / f"{post.slug}.html"
-
+        output_path.parent.mkdir(parents=True, exist_ok=True)
         context["canonical_url"] = self._canonical_url_for_path(output_path)
         html = self.renderer.render_post(post, **context)
         output_path.write_text(html, encoding="utf-8")
