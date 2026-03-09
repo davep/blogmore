@@ -1,5 +1,12 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added configurable post output path scheme via the `post_path`
+  configuration option. ([#237](https://github.com/davep/blogmore/pull/237))
+
 ## v1.8.0
 
 **Released: 2026-03-07**

@@ -318,6 +318,88 @@ Show estimated reading time on each post. When enabled, BlogMore calculates the 
 with_read_time: true
 ```
 
+#### `post_path`
+
+Format string that controls the output path (and therefore the URL) of every blog post.  This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** String  
+**Default:** `{year}/{month}/{day}/{slug}.html`
+
+```yaml
+post_path: "{year}/{month}/{day}/{slug}.html"
+```
+
+##### How it works
+
+The format string uses Python-style `{variable}` placeholders that are substituted with values derived from each post.  The result is joined onto the `output` directory, so the path is always relative to your site root.
+
+##### Available variables
+
+| Variable   | Description                                               | Example value   |
+|------------|-----------------------------------------------------------|-----------------|
+| `{slug}`   | Post slug (date prefix stripped if present). **Required.**| `my-first-post` |
+| `{year}`   | 4-digit year                                              | `2024`          |
+| `{month}`  | 2-digit zero-padded month                                 | `01`            |
+| `{day}`    | 2-digit zero-padded day                                   | `15`            |
+| `{hour}`   | 2-digit zero-padded 24-hour hour                          | `09`            |
+| `{minute}` | 2-digit zero-padded minute                                | `30`            |
+| `{second}` | 2-digit zero-padded second                                | `05`            |
+| `{category}`| Category of the post, slugified for safe URL use         | `python`        |
+| `{author}` | Author of the post, slugified for safe URL use            | `dave-pearson`  |
+
+The `{slug}` variable is **required** — every post must produce a unique path, and the slug is the most reliable way to achieve that.
+
+For posts without a date the date/time variables (`{year}`, `{month}`, `{day}`, `{hour}`, `{minute}`, `{second}`) are substituted with empty strings.  Posts with no category or author similarly produce an empty string for those variables.  Consecutive forward slashes that result from empty substitutions are automatically collapsed.
+
+##### Safety
+
+BlogMore always ensures the resolved path remains inside the `output` directory.  A `post_path` value containing `..` segments or other path-traversal constructs is detected and rejected at startup with an error message.
+
+##### Path clash detection
+
+If two or more posts would produce the **same output path** (which can easily happen when using a template that omits date variables), BlogMore prints a prominent `WARNING` before generating the site.  The **newest post** (by date) always wins; older posts that would have overwritten the same file are silently skipped.
+
+```
+WARNING: Post path clash detected!  Multiple posts would be written to the same output file.
+  Output path : output/post.html
+  Winner (newest) : 'My Newer Post'
+  Ignored (older): 'My Older Post'
+```
+
+Use `clean_first: true` together with a template that guarantees unique paths to avoid unexpected results.
+
+##### Examples
+
+Default layout — year/month/day subdirectories:
+
+```yaml
+post_path: "{year}/{month}/{day}/{slug}.html"
+```
+
+Every post in its own directory (clean URLs):
+
+```yaml
+post_path: "{year}/{month}/{day}/{slug}/index.html"
+```
+
+All posts under a single flat `/posts/` directory:
+
+```yaml
+post_path: "posts/{slug}.html"
+```
+
+Posts organised by category then slug:
+
+```yaml
+post_path: "{category}/{slug}.html"
+```
+
+Posts organised by author, then year and slug:
+
+```yaml
+post_path: "{author}/{year}/{slug}.html"
+```
+
 ### Styling Options
 
 #### `minify_css`
@@ -523,6 +605,7 @@ posts_per_feed: 30
 default_author: "Dave Pearson"
 icon_source: "icon.png"
 with_search: true
+post_path: "{year}/{month}/{day}/{slug}.html"
 
 # Styling
 minify_css: true

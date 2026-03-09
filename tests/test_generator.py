@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+import pytest
 from blogmore.generator import SiteGenerator, paginate_posts, sanitize_for_url
 from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN, Post
 from blogmore.site_config import SiteConfig
@@ -2975,3 +2976,179 @@ class TestWithReadTime:
         january_pos = content.find('href="#archive-2024-01"')
 
         assert december_pos < june_pos < january_pos
+
+
+class TestPostPathConfiguration:
+    """Tests for the configurable post_path feature."""
+
+    def test_default_post_path_produces_date_based_structure(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The default post_path generates the historical year/month/day/slug.html layout."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator.generate()
+
+        # first-post.md has date 2024-01-15 and no date prefix in slug.
+        post_file = temp_output_dir / "2024" / "01" / "15" / "first-post.html"
+        assert post_file.exists()
+
+    def test_custom_post_path_slug_only(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """A slug-only post_path places all posts flat in the output directory."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                post_path="{slug}.html",
+            )
+        )
+        generator.generate()
+
+        # With {slug}.html, first-post.html should be directly in output_dir.
+        post_file = temp_output_dir / "first-post.html"
+        assert post_file.exists()
+        content = post_file.read_text()
+        assert "My First Post" in content
+
+    def test_custom_post_path_per_post_directory(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """A template ending in index.html gives every post its own directory."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                post_path="{year}/{month}/{day}/{slug}/index.html",
+            )
+        )
+        generator.generate()
+
+        post_file = (
+            temp_output_dir / "2024" / "01" / "15" / "first-post" / "index.html"
+        )
+        assert post_file.exists()
+
+    def test_post_url_reflects_configured_post_path(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Post URLs in generated HTML reflect the configured post_path scheme."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                post_path="posts/{slug}.html",
+            )
+        )
+        generator.generate()
+
+        # The index page lists posts with links; the URL should use the new scheme.
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/posts/first-post.html" in index_content
+
+    def test_post_url_property_set_after_generation(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """After _resolve_post_output_paths the post url_path is set."""
+        from blogmore.parser import PostParser, post_sort_key
+        from blogmore.post_path import DEFAULT_POST_PATH
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                post_path="posts/{slug}.html",
+            )
+        )
+        parser = generator.parser
+        posts = parser.parse_directory(posts_dir)
+        posts.sort(key=post_sort_key, reverse=True)
+
+        generator._resolve_post_output_paths(posts)
+
+        dated = [p for p in posts if p.date is not None]
+        assert dated, "Test requires at least one dated post in fixtures"
+
+        for post in dated:
+            assert post.url_path is not None
+            assert post.url_path.startswith("/posts/")
+
+    def test_post_path_clash_warning_emitted(
+        self, tmp_path: Path, temp_output_dir: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """When two posts would share the same output path a WARNING is printed."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Both posts have different dates but the slug-only template means
+        # they would clash only if the slugs are the same.  Use identical slugs.
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: Post A\ndate: 2024-01-01\n---\n\nContent A."
+        )
+        (content_dir / "2024-06-01-post.md").write_text(
+            "---\ntitle: Post B\ndate: 2024-06-01\n---\n\nContent B."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                # slug-only: both "post.md" files resolve to "post.html"
+                post_path="{slug}.html",
+            )
+        )
+        generator.generate()
+
+        captured = capsys.readouterr()
+        assert "WARNING" in captured.out
+        assert "clash" in captured.out.lower()
+
+    def test_post_path_clash_newest_wins(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """When two posts clash, the newest post's content is in the output file."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: Older Post\ndate: 2024-01-01\n---\n\nThis is the older content."
+        )
+        (content_dir / "2024-06-01-post.md").write_text(
+            "---\ntitle: Newer Post\ndate: 2024-06-01\n---\n\nThis is the newer content."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                post_path="{slug}.html",
+            )
+        )
+        generator.generate()
+
+        output_file = temp_output_dir / "post.html"
+        assert output_file.exists()
+        content = output_file.read_text()
+        assert "Newer Post" in content
+        # The older post's body content must not appear in the winning file.
+        assert "This is the older content." not in content
+
+    def test_post_path_no_clash_when_unique(
+        self, posts_dir: Path, temp_output_dir: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """No WARNING is printed when all posts produce unique output paths."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator.generate()
+
+        captured = capsys.readouterr()
+        assert "WARNING" not in captured.out

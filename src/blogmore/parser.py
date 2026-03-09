@@ -2,7 +2,7 @@
 
 import datetime as dt
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -129,6 +129,7 @@ class Post:
     tags: list[str] | None = None
     draft: bool = False
     metadata: dict[str, Any] | None = None
+    url_path: str | None = field(default=None, repr=False, compare=False)
 
     @property
     def slug(self) -> str:
@@ -137,7 +138,18 @@ class Post:
 
     @property
     def url(self) -> str:
-        """Generate the URL path for the post."""
+        """Generate the URL path for the post.
+
+        If the generator has resolved a custom URL via the ``post_path``
+        configuration option it will be stored in ``url_path`` and returned
+        directly.  Otherwise the URL is derived from the post date and slug
+        using the default ``/{year}/{month}/{day}/{slug}.html`` scheme.
+
+        Returns:
+            The URL path for the post, always beginning with ``/``.
+        """
+        if self.url_path is not None:
+            return self.url_path
         if self.date:
             # Extract date components
             year = self.date.year

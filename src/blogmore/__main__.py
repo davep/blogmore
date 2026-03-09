@@ -14,6 +14,7 @@ from blogmore.config import (
     normalize_site_keywords,
 )
 from blogmore.generator import SiteGenerator
+from blogmore.post_path import DEFAULT_POST_PATH, validate_post_path_template
 from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
 from blogmore.site_config import SiteConfig
@@ -59,6 +60,20 @@ def main() -> int:
     # Normalize site_keywords: CLI provides a string, config provides a list or string
     site_keywords = normalize_site_keywords(getattr(args, "site_keywords", None))
 
+    # Load post_path from config file only (not available as a CLI argument).
+    raw_post_path = config.get("post_path", DEFAULT_POST_PATH)
+    if not isinstance(raw_post_path, str):
+        print(
+            "Error: post_path in the configuration file must be a string",
+            file=sys.stderr,
+        )
+        return 1
+    try:
+        validate_post_path_template(raw_post_path)
+    except ValueError as e:
+        print(f"Error: Invalid post_path in configuration file: {e}", file=sys.stderr)
+        return 1
+
     # Build the shared site configuration object
     site_config = SiteConfig(
         content_dir=args.content_dir,
@@ -81,6 +96,7 @@ def main() -> int:
         minify_js=args.minify_js,
         with_read_time=args.with_read_time,
         include_drafts=args.include_drafts,
+        post_path=raw_post_path,
     )
 
     # Handle serve command

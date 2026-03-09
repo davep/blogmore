@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from blogmore.post_path import DEFAULT_POST_PATH
 from blogmore.utils import normalize_site_url
 
 
@@ -83,6 +84,14 @@ class SiteConfig:
 
     include_drafts: bool = False
     """Whether to include draft posts in generation."""
+
+    post_path: str = DEFAULT_POST_PATH
+    """Format string used to determine each post's output path and URL.
+
+    Variable placeholders available: ``{year}``, ``{month}``, ``{day}``,
+    ``{hour}``, ``{minute}``, ``{second}``, ``{category}``, ``{author}``,
+    ``{slug}``.  The ``{slug}`` placeholder is required.
+    """
 
     def __post_init__(self) -> None:
         """Normalise fields after initialisation."""
