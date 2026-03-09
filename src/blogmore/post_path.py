@@ -5,10 +5,10 @@
 import re
 from pathlib import Path
 from string import Formatter
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from blogmore.parser import Post
+##############################################################################
+# Application imports.
+from blogmore.parser import Post, remove_date_prefix, sanitize_for_url
 
 ##############################################################################
 # Default post path template (matches historical BlogMore behaviour).
@@ -74,7 +74,7 @@ def validate_post_path_template(template: str) -> None:
         )
 
 
-def resolve_post_path(post: "Post", template: str) -> str:
+def resolve_post_path(post: Post, template: str) -> str:
     """Resolve a post_path template for a given post.
 
     Substitutes all recognised variable placeholders in *template* with
@@ -96,9 +96,6 @@ def resolve_post_path(post: "Post", template: str) -> str:
         ValueError: If the template references an unknown variable or is
             otherwise malformed.
     """
-    # Import here to avoid circular imports at module load time.
-    from blogmore.parser import remove_date_prefix, sanitize_for_url
-
     slug = remove_date_prefix(post.slug)
 
     # Author – read from metadata, slugify for safe use in URLs/paths.
@@ -150,7 +147,7 @@ def resolve_post_path(post: "Post", template: str) -> str:
     return result.lstrip("/")
 
 
-def compute_output_path(output_dir: Path, post: "Post", template: str) -> Path:
+def compute_output_path(output_dir: Path, post: Post, template: str) -> Path:
     """Compute the safe, absolute output file path for a post.
 
     Resolves *template* using the post's metadata and joins the result onto
