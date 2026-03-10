@@ -962,6 +962,100 @@ class TestSiteGenerator:
         assert temp_output_dir.exists()
         assert (temp_output_dir / "index.html").exists()
 
+    def test_copy_extras_copies_flat_files(
+        self, tmp_path: Path, temp_output_dir: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Test that _copy_extras copies flat files from extras to output root."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        extras_dir = content_dir / "extras"
+        extras_dir.mkdir()
+        (extras_dir / "robots.txt").write_text("User-agent: *\nDisallow:")
+        (extras_dir / "humans.txt").write_text("Team: The Developers")
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator._copy_extras()
+
+        assert (temp_output_dir / "robots.txt").read_text() == "User-agent: *\nDisallow:"
+        assert (temp_output_dir / "humans.txt").read_text() == "Team: The Developers"
+        captured = capsys.readouterr()
+        assert "Copied 2 extra file(s)" in captured.out
+
+    def test_copy_extras_preserves_subdirectories(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that _copy_extras recursively copies subdirectories."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        extras_dir = content_dir / "extras"
+        extras_dir.mkdir()
+
+        (extras_dir / "robots.txt").write_text("User-agent: *\nDisallow:")
+        images_dir = extras_dir / "images"
+        images_dir.mkdir()
+        (images_dir / "splash.png").write_bytes(b"\x89PNG")
+        thumbnails_dir = images_dir / "thumbnails"
+        thumbnails_dir.mkdir()
+        (thumbnails_dir / "tn1.jpeg").write_bytes(b"\xff\xd8\xff")
+        (thumbnails_dir / "tn2.jpeg").write_bytes(b"\xff\xd8\xff")
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator._copy_extras()
+
+        assert (temp_output_dir / "robots.txt").exists()
+        assert (temp_output_dir / "images" / "splash.png").read_bytes() == b"\x89PNG"
+        assert (temp_output_dir / "images" / "thumbnails" / "tn1.jpeg").read_bytes() == b"\xff\xd8\xff"
+        assert (temp_output_dir / "images" / "thumbnails" / "tn2.jpeg").read_bytes() == b"\xff\xd8\xff"
+
+    def test_copy_extras_no_extras_dir(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that _copy_extras handles missing extras directory gracefully."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        # Should not raise
+        generator._copy_extras()
+
+    def test_copy_extras_overriding_existing_file(
+        self, tmp_path: Path, temp_output_dir: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Test that _copy_extras overwrites existing files and prints a message."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        extras_dir = content_dir / "extras"
+        extras_dir.mkdir()
+        (extras_dir / "robots.txt").write_text("New content")
+        (temp_output_dir / "robots.txt").write_text("Old content")
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator._copy_extras()
+
+        assert (temp_output_dir / "robots.txt").read_text() == "New content"
+        captured = capsys.readouterr()
+        assert "Overriding existing file" in captured.out
+
     def test_global_context_includes_version(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:

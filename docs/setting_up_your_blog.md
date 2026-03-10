@@ -85,9 +85,28 @@ Inside your content directory, you can create an `extras/` subdirectory for asse
 ```
 posts/
 ├── extras/
+│   ├── robots.txt
+│   ├── humans.txt
 │   ├── icon.png
-│   └── custom.css
+│   ├── custom.css
+│   └── images/
+│       ├── splash.png
+│       └── thumbnails/
+│           ├── tn1.jpeg
+│           └── tn2.jpeg
 └── hello-world.md
+```
+
+The contents are copied recursively to the root of the output directory, preserving the subdirectory structure. Using the example above, the output would contain:
+
+```
+robots.txt
+humans.txt
+icon.png
+custom.css
+images/splash.png
+images/thumbnails/tn1.jpeg
+images/thumbnails/tn2.jpeg
 ```
 
 Common uses for `extras/` include:
@@ -95,8 +114,6 @@ Common uses for `extras/` include:
 - **Site icon** — a square, high-resolution PNG or JPEG image (ideally 1024×1024 or larger) that BlogMore uses to generate favicons and platform-specific icons automatically. See [Metadata and Sidebar — Site icons](metadata_and_sidebar.md#site-icons) for full details.
 - **Custom stylesheets** — any CSS files you'd like included alongside the default styles.
 - **Other assets** — fonts, images, or anything else that posts or pages link to directly.
-
-Everything in `extras/` is copied to the root of the output directory, preserving any subdirectory structure.
 
 ## The `pages` directory
 
