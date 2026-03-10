@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- BREAKING CHANGE: The `/attachments/` directory no longer has special
+  treatment. If you should have a `/attachments/` directory in your output
+  then place `attachments/` under `extras/` in the content directory.
+  ([#248](https://github.com/davep/blogmore/pull/248))
+
 ## v1.9.1
 
 **Released: 2026-03-10**
