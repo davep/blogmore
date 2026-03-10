@@ -1,12 +1,5 @@
 # BlogMore ChangeLog
 
-## Unreleased
-
-- The `extras` directory now supports subdirectories. Files and directories
-  within `extras/` are copied recursively to the root of the output
-  directory, preserving the subdirectory structure.
-  ([#244](https://github.com/davep/blogmore/pull/244))
-
 ## v1.9.1
 
 **Released: 2026-03-10**
