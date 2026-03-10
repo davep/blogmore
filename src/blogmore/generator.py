@@ -414,9 +414,6 @@ class SiteGenerator:
         if fontawesome_css_content is not None:
             self._write_fontawesome_css(fontawesome_css_content)
 
-        # Copy post attachments from content directory
-        self._copy_attachments()
-
         # Copy extra files from extras directory
         self._copy_extras()
 
@@ -1339,49 +1336,6 @@ class SiteGenerator:
                 self._write_minified_js(
                     output_static, SEARCH_JS_FILENAME, SEARCH_JS_MINIFIED_FILENAME
                 )
-
-    def _copy_attachments(self) -> None:
-        """Copy post attachments (images, files, etc.) from the attachments directory to output directory."""
-        attachments_dir = self._content_dir / "attachments"
-
-        if not attachments_dir.exists():
-            print(f"No attachments directory found in {self._content_dir}")
-            return
-
-        # Count how many attachments we copy
-        attachment_count = 0
-        failed_count = 0
-
-        # Recursively copy all files from the attachments directory
-        for file_path in attachments_dir.rglob("*"):
-            # Skip directories
-            if file_path.is_file():
-                try:
-                    # Calculate relative path from attachments directory to preserve structure
-                    relative_path = file_path.relative_to(attachments_dir)
-                    # Copy to output_dir/attachments/... to preserve the attachments directory structure
-                    output_path = (
-                        self.site_config.output_dir / "attachments" / relative_path
-                    )
-
-                    # Create parent directories if they don't exist
-                    output_path.parent.mkdir(parents=True, exist_ok=True)
-
-                    # Copy file preserving metadata
-                    shutil.copy2(file_path, output_path)
-                    attachment_count += 1
-                except (OSError, PermissionError) as e:
-                    print(f"Warning: Failed to copy attachment {file_path}: {e}")
-                    failed_count += 1
-                    continue
-
-        if attachment_count > 0:
-            print(f"Copied {attachment_count} attachment(s) from {attachments_dir}")
-        else:
-            print(f"No attachments found in {attachments_dir}")
-
-        if failed_count > 0:
-            print(f"Warning: Failed to copy {failed_count} attachment(s)")
 
     def _copy_extras(self) -> None:
         """Copy extra files from the extras directory to the output directory.
