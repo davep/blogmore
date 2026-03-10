@@ -96,6 +96,10 @@ class SiteConfig:
     def __post_init__(self) -> None:
         """Normalise fields after initialisation."""
         self.site_url = normalize_site_url(self.site_url)
+        # Resolve output_dir to an absolute path so that Path.relative_to()
+        # calls in the generator always work, even when the user supplies a
+        # relative path such as "site" or "./output".
+        self.output_dir = self.output_dir.resolve()
 
 
 def site_config_defaults() -> dict[str, Any]:
