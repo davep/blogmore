@@ -146,6 +146,29 @@ class TestSiteGenerator:
         assert (temp_output_dir / "static").exists()
         assert (temp_output_dir / "static" / "style.css").exists()
 
+    def test_generate_with_relative_output_dir(
+        self, posts_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Test that generation works correctly when output_dir is a relative path.
+
+        Regression test for the bug where using a relative output directory
+        caused a ValueError from Path.relative_to() because compute_output_path
+        returns an absolute path while output_dir remained relative.
+        """
+        monkeypatch.chdir(tmp_path)
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=Path("site"),
+            )
+        )
+        # This must not raise a ValueError about relative_to()
+        generator.generate()
+
+        absolute_output = tmp_path / "site"
+        assert absolute_output.exists()
+        assert (absolute_output / "index.html").exists()
+
     def test_generate_with_drafts(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """Test generating site including drafts."""
         generator = SiteGenerator(
