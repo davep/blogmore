@@ -84,10 +84,12 @@ docs:                           # Generate the system documentation
 
 .PHONY: rtfm
 rtfm:                           # Locally read the library documentation
+	rm -rf .cache
 	$(mkdocs) serve
 
 .PHONY: publishdocs
 publishdocs: docs			# Set up the docs for publishing
+	rm -rf .cache
 	$(publish-docs) site/
 
 ##############################################################################
