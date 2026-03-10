@@ -2,9 +2,11 @@
 
 ## v1.9.1
 
+**Released: 2026-03-10**
+
 - Fixed an error when using a relative path for the `output` configuration
   option. Using a relative path such as `site` now works correctly.
-  ([#238](https://github.com/davep/blogmore/pull/238))
+  ([#242](https://github.com/davep/blogmore/pull/242))
 
 ## v1.9.0
 
