@@ -1020,9 +1020,25 @@
 <p>Inside your content directory, you can create an <code>extras/</code> subdirectory for assets that should be copied straight into the output without any processing:</p>
 <div class="highlight"><pre><span></span><code>posts/
 ├── extras/
+│   ├── robots.txt
+│   ├── humans.txt
 │   ├── icon.png
-│   └── custom.css
+│   ├── custom.css
+│   └── images/
+│       ├── splash.png
+│       └── thumbnails/
+│           ├── tn1.jpeg
+│           └── tn2.jpeg
 └── hello-world.md
+</code></pre></div>
+<p>The contents are copied recursively to the root of the output directory, preserving the subdirectory structure. Using the example above, the output would contain:</p>
+<div class="highlight"><pre><span></span><code>robots.txt
+humans.txt
+icon.png
+custom.css
+images/splash.png
+images/thumbnails/tn1.jpeg
+images/thumbnails/tn2.jpeg
 </code></pre></div>
 <p>Common uses for <code>extras/</code> include:</p>
 <ul>
@@ -1030,7 +1046,6 @@
 <li><strong>Custom stylesheets</strong> — any CSS files you'd like included alongside the default styles.</li>
 <li><strong>Other assets</strong> — fonts, images, or anything else that posts or pages link to directly.</li>
 </ul>
-<p>Everything in <code>extras/</code> is copied to the root of the output directory, preserving any subdirectory structure.</p>
 <h2 id="the-pages-directory">The <code>pages</code> directory</h2>
 <p>Inside your content directory you can also create a <code>pages/</code> subdirectory. Files here are treated as <em>static pages</em> rather than blog posts — they appear in the site navigation and are not included in the post listing, the archive, or the feeds:</p>
 <div class="highlight"><pre><span></span><code>posts/
