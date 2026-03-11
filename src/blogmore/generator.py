@@ -17,6 +17,7 @@ from blogmore.feeds import BlogFeedGenerator
 from blogmore.fontawesome import (
     FONTAWESOME_CDN_BRANDS_WOFF2_URL,
     FONTAWESOME_CDN_CSS_URL,
+    FONTAWESOME_LOCAL_CSS_MINIFIED_PATH,
     FONTAWESOME_LOCAL_CSS_PATH,
     FontAwesomeOptimizer,
 )
@@ -459,23 +460,35 @@ class SiteGenerator:
             return None
 
         print("Optimizing FontAwesome CSS...")
-        self._fontawesome_css_url = FONTAWESOME_LOCAL_CSS_PATH
+        self._fontawesome_css_url = (
+            FONTAWESOME_LOCAL_CSS_MINIFIED_PATH
+            if self.site_config.minify_css
+            else FONTAWESOME_LOCAL_CSS_PATH
+        )
         return optimizer.build_css(metadata)
 
     def _write_fontawesome_css(self, css_content: str) -> None:
         """Write the optimised FontAwesome CSS file to the static directory.
 
         Must be called *after* :meth:`_copy_static_assets` so the file is not
-        overwritten.
+        overwritten.  When ``minify_css`` is enabled the content is minified
+        and written as ``fontawesome.min.css``; otherwise it is written as
+        ``fontawesome.css``.
 
         Args:
             css_content: CSS text to write.
         """
         static_dir = self.site_config.output_dir / "static"
         static_dir.mkdir(parents=True, exist_ok=True)
-        css_path = static_dir / "fontawesome.css"
-        css_path.write_text(css_content, encoding="utf-8")
-        print("Generated optimized FontAwesome CSS")
+        if self.site_config.minify_css:
+            minified = rcssmin.cssmin(css_content)
+            css_path = static_dir / "fontawesome.min.css"
+            css_path.write_text(minified, encoding="utf-8")
+            print("Generated minified FontAwesome CSS as fontawesome.min.css")
+        else:
+            css_path = static_dir / "fontawesome.css"
+            css_path.write_text(css_content, encoding="utf-8")
+            print("Generated optimized FontAwesome CSS")
 
     def _write_minified_css(self, output_static: Path) -> None:
         """Read the source CSS, minify it, and write it as ``styles.min.css``.

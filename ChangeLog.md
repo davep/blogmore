@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- When `minify_css` is enabled, the generated `fontawesome.css` is now
+  minified and written as `fontawesome.min.css` instead.
+  ([#252](https://github.com/davep/blogmore/pull/252))
+
 ## v1.10.0
 
 **Released: 2026-03-11**
