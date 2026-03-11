@@ -1,8 +1,11 @@
 """Unit tests for the generator module."""
 
+import re
+import time
 from pathlib import Path
 
 import pytest
+
 from blogmore.generator import SiteGenerator, paginate_posts, sanitize_for_url
 from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN, Post
 from blogmore.site_config import SiteConfig
@@ -3172,8 +3175,7 @@ class TestPostPathConfiguration:
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
         """After _resolve_post_output_paths the post url_path is set."""
-        from blogmore.parser import PostParser, post_sort_key
-        from blogmore.post_path import DEFAULT_POST_PATH
+        from blogmore.parser import post_sort_key
 
         generator = SiteGenerator(
             site_config=SiteConfig(
@@ -3269,3 +3271,158 @@ class TestPostPathConfiguration:
 
         captured = capsys.readouterr()
         assert "WARNING" not in captured.out
+
+
+class TestCacheBusting:
+    """Test that stylesheets are served with generation-specific cache-busting tokens."""
+
+    def test_main_stylesheet_has_cache_bust_token(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the main stylesheet URL contains a cache-busting token."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+
+        generator.generate()
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert "/static/style.css?v=" in content
+
+    def test_minified_stylesheet_has_cache_bust_token(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the minified stylesheet URL contains a cache-busting token."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                minify_css=True,
+            )
+        )
+
+        generator.generate()
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert "/static/styles.min.css?v=" in content
+
+    def test_cache_bust_token_is_numeric(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the cache-busting token is a numeric unix timestamp."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+
+        generator.generate()
+
+        content = (temp_output_dir / "index.html").read_text()
+        match = re.search(r"/static/style\.css\?v=(\d+)", content)
+        assert match is not None
+        token = match.group(1)
+        assert token.isdigit()
+
+    def test_cache_bust_token_consistent_across_pages(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the same cache-busting token appears on every page."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+
+        generator.generate()
+
+        # Collect token from index page
+        index_content = (temp_output_dir / "index.html").read_text()
+        match = re.search(r"/static/style\.css\?v=(\d+)", index_content)
+        assert match is not None
+        token = match.group(1)
+
+        # Every generated HTML file should use the same token
+        for html_file in temp_output_dir.rglob("*.html"):
+            page_content = html_file.read_text()
+            if "/static/style.css" in page_content:
+                assert f"/static/style.css?v={token}" in page_content, (
+                    f"File {html_file} uses a different cache-busting token"
+                )
+
+    def test_new_generation_produces_different_token(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that successive generate() calls produce different cache-bust tokens."""
+        first_output = tmp_path / "first"
+        second_output = tmp_path / "second"
+
+        first_generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=first_output,
+            )
+        )
+        first_generator.generate()
+
+        # Small delay to ensure timestamps differ
+        time.sleep(1.1)
+
+        second_generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=second_output,
+            )
+        )
+        second_generator.generate()
+
+        first_content = (first_output / "index.html").read_text()
+        second_content = (second_output / "index.html").read_text()
+
+        first_match = re.search(r"/static/style\.css\?v=(\d+)", first_content)
+        second_match = re.search(r"/static/style\.css\?v=(\d+)", second_content)
+
+        assert first_match is not None
+        assert second_match is not None
+        assert first_match.group(1) != second_match.group(1)
+
+    def test_local_extra_stylesheet_has_cache_bust_token(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that local extra stylesheets are served with a cache-busting token."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                extra_stylesheets=["/custom.css"],
+            )
+        )
+
+        generator.generate()
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert "/custom.css?v=" in content
+
+    def test_external_extra_stylesheet_not_cache_busted(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that external extra stylesheets are not modified with cache-busting."""
+        external_url = "https://example.com/custom.css"
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                extra_stylesheets=[external_url],
+            )
+        )
+
+        generator.generate()
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert external_url in content
+        assert f"{external_url}?v=" not in content

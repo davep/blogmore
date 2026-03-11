@@ -4,6 +4,11 @@
 
 **Released: WiP**
 
+- All locally-generated stylesheets (the main stylesheet and the FontAwesome
+  CSS when generated locally) now include a generation-specific
+  cache-busting query parameter (e.g. `?v=1741698000`) so that browsers
+  re-download updated stylesheets after a fresh site generation/deploy.
+  ([#253](https://github.com/davep/blogmore/pull/253))
 - When `minify_css` is enabled, the generated `fontawesome.css` is now
   minified and written as `fontawesome.min.css` instead.
   ([#252](https://github.com/davep/blogmore/pull/252))

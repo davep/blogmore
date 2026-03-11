@@ -97,6 +97,11 @@ class SiteGenerator:
         # Default to CDN URL; updated during generate() once socials are known
         self._fontawesome_css_url: str = FONTAWESOME_CDN_CSS_URL
 
+        # Cache-busting token; set at the start of each generate() call so all
+        # pages in one generation share the same token but successive generations
+        # get a fresh one, forcing browsers to re-fetch updated stylesheets.
+        self._cache_bust_token: str = ""
+
         self.parser = PostParser(site_url=site_config.site_url)
         self.renderer = TemplateRenderer(
             site_config.templates_dir,
@@ -194,9 +199,33 @@ class SiteGenerator:
             else:
                 print("Warning: No icons were generated")
 
+    def _with_cache_bust(self, url: str) -> str:
+        """Return a URL with a cache-busting query parameter appended.
+
+        External URLs (i.e. those that start with ``http://`` or ``https://``)
+        are returned unchanged.  Local URLs (starting with ``/``) have
+        ``?v=<token>`` appended so that browsers re-fetch them when the site is
+        regenerated.  If no cache-busting token has been set (e.g. before
+        :meth:`generate` is called) the URL is returned as-is.
+
+        Args:
+            url: The URL to process.
+
+        Returns:
+            The URL with a cache-busting query parameter appended, or the
+            original URL if it is external or the token has not been set.
+        """
+        if (
+            not self._cache_bust_token
+            or not url
+            or url.startswith(("http://", "https://"))
+        ):
+            return url
+        return f"{url}?v={self._cache_bust_token}"
+
     def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
-        styles_css_url = (
+        styles_css_url = self._with_cache_bust(
             f"/static/{CSS_MINIFIED_FILENAME}"
             if self.site_config.minify_css
             else f"/static/{CSS_FILENAME}"
@@ -225,7 +254,7 @@ class SiteGenerator:
             "with_search": self.site_config.with_search,
             "with_read_time": self.site_config.with_read_time,
             "default_author": self.site_config.default_author,
-            "fontawesome_css_url": self._fontawesome_css_url,
+            "fontawesome_css_url": self._with_cache_bust(self._fontawesome_css_url),
             "fontawesome_woff2_url": FONTAWESOME_CDN_BRANDS_WOFF2_URL,
             "styles_css_url": styles_css_url,
             "theme_js_url": theme_js_url,
@@ -286,6 +315,20 @@ class SiteGenerator:
     def generate(self) -> None:
         """Generate the complete static site."""
         content_dir = self._content_dir
+
+        # Mint a fresh cache-busting token for this generation.  All pages
+        # rendered during this run will share the same token so that once a
+        # visitor downloads a stylesheet it stays cached for the lifetime of
+        # this deployment.  A new generation produces a new token, which forces
+        # browsers to re-fetch any updated stylesheets.
+        self._cache_bust_token = str(int(time.time()))
+
+        # Apply cache-busting to any local extra stylesheets so they are also
+        # re-fetched after a new site generation.
+        if self.site_config.extra_stylesheets:
+            self.renderer.extra_stylesheets = [
+                self._with_cache_bust(url) for url in self.site_config.extra_stylesheets
+            ]
 
         # Clean output directory if requested
         if self.site_config.clean_first and self.site_config.output_dir.exists():
