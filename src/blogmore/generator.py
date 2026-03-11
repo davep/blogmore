@@ -215,7 +215,11 @@ class SiteGenerator:
             The URL with a cache-busting query parameter appended, or the
             original URL if it is external or the token has not been set.
         """
-        if not self._cache_bust_token or not url or url.startswith(("http://", "https://")):
+        if (
+            not self._cache_bust_token
+            or not url
+            or url.startswith(("http://", "https://"))
+        ):
             return url
         return f"{url}?v={self._cache_bust_token}"
 
@@ -323,8 +327,7 @@ class SiteGenerator:
         # re-fetched after a new site generation.
         if self.site_config.extra_stylesheets:
             self.renderer.extra_stylesheets = [
-                self._with_cache_bust(url)
-                for url in self.site_config.extra_stylesheets
+                self._with_cache_bust(url) for url in self.site_config.extra_stylesheets
             ]
 
         # Clean output directory if requested
