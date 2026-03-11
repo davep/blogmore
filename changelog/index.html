@@ -673,6 +673,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v1110" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.11.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v1100" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1021,6 +1032,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v1110" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.11.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v1100" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1325,6 +1347,18 @@
 
 
 <h1 id="blogmore-changelog">BlogMore ChangeLog</h1>
+<h2 id="v1110">v1.11.0</h2>
+<p><strong>Released: 2026-03-11</strong></p>
+<ul>
+<li>All locally-generated stylesheets (the main stylesheet and the FontAwesome
+  CSS when generated locally) now include a generation-specific
+  cache-busting query parameter (e.g. <code>?v=1741698000</code>) so that browsers
+  re-download updated stylesheets after a fresh site generation/deploy.
+  (<a href="https://github.com/davep/blogmore/pull/253">#253</a>)</li>
+<li>When <code>minify_css</code> is enabled, the generated <code>fontawesome.css</code> is now
+  minified and written as <code>fontawesome.min.css</code> instead.
+  (<a href="https://github.com/davep/blogmore/pull/252">#252</a>)</li>
+</ul>
 <h2 id="v1100">v1.10.0</h2>
 <p><strong>Released: 2026-03-11</strong></p>
 <ul>
