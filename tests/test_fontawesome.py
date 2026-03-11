@@ -10,6 +10,7 @@ from blogmore.fontawesome import (
     FONTAWESOME_CDN_BRANDS_WOFF2_URL,
     FONTAWESOME_CDN_CSS_URL,
     FONTAWESOME_CDN_WEBFONTS_BASE,
+    FONTAWESOME_LOCAL_CSS_MINIFIED_PATH,
     FONTAWESOME_LOCAL_CSS_PATH,
     FONTAWESOME_METADATA_URL,
     FontAwesomeOptimizer,
@@ -46,6 +47,14 @@ class TestFontAwesomeConstants:
     def test_local_css_path_under_static(self) -> None:
         """Test that the local CSS path is under /static/."""
         assert FONTAWESOME_LOCAL_CSS_PATH.startswith("/static/")
+
+    def test_local_css_minified_path_under_static(self) -> None:
+        """Test that the local minified CSS path is under /static/."""
+        assert FONTAWESOME_LOCAL_CSS_MINIFIED_PATH.startswith("/static/")
+
+    def test_local_css_minified_path_ends_with_min_css(self) -> None:
+        """Test that the local minified CSS path ends with .min.css."""
+        assert FONTAWESOME_LOCAL_CSS_MINIFIED_PATH.endswith(".min.css")
 
     def test_cdn_brands_woff2_url_derived_from_webfonts_base(self) -> None:
         """Test that the brands WOFF2 URL is derived from the webfonts base URL."""
@@ -430,3 +439,132 @@ class TestFontAwesomeOptimizerInGenerator:
 
         index_html = (temp_output_dir / "index.html").read_text()
         assert "<h2>Social</h2>" in index_html
+
+    def test_socials_with_minify_css_writes_min_css(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that fontawesome.min.css is generated when minify_css is enabled."""
+        from blogmore.generator import SiteGenerator
+
+        sidebar_config = {
+            "socials": [{"site": "github", "url": "https://github.com/example"}],
+        }
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                sidebar_config=sidebar_config,
+                minify_css=True,
+            )
+        )
+
+        with patch.object(
+            FontAwesomeOptimizer,
+            "fetch_icon_metadata",
+            return_value=STUB_METADATA,
+        ):
+            generator.generate()
+
+        assert (temp_output_dir / "static" / "fontawesome.min.css").exists()
+        assert not (temp_output_dir / "static" / "fontawesome.css").exists()
+
+    def test_socials_with_minify_css_html_references_min_css(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the HTML references fontawesome.min.css when minify_css is enabled."""
+        from blogmore.generator import SiteGenerator
+
+        sidebar_config = {
+            "socials": [{"site": "github", "url": "https://github.com/example"}],
+        }
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                sidebar_config=sidebar_config,
+                minify_css=True,
+            )
+        )
+
+        with patch.object(
+            FontAwesomeOptimizer,
+            "fetch_icon_metadata",
+            return_value=STUB_METADATA,
+        ):
+            generator.generate()
+
+        index_html = (temp_output_dir / "index.html").read_text()
+        assert FONTAWESOME_LOCAL_CSS_MINIFIED_PATH in index_html
+        assert FONTAWESOME_LOCAL_CSS_PATH not in index_html
+
+    def test_socials_without_minify_css_writes_plain_css(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that fontawesome.css is generated when minify_css is disabled."""
+        from blogmore.generator import SiteGenerator
+
+        sidebar_config = {
+            "socials": [{"site": "github", "url": "https://github.com/example"}],
+        }
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                sidebar_config=sidebar_config,
+                minify_css=False,
+            )
+        )
+
+        with patch.object(
+            FontAwesomeOptimizer,
+            "fetch_icon_metadata",
+            return_value=STUB_METADATA,
+        ):
+            generator.generate()
+
+        assert (temp_output_dir / "static" / "fontawesome.css").exists()
+        assert not (temp_output_dir / "static" / "fontawesome.min.css").exists()
+
+    def test_socials_with_minify_css_min_file_is_smaller(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that the minified fontawesome CSS is smaller than the unminified version."""
+        from blogmore.generator import SiteGenerator
+
+        sidebar_config = {
+            "socials": [{"site": "github", "url": "https://github.com/example"}],
+        }
+
+        plain_output = tmp_path / "plain"
+        minified_output = tmp_path / "minified"
+
+        plain_generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=plain_output,
+                sidebar_config=sidebar_config,
+                minify_css=False,
+            )
+        )
+        minified_generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=minified_output,
+                sidebar_config=sidebar_config,
+                minify_css=True,
+            )
+        )
+
+        with patch.object(
+            FontAwesomeOptimizer,
+            "fetch_icon_metadata",
+            return_value=STUB_METADATA,
+        ):
+            plain_generator.generate()
+            minified_generator.generate()
+
+        plain_size = (plain_output / "static" / "fontawesome.css").stat().st_size
+        minified_size = (
+            minified_output / "static" / "fontawesome.min.css"
+        ).stat().st_size
+        assert minified_size < plain_size

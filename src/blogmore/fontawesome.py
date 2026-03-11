@@ -46,6 +46,9 @@ FONTAWESOME_CDN_BRANDS_WOFF2_URL = (
 # Local path (relative to site root) where the optimized CSS is written
 FONTAWESOME_LOCAL_CSS_PATH = "/static/fontawesome.css"
 
+# Local path (relative to site root) where the minified optimized CSS is written
+FONTAWESOME_LOCAL_CSS_MINIFIED_PATH = "/static/fontawesome.min.css"
+
 
 class FontAwesomeOptimizer:
     """Generate optimized FontAwesome CSS containing only needed brand icons.
