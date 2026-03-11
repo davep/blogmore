@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v1.11.0
 
-**Released: WiP**
+**Released: 2026-03-11**
 
 - All locally-generated stylesheets (the main stylesheet and the FontAwesome
   CSS when generated locally) now include a generation-specific
