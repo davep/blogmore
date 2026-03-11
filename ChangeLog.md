@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v1.10.0
 
-**Released: WiP**
+**Released: 2026-03-11**
 
 - BREAKING CHANGE: The `/attachments/` directory no longer has special
   treatment. If you should have a `/attachments/` directory in your output
