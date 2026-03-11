@@ -74,6 +74,15 @@ def main() -> int:
         print(f"Error: Invalid post_path in configuration file: {e}", file=sys.stderr)
         return 1
 
+    # Load with_advert from config file only (not available as a CLI argument).
+    raw_with_advert = config.get("with_advert", True)
+    if not isinstance(raw_with_advert, bool):
+        print(
+            "Error: with_advert in the configuration file must be a boolean",
+            file=sys.stderr,
+        )
+        return 1
+
     # Build the shared site configuration object
     site_config = SiteConfig(
         content_dir=args.content_dir,
@@ -97,6 +106,7 @@ def main() -> int:
         with_read_time=args.with_read_time,
         include_drafts=args.include_drafts,
         post_path=raw_post_path,
+        with_advert=raw_with_advert,
     )
 
     # Handle serve command

@@ -277,6 +277,7 @@ class ConfigChangeHandler(FileSystemEventHandler):
             "with_search",
             "with_sitemap",
             "with_read_time",
+            "with_advert",
         ):
             if key in config:
                 update_kwargs[key] = config[key]

@@ -400,6 +400,17 @@ Posts organised by author, then year and slug:
 post_path: "{author}/{year}/{slug}.html"
 ```
 
+#### `with_advert`
+
+When `true` (the default), a small "Generated with BlogMore vX.Y.Z" line is included in the footer of every page, linking to the BlogMore website. Set this to `false` to suppress the footer line entirely.  This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** Boolean  
+**Default:** `true`
+
+```yaml
+with_advert: false
+```
+
 ### Styling Options
 
 #### `minify_css`
@@ -606,6 +617,7 @@ default_author: "Dave Pearson"
 icon_source: "icon.png"
 with_search: true
 post_path: "{year}/{month}/{day}/{slug}.html"
+with_advert: true
 
 # Styling
 minify_css: true

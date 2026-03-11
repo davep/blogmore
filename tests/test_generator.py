@@ -1078,6 +1078,38 @@ class TestSiteGenerator:
         assert "blogmore_version" in context
         assert context["blogmore_version"] == __version__
 
+    def test_global_context_includes_with_advert_true_by_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the global context includes with_advert as True by default."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+
+        context = generator._get_global_context()
+
+        assert "with_advert" in context
+        assert context["with_advert"] is True
+
+    def test_global_context_with_advert_false(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the global context reflects with_advert=False when configured."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_advert=False,
+            )
+        )
+
+        context = generator._get_global_context()
+
+        assert context["with_advert"] is False
+
     def test_site_description_in_global_context(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:

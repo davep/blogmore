@@ -144,7 +144,9 @@
             </main>
 
             <footer>
-                <p>Generated with <a href="https://github.com/davep/blogmore" target="_blank" rel="noopener noreferrer">Blogmore</a></p>
+                {% if with_advert %}
+                <p>Generated with <a href="https://blogmore.davep.dev/" target="_blank" rel="noopener noreferrer">BlogMore</a> v{{ blogmore_version }}</p>
+                {% endif %}
             </footer>
         </div>
     </div>

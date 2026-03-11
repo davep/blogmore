@@ -1,5 +1,17 @@
 # BlogMore ChangeLog
 
+## v1.12.0
+
+**Released: 2026-03-11**
+
+- The "Generated with" footer has been improved: the name is now correctly
+  cased as "BlogMore", the version number is shown (e.g. "Generated with
+  BlogMore v1.12.0"), the link now points to
+  [https://blogmore.davep.dev/](https://blogmore.davep.dev/), and the
+  footer can be suppressed entirely by setting `with_advert: false` in the
+  configuration file.
+  ([#258](https://github.com/davep/blogmore/pull/258))
+
 ## v1.11.0
 
 **Released: 2026-03-11**
