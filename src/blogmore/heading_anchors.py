@@ -3,6 +3,7 @@
 from typing import Any
 from xml.etree.ElementTree import Element, SubElement
 
+import markdown as _markdown
 from markdown.extensions import Extension
 from markdown.treeprocessors import Treeprocessor
 
@@ -75,7 +76,7 @@ class HeadingAnchorsExtension(Extension):
     ``id`` has been determined.
     """
 
-    def extendMarkdown(self, md: Any) -> None:
+    def extendMarkdown(self, md: _markdown.Markdown) -> None:
         """Register the heading anchors tree processor.
 
         Args:
