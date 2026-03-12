@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- The "Generated with" footer is now optional and can be turned off via
+  `with_advert: false` in the configuration file.
+  ([#258](https://github.com/davep/blogmore/pull/258))
+
 ## v1.11.0
 
 **Released: 2026-03-11**

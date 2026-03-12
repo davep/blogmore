@@ -441,3 +441,45 @@ int main() {
 
         # Check tags with special chars
         assert (temp_output_dir / "tag" / "c.html").exists()
+
+    def test_footer_advert_shown_by_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the BlogMore footer advert is shown by default."""
+        from blogmore import __version__
+        from blogmore.generator import SiteGenerator
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert f"Generated with" in index_content
+        assert "BlogMore" in index_content
+        assert f"v{__version__}" in index_content
+        assert "https://blogmore.davep.dev/" in index_content
+
+    def test_footer_advert_hidden_when_with_advert_false(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the BlogMore footer advert is hidden when with_advert=False."""
+        from blogmore.generator import SiteGenerator
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_advert=False,
+            )
+        )
+
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "Generated with" not in index_content
+        assert "blogmore.davep.dev" not in index_content

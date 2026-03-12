@@ -93,6 +93,9 @@ class SiteConfig:
     ``{slug}``.  The ``{slug}`` placeholder is required.
     """
 
+    with_advert: bool = True
+    """Whether to show the "Generated with BlogMore" footer line."""
+
     def __post_init__(self) -> None:
         """Normalise fields after initialisation."""
         self.site_url = normalize_site_url(self.site_url)

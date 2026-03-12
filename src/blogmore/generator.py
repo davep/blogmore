@@ -253,6 +253,7 @@ class SiteGenerator:
             "blogmore_version": __version__,
             "with_search": self.site_config.with_search,
             "with_read_time": self.site_config.with_read_time,
+            "with_advert": self.site_config.with_advert,
             "default_author": self.site_config.default_author,
             "fontawesome_css_url": self._with_cache_bust(self._fontawesome_css_url),
             "fontawesome_woff2_url": FONTAWESOME_CDN_BRANDS_WOFF2_URL,
