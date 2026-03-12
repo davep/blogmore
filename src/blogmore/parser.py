@@ -12,6 +12,7 @@ import yaml
 
 from blogmore.admonitions import AdmonitionsExtension
 from blogmore.external_links import ExternalLinksExtension
+from blogmore.heading_anchors import HeadingAnchorsExtension
 from blogmore.utils import calculate_reading_time
 
 _DATE_FORMATS = [
@@ -305,10 +306,12 @@ class PostParser:
         # Create custom extension instances
         external_links_ext = ExternalLinksExtension(site_url=site_url or "")
         admonitions_ext = AdmonitionsExtension()
+        heading_anchors_ext = HeadingAnchorsExtension()
 
         self.markdown = markdown.Markdown(
             extensions=[
                 "meta",
+                "attr_list",
                 "fenced_code",
                 "codehilite",
                 "tables",
@@ -316,6 +319,7 @@ class PostParser:
                 "footnotes",
                 admonitions_ext,
                 external_links_ext,
+                heading_anchors_ext,
             ],
             extension_configs={
                 "codehilite": {

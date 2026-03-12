@@ -413,6 +413,36 @@ Blogmore supports all standard Markdown features plus:
 - **Table of contents** generation
 - **Footnotes** - Use `[^1]` in text and `[^1]: Footnote text` at the bottom
 - **GitHub-style admonitions** - Alert boxes for notes, tips, warnings, etc.
+- **Custom heading IDs** - Set a specific `id` on any heading with `{#my-id}`
+
+### Custom Heading IDs
+
+Every heading in a post automatically receives a generated `id` attribute
+derived from its text, which makes it possible to link directly to any section
+of a post (e.g. `https://example.com/2024/01/01/my-post.html#introduction`).
+
+You can also set a custom `id` for any heading by appending `{#your-id}` to the
+heading line:
+
+```markdown
+### My Great Heading {#custom-id}
+```
+
+This produces:
+
+```html
+<h3 id="custom-id">My Great Heading</h3>
+```
+
+The custom `id` takes precedence over the auto-generated one.  Headings without
+a `{#…}` suffix keep their auto-generated IDs as usual.
+
+#### Heading anchor links
+
+To make it easy for readers to share a link to any section, a small **¶**
+symbol appears at the end of every heading when the user's mouse hovers over
+it.  Clicking the symbol navigates the browser to that heading's URL fragment.
+The symbol is invisible at all other times and does not affect the page layout.
 
 ### Admonitions (Alerts)
 
