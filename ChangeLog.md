@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v1.12.0
 
-**Released: WiP**
+**Released: 2026-03-12**
 
 - The "Generated with" footer is now optional and can be turned off via
   `with_advert: false` in the configuration file.
