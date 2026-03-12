@@ -4,18 +4,16 @@
 
 **Released: WiP**
 
-- Added support for custom heading IDs using the `{#custom-id}` syntax (e.g.
-  `### My Heading {#custom-id}`).  Headings without a custom ID continue to
-  receive auto-generated IDs as before.
-  ([#260](https://github.com/davep/blogmore/pull/260))
-- Heading elements (`h2`–`h6`) now display a **¶** hover-anchor link when the
-  reader moves the mouse over them, making it easy to copy a permalink to any
-  section.  The link fades in and out smoothly and does not affect the page
-  layout in any way.
-  ([#260](https://github.com/davep/blogmore/pull/260))
 - The "Generated with" footer is now optional and can be turned off via
   `with_advert: false` in the configuration file.
   ([#258](https://github.com/davep/blogmore/pull/258))
+- Added support for custom heading IDs using the `{#custom-id}` syntax (e.g.
+  `### My Heading {#custom-id}`). Headings without a custom ID continue to
+  receive auto-generated IDs as before.
+  ([#260](https://github.com/davep/blogmore/pull/260))
+- Heading elements (`h2`–`h6`) now display a **¶** hover-anchor link when
+  the reader moves the mouse over them, making it easy to copy a permalink
+  to any section. ([#260](https://github.com/davep/blogmore/pull/260))
 
 ## v1.11.0
 
