@@ -256,3 +256,53 @@ BlogMore supports GitHub-style alert boxes, written as blockquotes with a specia
 ```
 
 Each type is rendered with a distinct colour scheme and icon so that readers can recognise them at a glance.
+
+### Heading IDs and anchor links
+
+Every heading in a post automatically receives an `id` attribute derived from
+its text. For example:
+
+```markdown
+## Getting Started
+```
+
+becomes:
+
+```html
+<h2 id="getting-started">Getting Started</h2>
+```
+
+This means you can link directly to any section of a post by appending its
+fragment to the URL — for example
+`https://example.com/2024/01/15/my-post.html#getting-started`.
+
+#### Custom heading IDs
+
+If you need a specific `id` — for example because the auto-generated one is too
+long, or because you want a stable `id` that won't change if you reword the
+heading — you can set it explicitly by appending `{#your-id}` to the end of the
+heading line:
+
+```markdown
+### My Great Heading {#custom-id}
+```
+
+This produces:
+
+```html
+<h3 id="custom-id">My Great Heading</h3>
+```
+
+The custom `id` overrides the auto-generated one. Headings without a `{#…}`
+suffix keep their auto-generated IDs as usual.
+
+#### Hover anchor links
+
+To make it easy for readers to share a link to a specific section, BlogMore
+renders a small **¶** symbol at the end of every heading. The symbol is
+invisible by default and appears when the reader moves the mouse over the
+heading. Clicking the symbol navigates the browser to that heading's URL
+fragment, where the address can be copied from the browser's location bar.
+
+The anchor appears and disappears with a smooth fade and does not affect the
+layout of the page in any way.
