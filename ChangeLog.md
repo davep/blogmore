@@ -4,6 +4,10 @@
 
 **Released: WiP**
 
+- Revamped the README to be shorter and more informative: it now covers what
+  BlogMore is, its key features, installation (with `uv` as the recommended
+  method), a link to the full documentation, where to get help, and the
+  licence. ([#274](https://github.com/davep/blogmore/pull/274))
 - Added optional HTML minification via the `--minify-html` command-line
   switch or the `minify_html: true` configuration option.
   ([#272](https://github.com/davep/blogmore/pull/272))
