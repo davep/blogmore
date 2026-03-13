@@ -69,9 +69,18 @@ The fastest and most modern way to install BlogMore is with
 uv tool install blogmore
 ```
 
-If you don't have `uv` installed yet, visit
-[docs.astral.sh/uv](https://docs.astral.sh/uv/getting-started/installation/)
-for installation instructions.
+If you don't have `uv` installed you can use [uvx.sh](https://uvx.sh) to
+perform the installation. For GNU/Linux or macOS or similar:
+
+```sh
+curl -LsSf uvx.sh/blogmore/install.sh | sh
+```
+
+or on Windows:
+
+```sh
+powershell -ExecutionPolicy ByPass -c "irm https://uvx.sh/blogmore/install.ps1 | iex"
+```
 
 ### Using pipx
 
@@ -89,9 +98,9 @@ uv sync
 
 ## Documentation
 
-Full documentation—including a getting-started guide, day-to-day usage, a
-complete configuration reference, and the command-line reference—is available
-at **<https://blogmore.davep.dev/>**.
+Full documentation -- including a getting-started guide, day-to-day usage, a
+complete configuration reference, and the command-line reference -- is
+available at [blogmore.davep.dev](https://blogmore.davep.dev/).
 
 ## Getting Help
 
@@ -100,5 +109,6 @@ at **<https://blogmore.davep.dev/>**.
 
 ## Licence
 
-BlogMore is released under the
-[GPL-3.0-or-later](https://www.gnu.org/licenses/gpl-3.0.html) licence.
+BlogMore is released under the [GPL-3.0-or-later](./LICENSE) licence.
+
+[//]: # (README.md ends here)
