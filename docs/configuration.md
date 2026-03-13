@@ -475,7 +475,7 @@ minify_js: true
 
 #### `minify_html`
 
-Minify all generated HTML output. When enabled, every `.html` file produced by BlogMore is passed through the [`minify-html`](https://pypi.org/project/minify-html/) library before being saved. Unlike the CSS and JavaScript minification options, the output file name is not changed — only the content is minified.
+Minify all generated HTML output. When enabled, every `.html` file produced by BlogMore is minified before being saved. Unlike the CSS and JavaScript minification options, the output file name is not changed — only the content is minified.
 
 **Type:** Boolean  
 **Default:** `false`

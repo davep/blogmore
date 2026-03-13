@@ -420,10 +420,8 @@ minify_html: true
 
 When enabled, every `.html` file produced by BlogMore — posts, pages, indexes,
 archive pages, tag pages, category pages, the search page, and any other
-generated HTML — is passed through the
-[minify-html](https://pypi.org/project/minify-html/) library before being
-saved.  Unlike the CSS and JavaScript minification options, the file name is
-not changed; only the content is minified.
+generated HTML — is minified before being saved.  Unlike the CSS and JavaScript
+minification options, the file name is not changed; only the content is minified.
 
 ## Markdown Features
 
