@@ -46,8 +46,7 @@ def detect_source_icon(
 
     # If a custom filename is provided, check for it
     if custom_filename:
-        custom_path = extras_dir / custom_filename
-        if custom_path.is_file():
+        if (custom_path := extras_dir / Path(custom_filename).name).is_file():
             return custom_path
         return None
 
@@ -62,8 +61,7 @@ def detect_source_icon(
     ]
 
     for candidate in default_candidates:
-        candidate_path = extras_dir / candidate
-        if candidate_path.is_file():
+        if (candidate_path := extras_dir / candidate).is_file():
             return candidate_path
 
     return None
