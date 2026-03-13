@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## v1.13.0
+## Unreleased
 
-**Released: 2026-03-13**
+**Released: WiP**
 
 - Added `clean_urls` configuration file option (off by default). When set to
   `true`, any post whose resolved URL ends with `/index.html` has the
@@ -12,8 +12,7 @@
   reloaded on rebuild. Previously, `clean_urls`, `minify_css`, `minify_js`,
   `clean_first`, `include_drafts`, and `extra_stylesheets` changes were
   silently ignored when the config file was modified while the server was
-  running. Command-line options continue to take precedence over config file
-  values as before. ([#268](https://github.com/davep/blogmore/pull/268))
+  running. ([#269](https://github.com/davep/blogmore/pull/269))
 
 ## v1.12.0
 
