@@ -2,12 +2,11 @@
 
 ## Unreleased
 
-- Added optional HTML minification via the
-  [`minify-html`](https://pypi.org/project/minify-html/) library. Enabled
-  with `--minify-html` on the command line or `minify_html: true` in the
-  configuration file. All generated HTML files are minified in place; the
-  file names are unchanged. Off by default.
-  ([#TBD](https://github.com/davep/blogmore/pull/TBD))
+**Released: WiP**
+
+- Added optional HTML minification via the `--minify-html` command-line
+  switch or the `minify_html: true` configuration option.
+  ([#272](https://github.com/davep/blogmore/pull/272))
 
 ## v1.13.0
 
