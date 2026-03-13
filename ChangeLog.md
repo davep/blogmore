@@ -8,6 +8,12 @@
   `true`, any post whose resolved URL ends with `/index.html` has the
   `index.html` portion removed so that the URL ends with a trailing slash
   instead. ([#266](https://github.com/davep/blogmore/pull/266))
+- Fixed `serve` mode so that all configuration file settings are properly
+  reloaded on rebuild. Previously, `clean_urls`, `minify_css`, `minify_js`,
+  `clean_first`, `include_drafts`, and `extra_stylesheets` changes were
+  silently ignored when the config file was modified while the server was
+  running. Command-line options continue to take precedence over config file
+  values as before. ([#268](https://github.com/davep/blogmore/pull/268))
 
 ## v1.12.0
 
