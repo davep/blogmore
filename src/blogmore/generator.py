@@ -30,7 +30,7 @@ from blogmore.parser import (
     post_sort_key,
     sanitize_for_url,
 )
-from blogmore.post_path import compute_output_path
+from blogmore.post_path import CLEAN_URL_INDEX_FILES, compute_output_path
 from blogmore.renderer import TemplateRenderer
 from blogmore.search import write_search_index
 from blogmore.site_config import SiteConfig
@@ -645,10 +645,14 @@ class SiteGenerator:
             relative = output_path.relative_to(self.site_config.output_dir)
             url_path = "/" + relative.as_posix()
 
-            # Apply clean URL transformation: strip "index.html" from paths that
-            # end with "/index.html" so the URL ends with a trailing slash instead.
-            if self.site_config.clean_urls and url_path.endswith("/index.html"):
-                url_path = url_path[: -len("index.html")]
+            # Apply clean URL transformation: strip index filenames (e.g.
+            # "index.html") from paths so the URL ends with a trailing slash.
+            if self.site_config.clean_urls:
+                for index_file in CLEAN_URL_INDEX_FILES:
+                    cleaned = url_path.removesuffix(index_file)
+                    if cleaned != url_path:
+                        url_path = cleaned
+                        break
 
             post.url_path = url_path
 

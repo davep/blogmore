@@ -4,6 +4,7 @@ from pathlib import Path
 from xml.etree.ElementTree import Element, SubElement, indent, tostring
 
 from blogmore.parser import CUSTOM_404_HTML
+from blogmore.post_path import CLEAN_URL_INDEX_FILES
 from blogmore.utils import normalize_site_url
 
 SITEMAP_XMLNS = "http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -51,8 +52,12 @@ def collect_sitemap_urls(
         url_path = "/" + str(relative_path).replace("\\", "/")
 
         # Apply clean URL transformation when enabled
-        if clean_urls and url_path.endswith("/index.html"):
-            url_path = url_path[: -len("index.html")]
+        if clean_urls:
+            for index_file in CLEAN_URL_INDEX_FILES:
+                cleaned = url_path.removesuffix(index_file)
+                if cleaned != url_path:
+                    url_path = cleaned
+                    break
 
         urls.append(f"{base_url}{url_path}")
 

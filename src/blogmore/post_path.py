@@ -15,6 +15,12 @@ from blogmore.parser import Post, remove_date_prefix, sanitize_for_url
 DEFAULT_POST_PATH = "{year}/{month}/{day}/{slug}.html"
 
 ##############################################################################
+# The set of filenames that are treated as "index" files and stripped when
+# clean_urls is enabled.  A frozenset allows the list to grow in future
+# without changing any of the transformation logic.
+CLEAN_URL_INDEX_FILES = frozenset({"index.html", "index.htm"})
+
+##############################################################################
 # The set of variable names that may appear in a post_path template.
 ALLOWED_PATH_VARIABLES = frozenset(
     {
