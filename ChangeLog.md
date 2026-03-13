@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## v1.13.0
+
+**Released: 2026-03-13**
+
+- Added `clean_urls` configuration file option (off by default). When set to
+  `true`, any post whose resolved URL ends with `/index.html` has the
+  `index.html` portion removed so that the URL ends with a trailing slash
+  instead. ([#266](https://github.com/davep/blogmore/pull/266))
+
 ## v1.12.0
 
 **Released: 2026-03-12**

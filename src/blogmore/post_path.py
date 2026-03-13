@@ -15,6 +15,33 @@ from blogmore.parser import Post, remove_date_prefix, sanitize_for_url
 DEFAULT_POST_PATH = "{year}/{month}/{day}/{slug}.html"
 
 ##############################################################################
+# The set of filenames that are treated as "index" files and stripped when
+# clean_urls is enabled.  A frozenset allows the list to grow in future
+# without changing any of the transformation logic.
+CLEAN_URL_INDEX_FILES = frozenset({"index.html", "index.htm"})
+
+
+def make_url_clean(url: str) -> str:
+    """Strip any index filename suffix from a URL path.
+
+    Iterates over ``CLEAN_URL_INDEX_FILES`` and removes the first matching
+    suffix so that, for example, ``/posts/my-post/index.html`` becomes
+    ``/posts/my-post/``.
+
+    Args:
+        url: The URL path to clean.
+
+    Returns:
+        The URL with the index filename removed, or the original URL if no
+        index filename suffix was found.
+    """
+    for index_file in CLEAN_URL_INDEX_FILES:
+        if (cleaned := url.removesuffix(index_file)) != url:
+            return cleaned
+    return url
+
+
+##############################################################################
 # The set of variable names that may appear in a post_path template.
 ALLOWED_PATH_VARIABLES = frozenset(
     {
