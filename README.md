@@ -104,8 +104,8 @@ available at [blogmore.davep.dev](https://blogmore.davep.dev/).
 
 ## Getting Help
 
-- **Questions and discussion** — [GitHub Discussions](https://github.com/davep/blogmore/discussions)
-- **Bug reports and feature requests** — [GitHub Issues](https://github.com/davep/blogmore/issues)
+- **Feature requests, questions and discussion** — [GitHub Discussions](https://github.com/davep/blogmore/discussions)
+- **Bug reports** — [GitHub Issues](https://github.com/davep/blogmore/issues)
 
 ## Licence
 
