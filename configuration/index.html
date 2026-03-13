@@ -1048,6 +1048,34 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#clean_urls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clean_urls
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="clean_urls">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#typical-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Typical usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1883,6 +1911,34 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#clean_urls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clean_urls
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="clean_urls">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#typical-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Typical usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2524,6 +2580,26 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <strong>Default:</strong> <code>true</code></p>
 <div class="highlight"><pre><span></span><code><span class="nt">with_advert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </code></pre></div>
+<h4 id="clean_urls"><code>clean_urls</code></h4>
+<p>When <code>true</code>, any post whose resolved URL ends with <code>/index.html</code> has the <code>index.html</code> portion removed so that the URL ends with a trailing slash instead.  For example, if <code>post_path</code> is set to <code>posts/{slug}/index.html</code>, a post with slug <code>my-first-post</code> would normally be referenced as:</p>
+<div class="highlight"><pre><span></span><code>https://example.com/posts/my-first-post/index.html
+</code></pre></div>
+<p>With <code>clean_urls: true</code> every mention of that URL — in the generated HTML, RSS/Atom feeds, sitemap, and canonical <code>&lt;link&gt;</code> tags — becomes:</p>
+<div class="highlight"><pre><span></span><code>https://example.com/posts/my-first-post/
+</code></pre></div>
+<p>The output <em>file</em> is still written to <code>posts/my-first-post/index.html</code> on disk; only the URLs embedded in the generated site change.</p>
+<p>This setting has no effect when <code>post_path</code> does not produce paths that end in <code>index.html</code>.</p>
+<p>This is a <strong>configuration file only</strong> option — it cannot be set on the command line.  Off by default.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">clean_urls</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<h5 id="typical-usage">Typical usage</h5>
+<p>Combine <code>clean_urls</code> with a <code>post_path</code> that places each post in its own directory:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">post_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;posts/{slug}/index.html&quot;</span>
+<span class="nt">clean_urls</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<p>This gives every post a clean, shareable URL such as <code>https://example.com/posts/my-first-post/</code>.</p>
 <h3 id="styling-options">Styling Options</h3>
 <h4 id="minify_css"><code>minify_css</code></h4>
 <p>Minify the generated CSS and write it as <code>styles.min.css</code> instead of <code>style.css</code>. This reduces the size of the stylesheet delivered to visitors.</p>

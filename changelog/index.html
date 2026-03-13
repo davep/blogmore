@@ -673,6 +673,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v1130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.13.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v1120" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1043,6 +1054,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v1130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.13.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v1120" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1369,6 +1391,19 @@
 
 
 <h1 id="blogmore-changelog">BlogMore ChangeLog</h1>
+<h2 id="v1130">v1.13.0</h2>
+<p><strong>Released: 2026-03-13</strong></p>
+<ul>
+<li>Added <code>clean_urls</code> configuration file option (off by default). When set to
+  <code>true</code>, any post whose resolved URL ends with <code>/index.html</code> has the
+  <code>index.html</code> portion removed so that the URL ends with a trailing slash
+  instead. (<a href="https://github.com/davep/blogmore/pull/266">#266</a>)</li>
+<li>Fixed <code>serve</code> mode so that all configuration file settings are properly
+  reloaded on rebuild. Previously, <code>clean_urls</code>, <code>minify_css</code>, <code>minify_js</code>,
+  <code>clean_first</code>, <code>include_drafts</code>, and <code>extra_stylesheets</code> changes were
+  silently ignored when the config file was modified while the server was
+  running. (<a href="https://github.com/davep/blogmore/pull/269">#269</a>)</li>
+</ul>
 <h2 id="v1120">v1.12.0</h2>
 <p><strong>Released: 2026-03-12</strong></p>
 <ul>
