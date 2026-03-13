@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v1.13.0
 
-**Released: WiP**
+**Released: 2026-03-13**
 
 - Added `clean_urls` configuration file option (off by default). When set to
   `true`, any post whose resolved URL ends with `/index.html` has the
