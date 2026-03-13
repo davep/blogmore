@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+- Added optional HTML minification via the
+  [`minify-html`](https://pypi.org/project/minify-html/) library. Enabled
+  with `--minify-html` on the command line or `minify_html: true` in the
+  configuration file. All generated HTML files are minified in place; the
+  file names are unchanged. Off by default.
+  ([#TBD](https://github.com/davep/blogmore/pull/TBD))
+
 ## v1.13.0
 
 **Released: 2026-03-13**

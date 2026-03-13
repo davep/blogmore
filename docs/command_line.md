@@ -235,6 +235,16 @@ JavaScript minification is **disabled by default**. Pass this flag to opt in.
 blogmore build posts/ --minify-js
 ```
 
+#### `--minify-html`
+
+Minify all generated HTML output. When enabled, every `.html` file produced by BlogMore is passed through the [`minify-html`](https://pypi.org/project/minify-html/) library before being saved. Unlike `--minify-css` and `--minify-js`, the output file name is not changed — only the content is minified.
+
+HTML minification is **disabled by default**. Pass this flag to opt in.
+
+```bash
+blogmore build posts/ --minify-html
+```
+
 ### Examples
 
 Basic site generation:
@@ -317,6 +327,7 @@ The serve command also accepts all the build command options:
 - `--with-sitemap`
 - `--minify-css`
 - `--minify-js`
+- `--minify-html`
 - `--with-read-time`
 - `--socials-title`
 
@@ -408,6 +419,7 @@ The publish command also accepts all the build command options:
 - `--with-sitemap`
 - `--minify-css`
 - `--minify-js`
+- `--minify-html`
 - `--with-read-time`
 - `--socials-title`
 

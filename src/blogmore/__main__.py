@@ -112,6 +112,7 @@ def main() -> int:
         with_sitemap=args.with_sitemap,
         minify_css=args.minify_css,
         minify_js=args.minify_js,
+        minify_html=args.minify_html,
         with_read_time=args.with_read_time,
         include_drafts=args.include_drafts,
         post_path=raw_post_path,
@@ -270,6 +271,7 @@ def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
         "with_sitemap": False,
         "minify_css": False,
         "minify_js": False,
+        "minify_html": False,
         "with_read_time": False,
         "socials_title": "Social",
     }
