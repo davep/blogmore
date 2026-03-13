@@ -643,7 +643,14 @@ class SiteGenerator:
 
             # Set the post's URL so all templates/feeds reflect the configured scheme.
             relative = output_path.relative_to(self.site_config.output_dir)
-            post.url_path = "/" + relative.as_posix()
+            url_path = "/" + relative.as_posix()
+
+            # Apply clean URL transformation: strip "index.html" from paths that
+            # end with "/index.html" so the URL ends with a trailing slash instead.
+            if self.site_config.clean_urls and url_path.endswith("/index.html"):
+                url_path = url_path[: -len("index.html")]
+
+            post.url_path = url_path
 
             path_to_post_ids[str(output_path)].append(id(post))
 
@@ -704,7 +711,16 @@ class SiteGenerator:
             context["next_post"] = None
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        context["canonical_url"] = self._canonical_url_for_path(output_path)
+        # When clean URLs are enabled, post.url already has index.html stripped;
+        # use it directly so the canonical URL matches what we advertise everywhere.
+        if self.site_config.clean_urls:
+            context["canonical_url"] = (
+                f"{self.site_config.site_url}{post.url}"
+                if self.site_config.site_url
+                else post.url
+            )
+        else:
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
         html = self.renderer.render_post(post, **context)
         output_path.write_text(html, encoding="utf-8")
 
@@ -1297,7 +1313,11 @@ class SiteGenerator:
         containing an entry for every generated HTML page except
         ``search.html``.
         """
-        write_sitemap(self.site_config.output_dir, self.site_config.site_url)
+        write_sitemap(
+            self.site_config.output_dir,
+            self.site_config.site_url,
+            clean_urls=self.site_config.clean_urls,
+        )
 
     def _copy_static_assets(self) -> None:
         """Copy static assets (CSS, JS, images) to output directory.

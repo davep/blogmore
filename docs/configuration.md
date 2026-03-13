@@ -411,6 +411,44 @@ When `true` (the default), a small "Generated with BlogMore vX.Y.Z" line is incl
 with_advert: false
 ```
 
+#### `clean_urls`
+
+When `true`, any post whose resolved URL ends with `/index.html` has the `index.html` portion removed so that the URL ends with a trailing slash instead.  For example, if `post_path` is set to `posts/{slug}/index.html`, a post with slug `my-first-post` would normally be referenced as:
+
+```
+https://example.com/posts/my-first-post/index.html
+```
+
+With `clean_urls: true` every mention of that URL — in the generated HTML, RSS/Atom feeds, sitemap, and canonical `<link>` tags — becomes:
+
+```
+https://example.com/posts/my-first-post/
+```
+
+The output *file* is still written to `posts/my-first-post/index.html` on disk; only the URLs embedded in the generated site change.
+
+This setting has no effect when `post_path` does not produce paths that end in `index.html`.
+
+This is a **configuration file only** option — it cannot be set on the command line.  Off by default.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+clean_urls: true
+```
+
+##### Typical usage
+
+Combine `clean_urls` with a `post_path` that places each post in its own directory:
+
+```yaml
+post_path: "posts/{slug}/index.html"
+clean_urls: true
+```
+
+This gives every post a clean, shareable URL such as `https://example.com/posts/my-first-post/`.
+
 ### Styling Options
 
 #### `minify_css`

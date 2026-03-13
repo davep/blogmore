@@ -3305,6 +3305,217 @@ class TestPostPathConfiguration:
         assert "WARNING" not in captured.out
 
 
+class TestCleanUrls:
+    """Tests for the clean_urls feature."""
+
+    def test_clean_urls_default_is_false(self) -> None:
+        """The clean_urls setting defaults to False."""
+        config = SiteConfig(output_dir=Path("output"))
+        assert config.clean_urls is False
+
+    def test_clean_urls_disabled_keeps_index_html_in_url(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls is False, post URLs ending in index.html are unchanged."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-15-my-post.md").write_text(
+            "---\ntitle: My Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                post_path="posts/{slug}/index.html",
+                clean_urls=False,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/posts/my-post/index.html" in index_content
+        assert "/posts/my-post/" in index_content  # the index.html version contains "/"
+
+    def test_clean_urls_enabled_strips_index_html_from_post_url(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls is True, index.html is stripped from post URLs."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-15-my-post.md").write_text(
+            "---\ntitle: My Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                post_path="posts/{slug}/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/posts/my-post/" in index_content
+        assert "/posts/my-post/index.html" not in index_content
+
+    def test_clean_urls_does_not_affect_non_index_html_paths(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls is True, post URLs not ending in index.html are unchanged."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-15-my-post.md").write_text(
+            "---\ntitle: My Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                post_path="posts/{slug}.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/posts/my-post.html" in index_content
+
+    def test_clean_urls_post_file_still_written_as_index_html(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """The output file is still index.html on disk even with clean_urls enabled."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-15-my-post.md").write_text(
+            "---\ntitle: My Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                post_path="posts/{slug}/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        # The physical file still exists at the index.html path
+        assert (temp_output_dir / "posts" / "my-post" / "index.html").exists()
+
+    def test_clean_urls_canonical_url_is_clean(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls is True, canonical URL in post page has no index.html."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-15-my-post.md").write_text(
+            "---\ntitle: My Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                post_path="posts/{slug}/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        post_content = (
+            temp_output_dir / "posts" / "my-post" / "index.html"
+        ).read_text()
+        assert "https://example.com/posts/my-post/" in post_content
+        assert "https://example.com/posts/my-post/index.html" not in post_content
+
+    def test_clean_urls_feed_uses_clean_url(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls is True, the RSS/Atom feed uses clean post URLs."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-15-my-post.md").write_text(
+            "---\ntitle: My Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                post_path="posts/{slug}/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        feed_content = (temp_output_dir / "feed.xml").read_text()
+        assert "https://example.com/posts/my-post/" in feed_content
+        assert "https://example.com/posts/my-post/index.html" not in feed_content
+
+    def test_clean_urls_sitemap_uses_clean_url(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls and with_sitemap are both True, sitemap uses clean URLs."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-15-my-post.md").write_text(
+            "---\ntitle: My Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                post_path="posts/{slug}/index.html",
+                clean_urls=True,
+                with_sitemap=True,
+            )
+        )
+        generator.generate()
+
+        sitemap_content = (temp_output_dir / "sitemap.xml").read_text()
+        assert "https://example.com/posts/my-post/" in sitemap_content
+        assert "https://example.com/posts/my-post/index.html" not in sitemap_content
+
+    def test_clean_urls_prev_next_navigation_uses_clean_url(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls is True, prev/next post navigation uses clean URLs."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-15-first-post.md").write_text(
+            "---\ntitle: First Post\ndate: 2024-01-15\n---\n\nContent A."
+        )
+        (content_dir / "2024-02-20-second-post.md").write_text(
+            "---\ntitle: Second Post\ndate: 2024-02-20\n---\n\nContent B."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                post_path="posts/{slug}/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        # The first post's page should link to second post with a clean URL
+        first_post_content = (
+            temp_output_dir / "posts" / "first-post" / "index.html"
+        ).read_text()
+        assert "/posts/second-post/" in first_post_content
+        assert "/posts/second-post/index.html" not in first_post_content
+
+
 class TestCacheBusting:
     """Test that stylesheets are served with generation-specific cache-busting tokens."""
 

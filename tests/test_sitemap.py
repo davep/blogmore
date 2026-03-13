@@ -92,7 +92,55 @@ class TestCollectSitemapUrls:
         assert len(urls) == 1
         assert "https://example.com/index.html" in urls
 
-    def test_all_excluded_pages_constants(self) -> None:
+    def test_clean_urls_strips_index_html_from_nested_paths(
+        self, tmp_path: Path
+    ) -> None:
+        """When clean_urls is True, index.html is stripped from nested paths."""
+        post_dir = tmp_path / "posts" / "my-post"
+        post_dir.mkdir(parents=True)
+        (post_dir / "index.html").write_text("<html/>")
+
+        urls = collect_sitemap_urls(tmp_path, "https://example.com", clean_urls=True)
+
+        assert "https://example.com/posts/my-post/" in urls
+        assert "https://example.com/posts/my-post/index.html" not in urls
+
+    def test_clean_urls_false_keeps_index_html_in_nested_paths(
+        self, tmp_path: Path
+    ) -> None:
+        """When clean_urls is False, index.html is kept in nested paths."""
+        post_dir = tmp_path / "posts" / "my-post"
+        post_dir.mkdir(parents=True)
+        (post_dir / "index.html").write_text("<html/>")
+
+        urls = collect_sitemap_urls(tmp_path, "https://example.com", clean_urls=False)
+
+        assert "https://example.com/posts/my-post/index.html" in urls
+        assert "https://example.com/posts/my-post/" not in urls
+
+    def test_clean_urls_strips_index_html_from_root(self, tmp_path: Path) -> None:
+        """When clean_urls is True, index.html at root becomes trailing slash."""
+        (tmp_path / "index.html").write_text("<html/>")
+
+        urls = collect_sitemap_urls(tmp_path, "https://example.com", clean_urls=True)
+
+        # /index.html → / (but it's still included)
+        assert "https://example.com/" in urls
+        assert "https://example.com/index.html" not in urls
+
+    def test_clean_urls_does_not_affect_non_index_html_files(
+        self, tmp_path: Path
+    ) -> None:
+        """When clean_urls is True, non-index.html files are unaffected."""
+        (tmp_path / "archive.html").write_text("<html/>")
+        post_dir = tmp_path / "2024" / "01" / "15"
+        post_dir.mkdir(parents=True)
+        (post_dir / "my-post.html").write_text("<html/>")
+
+        urls = collect_sitemap_urls(tmp_path, "https://example.com", clean_urls=True)
+
+        assert "https://example.com/archive.html" in urls
+        assert "https://example.com/2024/01/15/my-post.html" in urls
         """Test that the EXCLUDED_PAGES constant contains expected entries."""
         assert "search.html" in EXCLUDED_PAGES
         assert CUSTOM_404_HTML in EXCLUDED_PAGES
@@ -207,6 +255,18 @@ class TestWriteSitemap:
         # Reading as UTF-8 should not raise an error
         content = (tmp_path / SITEMAP_FILENAME).read_text(encoding="utf-8")
         assert content
+
+    def test_write_sitemap_clean_urls_strips_index_html(self, tmp_path: Path) -> None:
+        """When clean_urls is True, write_sitemap produces clean URLs."""
+        post_dir = tmp_path / "posts" / "my-post"
+        post_dir.mkdir(parents=True)
+        (post_dir / "index.html").write_text("<html/>")
+
+        write_sitemap(tmp_path, "https://example.com", clean_urls=True)
+
+        content = (tmp_path / SITEMAP_FILENAME).read_text()
+        assert "https://example.com/posts/my-post/" in content
+        assert "https://example.com/posts/my-post/index.html" not in content
 
 
 class TestSitemapIntegrationWithGenerator:

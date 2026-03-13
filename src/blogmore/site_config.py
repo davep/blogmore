@@ -93,6 +93,19 @@ class SiteConfig:
     ``{slug}``.  The ``{slug}`` placeholder is required.
     """
 
+    clean_urls: bool = False
+    """Whether to generate clean URLs for posts whose path ends in ``index.html``.
+
+    When enabled, any post whose resolved URL ends with ``/index.html`` will
+    have the ``index.html`` portion removed so that the URL ends with a
+    trailing slash instead.  For example, a post at
+    ``posts/my-first-post/index.html`` will be referenced everywhere as
+    ``posts/my-first-post/`` rather than ``posts/my-first-post/index.html``.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Off by default.
+    """
+
     with_advert: bool = True
     """Whether to show the "Generated with BlogMore" footer line."""
 
