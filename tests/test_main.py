@@ -1324,7 +1324,7 @@ class TestConfigChangeHandler:
             )
         )
 
-        with patch.object(generator, "generate") as mock_generate:
+        with patch.object(generator, "generate"):
             handler = ConfigChangeHandler(
                 config_path=config_file,
                 generator=generator,
@@ -1344,8 +1344,9 @@ class TestConfigChangeHandler:
             handler.on_any_event(event)
             time.sleep(0.2)
 
-            # Verify stylesheets were updated
-            assert generator.renderer.extra_stylesheets == [
+            # Verify stylesheets were updated in site_config (generate() will
+            # propagate them to the renderer with cache-busting applied)
+            assert generator.site_config.extra_stylesheets == [
                 "style1.css",
                 "style2.css",
                 "style3.css",
@@ -1375,7 +1376,7 @@ class TestConfigChangeHandler:
             )
         )
 
-        with patch.object(generator, "generate") as mock_generate:
+        with patch.object(generator, "generate"):
             handler = ConfigChangeHandler(
                 config_path=config_file,
                 generator=generator,
@@ -1446,3 +1447,145 @@ class TestConfigChangeHandler:
 
             # Only one generation should have occurred despite multiple events
             assert mock_generate.call_count == 1
+
+    @pytest.mark.parametrize(
+        "config_key",
+        [
+            "clean_urls",
+            "minify_css",
+            "minify_js",
+            "clean_first",
+            "include_drafts",
+        ],
+    )
+    def test_on_any_event_updates_boolean_field(
+        self,
+        posts_dir: Path,
+        temp_output_dir: Path,
+        tmp_path: Path,
+        config_key: str,
+    ) -> None:
+        """Test that boolean config fields are updated when the config changes."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+
+        config_file = tmp_path / "blogmore.yaml"
+        config_data: dict[str, object] = {config_key: False}
+        with open(config_file, "w") as f:
+            yaml.dump(config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                **{config_key: False},  # type: ignore[arg-type]
+            )
+        )
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides={},
+                debounce_seconds=0.05,
+            )
+
+            new_config_data: dict[str, object] = {config_key: True}
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            assert getattr(generator.site_config, config_key) is True
+
+    def test_cli_minify_css_overrides_config_on_reload(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that a CLI minify_css setting overrides config on reload."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+
+        config_file = tmp_path / "blogmore.yaml"
+        config_data: dict[str, object] = {"minify_css": False}
+        with open(config_file, "w") as f:
+            yaml.dump(config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                minify_css=True,
+            )
+        )
+
+        # CLI set --minify-css, so it's in cli_overrides
+        cli_overrides: dict[str, object] = {"minify_css": True}
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides=cli_overrides,
+                debounce_seconds=0.05,
+            )
+
+            # Config changes to explicitly disable minify_css
+            new_config_data: dict[str, object] = {"minify_css": False}
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            # CLI override should win over config
+            assert generator.site_config.minify_css is True
+
+    def test_extra_stylesheets_updated_in_site_config(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that extra_stylesheets update is stored in site_config for generate()."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+
+        config_file = tmp_path / "blogmore.yaml"
+        config_data: dict[str, object] = {"extra_stylesheets": ["old.css"]}
+        with open(config_file, "w") as f:
+            yaml.dump(config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                extra_stylesheets=["old.css"],
+            )
+        )
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides={},
+                debounce_seconds=0.05,
+            )
+
+            new_config_data: dict[str, object] = {
+                "extra_stylesheets": ["new1.css", "new2.css"]
+            }
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            # site_config must be updated so generate() picks up the new list
+            assert generator.site_config.extra_stylesheets == ["new1.css", "new2.css"]

@@ -276,8 +276,13 @@ class ConfigChangeHandler(FileSystemEventHandler):
             "icon_source",
             "with_search",
             "with_sitemap",
+            "minify_css",
+            "minify_js",
             "with_read_time",
             "with_advert",
+            "clean_urls",
+            "clean_first",
+            "include_drafts",
         ):
             if key in config:
                 update_kwargs[key] = config[key]
@@ -290,9 +295,9 @@ class ConfigChangeHandler(FileSystemEventHandler):
         if "extra_stylesheets" in config:
             stylesheets = config["extra_stylesheets"]
             if isinstance(stylesheets, str):
-                self.generator.renderer.extra_stylesheets = [stylesheets]
+                update_kwargs["extra_stylesheets"] = [stylesheets]
             elif isinstance(stylesheets, list):
-                self.generator.renderer.extra_stylesheets = stylesheets
+                update_kwargs["extra_stylesheets"] = stylesheets
 
         raw_post_path = config.get("post_path", DEFAULT_POST_PATH)
         if isinstance(raw_post_path, str):
