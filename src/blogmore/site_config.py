@@ -79,6 +79,15 @@ class SiteConfig:
     minify_js: bool = False
     """Whether to minify the JavaScript output files."""
 
+    minify_html: bool = False
+    """Whether to minify all generated HTML output.
+
+    When enabled, every ``.html`` file written by the generator is passed
+    through the ``minify-html`` library before being saved.  The output
+    file name is not changed — only the content is minified.  Off by
+    default.
+    """
+
     with_read_time: bool = False
     """Whether to show estimated reading time on posts."""
 

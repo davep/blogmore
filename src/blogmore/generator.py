@@ -9,6 +9,7 @@ from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
+import minify_html
 import rcssmin  # type: ignore[import-untyped]
 import rjsmin  # type: ignore[import-untyped]
 
@@ -534,6 +535,21 @@ class SiteGenerator:
             css_path.write_text(css_content, encoding="utf-8")
             print("Generated optimized FontAwesome CSS")
 
+    def _write_html(self, output_path: Path, html: str) -> None:
+        """Write an HTML string to a file, minifying it when configured to do so.
+
+        When ``minify_html`` is enabled the HTML content is passed through the
+        ``minify-html`` library before being written.  The output file name is
+        not changed — only the content is minified.
+
+        Args:
+            output_path: Destination file path.
+            html: HTML content to write.
+        """
+        if self.site_config.minify_html:
+            html = minify_html.minify(html, minify_js=False, minify_css=False)
+        output_path.write_text(html, encoding="utf-8")
+
     def _write_minified_css(self, output_static: Path) -> None:
         """Read the source CSS, minify it, and write it as ``styles.min.css``.
 
@@ -722,7 +738,7 @@ class SiteGenerator:
         else:
             context["canonical_url"] = self._canonical_url_for_path(output_path)
         html = self.renderer.render_post(post, **context)
-        output_path.write_text(html, encoding="utf-8")
+        self._write_html(output_path, html)
 
     def _generate_page(self, page: Page, pages: list[Page]) -> None:
         """Generate a single static page."""
@@ -733,7 +749,7 @@ class SiteGenerator:
 
         html = self.renderer.render_page(page, **context)
 
-        output_path.write_text(html, encoding="utf-8")
+        self._write_html(output_path, html)
 
     def _generate_404_page(self, page: Page, pages: list[Page]) -> None:
         """Generate the custom 404 page in the root of the output directory."""
@@ -744,7 +760,7 @@ class SiteGenerator:
 
         html = self.renderer.render_page(page, **context)
 
-        output_path.write_text(html, encoding="utf-8")
+        self._write_html(output_path, html)
 
     def _generate_index_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the main index page with pagination."""
@@ -779,7 +795,7 @@ class SiteGenerator:
                 page_posts, page=page_num, total_pages=total_pages, **context
             )
 
-            output_path.write_text(html, encoding="utf-8")
+            self._write_html(output_path, html)
 
     def _generate_archive_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the archive page."""
@@ -790,7 +806,7 @@ class SiteGenerator:
         html = self.renderer.render_archive(
             posts, page=1, total_pages=1, base_path="/archive", **context
         )
-        output_path.write_text(html, encoding="utf-8")
+        self._write_html(output_path, html)
 
     def _generate_date_archives(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate date-based archive pages (year, month, day) with pagination."""
@@ -854,7 +870,7 @@ class SiteGenerator:
                     **context,
                 )
 
-                output_path.write_text(html, encoding="utf-8")
+                self._write_html(output_path, html)
 
         # Generate month archives with pagination
         for (year, month), month_posts in posts_by_month.items():
@@ -900,7 +916,7 @@ class SiteGenerator:
                     **context,
                 )
 
-                output_path.write_text(html, encoding="utf-8")
+                self._write_html(output_path, html)
 
         # Generate day archives with pagination
         for (year, month, day), day_posts in posts_by_day.items():
@@ -948,7 +964,7 @@ class SiteGenerator:
                     **context,
                 )
 
-                output_path.write_text(html, encoding="utf-8")
+                self._write_html(output_path, html)
 
     def _generate_tag_pages(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate pages for each tag with pagination."""
@@ -1005,7 +1021,7 @@ class SiteGenerator:
                     **context,
                 )
 
-                output_path.write_text(html, encoding="utf-8")
+                self._write_html(output_path, html)
 
     def _group_posts_by_tag(
         self, posts: list[Post]
@@ -1092,7 +1108,7 @@ class SiteGenerator:
 
         html = self.renderer.render_tags_page(tag_data, **context)
 
-        output_path.write_text(html, encoding="utf-8")
+        self._write_html(output_path, html)
 
     def _generate_categories_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the categories overview page with word cloud."""
@@ -1160,7 +1176,7 @@ class SiteGenerator:
 
         html = self.renderer.render_categories_page(category_data, **context)
 
-        output_path.write_text(html, encoding="utf-8")
+        self._write_html(output_path, html)
 
     def _generate_category_pages(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate pages for each category with pagination."""
@@ -1222,7 +1238,7 @@ class SiteGenerator:
                     **context,
                 )
 
-                output_path.write_text(html, encoding="utf-8")
+                self._write_html(output_path, html)
 
     def _group_posts_by_category(
         self, posts: list[Post]
@@ -1291,7 +1307,7 @@ class SiteGenerator:
         output_path = self.site_config.output_dir / "search.html"
         context["canonical_url"] = self._canonical_url_for_path(output_path)
         html = self.renderer.render_search_page(**context)
-        output_path.write_text(html, encoding="utf-8")
+        self._write_html(output_path, html)
 
     def _remove_stale_search_files(self) -> None:
         """Remove search-related files left over from a previous build.

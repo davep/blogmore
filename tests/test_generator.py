@@ -2030,6 +2030,114 @@ class TestMinifyJs:
         assert "world" in minified_content
 
 
+class TestMinifyHtml:
+    """Test the minify_html feature."""
+
+    def test_minify_html_false_by_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that HTML is not minified by default."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+
+        generator.generate()
+
+        content = (temp_output_dir / "index.html").read_text(encoding="utf-8")
+        # Unminified HTML will contain newlines and indentation
+        assert "\n" in content
+
+    def test_minify_html_produces_smaller_output(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that minify_html produces smaller HTML files than the default."""
+        normal_output = tmp_path / "normal"
+        minified_output = tmp_path / "minified"
+
+        normal_generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=normal_output,
+            )
+        )
+        normal_generator.generate()
+
+        minified_generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=minified_output,
+                minify_html=True,
+            )
+        )
+        minified_generator.generate()
+
+        normal_size = (normal_output / "index.html").stat().st_size
+        minified_size = (minified_output / "index.html").stat().st_size
+        assert minified_size < normal_size
+
+    def test_minify_html_filename_unchanged(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that HTML filenames are not changed when minify_html is enabled."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                minify_html=True,
+            )
+        )
+
+        generator.generate()
+
+        # index.html is still called index.html, not index.min.html
+        assert (temp_output_dir / "index.html").exists()
+        assert not (temp_output_dir / "index.min.html").exists()
+
+    def test_minify_html_valid_html_output(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that minified HTML output still contains expected content."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                minify_html=True,
+            )
+        )
+
+        generator.generate()
+
+        content = (temp_output_dir / "index.html").read_text(encoding="utf-8")
+        # Minified HTML should still have essential structure
+        assert "<!doctype html>" in content.lower()
+        assert "<html" in content
+
+    def test_minify_html_applied_to_all_pages(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that minify_html is applied to all generated HTML files."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                minify_html=True,
+            )
+        )
+
+        generator.generate()
+
+        html_files = list(temp_output_dir.rglob("*.html"))
+        assert len(html_files) > 0
+
+        for html_file in html_files:
+            content = html_file.read_text(encoding="utf-8")
+            # Each file should still have valid HTML structure
+            assert "<html" in content or "<!doctype" in content.lower()
+
+
 class TestPrevNextHeadLinkTags:
     """Test that prev/next link tags are correctly added to the head of post pages."""
 

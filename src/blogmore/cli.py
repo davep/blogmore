@@ -141,6 +141,13 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     )
 
     parser.add_argument(
+        "--minify-html",
+        action="store_true",
+        default=_SITE_CONFIG_DEFAULTS["minify_html"],
+        help="Minify all generated HTML output in place (default: disabled)",
+    )
+
+    parser.add_argument(
         "--with-read-time",
         action="store_true",
         default=_SITE_CONFIG_DEFAULTS["with_read_time"],

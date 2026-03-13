@@ -278,6 +278,7 @@ class ConfigChangeHandler(FileSystemEventHandler):
             "with_sitemap",
             "minify_css",
             "minify_js",
+            "minify_html",
             "with_read_time",
             "with_advert",
             "clean_urls",

@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added optional HTML minification via the `--minify-html` command-line
+  switch or the `minify_html: true` configuration option.
+  ([#272](https://github.com/davep/blogmore/pull/272))
+
 ## v1.13.0
 
 **Released: 2026-03-13**

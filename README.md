@@ -404,6 +404,25 @@ When enabled, BlogMore calculates the approximate time to read each post based
 on 200 words per minute and displays it next to the post date on the index,
 archive, tag, category, and individual post pages.
 
+## HTML Minification
+
+HTML minification is disabled by default.  To enable it, pass `--minify-html`
+on the command line or set `minify_html: true` in the configuration file.
+
+```bash
+blogmore build posts/ --minify-html
+```
+
+```yaml
+# blogmore.yaml
+minify_html: true
+```
+
+When enabled, every `.html` file produced by BlogMore — posts, pages, indexes,
+archive pages, tag pages, category pages, the search page, and any other
+generated HTML — is minified before being saved.  Unlike the CSS and JavaScript
+minification options, the file name is not changed; only the content is minified.
+
 ## Markdown Features
 
 Blogmore supports all standard Markdown features plus:

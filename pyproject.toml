@@ -28,6 +28,7 @@ dependencies = [
     "Pillow>=10.0.0",
     "rcssmin>=1.1.2",
     "rjsmin>=1.2.5",
+    "minify-html>=0.15.0",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",

@@ -830,3 +830,23 @@ class TestSiteKeywordsConfig:
         merge_config_with_args(config, args)
 
         assert args.with_read_time is True
+
+    def test_minify_html_from_config(self) -> None:
+        """Test loading minify_html from config."""
+        config = {"minify_html": True}
+        args = Mock()
+        args.minify_html = False  # default
+
+        merge_config_with_args(config, args)
+
+        assert args.minify_html is True
+
+    def test_cli_minify_html_overrides_config(self) -> None:
+        """Test that CLI minify_html overrides config."""
+        config = {"minify_html": False}
+        args = Mock()
+        args.minify_html = True  # set via CLI
+
+        merge_config_with_args(config, args)
+
+        assert args.minify_html is True
