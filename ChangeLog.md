@@ -29,6 +29,10 @@
     typography-focused design), and `modern-compact/` (CSS + custom templates,
     narrower sidebar and compact post cards).
   - Updated `docs/templates.md` to point readers to the new theming guide.
+  - Fixed a bug where files removed from the `extras/` directory would persist
+    in the output on subsequent builds.  A manifest file
+    (`.blogmore-extras-manifest`) is now maintained in the output directory so
+    that stale extras files are automatically cleaned up.
   ([#275](https://github.com/davep/blogmore/pull/275))
 
 ## v1.13.0

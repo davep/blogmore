@@ -1,6 +1,7 @@
 """Static site generator for blog content."""
 
 import datetime as dt
+import json
 import shutil
 import time
 import urllib.error
@@ -43,6 +44,7 @@ THEME_JS_FILENAME = "theme.js"
 THEME_JS_MINIFIED_FILENAME = "theme.min.js"
 SEARCH_JS_FILENAME = "search.js"
 SEARCH_JS_MINIFIED_FILENAME = "search.min.js"
+EXTRAS_MANIFEST_FILENAME = ".blogmore-extras-manifest"
 
 
 def paginate_posts(posts: list[Post], posts_per_page: int) -> list[list[Post]]:
@@ -1436,10 +1438,53 @@ class SiteGenerator:
         Files in the extras directory are copied to the output root, preserving
         directory structure relative to the extras directory. If a file would
         override an existing file, it is allowed but a message is printed.
+
+        A manifest file (``EXTRAS_MANIFEST_FILENAME``) is maintained in the
+        output directory so that files removed from ``extras/`` are also removed
+        from the output on subsequent builds, even without ``clean_first=True``.
         """
         extras_dir = self._content_dir / "extras"
+        manifest_path = self.site_config.output_dir / EXTRAS_MANIFEST_FILENAME
+
+        # Read the previous manifest so we can detect and remove stale files.
+        previous_extras: set[str] = set()
+        if manifest_path.exists():
+            try:
+                previous_extras = set(
+                    json.loads(manifest_path.read_text(encoding="utf-8"))
+                )
+            except (json.JSONDecodeError, OSError):
+                previous_extras = set()
+
+        # Collect the set of files currently present in extras/.
+        current_extras: set[str] = set()
+        if extras_dir.exists():
+            for file_path in extras_dir.rglob("*"):
+                if file_path.is_file():
+                    current_extras.add(
+                        file_path.relative_to(extras_dir).as_posix()
+                    )
+
+        # Remove files that were previously copied but are no longer in extras/.
+        stale_extras = previous_extras - current_extras
+        stale_removed = 0
+        for stale_relative in stale_extras:
+            stale_output = self.site_config.output_dir / stale_relative
+            if stale_output.exists():
+                try:
+                    stale_output.unlink()
+                    stale_removed += 1
+                except OSError as e:
+                    print(
+                        f"Warning: Could not remove stale extra file"
+                        f" {stale_relative}: {e}"
+                    )
+        if stale_removed > 0:
+            print(f"Removed {stale_removed} stale extra file(s) from output")
 
         if not extras_dir.exists():
+            # No extras directory: write an empty manifest and return.
+            manifest_path.write_text("[]", encoding="utf-8")
             return
 
         # Count how many extras we copy
@@ -1475,6 +1520,11 @@ class SiteGenerator:
                     print(f"Warning: Failed to copy extra file {file_path}: {e}")
                     failed_count += 1
                     continue
+
+        # Write the updated manifest so the next build knows what was copied.
+        manifest_path.write_text(
+            json.dumps(sorted(current_extras), indent=2), encoding="utf-8"
+        )
 
         if extras_count > 0:
             print(f"Copied {extras_count} extra file(s) from {extras_dir}")
