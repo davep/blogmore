@@ -63,6 +63,21 @@ posts_per_feed: 20
 # Displays the approximate time to read each post based on 200 words per minute.
 # with_read_time: false
 
+# Optional: Show "Generated with BlogMore" footer line (default: true)
+# Set to false to hide the footer attribution line.
+# with_advert: true
+
+# Optional: Custom post URL path format (default: "{year}/{month}/{day}/{slug}.html")
+# Available placeholders: {year}, {month}, {day}, {hour}, {minute}, {second},
+# {category}, {author}, {slug}. The {slug} placeholder is required.
+# post_path: "{year}/{month}/{day}/{slug}.html"
+
+# Optional: Generate clean URLs for posts (default: false)
+# When enabled, posts whose URL ends with /index.html will use the shorter
+# trailing-slash form instead (e.g. /posts/my-first-post/ instead of
+# /posts/my-first-post/index.html). Configuration file only.
+# clean_urls: false
+
 # Styling options
 
 # Optional: Minify the CSS, writing it as styles.min.css (default: false)
@@ -71,6 +86,9 @@ posts_per_feed: 20
 # Optional: Minify the JavaScript, writing it as theme.min.js (default: false)
 # If search is enabled, search.js is also minified as search.min.js.
 # minify_js: false
+
+# Optional: Minify all generated HTML output (default: false)
+# minify_html: false
 
 # Optional: Additional stylesheets to include (can be URLs or relative paths)
 # extra_stylesheets:
@@ -97,6 +115,9 @@ posts_per_feed: 20
 #     url: https://github.com/username
 #   - site: lastfm
 #     url: https://www.last.fm/user/username
+
+# Optional: Custom title for the socials section in sidebar (default: "Social")
+# socials_title: "Social"
 
 # Serve-specific options (only used with 'blogmore serve' command)
 
