@@ -1085,7 +1085,7 @@ class TestSiteGenerator:
         )
         generator._copy_extras()
 
-        manifest_path = temp_output_dir / EXTRAS_MANIFEST_FILENAME
+        manifest_path = content_dir / EXTRAS_MANIFEST_FILENAME
         assert manifest_path.exists()
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         assert sorted(manifest) == ["custom.css", "robots.txt"]
@@ -1126,7 +1126,7 @@ class TestSiteGenerator:
 
         # Manifest should be updated to reflect only robots.txt
         manifest = json.loads(
-            (temp_output_dir / EXTRAS_MANIFEST_FILENAME).read_text(encoding="utf-8")
+            (content_dir / EXTRAS_MANIFEST_FILENAME).read_text(encoding="utf-8")
         )
         assert manifest == ["robots.txt"]
 

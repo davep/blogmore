@@ -1442,11 +1442,11 @@ class SiteGenerator:
         override an existing file, it is allowed but a message is printed.
 
         A manifest file (``EXTRAS_MANIFEST_FILENAME``) is maintained in the
-        output directory so that files removed from ``extras/`` are also removed
+        content directory so that files removed from ``extras/`` are also removed
         from the output on subsequent builds, even without ``clean_first=True``.
         """
         extras_dir = self._content_dir / "extras"
-        manifest_path = self.site_config.output_dir / EXTRAS_MANIFEST_FILENAME
+        manifest_path = self._content_dir / EXTRAS_MANIFEST_FILENAME
 
         # Read the previous manifest so we can detect and remove stale files.
         previous_extras: set[str] = set()
