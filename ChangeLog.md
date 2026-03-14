@@ -10,11 +10,6 @@
 - Consolidated and better documented the theming infrastructure to make
   custom themes easier to create.
   ([#275](https://github.com/davep/blogmore/pull/275))
-- Refreshed `blogmore.yaml.example` to include all configuration options
-  (`post_path`, `clean_urls`, `with_advert`, `minify_html`, `socials_title`)
-  and updated the Copilot instructions to remind future contributors to keep
-  the file in sync with configuration changes.
-  ([#277](https://github.com/davep/blogmore/pull/277))
 
 ## v1.13.0
 
