@@ -12,6 +12,8 @@ nav:
       - metadata_and_sidebar.md
       - building.md
       - templates.md
+      - theming.md
+      - template-api.md
       - command_line.md
       - "Configuration": configuration.md
   - Change Log: changelog.md

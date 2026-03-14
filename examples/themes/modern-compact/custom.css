@@ -1,0 +1,135 @@
+/* =============================================================================
+   Modern Compact Theme for BlogMore
+
+   A contemporary design with tighter spacing, a narrower sidebar, and a warm
+   dark mode palette.  Demonstrates both CSS overrides and custom templates.
+
+   Companion files:
+     templates/base.html        — narrower sidebar, custom fonts
+     templates/_post_summary.html — compact post card layout
+
+   Installation:
+     1. Copy this directory's contents into your blog:
+          extras/custom.css       → extras/custom.css
+          templates/              → my-templates/ (rename as you like)
+     2. Update blogmore.yaml:
+          templates: my-templates
+          extra_stylesheets:
+            - /custom.css
+   ============================================================================= */
+
+/* ---- Custom properties for the compact sidebar width --------------------- */
+/* These are not part of BlogMore's standard API; they are theme-private       */
+:root {
+    --sidebar-width: 220px;
+    --sidebar-padding: 20px 16px;
+}
+
+/* ---- Light mode ----------------------------------------------------------- */
+:root {
+    --bg-color: #f8f9fa;
+    --text-color: #1a1a2e;
+    --text-secondary: #6c6c84;
+    --border-color: #e2e2ec;
+    --border-color-light: #eeeef5;
+
+    --link-color: #5c6bc0;
+    --link-hover-color: #3949ab;
+    --link-visited-color: #7b1fa2;
+    --hover-color: #5c6bc0;
+    --hover-color-dark: #3949ab;
+
+    --code-bg: #eef0fb;
+
+    --tag-bg: #e8eaf6;
+    --tag-hover-bg: #c5cae9;
+    --category-bg: #ede7f6;
+    --category-hover-bg: #d1c4e9;
+    --category-text: #5c6bc0;
+
+    --blockquote-border: #9fa8da;
+    --table-border: #e2e2ec;
+    --table-header-bg: #e8eaf6;
+    --table-stripe-bg: #f3f4fc;
+
+    --admonition-note-title-color: #3949ab;
+    --admonition-tip-title-color: #2e7d32;
+    --admonition-important-title-color: #6a1b9a;
+    --admonition-warning-title-color: #e65100;
+    --admonition-caution-title-color: #c62828;
+}
+
+/* ---- Dark mode palette ---------------------------------------------------- */
+:root {
+    --dark-bg-color: #12111f;
+    --dark-text-color: #d8d8f0;
+    --dark-text-secondary: #8888aa;
+    --dark-border-color: #252438;
+    --dark-border-color-light: #1e1d30;
+
+    --dark-link-color: #9fa8da;
+    --dark-link-hover-color: #c5cae9;
+    --dark-link-visited-color: #ce93d8;
+    --dark-hover-color: #9fa8da;
+    --dark-hover-color-dark: #c5cae9;
+
+    --dark-code-bg: #1e1d30;
+
+    --dark-tag-bg: #1e1d30;
+    --dark-tag-hover-bg: #252438;
+    --dark-category-bg: #1a1828;
+    --dark-category-hover-bg: #252438;
+    --dark-category-text: #9fa8da;
+
+    --dark-blockquote-border: #3949ab;
+    --dark-table-border: #252438;
+    --dark-table-header-bg: #1e1d30;
+    --dark-table-stripe-bg: #161525;
+
+    --dark-admonition-note-title-color: #9fa8da;
+    --dark-admonition-tip-title-color: #81c784;
+    --dark-admonition-important-title-color: #ce93d8;
+    --dark-admonition-warning-title-color: #ffb74d;
+    --dark-admonition-caution-title-color: #ef9a9a;
+}
+
+/* ---- Compact sidebar --------------------------------------------------------
+   The custom base.html uses a --sidebar-width variable; override it here if
+   you want a different sidebar width without editing the template.
+   --------------------------------------------------------------------------- */
+.sidebar {
+    width: var(--sidebar-width);
+    padding: var(--sidebar-padding);
+}
+
+.main-wrapper {
+    margin-left: var(--sidebar-width);
+}
+
+/* ---- Tighter post summary cards ------------------------------------------ */
+.post-summary {
+    margin-bottom: 28px;
+    padding-bottom: 22px;
+}
+
+.post-summary h2 {
+    font-size: 1.35em;
+    margin: 0 0 6px 0;
+}
+
+/* ---- Compact post metadata ------------------------------------------------ */
+.post-meta-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    align-items: center;
+    font-size: 0.82em;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+/* ---- Footer styling ------------------------------------------------------- */
+footer {
+    margin-top: 40px;
+    padding-top: 16px;
+}

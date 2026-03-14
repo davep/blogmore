@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<!--
+    Modern Compact theme — base.html
+
+    Differences from the BlogMore default:
+      • Sidebar width is controlled by the --sidebar-width CSS custom property
+        (set in custom.css; default 220px vs the built-in 280px).
+      • A Google Fonts import adds a clean sans-serif for headings.
+      • The data-theme attribute is already applied to <html> by theme.js, so
+        no script-dependent flash of unstyled content occurs.
+
+    All template blocks from the default base.html are preserved so that child
+    templates (index.html, post.html, etc.) work without modification.
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="blogmore v{{ blogmore_version }}">
+    {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}
+    <title>{% block title %}{{ site_title }}{% endblock %}</title>
+    {% if favicon_url %}
+    <link rel="icon" href="{{ favicon_url }}">
+    {% endif %}
+    {% if has_platform_icons %}
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-touch-icon-120.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-touch-icon-152.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="/icons/apple-touch-icon-167.png">
+    <link rel="manifest" href="/icons/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-config" content="/icons/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+    {% endif %}
+    {% if fontawesome_css_url %}
+    <link rel="preload" href="{{ fontawesome_woff2_url }}" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ fontawesome_css_url }}">
+    {% endif %}
+    <!-- Custom Google Fonts for the modern-compact theme -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ styles_css_url }}">
+    {% if extra_stylesheets %}
+    {% for stylesheet in extra_stylesheets %}
+    <link rel="stylesheet" href="{{ stylesheet }}">
+    {% endfor %}
+    {% endif %}
+    {% block feed_links %}
+    <link rel="alternate" type="application/rss+xml" title="{{ site_title }} - RSS Feed" href="{{ site_url }}/feed.xml">
+    <link rel="alternate" type="application/atom+xml" title="{{ site_title }} - Atom Feed" href="{{ site_url }}/feeds/all.atom.xml">
+    {% endblock %}
+    {% block site_author_meta %}
+    {% if default_author %}
+    <meta name="author" content="{{ default_author }}">
+    {% endif %}
+    {% endblock %}
+    {% block meta_tags %}{% endblock %}
+    <script src="{{ theme_js_url }}"></script>
+    {% if prev_page_url %}<link rel="prev" href="{{ prev_page_url }}">{% endif %}
+    {% if next_page_url %}<link rel="next" href="{{ next_page_url }}">{% endif %}
+    {% block extra_head %}
+    <!-- Modern Compact: Inter font applied to headings and sidebar -->
+    <style>
+        h1, h2, h3, h4, h5, h6, .sidebar-title h1 {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+    {% endblock %}
+</head>
+<body>
+    <div class="site-container">
+        <aside class="sidebar">
+            <div class="sidebar-mobile-bar">
+                <span class="sidebar-mobile-spacer"></span>
+                <span class="sidebar-mobile-title"><a href="/">{{ site_title }}</a></span>
+                <button class="burger-menu" type="button" aria-label="Toggle navigation" aria-expanded="false"></button>
+            </div>
+            <div class="sidebar-content">
+                <div class="sidebar-header">
+                    {% if site_logo %}
+                    <div class="sidebar-logo">
+                        <a href="/">
+                            <img src="{{ site_logo }}" alt="{{ site_title }}">
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    <div class="sidebar-title">
+                        <h1><a href="/">{{ site_title }}</a></h1>
+                        {% if site_subtitle %}
+                        <p class="sidebar-subtitle">{{ site_subtitle }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if pages %}
+                <div class="sidebar-pages">
+                    <ul class="sidebar-links">
+                        {% for page in pages %}
+                        <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                {% if links %}
+                <section class="sidebar-section">
+                    <h2>Links</h2>
+                    <ul class="sidebar-links">
+                        {% for link in links %}
+                        <li><a href="{{ link.url }}"{% if link.url|is_external_link %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                {% endif %}
+
+                {% if socials %}
+                <section class="sidebar-section">
+                    <h2>{{ socials_title | default('Social') }}</h2>
+                    <div class="sidebar-socials">
+                        {% for social in socials %}
+                        <a href="{{ social.url }}" title="{{ social.site }}" aria-label="{{ social.site }}"{% if social.url|is_external_link %} target="_blank" rel="noopener noreferrer"{% endif %}>
+                            <i class="fa-brands fa-{{ social.site }}"></i>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+            </div>
+        </aside>
+
+        <div class="main-wrapper">
+            <header>
+                <nav>
+                    <ul>
+                        <li><a href="/categories.html">Categories</a></li>
+                        <li><a href="/tags.html">Tags</a></li>
+                        <li><a href="/archive.html">Archive</a></li>
+                        {% if with_search %}
+                        <li><a href="/search.html">Search</a></li>
+                        {% endif %}
+                        {% block feed_nav_links %}
+                        <li><a href="/feed.xml" title="Subscribe via RSS feed">RSS</a></li>
+                        <li><a href="/feeds/all.atom.xml" title="Subscribe via Atom feed">Atom</a></li>
+                        {% endblock %}
+                        <li>
+                            <button class="theme-toggle" type="button" aria-label="Toggle theme">
+                                <span class="icon light-icon">☀️</span>
+                                <span class="icon dark-icon">🌙</span>
+                                <span class="theme-label">Theme</span>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+
+            <main>
+                {% block content %}{% endblock %}
+            </main>
+
+            <footer>
+                {% if with_advert %}
+                <p>Generated with <a href="https://blogmore.davep.dev/" target="_blank" rel="noopener noreferrer">BlogMore</a> v{{ blogmore_version }}</p>
+                {% endif %}
+            </footer>
+        </div>
+    </div>
+</body>
+</html>

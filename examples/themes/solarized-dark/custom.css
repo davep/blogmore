@@ -1,0 +1,98 @@
+/* =============================================================================
+   Solarized Dark Theme for BlogMore
+   Based on the Solarized colour palette by Ethan Schoonover
+   https://ethanschoonover.com/solarized/
+
+   This is a CSS-only theme: it overrides BlogMore's CSS custom properties
+   without modifying any templates.
+
+   Installation:
+     1. Copy this file into your blog's extras/ directory.
+     2. Add to blogmore.yaml:
+          extra_stylesheets:
+            - /solarized-dark.css
+   ============================================================================= */
+
+/* ---- Solarized palette reference ----------------------------------------- */
+/* Base tones (dark → light)                                                    */
+/*   base03: #002b36   base02: #073642   base01: #586e75   base00: #657b83     */
+/*   base0:  #839496   base1:  #93a1a1   base2:  #eee8d5   base3:  #fdf6e3     */
+/* Accent colours                                                                */
+/*   yellow:  #b58900   orange: #cb4b16   red:    #dc322f   magenta: #d33682    */
+/*   violet:  #6c71c4   blue:   #268bd2   cyan:   #2aa198   green:  #859900     */
+/* --------------------------------------------------------------------------- */
+
+/* ---- Dark mode palette ---------------------------------------------------- */
+:root {
+    /* The Solarized "dark" base tones become the dark-mode palette */
+    --dark-bg-color: #002b36;
+    --dark-text-color: #839496;
+    --dark-text-secondary: #586e75;
+    --dark-border-color: #073642;
+    --dark-border-color-light: #013740;
+
+    /* Blue links on dark solarized */
+    --dark-link-color: #268bd2;
+    --dark-link-hover-color: #2aa198;
+    --dark-link-visited-color: #6c71c4;
+    --dark-hover-color: #268bd2;
+    --dark-hover-color-dark: #2aa198;
+
+    /* Code blocks use base02 background */
+    --dark-code-bg: #073642;
+
+    /* Tags & categories with accent colours */
+    --dark-tag-bg: #073642;
+    --dark-tag-hover-bg: #0a3e4a;
+    --dark-category-bg: #013740;
+    --dark-category-hover-bg: #0a4a55;
+    --dark-category-text: #2aa198;
+
+    /* Borders and tables */
+    --dark-blockquote-border: #586e75;
+    --dark-table-border: #073642;
+    --dark-table-header-bg: #073642;
+    --dark-table-stripe-bg: #00252f;
+
+    /* Admonition titles with Solarized accent colours */
+    --dark-admonition-note-title-color: #268bd2;
+    --dark-admonition-tip-title-color: #859900;
+    --dark-admonition-important-title-color: #6c71c4;
+    --dark-admonition-warning-title-color: #b58900;
+    --dark-admonition-caution-title-color: #dc322f;
+}
+
+/* ---- Light mode palette --------------------------------------------------- */
+/* The Solarized "light" base tones work as the light-mode overrides */
+:root {
+    --bg-color: #fdf6e3;
+    --text-color: #657b83;
+    --text-secondary: #93a1a1;
+    --border-color: #eee8d5;
+    --border-color-light: #f5f0e5;
+
+    --link-color: #268bd2;
+    --link-hover-color: #2aa198;
+    --link-visited-color: #6c71c4;
+    --hover-color: #268bd2;
+    --hover-color-dark: #2aa198;
+
+    --code-bg: #eee8d5;
+
+    --tag-bg: #eee8d5;
+    --tag-hover-bg: #e0d8c5;
+    --category-bg: #d9eff2;
+    --category-hover-bg: #c5e5ea;
+    --category-text: #2aa198;
+
+    --blockquote-border: #93a1a1;
+    --table-border: #e0d8c5;
+    --table-header-bg: #eee8d5;
+    --table-stripe-bg: #f8f3e8;
+
+    --admonition-note-title-color: #268bd2;
+    --admonition-tip-title-color: #859900;
+    --admonition-important-title-color: #6c71c4;
+    --admonition-warning-title-color: #b58900;
+    --admonition-caution-title-color: #dc322f;
+}

@@ -1,12 +1,17 @@
 """Unit tests for the generator module."""
 
 import re
+import shutil
 import time
 from pathlib import Path
 
 import pytest
 
-from blogmore.generator import SiteGenerator, paginate_posts, sanitize_for_url
+from blogmore.generator import (
+    SiteGenerator,
+    paginate_posts,
+    sanitize_for_url,
+)
 from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN, Post
 from blogmore.site_config import SiteConfig
 

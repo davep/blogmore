@@ -7,6 +7,9 @@
 - Added optional HTML minification via the `--minify-html` command-line
   switch or the `minify_html: true` configuration option.
   ([#272](https://github.com/davep/blogmore/pull/272))
+- Consolidated and better documented the theming infrastructure to make
+  custom themes easier to create.
+  ([#275](https://github.com/davep/blogmore/pull/275))
 
 ## v1.13.0
 
