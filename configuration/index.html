@@ -324,6 +324,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -534,6 +538,62 @@
     
   
     Templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../theming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../template-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template API reference
   
 
     
@@ -1109,6 +1169,17 @@
     <span class="md-ellipsis">
       
         minify_js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minify_html" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        minify_html
       
     </span>
   </a>
@@ -1979,6 +2050,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#minify_html" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        minify_html
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#extra_stylesheets" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2612,6 +2694,12 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <p><strong>Type:</strong> Boolean<br />
 <strong>Default:</strong> <code>false</code></p>
 <div class="highlight"><pre><span></span><code><span class="nt">minify_js</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<h4 id="minify_html"><code>minify_html</code></h4>
+<p>Minify all generated HTML output. When enabled, every <code>.html</code> file produced by BlogMore is minified before being saved. Unlike the CSS and JavaScript minification options, the output file name is not changed — only the content is minified.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">minify_html</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 <h4 id="extra_stylesheets"><code>extra_stylesheets</code></h4>
 <p>List of additional stylesheets to include. Can be absolute URLs or paths relative to your site root.</p>

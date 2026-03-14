@@ -8,30 +8,32 @@
       
       
       
+        <link rel="canonical" href="https://blogmore.davep.dev/THEME_DEVELOPMENT_GUIDELINES/">
+      
       
       
       
         
       
       
-      <link rel="icon" href="/assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="zensical-0.0.26">
     
     
       
-        <title>BlogMore</title>
+        <title>Theme Development Guidelines - BlogMore</title>
       
     
     
       
         
       
-      <link rel="stylesheet" href="/assets/stylesheets/modern/main.50057488.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.50057488.min.css">
       
         
           
         
-        <link rel="stylesheet" href="/assets/stylesheets/modern/palette.dfe2e883.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.dfe2e883.min.css">
       
       
 
@@ -50,7 +52,7 @@
       
     
     
-    <script>__md_scope=new URL("/",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
       
 
@@ -74,7 +76,8 @@
     <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
     <div data-md-component="skip">
       
-        <a href="#__skip" class="md-skip">
+        
+        <a href="#theme-development-guidelines" class="md-skip">
           Skip to content
         </a>
       
@@ -90,7 +93,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="/" title="BlogMore" class="md-header__button md-logo" aria-label="BlogMore" data-md-component="logo">
+    <a href="./.." title="BlogMore" class="md-header__button md-logo" aria-label="BlogMore" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M64 32C28.7 32 0 60.7 0 96v320c0 35.3 28.7 64 64 64h320c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64zm32 104c0-13.3 10.7-24 24-24 137 0 248 111 248 248 0 13.3-10.7 24-24 24s-24-10.7-24-24c0-110.5-89.5-200-200-200-13.3 0-24-10.7-24-24m0 96c0-13.3 10.7-24 24-24 83.9 0 152 68.1 152 152 0 13.3-10.7 24-24 24s-24-10.7-24-24c0-57.4-46.6-104-104-104-13.3 0-24-10.7-24-24m0 120a32 32 0 1 1 64 0 32 32 0 1 1-64 0"/></svg>
@@ -110,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              Theme Development Guidelines
             
           </span>
         </div>
@@ -190,7 +193,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/" class="md-tabs__link">
+        <a href="./.." class="md-tabs__link">
           
   
   BlogMore
@@ -207,7 +210,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="/changelog/" class="md-tabs__link">
+      <a href="../changelog/" class="md-tabs__link">
         
   
   Change Log
@@ -223,7 +226,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="/license/" class="md-tabs__link">
+      <a href="../license/" class="md-tabs__link">
         
   
   License
@@ -261,7 +264,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/" title="BlogMore" class="md-nav__button md-logo" aria-label="BlogMore" data-md-component="logo">
+    <a href="./.." title="BlogMore" class="md-nav__button md-logo" aria-label="BlogMore" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M64 32C28.7 32 0 60.7 0 96v320c0 35.3 28.7 64 64 64h320c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64zm32 104c0-13.3 10.7-24 24-24 137 0 248 111 248 248 0 13.3-10.7 24-24 24s-24-10.7-24-24c0-110.5-89.5-200-200-200-13.3 0-24-10.7-24-24m0 96c0-13.3 10.7-24 24-24 83.9 0 152 68.1 152 152 0 13.3-10.7 24-24 24s-24-10.7-24-24c0-57.4-46.6-104-104-104-13.3 0-24-10.7-24-24m0 120a32 32 0 1 1 64 0 32 32 0 1 1-64 0"/></svg>
@@ -332,7 +335,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="/" class="md-nav__link ">
+            <a href="./.." class="md-nav__link ">
               
   
   
@@ -376,7 +379,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/setting_up_your_blog/" class="md-nav__link">
+      <a href="../setting_up_your_blog/" class="md-nav__link">
         
   
   
@@ -404,7 +407,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/writing_a_post/" class="md-nav__link">
+      <a href="../writing_a_post/" class="md-nav__link">
         
   
   
@@ -432,7 +435,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/writing_a_page/" class="md-nav__link">
+      <a href="../writing_a_page/" class="md-nav__link">
         
   
   
@@ -460,7 +463,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/metadata_and_sidebar/" class="md-nav__link">
+      <a href="../metadata_and_sidebar/" class="md-nav__link">
         
   
   
@@ -488,7 +491,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/building/" class="md-nav__link">
+      <a href="../building/" class="md-nav__link">
         
   
   
@@ -516,7 +519,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/templates/" class="md-nav__link">
+      <a href="../templates/" class="md-nav__link">
         
   
   
@@ -544,7 +547,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/theming/" class="md-nav__link">
+      <a href="../theming/" class="md-nav__link">
         
   
   
@@ -572,7 +575,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/template-api/" class="md-nav__link">
+      <a href="../template-api/" class="md-nav__link">
         
   
   
@@ -600,7 +603,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/command_line/" class="md-nav__link">
+      <a href="../command_line/" class="md-nav__link">
         
   
   
@@ -628,7 +631,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/configuration/" class="md-nav__link">
+      <a href="../configuration/" class="md-nav__link">
         
   
   
@@ -663,7 +666,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/changelog/" class="md-nav__link">
+      <a href="../changelog/" class="md-nav__link">
         
   
   
@@ -690,7 +693,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/license/" class="md-nav__link">
+      <a href="../license/" class="md-nav__link">
         
   
   
@@ -728,6 +731,210 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mandatory-rule-for-ai-agents-no-breaking-changes-without-explicit-human-approval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Mandatory rule for AI agents: no breaking changes without explicit human approval
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#css-architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CSS architecture overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CSS architecture overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dark-mode-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dark mode implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#colour-variable-naming-convention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Colour variable naming convention
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#css-file-section-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CSS file section structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stable-css-custom-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stable CSS custom properties
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#template-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template contract
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Template contract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#stable-context-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stable context variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stable-post-attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stable Post attributes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stable-template-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stable template blocks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stable-css-classes-used-in-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stable CSS classes (used in templates)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rules-for-making-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rules for making changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Rules for making changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-editing-stylecss" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When editing style.css
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-editing-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When editing templates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-updating-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When updating documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checklist-before-submitting-a-pr-that-touches-css-or-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checklist before submitting a PR that touches CSS or templates
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -740,8 +947,227 @@
               
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
+  
+  
 
+
+<h1 id="theme-development-guidelines">Theme Development Guidelines</h1>
+<p>This document is aimed at <strong>AI agents and contributors</strong> working on the
+BlogMore codebase.  It describes the stable public contracts that surround
+CSS, templates, and theming infrastructure, and explains the rules to follow
+when making changes that touch those areas.</p>
+<p>Human users looking to <em>create</em> a theme should read <a href="../theming/">Theming</a> and
+<a href="../template-api/">Template API</a> instead.</p>
+<h2 id="mandatory-rule-for-ai-agents-no-breaking-changes-without-explicit-human-approval">⚠️ Mandatory rule for AI agents: no breaking changes without explicit human approval</h2>
+<p><strong>Breaking changes to the theming system are strictly prohibited unless a
+human maintainer has explicitly requested or approved them.</strong></p>
+<p>A breaking change is any change that would require the author of an existing
+custom theme (stylesheet or template) to modify their work to maintain the
+same visual or functional result.  Examples include:</p>
+<ul>
+<li>Renaming or removing a CSS custom property (e.g. <code>--bg-color</code>).</li>
+<li>Renaming or removing a template context variable (e.g. <code>post.title</code>).</li>
+<li>Renaming or removing a Jinja2 template block.</li>
+<li>Changing the semantics of an existing CSS class in a way that alters layout
+  or visual appearance for custom templates.</li>
+</ul>
+<p><strong>If you are an AI agent and you believe a breaking change is necessary:</strong></p>
+<ol>
+<li><strong>Stop.</strong>  Do not make the change.</li>
+<li>Describe the proposed change and why it is needed in a comment or message
+   to the human maintainer.</li>
+<li>Proceed only after receiving explicit written approval.</li>
+</ol>
+<p>Breaking changes, when approved, must:</p>
+<ul>
+<li>Be introduced only in a new <strong>major</strong> version bump (e.g. v1.x → v2.0).
+  A minor version bump (v1.x → v1.(x+1)) is <strong>never</strong> sufficient for a
+  breaking change, regardless of how small the change appears.</li>
+<li>Be labelled <code>BREAKING CHANGE</code> in <code>ChangeLog.md</code> with full migration
+  instructions.</li>
+</ul>
+<p>Additive changes (new CSS custom properties, new context variables, new
+template blocks) are backward-compatible.  They require at most a <strong>minor</strong>
+version bump and do not need human pre-approval beyond the normal review
+process.</p>
+<h2 id="css-architecture-overview">CSS architecture overview</h2>
+<p>BlogMore's stylesheet (<code>src/blogmore/templates/static/style.css</code>) uses CSS
+custom properties (variables) as its theming layer.</p>
+<h3 id="dark-mode-implementation">Dark mode implementation</h3>
+<p>Dark mode colours are defined in <strong>two selectors</strong>, both of which reference
+shared palette variables:</p>
+<div class="highlight"><pre><span></span><code>:root                     — declares --dark-* palette variables (values defined once)
+  │
+  ├── @media (prefers-color-scheme: dark) :root:not([data-theme])
+  │     — fallback for no-JavaScript environments; maps --foo to var(--dark-foo)
+  │
+  └── :root[data-theme=&quot;dark&quot;]
+        — used by theme.js; maps --foo to var(--dark-foo)
+</code></pre></div>
+<p><strong>Rule</strong>: When changing a dark mode colour, change the <code>--dark-*</code> variable
+value in <code>:root</code>.  <strong>Never</strong> change only one of the two selector blocks —
+they must always reference the same <code>--dark-*</code> palette variables.</p>
+<h3 id="colour-variable-naming-convention">Colour variable naming convention</h3>
+<table>
+<thead>
+<tr>
+<th>Prefix</th>
+<th>Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(none)</td>
+<td>Active value used by components; resolves to light or dark depending on current mode</td>
+</tr>
+<tr>
+<td><code>--dark-</code></td>
+<td>Dark mode palette value; always defined in <code>:root</code></td>
+</tr>
+</tbody>
+</table>
+<p>Example pair:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">--bg-color</span><span class="w">           </span><span class="c">/* active value — used by body { background: var(--bg-color); } */</span>
+<span class="nt">--dark-bg-color</span><span class="w">      </span><span class="c">/* dark palette value — referenced by both dark mode selectors */</span>
+</code></pre></div>
+<h3 id="css-file-section-structure">CSS file section structure</h3>
+<p>The stylesheet is divided into clearly labelled sections:</p>
+<ol>
+<li><strong>COLOR VARIABLES</strong> — all custom properties, including <code>--dark-*</code> palette</li>
+<li><strong>BASE STYLES</strong> — reset, <code>body</code>, global typography</li>
+<li><strong>LAYOUT COMPONENTS</strong> — <code>.site-container</code>, <code>.sidebar</code>, <code>.main-wrapper</code></li>
+<li><strong>CONTENT STYLING</strong> — links, header, post styles, blockquotes, tables</li>
+<li><strong>NAVIGATION &amp; PAGINATION</strong> — <code>.post-navigation</code>, <code>.pagination</code></li>
+<li><strong>ADMONITIONS &amp; FOOTNOTES</strong> — admonition blocks and footnote styles</li>
+<li><strong>THEME TOGGLE</strong> — dark/light mode button</li>
+<li><strong>Syntax Highlighting</strong> — Pygments light and dark highlight rules</li>
+<li><strong>LISTING PAGES</strong> — tags, categories, archive, search</li>
+</ol>
+<p>When adding new CSS, place it in the most appropriate section.</p>
+<h3 id="stable-css-custom-properties">Stable CSS custom properties</h3>
+<p>The following properties are part of the public API and <strong>must not be
+renamed</strong> in a v1.x release:</p>
+<p><strong>Light/active values:</strong>
+<code>--bg-color</code>, <code>--text-color</code>, <code>--text-secondary</code>, <code>--border-color</code>,
+<code>--border-color-light</code>, <code>--link-color</code>, <code>--link-hover-color</code>,
+<code>--link-visited-color</code>, <code>--hover-color</code>, <code>--hover-color-dark</code>, <code>--code-bg</code>,
+<code>--tag-bg</code>, <code>--tag-hover-bg</code>, <code>--category-bg</code>, <code>--category-hover-bg</code>,
+<code>--category-text</code>, <code>--blockquote-border</code>, <code>--table-border</code>,
+<code>--table-header-bg</code>, <code>--table-stripe-bg</code>, <code>--admonition-note-title-color</code>,
+<code>--admonition-tip-title-color</code>, <code>--admonition-important-title-color</code>,
+<code>--admonition-warning-title-color</code>, <code>--admonition-caution-title-color</code>.</p>
+<p><strong>Dark palette values</strong> (all prefixed <code>--dark-</code>):
+<code>--dark-bg-color</code>, <code>--dark-text-color</code>, <code>--dark-text-secondary</code>,
+<code>--dark-border-color</code>, <code>--dark-border-color-light</code>, <code>--dark-link-color</code>,
+<code>--dark-link-hover-color</code>, <code>--dark-link-visited-color</code>, <code>--dark-hover-color</code>,
+<code>--dark-hover-color-dark</code>, <code>--dark-code-bg</code>, <code>--dark-tag-bg</code>,
+<code>--dark-tag-hover-bg</code>, <code>--dark-category-bg</code>, <code>--dark-category-hover-bg</code>,
+<code>--dark-category-text</code>, <code>--dark-blockquote-border</code>, <code>--dark-table-border</code>,
+<code>--dark-table-header-bg</code>, <code>--dark-table-stripe-bg</code>,
+<code>--dark-admonition-note-title-color</code>, <code>--dark-admonition-tip-title-color</code>,
+<code>--dark-admonition-important-title-color</code>,
+<code>--dark-admonition-warning-title-color</code>,
+<code>--dark-admonition-caution-title-color</code>.</p>
+<h2 id="template-contract">Template contract</h2>
+<h3 id="stable-context-variables">Stable context variables</h3>
+<p>All variables documented in <a href="../template-api/">Template API</a> are stable for
+v1.x.  Key ones that appear in nearly every template:</p>
+<ul>
+<li><code>site_title</code>, <code>site_subtitle</code>, <code>site_url</code></li>
+<li><code>all_posts</code> — full sorted list of <code>Post</code> objects</li>
+<li><code>pages</code> — sorted list of <code>Page</code> objects</li>
+<li><code>prev_page_url</code>, <code>next_page_url</code> — pagination URLs (may be <code>None</code>)</li>
+<li><code>canonical_url</code></li>
+</ul>
+<h3 id="stable-post-attributes">Stable Post attributes</h3>
+<p><code>post.title</code>, <code>post.html_content</code>, <code>post.date</code>, <code>post.url</code>, <code>post.slug</code>,
+<code>post.category</code>, <code>post.tags</code>, <code>post.description</code>, <code>post.reading_time</code>,
+<code>post.modified_date</code>, <code>post.draft</code>, <code>post.metadata</code>.</p>
+<h3 id="stable-template-blocks">Stable template blocks</h3>
+<p><code>base.html</code> provides these blocks that child templates can safely override:
+<code>title</code>, <code>feed_links</code>, <code>site_author_meta</code>, <code>meta_tags</code>, <code>extra_head</code>,
+<code>content</code>, <code>feed_nav_links</code>.</p>
+<h3 id="stable-css-classes-used-in-templates">Stable CSS classes (used in templates)</h3>
+<p><code>.site-container</code>, <code>.sidebar</code>, <code>.sidebar-content</code>, <code>.sidebar-header</code>,
+<code>.sidebar-pages</code>, <code>.sidebar-section</code>, <code>.sidebar-links</code>, <code>.sidebar-socials</code>,
+<code>.main-wrapper</code>, <code>.post-header</code>, <code>.post-content</code>, <code>.post-summary</code>,
+<code>.post-navigation</code>, <code>.pagination</code>, <code>.tag-cloud</code>, <code>.tags</code>, <code>.category-link</code>,
+<code>.theme-toggle</code>, <code>.highlight</code>.</p>
+<h2 id="rules-for-making-changes">Rules for making changes</h2>
+<h3 id="when-editing-stylecss">When editing style.css</h3>
+<ol>
+<li>
+<p><strong>Adding a new colour</strong>: add it as both an active variable (no prefix, with
+   a light default) and a <code>--dark-</code> palette variable in <code>:root</code>.  Then add
+   the active variable to both dark mode selectors referencing <code>var(--dark-*)</code>.</p>
+</li>
+<li>
+<p><strong>Changing a colour value</strong>: change only the <code>--dark-*</code> value in <code>:root</code>
+   (dark mode) or the active variable's default (light mode).</p>
+</li>
+<li>
+<p><strong>Renaming a variable</strong>: this is a <strong>breaking change</strong>.  Label it clearly
+   in <code>ChangeLog.md</code> with <code>BREAKING CHANGE</code>, provide the old and new names,
+   and only introduce it in a new <strong>major</strong> version.</p>
+</li>
+<li>
+<p><strong>Adding new selectors</strong>: place them in the correct section, add comments
+   if not self-evident.</p>
+</li>
+</ol>
+<h3 id="when-editing-templates">When editing templates</h3>
+<ol>
+<li>
+<p>Do not remove any variable from the context without labelling the change
+   as breaking and following the breaking-change policy (see the mandatory
+   rule at the top of this document — this requires a human approval and a
+   major version bump).</p>
+</li>
+<li>
+<p>Do not rename template blocks without a breaking-change label.</p>
+</li>
+<li>
+<p>If you add a new context variable, document it in
+   <a href="../template-api/">Template API</a>.</p>
+</li>
+<li>
+<p>If you add or rename a CSS class used by a template, update the CSS and
+   the class table in <a href="../template-api/">Template API</a>.</p>
+</li>
+</ol>
+<h3 id="when-updating-documentation">When updating documentation</h3>
+<ul>
+<li>Changes to theming behaviour → update <a href="../theming/">Theming</a>.</li>
+<li>Changes to context variables or blocks → update <a href="../template-api/">Template API</a>.</li>
+<li>Breaking changes → add a <code>BREAKING CHANGE</code> entry to <a href="../changelog/">ChangeLog</a>.</li>
+</ul>
+<h2 id="checklist-before-submitting-a-pr-that-touches-css-or-templates">Checklist before submitting a PR that touches CSS or templates</h2>
+<ul>
+<li>[ ] No existing <code>--*</code> CSS variable has been renamed.</li>
+<li>[ ] Dark mode colour values were changed via <code>--dark-*</code> variables, not
+      by editing only one of the two dark mode selectors.</li>
+<li>[ ] New variables follow the <code>--name</code> / <code>--dark-name</code> convention.</li>
+<li>[ ] Template context variables removed or renamed are labelled as breaking.</li>
+<li>[ ] <a href="../template-api/">Template API</a> and <a href="../theming/">Theming</a> are updated
+      if the public API changed.</li>
+<li>[ ] <code>ChangeLog.md</code> has an entry for the change.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
               </article>
             </div>
           
@@ -865,10 +1291,10 @@
       
       
       
-      <script id="__config" type="application/json">{"annotate":null,"base":"/","features":["navigation.tabs","navigation.indexes","navigation.tabs.sticky","navigation.footer","content.code.copy"],"search":"/assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.tabs","navigation.indexes","navigation.tabs.sticky","navigation.footer","content.code.copy"],"search":"../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="/assets/javascripts/bundle.5fd3284f.min.js"></script>
+      <script src="../assets/javascripts/bundle.5fd3284f.min.js"></script>
       
     
   </body>
