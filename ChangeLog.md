@@ -7,32 +7,8 @@
 - Added optional HTML minification via the `--minify-html` command-line
   switch or the `minify_html: true` configuration option.
   ([#272](https://github.com/davep/blogmore/pull/272))
-- Consolidated theming infrastructure to make custom themes easier to create:
-  - Refactored `style.css` to eliminate dark mode colour duplication by
-    introducing `--dark-*` CSS custom properties whose values are defined
-    once in `:root` and referenced (via `var()`) by both the
-    `@media (prefers-color-scheme: dark)` fallback and the
-    `[data-theme="dark"]` selector.  Admonition title colours are now
-    CSS-variable-driven too.  Added `color-scheme` property and comprehensive
-    section comments throughout the stylesheet.
-  - Added `docs/theming.md` — a complete theme development guide covering CSS
-    variable overrides, the full variable reference, template customisation,
-    and stability guarantees.
-  - Added `docs/template-api.md` — documents the stable template contract:
-    all context variables, `Post`/`Page` object attributes, template blocks,
-    CSS classes, and the breaking change policy for v1.x.
-  - Added `docs/THEME_DEVELOPMENT_GUIDELINES.md` — agent-oriented reference
-    explaining the CSS variable architecture and the rules to follow when
-    making changes that touch CSS or templates.
-  - Added three example themes in `examples/themes/`: `solarized-dark/`
-    (CSS only, Solarized palette), `minimal-monochrome/` (CSS only, grayscale
-    typography-focused design), and `modern-compact/` (CSS + custom templates,
-    narrower sidebar and compact post cards).
-  - Updated `docs/templates.md` to point readers to the new theming guide.
-  - Fixed a bug where files removed from the `extras/` directory would persist
-    in the output on subsequent builds.  A manifest file
-    (`.blogmore-extras-manifest`) is now maintained in the output directory so
-    that stale extras files are automatically cleaned up.
+- Consolidated and better documented the theming infrastructure to make
+  custom themes easier to create.
   ([#275](https://github.com/davep/blogmore/pull/275))
 
 ## v1.13.0
