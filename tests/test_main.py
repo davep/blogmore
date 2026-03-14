@@ -1,5 +1,6 @@
 """Integration tests for the CLI module."""
 
+import dataclasses
 import sys
 import time
 from pathlib import Path
@@ -1589,3 +1590,71 @@ class TestConfigChangeHandler:
 
             # site_config must be updated so generate() picks up the new list
             assert generator.site_config.extra_stylesheets == ["new1.css", "new2.css"]
+
+    def test_extra_stylesheets_cleared_when_removed_from_config(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that removing extra_stylesheets from config clears it in site_config."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+
+        config_file = tmp_path / "blogmore.yaml"
+        config_data: dict[str, object] = {"extra_stylesheets": ["/custom.css"]}
+        with open(config_file, "w") as f:
+            yaml.dump(config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                extra_stylesheets=["/custom.css"],
+            )
+        )
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides={},
+                debounce_seconds=0.05,
+            )
+
+            # Remove extra_stylesheets from the config entirely
+            new_config_data: dict[str, object] = {"site_title": "My Blog"}
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            # extra_stylesheets must be cleared so generate() no longer
+            # includes the <link> tag for /custom.css
+            assert generator.site_config.extra_stylesheets is None
+
+    def test_extra_stylesheets_cleared_in_renderer_on_generate(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that generate() clears renderer.extra_stylesheets when config has none."""
+        from blogmore.generator import SiteGenerator
+
+        # Generator started with stylesheets
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                extra_stylesheets=["/custom.css"],
+            )
+        )
+        # Simulate what happens after config reload removes extra_stylesheets:
+        # site_config.extra_stylesheets is now None
+        generator.site_config = dataclasses.replace(
+            generator.site_config, extra_stylesheets=None
+        )
+
+        generator.generate()
+
+        # Renderer must have an empty list, not the old stylesheet
+        assert generator.renderer.extra_stylesheets == []

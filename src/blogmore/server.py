@@ -299,6 +299,13 @@ class ConfigChangeHandler(FileSystemEventHandler):
                 update_kwargs["extra_stylesheets"] = [stylesheets]
             elif isinstance(stylesheets, list):
                 update_kwargs["extra_stylesheets"] = stylesheets
+        else:
+            # extra_stylesheets was removed from the config file; fall back to
+            # any value supplied via the CLI, or clear the list entirely so the
+            # next generate() does not include the old stylesheet references.
+            update_kwargs["extra_stylesheets"] = self.cli_overrides.get(
+                "extra_stylesheets"
+            )
 
         raw_post_path = config.get("post_path", DEFAULT_POST_PATH)
         if isinstance(raw_post_path, str):

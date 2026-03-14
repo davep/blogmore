@@ -328,11 +328,13 @@ class SiteGenerator:
         self._cache_bust_token = str(int(time.time()))
 
         # Apply cache-busting to any local extra stylesheets so they are also
-        # re-fetched after a new site generation.
-        if self.site_config.extra_stylesheets:
-            self.renderer.extra_stylesheets = [
-                self._with_cache_bust(url) for url in self.site_config.extra_stylesheets
-            ]
+        # re-fetched after a new site generation.  Always reassign the list so
+        # that removing extra_stylesheets from the config correctly clears the
+        # renderer's list on the next build.
+        extra_stylesheets = self.site_config.extra_stylesheets or []
+        self.renderer.extra_stylesheets = [
+            self._with_cache_bust(url) for url in extra_stylesheets
+        ]
 
         # Clean output directory if requested
         if self.site_config.clean_first and self.site_config.output_dir.exists():
