@@ -1,0 +1,106 @@
+/* =============================================================================
+   Minimal Monochrome Theme for BlogMore
+
+   A clean, grayscale design that removes colour as a distraction and focuses
+   entirely on typography and whitespace.  Links use bold weight rather than
+   colour for differentiation.
+
+   This is a CSS-only theme.
+
+   Installation:
+     1. Copy this file into your blog's extras/ directory.
+     2. Add to blogmore.yaml:
+          extra_stylesheets:
+            - /minimal-monochrome.css
+   ============================================================================= */
+
+/* ---- Light mode ----------------------------------------------------------- */
+:root {
+    --bg-color: #ffffff;
+    --text-color: #111111;
+    --text-secondary: #555555;
+    --border-color: #dddddd;
+    --border-color-light: #eeeeee;
+
+    /* Links are styled with weight, not colour */
+    --link-color: #111111;
+    --link-hover-color: #000000;
+    --link-visited-color: #444444;
+    --hover-color: #111111;
+    --hover-color-dark: #000000;
+
+    --code-bg: #f4f4f4;
+
+    --tag-bg: #eeeeee;
+    --tag-hover-bg: #dddddd;
+    --category-bg: #eeeeee;
+    --category-hover-bg: #dddddd;
+    --category-text: #111111;
+
+    --blockquote-border: #bbbbbb;
+    --table-border: #cccccc;
+    --table-header-bg: #eeeeee;
+    --table-stripe-bg: #fafafa;
+
+    --admonition-note-title-color: #222222;
+    --admonition-tip-title-color: #222222;
+    --admonition-important-title-color: #222222;
+    --admonition-warning-title-color: #222222;
+    --admonition-caution-title-color: #222222;
+}
+
+/* ---- Dark mode palette ---------------------------------------------------- */
+:root {
+    --dark-bg-color: #111111;
+    --dark-text-color: #eeeeee;
+    --dark-text-secondary: #aaaaaa;
+    --dark-border-color: #333333;
+    --dark-border-color-light: #222222;
+
+    --dark-link-color: #eeeeee;
+    --dark-link-hover-color: #ffffff;
+    --dark-link-visited-color: #cccccc;
+    --dark-hover-color: #eeeeee;
+    --dark-hover-color-dark: #ffffff;
+
+    --dark-code-bg: #1e1e1e;
+
+    --dark-tag-bg: #222222;
+    --dark-tag-hover-bg: #333333;
+    --dark-category-bg: #222222;
+    --dark-category-hover-bg: #333333;
+    --dark-category-text: #eeeeee;
+
+    --dark-blockquote-border: #555555;
+    --dark-table-border: #333333;
+    --dark-table-header-bg: #222222;
+    --dark-table-stripe-bg: #171717;
+
+    --dark-admonition-note-title-color: #dddddd;
+    --dark-admonition-tip-title-color: #dddddd;
+    --dark-admonition-important-title-color: #dddddd;
+    --dark-admonition-warning-title-color: #dddddd;
+    --dark-admonition-caution-title-color: #dddddd;
+}
+
+/* ---- Link styling --------------------------------------------------------- */
+/* Monochrome: differentiate links with bold weight, no underline by default */
+a {
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid currentColor;
+}
+
+a:hover {
+    border-bottom-width: 2px;
+}
+
+/* Navigation links don't need the border treatment */
+header ul a,
+.sidebar a,
+.post-navigation a,
+.pagination-link,
+.theme-toggle {
+    border-bottom: none;
+    font-weight: inherit;
+}

@@ -1,7 +1,23 @@
-/* Basic styling for blogmore */
+/* =============================================================================
+   COLOR VARIABLES
+   ============================================================================= */
 
+/* Light mode defaults and dark mode palette.
+ *
+ * The --dark-* variables define the colour values used in dark mode.  They are
+ * declared here in :root so that the actual hex values appear only once.  Both
+ * the @media fallback block (for browsers with JavaScript disabled) and the
+ * [data-theme="dark"] block (used by theme.js when JavaScript is enabled)
+ * reference these shared palette variables via var().
+ *
+ * To override dark mode colours in a custom stylesheet you only need to change
+ * the --dark-* variables — the change will automatically apply to both dark
+ * mode mechanisms.  See docs/theming.md for examples.
+ */
 :root {
-    /* Light mode colors */
+    color-scheme: light;
+
+    /* ---- Light mode active values ---- */
     --bg-color: #fff;
     --text-color: #333;
     --text-secondary: #666;
@@ -22,57 +38,111 @@
     --table-border: #ddd;
     --table-header-bg: #f0f0f0;
     --table-stripe-bg: #fafafa;
+    --admonition-note-title-color: #0969da;
+    --admonition-tip-title-color: #1a7f37;
+    --admonition-important-title-color: #8250df;
+    --admonition-warning-title-color: #9a6700;
+    --admonition-caution-title-color: #d1242f;
+
+    /* ---- Dark mode palette (shared by both dark mode selectors below) ---- */
+    --dark-bg-color: #1a1a1a;
+    --dark-text-color: #e0e0e0;
+    --dark-text-secondary: #a0a0a0;
+    --dark-border-color: #333;
+    --dark-border-color-light: #2a2a2a;
+    --dark-link-color: #6eb3ff;
+    --dark-link-hover-color: #8cc5ff;
+    --dark-link-visited-color: #b399ff;
+    --dark-hover-color: #6eb3ff;
+    --dark-hover-color-dark: #8cc5ff;
+    --dark-code-bg: #2a2a2a;
+    --dark-tag-bg: #2a2a2a;
+    --dark-tag-hover-bg: #333;
+    --dark-category-bg: #1a3a4a;
+    --dark-category-hover-bg: #2a4a5a;
+    --dark-category-text: #6eb3ff;
+    --dark-blockquote-border: #444;
+    --dark-table-border: #404040;
+    --dark-table-header-bg: #2a2a2a;
+    --dark-table-stripe-bg: #222222;
+    --dark-admonition-note-title-color: #58a6ff;
+    --dark-admonition-tip-title-color: #3fb950;
+    --dark-admonition-important-title-color: #a371f7;
+    --dark-admonition-warning-title-color: #d29922;
+    --dark-admonition-caution-title-color: #f85149;
 }
 
-/* Dark mode colors - applied by system preference */
+/* Dark mode — applied by system preference (JavaScript disabled fallback).
+ * Applies when the OS/browser prefers dark and no data-theme attribute has been
+ * set (i.e. theme.js has not yet run or JavaScript is disabled entirely).
+ */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme]) {
-        --bg-color: #1a1a1a;
-        --text-color: #e0e0e0;
-        --text-secondary: #a0a0a0;
-        --border-color: #333;
-        --border-color-light: #2a2a2a;
-        --link-color: #6eb3ff;
-        --link-hover-color: #8cc5ff;
-        --link-visited-color: #b399ff;
-        --hover-color: #6eb3ff;
-        --hover-color-dark: #8cc5ff;
-        --code-bg: #2a2a2a;
-        --tag-bg: #2a2a2a;
-        --tag-hover-bg: #333;
-        --category-bg: #1a3a4a;
-        --category-hover-bg: #2a4a5a;
-        --category-text: #6eb3ff;
-        --blockquote-border: #444;
-        --table-border: #404040;
-        --table-header-bg: #2a2a2a;
-        --table-stripe-bg: #222222;
+        color-scheme: dark;
+        --bg-color: var(--dark-bg-color);
+        --text-color: var(--dark-text-color);
+        --text-secondary: var(--dark-text-secondary);
+        --border-color: var(--dark-border-color);
+        --border-color-light: var(--dark-border-color-light);
+        --link-color: var(--dark-link-color);
+        --link-hover-color: var(--dark-link-hover-color);
+        --link-visited-color: var(--dark-link-visited-color);
+        --hover-color: var(--dark-hover-color);
+        --hover-color-dark: var(--dark-hover-color-dark);
+        --code-bg: var(--dark-code-bg);
+        --tag-bg: var(--dark-tag-bg);
+        --tag-hover-bg: var(--dark-tag-hover-bg);
+        --category-bg: var(--dark-category-bg);
+        --category-hover-bg: var(--dark-category-hover-bg);
+        --category-text: var(--dark-category-text);
+        --blockquote-border: var(--dark-blockquote-border);
+        --table-border: var(--dark-table-border);
+        --table-header-bg: var(--dark-table-header-bg);
+        --table-stripe-bg: var(--dark-table-stripe-bg);
+        --admonition-note-title-color: var(--dark-admonition-note-title-color);
+        --admonition-tip-title-color: var(--dark-admonition-tip-title-color);
+        --admonition-important-title-color: var(--dark-admonition-important-title-color);
+        --admonition-warning-title-color: var(--dark-admonition-warning-title-color);
+        --admonition-caution-title-color: var(--dark-admonition-caution-title-color);
     }
 }
 
-/* Manual theme overrides - these override system preference */
+/* Dark mode — applied by theme toggle (JavaScript enabled).
+ * theme.js sets data-theme="dark" when the user has selected dark mode or
+ * when the system preference is dark.
+ */
 :root[data-theme="dark"] {
-    --bg-color: #1a1a1a;
-    --text-color: #e0e0e0;
-    --text-secondary: #a0a0a0;
-    --border-color: #333;
-    --border-color-light: #2a2a2a;
-    --link-color: #6eb3ff;
-    --link-hover-color: #8cc5ff;
-    --link-visited-color: #b399ff;
-    --hover-color: #6eb3ff;
-    --hover-color-dark: #8cc5ff;
-    --code-bg: #2a2a2a;
-    --tag-bg: #2a2a2a;
-    --tag-hover-bg: #333;
-    --category-bg: #1a3a4a;
-    --category-hover-bg: #2a4a5a;
-    --category-text: #6eb3ff;
-    --blockquote-border: #444;
-    --table-border: #404040;
-    --table-header-bg: #2a2a2a;
-    --table-stripe-bg: #222222;
+    color-scheme: dark;
+    --bg-color: var(--dark-bg-color);
+    --text-color: var(--dark-text-color);
+    --text-secondary: var(--dark-text-secondary);
+    --border-color: var(--dark-border-color);
+    --border-color-light: var(--dark-border-color-light);
+    --link-color: var(--dark-link-color);
+    --link-hover-color: var(--dark-link-hover-color);
+    --link-visited-color: var(--dark-link-visited-color);
+    --hover-color: var(--dark-hover-color);
+    --hover-color-dark: var(--dark-hover-color-dark);
+    --code-bg: var(--dark-code-bg);
+    --tag-bg: var(--dark-tag-bg);
+    --tag-hover-bg: var(--dark-tag-hover-bg);
+    --category-bg: var(--dark-category-bg);
+    --category-hover-bg: var(--dark-category-hover-bg);
+    --category-text: var(--dark-category-text);
+    --blockquote-border: var(--dark-blockquote-border);
+    --table-border: var(--dark-table-border);
+    --table-header-bg: var(--dark-table-header-bg);
+    --table-stripe-bg: var(--dark-table-stripe-bg);
+    --admonition-note-title-color: var(--dark-admonition-note-title-color);
+    --admonition-tip-title-color: var(--dark-admonition-tip-title-color);
+    --admonition-important-title-color: var(--dark-admonition-important-title-color);
+    --admonition-warning-title-color: var(--dark-admonition-warning-title-color);
+    --admonition-caution-title-color: var(--dark-admonition-caution-title-color);
 }
+
+/* =============================================================================
+   BASE STYLES
+   ============================================================================= */
 
 * {
     box-sizing: border-box;
@@ -87,6 +157,10 @@ body {
     background: var(--bg-color);
     transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* =============================================================================
+   LAYOUT COMPONENTS
+   ============================================================================= */
 
 /* Site container with sidebar layout */
 .site-container {
@@ -424,6 +498,10 @@ body {
     }
 }
 
+/* =============================================================================
+   CONTENT STYLING
+   ============================================================================= */
+
 /* General link styles for content */
 a {
     color: var(--link-color);
@@ -548,6 +626,10 @@ time a:visited {
     background: var(--tag-hover-bg);
     color: var(--text-color);
 }
+
+/* =============================================================================
+   NAVIGATION & PAGINATION
+   ============================================================================= */
 
 /* Post navigation (previous/next links) */
 .post-navigation {
@@ -793,6 +875,10 @@ img[src*="#centre"] {
     background: var(--table-stripe-bg);
 }
 
+/* =============================================================================
+   ADMONITIONS & FOOTNOTES
+   ============================================================================= */
+
 /* GitHub-style admonitions */
 .post-content .admonition {
     margin: 1.5em 0;
@@ -828,7 +914,7 @@ img[src*="#centre"] {
 }
 
 .post-content .admonition-note .admonition-title {
-    color: #0969da;
+    color: var(--admonition-note-title-color);
 }
 
 /* Tip admonition - green */
@@ -837,7 +923,7 @@ img[src*="#centre"] {
 }
 
 .post-content .admonition-tip .admonition-title {
-    color: #1a7f37;
+    color: var(--admonition-tip-title-color);
 }
 
 /* Important admonition - purple */
@@ -846,7 +932,7 @@ img[src*="#centre"] {
 }
 
 .post-content .admonition-important .admonition-title {
-    color: #8250df;
+    color: var(--admonition-important-title-color);
 }
 
 /* Warning admonition - orange */
@@ -855,7 +941,7 @@ img[src*="#centre"] {
 }
 
 .post-content .admonition-warning .admonition-title {
-    color: #9a6700;
+    color: var(--admonition-warning-title-color);
 }
 
 /* Caution admonition - red */
@@ -864,50 +950,7 @@ img[src*="#centre"] {
 }
 
 .post-content .admonition-caution .admonition-title {
-    color: #d1242f;
-}
-
-/* Dark mode adjustments for admonitions */
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme]) .post-content .admonition-note .admonition-title {
-        color: #58a6ff;
-    }
-
-    :root:not([data-theme]) .post-content .admonition-tip .admonition-title {
-        color: #3fb950;
-    }
-
-    :root:not([data-theme]) .post-content .admonition-important .admonition-title {
-        color: #a371f7;
-    }
-
-    :root:not([data-theme]) .post-content .admonition-warning .admonition-title {
-        color: #d29922;
-    }
-
-    :root:not([data-theme]) .post-content .admonition-caution .admonition-title {
-        color: #f85149;
-    }
-}
-
-:root[data-theme="dark"] .post-content .admonition-note .admonition-title {
-    color: #58a6ff;
-}
-
-:root[data-theme="dark"] .post-content .admonition-tip .admonition-title {
-    color: #3fb950;
-}
-
-:root[data-theme="dark"] .post-content .admonition-important .admonition-title {
-    color: #a371f7;
-}
-
-:root[data-theme="dark"] .post-content .admonition-warning .admonition-title {
-    color: #d29922;
-}
-
-:root[data-theme="dark"] .post-content .admonition-caution .admonition-title {
-    color: #f85149;
+    color: var(--admonition-caution-title-color);
 }
 
 /* Footnotes */
@@ -991,6 +1034,10 @@ footer a {
 footer a:hover {
     color: var(--text-color);
 }
+
+/* =============================================================================
+   THEME TOGGLE
+   ============================================================================= */
 
 /* Theme toggle button */
 .theme-toggle {
@@ -1294,6 +1341,10 @@ footer a:hover {
 :root[data-theme="dark"] .highlight .vi { color: #f8f8f2 } /* Name.Variable.Instance */
 :root[data-theme="dark"] .highlight .vm { color: #f8f8f2 } /* Name.Variable.Magic */
 :root[data-theme="dark"] .highlight .il { color: #ae81ff } /* Literal.Number.Integer.Long */
+
+/* =============================================================================
+   LISTING PAGES (tags, categories, archive, search)
+   ============================================================================= */
 
 /* Tags page styles */
 .tags-page h1,

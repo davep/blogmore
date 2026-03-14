@@ -1,5 +1,10 @@
 # Templates
 
+!!! tip "Looking for theming guidance?"
+    If you want to customise colours, typography, or want worked examples of
+    complete themes, see the [Theming](theming.md) guide.  It also covers the
+    Template API stability contract and links to example themes.
+
 BlogMore generates every page of your site using [Jinja2](https://jinja.palletsprojects.com/) templates. The default templates produce a clean, responsive design that works well for most blogs. If you need to change the look or layout of your site beyond what CSS can achieve, you can override the templates.
 
 ## The default templates
