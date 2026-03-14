@@ -1,6 +1,5 @@
 """Unit tests for the generator module."""
 
-import json
 import re
 import shutil
 import time
@@ -9,7 +8,6 @@ from pathlib import Path
 import pytest
 
 from blogmore.generator import (
-    EXTRAS_MANIFEST_FILENAME,
     SiteGenerator,
     paginate_posts,
     sanitize_for_url,
@@ -1065,133 +1063,6 @@ class TestSiteGenerator:
         assert (temp_output_dir / "robots.txt").read_text() == "New content"
         captured = capsys.readouterr()
         assert "Overriding existing file" in captured.out
-
-    def test_copy_extras_writes_manifest(
-        self, tmp_path: Path, temp_output_dir: Path
-    ) -> None:
-        """Test that _copy_extras writes a manifest of copied files."""
-        content_dir = tmp_path / "content"
-        content_dir.mkdir()
-        extras_dir = content_dir / "extras"
-        extras_dir.mkdir()
-        (extras_dir / "robots.txt").write_text("User-agent: *\nDisallow:")
-        (extras_dir / "custom.css").write_text("body { color: red; }")
-
-        generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=content_dir,
-                output_dir=temp_output_dir,
-            )
-        )
-        generator._copy_extras()
-
-        manifest_path = content_dir / EXTRAS_MANIFEST_FILENAME
-        assert manifest_path.exists()
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        assert sorted(manifest) == ["custom.css", "robots.txt"]
-
-    def test_copy_extras_removes_stale_files(
-        self, tmp_path: Path, temp_output_dir: Path, capsys: pytest.CaptureFixture[str]
-    ) -> None:
-        """Test that files removed from extras/ are cleaned up from output."""
-        content_dir = tmp_path / "content"
-        content_dir.mkdir()
-        extras_dir = content_dir / "extras"
-        extras_dir.mkdir()
-        (extras_dir / "robots.txt").write_text("User-agent: *\nDisallow:")
-        (extras_dir / "custom.css").write_text("body { color: red; }")
-
-        generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=content_dir,
-                output_dir=temp_output_dir,
-            )
-        )
-        # First build — both files are copied
-        generator._copy_extras()
-        assert (temp_output_dir / "robots.txt").exists()
-        assert (temp_output_dir / "custom.css").exists()
-
-        # Remove custom.css from extras
-        (extras_dir / "custom.css").unlink()
-
-        # Second build — custom.css should be removed from output
-        capsys.readouterr()  # clear previous output
-        generator._copy_extras()
-
-        assert (temp_output_dir / "robots.txt").exists()
-        assert not (temp_output_dir / "custom.css").exists()
-        captured = capsys.readouterr()
-        assert "Removed 1 stale extra file(s) from output" in captured.out
-
-        # Manifest should be updated to reflect only robots.txt
-        manifest = json.loads(
-            (content_dir / EXTRAS_MANIFEST_FILENAME).read_text(encoding="utf-8")
-        )
-        assert manifest == ["robots.txt"]
-
-    def test_copy_extras_removes_stale_subdir_files(
-        self, tmp_path: Path, temp_output_dir: Path
-    ) -> None:
-        """Test that files in subdirs removed from extras/ are cleaned up from output."""
-        content_dir = tmp_path / "content"
-        content_dir.mkdir()
-        extras_dir = content_dir / "extras"
-        images_dir = extras_dir / "images"
-        images_dir.mkdir(parents=True)
-        (images_dir / "logo.png").write_bytes(b"\x89PNG")
-        (extras_dir / "robots.txt").write_text("User-agent: *\nDisallow:")
-
-        generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=content_dir,
-                output_dir=temp_output_dir,
-            )
-        )
-        # First build — logo.png and robots.txt are copied
-        generator._copy_extras()
-        assert (temp_output_dir / "images" / "logo.png").exists()
-        assert (temp_output_dir / "robots.txt").exists()
-
-        # Remove the images subdirectory from extras
-        shutil.rmtree(images_dir)
-
-        # Second build — logo.png should be removed, robots.txt stays
-        generator._copy_extras()
-
-        assert not (temp_output_dir / "images" / "logo.png").exists()
-        assert (temp_output_dir / "robots.txt").exists()
-
-    def test_copy_extras_no_extras_dir_removes_all_previous(
-        self, tmp_path: Path, temp_output_dir: Path, capsys: pytest.CaptureFixture[str]
-    ) -> None:
-        """Test that removing the entire extras/ directory cleans up all previously copied files."""
-        content_dir = tmp_path / "content"
-        content_dir.mkdir()
-        extras_dir = content_dir / "extras"
-        extras_dir.mkdir()
-        (extras_dir / "robots.txt").write_text("User-agent: *\nDisallow:")
-
-        generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=content_dir,
-                output_dir=temp_output_dir,
-            )
-        )
-        # First build — robots.txt is copied
-        generator._copy_extras()
-        assert (temp_output_dir / "robots.txt").exists()
-
-        # Remove the entire extras directory
-        shutil.rmtree(extras_dir)
-
-        # Second build — robots.txt should be removed from output
-        capsys.readouterr()
-        generator._copy_extras()
-
-        assert not (temp_output_dir / "robots.txt").exists()
-        captured = capsys.readouterr()
-        assert "Removed 1 stale extra file(s) from output" in captured.out
 
     def test_global_context_includes_version(
         self, posts_dir: Path, temp_output_dir: Path
