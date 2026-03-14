@@ -51,5 +51,9 @@
   or fixing a bug, be sure to add an appropriate change log entry. Follow
   the format that is already there; be sure to link the PR that provides the
   change.
+- Whenever you add, remove, or change a configuration option in
+  `site_config.py` or `config.py`, you **must** update `blogmore.yaml.example`
+  to keep it in sync. The example file should document every option that a
+  user can set in their configuration file.
 
 [//]: # (copilot-instructions.md ends here)
