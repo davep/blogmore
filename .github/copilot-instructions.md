@@ -55,5 +55,8 @@
   `site_config.py` or `config.py`, you **must** update `blogmore.yaml.example`
   to keep it in sync. The example file should document every option that a
   user can set in their configuration file.
+- Be sure to read `THEME_DEVELOPMENT_GUIDELINES.md` in the root of the
+  repository before making any changes that might impact on styling and
+  templates.
 
 [//]: # (copilot-instructions.md ends here)
