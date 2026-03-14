@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v1.14.0
 
-**Released: WiP**
+**Released: 2026-03-14**
 
 - Added optional HTML minification via the `--minify-html` command-line
   switch or the `minify_html: true` configuration option.
