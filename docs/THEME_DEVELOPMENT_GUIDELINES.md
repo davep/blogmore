@@ -8,6 +8,41 @@ when making changes that touch those areas.
 Human users looking to *create* a theme should read [Theming](theming.md) and
 [Template API](template-api.md) instead.
 
+## ⚠️ Mandatory rule for AI agents: no breaking changes without explicit human approval
+
+**Breaking changes to the theming system are strictly prohibited unless a
+human maintainer has explicitly requested or approved them.**
+
+A breaking change is any change that would require the author of an existing
+custom theme (stylesheet or template) to modify their work to maintain the
+same visual or functional result.  Examples include:
+
+- Renaming or removing a CSS custom property (e.g. `--bg-color`).
+- Renaming or removing a template context variable (e.g. `post.title`).
+- Renaming or removing a Jinja2 template block.
+- Changing the semantics of an existing CSS class in a way that alters layout
+  or visual appearance for custom templates.
+
+**If you are an AI agent and you believe a breaking change is necessary:**
+
+1. **Stop.**  Do not make the change.
+2. Describe the proposed change and why it is needed in a comment or message
+   to the human maintainer.
+3. Proceed only after receiving explicit written approval.
+
+Breaking changes, when approved, must:
+
+- Be introduced only in a new **major** version bump (e.g. v1.x → v2.0).
+  A minor version bump (v1.x → v1.(x+1)) is **never** sufficient for a
+  breaking change, regardless of how small the change appears.
+- Be labelled `BREAKING CHANGE` in `ChangeLog.md` with full migration
+  instructions.
+
+Additive changes (new CSS custom properties, new context variables, new
+template blocks) are backward-compatible.  They require at most a **minor**
+version bump and do not need human pre-approval beyond the normal review
+process.
+
 ## CSS architecture overview
 
 BlogMore's stylesheet (`src/blogmore/templates/static/style.css`) uses CSS
@@ -136,7 +171,7 @@ v1.x.  Key ones that appear in nearly every template:
 
 3. **Renaming a variable**: this is a **breaking change**.  Label it clearly
    in `ChangeLog.md` with `BREAKING CHANGE`, provide the old and new names,
-   and only introduce it in a new minor version.
+   and only introduce it in a new **major** version.
 
 4. **Adding new selectors**: place them in the correct section, add comments
    if not self-evident.
@@ -144,7 +179,9 @@ v1.x.  Key ones that appear in nearly every template:
 ### When editing templates
 
 1. Do not remove any variable from the context without labelling the change
-   as breaking and following the breaking-change policy.
+   as breaking and following the breaking-change policy (see the mandatory
+   rule at the top of this document — this requires a human approval and a
+   major version bump).
 
 2. Do not rename template blocks without a breaking-change label.
 

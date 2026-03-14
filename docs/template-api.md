@@ -212,5 +212,9 @@ changes will:
 
 1. Be labelled `BREAKING CHANGE` in [ChangeLog.md](changelog.md).
 2. Include step-by-step migration instructions.
-3. Only be introduced in a new minor version (i.e. v1.x → v1.(x+1)), never
-   in a patch release.
+3. Only be introduced in a new **major** version (i.e. v1.x → v2.0), never
+   in a minor or patch release.
+
+Additive changes (new context variables, new CSS custom properties, new
+template blocks) are backward-compatible and therefore require only a minor
+version bump at most.
