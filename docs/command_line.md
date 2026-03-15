@@ -247,7 +247,7 @@ blogmore build posts/ --minify-html
 
 #### `--parallel-generation`
 
-Parse Markdown files and render HTML for posts and pages concurrently using a thread pool.  Speeds up builds for large sites while producing identical output to the sequential (default) mode.
+Parse Markdown files and render HTML for posts and pages concurrently using a process pool.  Speeds up builds for large sites while producing identical output to the sequential (default) mode.
 
 Parallel generation is **disabled by default**. Pass this flag to opt in.
 

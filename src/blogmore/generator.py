@@ -68,6 +68,171 @@ def paginate_posts(posts: list[Post], posts_per_page: int) -> list[list[Post]]:
     return pages
 
 
+##############################################################################
+# Module-level state and helpers for process-pool parallel generation.
+#
+# ProcessPoolExecutor requires picklable callables (module-level functions,
+# not bound methods).  A TemplateRenderer is created once per worker process
+# via the initializer so it need not be pickled for every individual task.
+# Shared data (all_posts, pages, global_context) is also pushed to the
+# initializer so it is only pickled once per process rather than once per
+# task.
+
+_gen_process_renderer: TemplateRenderer | None = None
+_gen_process_config: SiteConfig | None = None
+_gen_process_post_state: dict[str, Any] | None = None
+_gen_process_page_state: dict[str, Any] | None = None
+
+
+def _init_post_generation_worker(
+    site_config: SiteConfig,
+    all_posts: list[Post],
+    pages: list[Page],
+    global_context: dict[str, Any],
+    extra_stylesheets: list[str],
+) -> None:
+    """Initialise per-process state for parallel post-page generation.
+
+    Called exactly once per worker process by
+    :class:`~concurrent.futures.ProcessPoolExecutor` before any task runs.
+    Creates a :class:`~blogmore.renderer.TemplateRenderer` and stores shared
+    data in module-level variables so they need not be pickled per task.
+
+    Args:
+        site_config: The site configuration.
+        all_posts: All posts sorted by date (newest first).
+        pages: All static pages.
+        global_context: Precomputed global template context dict.
+        extra_stylesheets: Cache-busted extra stylesheet URLs.
+    """
+    global _gen_process_renderer, _gen_process_config, _gen_process_post_state
+    _gen_process_renderer = TemplateRenderer(
+        templates_dir=site_config.templates_dir,
+        extra_stylesheets=extra_stylesheets,
+        site_url=site_config.site_url,
+    )
+    _gen_process_config = site_config
+    _gen_process_post_state = {
+        "all_posts": all_posts,
+        "pages": pages,
+        "global_context": global_context,
+    }
+
+
+def _generate_post_page_worker(post: Post, output_path: Path) -> None:
+    """Render and write a single post page in a worker process.
+
+    Replicates the logic of
+    :meth:`~blogmore.generator.SiteGenerator._generate_post_page` using
+    per-process state created by :func:`_init_post_generation_worker`.
+
+    Args:
+        post: The post to render.
+        output_path: The absolute output file path for this post.
+    """
+    assert (
+        _gen_process_renderer is not None
+        and _gen_process_config is not None
+        and _gen_process_post_state is not None
+    ), "Post generation worker process not initialised"
+
+    site_config = _gen_process_config
+    all_posts: list[Post] = _gen_process_post_state["all_posts"]
+    pages: list[Page] = _gen_process_post_state["pages"]
+    context: dict[str, Any] = dict(_gen_process_post_state["global_context"])
+
+    context["all_posts"] = all_posts
+    context["pages"] = pages
+
+    # Find previous and next posts (all_posts is sorted newest first).
+    try:
+        current_index = all_posts.index(post)
+        context["prev_post"] = (
+            all_posts[current_index + 1] if current_index + 1 < len(all_posts) else None
+        )
+        context["next_post"] = (
+            all_posts[current_index - 1] if current_index > 0 else None
+        )
+    except ValueError:
+        context["prev_post"] = None
+        context["next_post"] = None
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    if site_config.clean_urls:
+        context["canonical_url"] = (
+            f"{site_config.site_url}{post.url}" if site_config.site_url else post.url
+        )
+    else:
+        relative = output_path.relative_to(site_config.output_dir)
+        context["canonical_url"] = f"{site_config.site_url}/{relative.as_posix()}"
+
+    html = _gen_process_renderer.render_post(post, **context)
+    if site_config.minify_html:
+        html = minify_html.minify(html, minify_js=False, minify_css=False)
+    output_path.write_text(html, encoding="utf-8")
+
+
+def _init_page_generation_worker(
+    site_config: SiteConfig,
+    pages: list[Page],
+    global_context: dict[str, Any],
+    extra_stylesheets: list[str],
+) -> None:
+    """Initialise per-process state for parallel static-page generation.
+
+    Called exactly once per worker process by
+    :class:`~concurrent.futures.ProcessPoolExecutor`.
+
+    Args:
+        site_config: The site configuration.
+        pages: All static pages.
+        global_context: Precomputed global template context dict.
+        extra_stylesheets: Cache-busted extra stylesheet URLs.
+    """
+    global _gen_process_renderer, _gen_process_config, _gen_process_page_state
+    _gen_process_renderer = TemplateRenderer(
+        templates_dir=site_config.templates_dir,
+        extra_stylesheets=extra_stylesheets,
+        site_url=site_config.site_url,
+    )
+    _gen_process_config = site_config
+    _gen_process_page_state = {
+        "pages": pages,
+        "global_context": global_context,
+    }
+
+
+def _generate_page_worker(page: Page) -> None:
+    """Render and write a single static page in a worker process.
+
+    Replicates the logic of
+    :meth:`~blogmore.generator.SiteGenerator._generate_page` using
+    per-process state created by :func:`_init_page_generation_worker`.
+
+    Args:
+        page: The static page to render.
+    """
+    assert (
+        _gen_process_renderer is not None
+        and _gen_process_config is not None
+        and _gen_process_page_state is not None
+    ), "Page generation worker process not initialised"
+
+    site_config = _gen_process_config
+    pages: list[Page] = _gen_process_page_state["pages"]
+    context: dict[str, Any] = dict(_gen_process_page_state["global_context"])
+
+    context["pages"] = pages
+    output_path = site_config.output_dir / f"{page.slug}.html"
+    relative = output_path.relative_to(site_config.output_dir)
+    context["canonical_url"] = f"{site_config.site_url}/{relative.as_posix()}"
+
+    html = _gen_process_renderer.render_page(page, **context)
+    if site_config.minify_html:
+        html = minify_html.minify(html, minify_js=False, minify_css=False)
+    output_path.write_text(html, encoding="utf-8")
+
+
 class SiteGenerator:
     """Generate a static blog site from markdown posts."""
 
@@ -706,13 +871,15 @@ class SiteGenerator:
         pages: list[Page],
         post_output_paths: dict[int, Path],
     ) -> None:
-        """Generate post pages concurrently using a thread pool.
+        """Generate post pages concurrently using a process pool.
 
         Builds the de-duplicated task list (same path-clash filtering as the
-        sequential path) and then dispatches each :meth:`_generate_post_page`
-        call to a :class:`~concurrent.futures.ThreadPoolExecutor`.  Errors are
-        collected so that all posts are attempted before any exception is
-        raised.
+        sequential path) and then dispatches each post to a
+        :class:`~concurrent.futures.ProcessPoolExecutor`.  Shared data
+        (``all_posts``, ``pages``, global context) is sent once per process via
+        the pool initializer to avoid pickling it for every individual task.
+        Errors are collected so that all posts are attempted before any
+        exception is raised.
 
         Args:
             posts: All posts sorted by date (newest first).
@@ -730,13 +897,23 @@ class SiteGenerator:
             generated_paths.add(path_key)
             tasks.append((post, output_path))
 
+        global_context = self._get_global_context()
+        extra_stylesheets = self.renderer.extra_stylesheets
         errors: list[tuple[Post, Exception]] = []
         max_workers = self.site_config.parallel_generation_workers
-        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        with concurrent.futures.ProcessPoolExecutor(
+            max_workers=max_workers,
+            initializer=_init_post_generation_worker,
+            initargs=(
+                self.site_config,
+                posts,
+                pages,
+                global_context,
+                extra_stylesheets,
+            ),
+        ) as executor:
             future_to_post = {
-                executor.submit(
-                    self._generate_post_page, post, posts, pages, output_path
-                ): post
+                executor.submit(_generate_post_page_worker, post, output_path): post
                 for post, output_path in tasks
             }
             for future in concurrent.futures.as_completed(future_to_post):
@@ -755,21 +932,27 @@ class SiteGenerator:
             ) from errors[0][1]
 
     def _generate_pages_parallel(self, pages: list[Page]) -> None:
-        """Generate static pages concurrently using a thread pool.
+        """Generate static pages concurrently using a process pool.
 
-        Dispatches each :meth:`_generate_page` call to a
-        :class:`~concurrent.futures.ThreadPoolExecutor`.  Errors are collected
-        so that all pages are attempted before any exception is raised.
+        Dispatches each page to a
+        :class:`~concurrent.futures.ProcessPoolExecutor`.  Shared data is sent
+        once per process via the pool initializer.  Errors are collected so
+        that all pages are attempted before any exception is raised.
 
         Args:
             pages: All static pages to generate.
         """
+        global_context = self._get_global_context()
+        extra_stylesheets = self.renderer.extra_stylesheets
         errors: list[tuple[Page, Exception]] = []
         max_workers = self.site_config.parallel_generation_workers
-        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        with concurrent.futures.ProcessPoolExecutor(
+            max_workers=max_workers,
+            initializer=_init_page_generation_worker,
+            initargs=(self.site_config, pages, global_context, extra_stylesheets),
+        ) as executor:
             future_to_page = {
-                executor.submit(self._generate_page, page, pages): page
-                for page in pages
+                executor.submit(_generate_page_worker, page): page for page in pages
             }
             for future in concurrent.futures.as_completed(future_to_page):
                 page = future_to_page[future]

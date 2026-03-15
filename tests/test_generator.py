@@ -3840,7 +3840,7 @@ class TestParallelGeneration:
     def test_parallel_generation_with_workers_argument(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
-        """Test that parallel_generation_workers limits the thread-pool size."""
+        """Test that parallel_generation_workers limits the process-pool size."""
         generator = SiteGenerator(
             site_config=SiteConfig(
                 content_dir=posts_dir,

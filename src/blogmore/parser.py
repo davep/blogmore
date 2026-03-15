@@ -519,8 +519,8 @@ class PostParser:
             directory: Directory containing markdown files
             include_drafts: Whether to include posts marked as drafts
             exclude_dirs: Optional list of subdirectories to exclude from scanning
-            parallel: When ``True``, parse files concurrently using a thread pool.
-            max_workers: Maximum number of worker threads when ``parallel`` is
+            parallel: When ``True``, parse files concurrently using a process pool.
+            max_workers: Maximum number of worker processes when ``parallel`` is
                 ``True``.  ``None`` lets Python choose a sensible default.
 
         Returns:
@@ -544,11 +544,13 @@ class PostParser:
 
         if parallel and len(md_files) > 1:
             errors: list[tuple[Path, Exception]] = []
-            with concurrent.futures.ThreadPoolExecutor(
-                max_workers=max_workers
+            with concurrent.futures.ProcessPoolExecutor(
+                max_workers=max_workers,
+                initializer=_init_parser_worker,
+                initargs=(self._site_url,),
             ) as executor:
                 future_to_path = {
-                    executor.submit(self.parse_file, md_file): md_file
+                    executor.submit(_parse_file_worker, md_file): md_file
                     for md_file in md_files
                 }
                 for future in concurrent.futures.as_completed(future_to_path):
@@ -672,3 +674,42 @@ class PostParser:
         except (ValueError, FileNotFoundError) as e:
             print(f"Warning: Skipping {path}: {e}")
             return None
+
+
+##############################################################################
+# Module-level state and helpers for process-pool parallel parsing.
+#
+# ProcessPoolExecutor requires picklable callables (module-level functions,
+# not bound methods).  A PostParser is created once per worker process via
+# the initializer so it need not be pickled for every individual task.
+
+_process_parser: PostParser | None = None
+
+
+def _init_parser_worker(site_url: str) -> None:
+    """Initialise a per-process PostParser for parallel parsing.
+
+    Called exactly once per worker process by
+    :class:`~concurrent.futures.ProcessPoolExecutor` before any task runs.
+
+    Args:
+        site_url: The site base URL passed to :class:`PostParser`.
+    """
+    global _process_parser
+    _process_parser = PostParser(site_url=site_url)
+
+
+def _parse_file_worker(path: Path) -> Post:
+    """Parse a single Markdown file inside a worker process.
+
+    Uses the per-process :class:`PostParser` created by
+    :func:`_init_parser_worker`.
+
+    Args:
+        path: Path to the Markdown file to parse.
+
+    Returns:
+        The parsed :class:`Post` object.
+    """
+    assert _process_parser is not None, "Worker process parser not initialised"
+    return _process_parser.parse_file(path)

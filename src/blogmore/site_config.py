@@ -119,9 +119,9 @@ class SiteConfig:
     """Whether to show the "Generated with BlogMore" footer line."""
 
     parallel_generation: bool = False
-    """Whether to generate posts and pages in parallel using a thread pool.
+    """Whether to generate posts and pages in parallel using a process pool.
 
-    When ``True`` a :class:`~concurrent.futures.ThreadPoolExecutor` is used to
+    When ``True`` a :class:`~concurrent.futures.ProcessPoolExecutor` is used to
     render post and page HTML concurrently.  Off by default to preserve the
     deterministic, single-threaded behaviour of previous releases.
     """

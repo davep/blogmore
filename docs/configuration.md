@@ -453,8 +453,8 @@ This gives every post a clean, shareable URL such as `https://example.com/posts/
 
 #### `parallel_generation`
 
-Enable parallel generation of posts and pages using a thread pool.  When `true`, BlogMore uses a
-[`ThreadPoolExecutor`](https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor)
+Enable parallel generation of posts and pages using a process pool.  When `true`, BlogMore uses a
+[`ProcessPoolExecutor`](https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.ProcessPoolExecutor)
 to parse Markdown files and render HTML for all posts and static pages concurrently.
 
 Off by default to preserve the deterministic, single-threaded behaviour of previous releases.
