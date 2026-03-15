@@ -92,6 +92,35 @@ def main() -> int:
         )
         return 1
 
+    # Load head from config file only (not available as a CLI argument).
+    raw_head = config.get("head", [])
+    if not isinstance(raw_head, list):
+        print(
+            "Error: head in the configuration file must be a list",
+            file=sys.stderr,
+        )
+        return 1
+    for item in raw_head:
+        if not isinstance(item, dict) or len(item) != 1:
+            print(
+                "Error: each entry in head must be a single-key mapping from a tag name to its attributes",
+                file=sys.stderr,
+            )
+            return 1
+        tag_name, attributes = next(iter(item.items()))
+        if not isinstance(tag_name, str):
+            print(
+                "Error: head tag names must be strings",
+                file=sys.stderr,
+            )
+            return 1
+        if not isinstance(attributes, dict):
+            print(
+                "Error: head tag attributes must be a mapping of attribute names to values",
+                file=sys.stderr,
+            )
+            return 1
+
     # Build the shared site configuration object
     site_config = SiteConfig(
         content_dir=args.content_dir,
@@ -118,6 +147,7 @@ def main() -> int:
         post_path=raw_post_path,
         with_advert=raw_with_advert,
         clean_urls=raw_clean_urls,
+        head=raw_head,
     )
 
     # Handle serve command

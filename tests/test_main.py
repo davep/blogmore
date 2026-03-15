@@ -23,10 +23,7 @@ class TestContentChangeHandler:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=posts_dir,
-                output_dir=temp_output_dir
-            )
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
         handler = ContentChangeHandler(
@@ -47,10 +44,7 @@ class TestContentChangeHandler:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=posts_dir,
-                output_dir=temp_output_dir
-            )
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
         handler = ContentChangeHandler(generator=generator)
@@ -70,10 +64,7 @@ class TestContentChangeHandler:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=posts_dir,
-                output_dir=temp_output_dir
-            )
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
         handler = ContentChangeHandler(generator=generator)
@@ -93,10 +84,7 @@ class TestContentChangeHandler:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=posts_dir,
-                output_dir=temp_output_dir
-            )
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
         handler = ContentChangeHandler(generator=generator)
@@ -117,10 +105,7 @@ class TestContentChangeHandler:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=posts_dir,
-                output_dir=temp_output_dir
-            )
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
         handler = ContentChangeHandler(generator=generator, debounce_seconds=0.05)
@@ -149,10 +134,7 @@ class TestContentChangeHandler:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=posts_dir,
-                output_dir=temp_output_dir
-            )
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
         handler = ContentChangeHandler(generator=generator, debounce_seconds=0.1)
@@ -185,10 +167,7 @@ class TestContentChangeHandler:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=posts_dir,
-                output_dir=temp_output_dir
-            )
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
         handler = ContentChangeHandler(generator=generator, debounce_seconds=0.05)
@@ -212,10 +191,7 @@ class TestContentChangeHandler:
         from blogmore.generator import SiteGenerator
 
         generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=posts_dir,
-                output_dir=temp_output_dir
-            )
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
         handler = ContentChangeHandler(generator=generator)
@@ -261,18 +237,18 @@ class TestQuietHTTPRequestHandler:
         handler.directory = str(tmp_path)
         handler.wfile = output_buffer
 
-        with patch.object(handler, "send_response") as mock_send_response, patch.object(
-            handler, "send_header"
-        ), patch.object(handler, "end_headers"):
+        with (
+            patch.object(handler, "send_response") as mock_send_response,
+            patch.object(handler, "send_header"),
+            patch.object(handler, "end_headers"),
+        ):
             handler.send_error(404)
             mock_send_response.assert_called_once_with(404)
 
         written = output_buffer.getvalue()
         assert b"Custom 404" in written
 
-    def test_fallback_to_default_error_when_no_custom_404(
-        self, tmp_path: Path
-    ) -> None:
+    def test_fallback_to_default_error_when_no_custom_404(self, tmp_path: Path) -> None:
         """Test that the default error response is used when 404.html is absent."""
         import io
         from unittest.mock import patch
@@ -312,7 +288,6 @@ class TestQuietHTTPRequestHandler:
             handler.send_error(500)
             mock_super_send_error.assert_called_once_with(500, None, None)
 
-
     """Test the serve_site function."""
 
     @patch("blogmore.server.ReusingTCPServer")
@@ -334,7 +309,9 @@ class TestQuietHTTPRequestHandler:
         # Mock serve_forever to raise KeyboardInterrupt immediately
         mock_server_instance.serve_forever.side_effect = KeyboardInterrupt()
 
-        result = serve_site(site_config=SiteConfig(output_dir=temp_output_dir), watch=False)
+        result = serve_site(
+            site_config=SiteConfig(output_dir=temp_output_dir), watch=False
+        )
 
         assert result == 0
 
@@ -359,11 +336,8 @@ class TestQuietHTTPRequestHandler:
         mock_server_instance.serve_forever.side_effect = KeyboardInterrupt()
 
         result = serve_site(
-            site_config=SiteConfig(
-                output_dir=temp_output_dir,
-                content_dir=posts_dir
-            ),
-            watch=False
+            site_config=SiteConfig(output_dir=temp_output_dir, content_dir=posts_dir),
+            watch=False,
         )
 
         assert result == 0
@@ -374,8 +348,7 @@ class TestQuietHTTPRequestHandler:
         """Test serving with non-existent content directory."""
         result = serve_site(
             site_config=SiteConfig(
-                output_dir=temp_output_dir,
-                content_dir=Path("nonexistent")
+                output_dir=temp_output_dir, content_dir=Path("nonexistent")
             ),
         )
 
@@ -398,7 +371,9 @@ class TestQuietHTTPRequestHandler:
         # Mock server to raise OSError
         mock_server.side_effect = OSError("Address already in use")
 
-        result = serve_site(site_config=SiteConfig(output_dir=temp_output_dir), watch=False)
+        result = serve_site(
+            site_config=SiteConfig(output_dir=temp_output_dir), watch=False
+        )
 
         assert result == 1
 
@@ -432,7 +407,9 @@ class TestQuietHTTPRequestHandler:
 
         mock_server.side_effect = capture_args
 
-        result = serve_site(site_config=SiteConfig(output_dir=temp_output_dir), watch=False)
+        result = serve_site(
+            site_config=SiteConfig(output_dir=temp_output_dir), watch=False
+        )
 
         assert result == 0
         assert len(captured_handler) == 1
@@ -1096,6 +1073,132 @@ class TestConfigFileIntegration:
             assert result == 1  # Should fail
 
 
+class TestHeadConfigValidation:
+    """Tests for `head` configuration file validation."""
+
+    def test_head_config_renders_tags(
+        self,
+        posts_dir: Path,
+        temp_output_dir: Path,
+        tmp_path: Path,
+    ) -> None:
+        """Valid head config entries are rendered into every generated page."""
+        config_file = tmp_path / "blogmore.yaml"
+        config_file.write_text(
+            f"output: {temp_output_dir}\n"
+            "head:\n"
+            "  - link:\n"
+            "      rel: author\n"
+            "      href: /humans.txt\n"
+            "  - meta:\n"
+            "      name: theme-color\n"
+            '      content: "#ffffff"\n'
+        )
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(posts_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 0
+        content = (temp_output_dir / "index.html").read_text()
+        assert '<link rel="author" href="/humans.txt">' in content
+        assert '<meta name="theme-color" content="#ffffff">' in content
+
+    def test_head_config_not_a_list_returns_error(
+        self,
+        posts_dir: Path,
+        tmp_path: Path,
+    ) -> None:
+        """A non-list `head` value causes main() to return 1."""
+        config_file = tmp_path / "blogmore.yaml"
+        config = {
+            "output": str(tmp_path / "output"),
+            "head": "not-a-list",
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(posts_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 1
+
+    def test_head_config_item_not_single_key_dict_returns_error(
+        self,
+        posts_dir: Path,
+        tmp_path: Path,
+    ) -> None:
+        """A head entry that is not a single-key mapping causes main() to return 1."""
+        config_file = tmp_path / "blogmore.yaml"
+        # Two keys in one entry is invalid
+        config_file.write_text(
+            "output: " + str(tmp_path / "output") + "\n"
+            "head:\n"
+            "  - link: {rel: author}\n"
+            "    meta: {name: foo}\n"
+        )
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(posts_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 1
+
+    def test_head_config_attributes_not_a_dict_returns_error(
+        self,
+        posts_dir: Path,
+        tmp_path: Path,
+    ) -> None:
+        """A head entry whose attributes value is not a dict causes main() to return 1."""
+        config_file = tmp_path / "blogmore.yaml"
+        config_file.write_text(
+            "output: " + str(tmp_path / "output") + "\nhead:\n  - link: not-a-dict\n"
+        )
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(posts_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 1
+
+    def test_head_config_empty_list_is_valid(
+        self,
+        posts_dir: Path,
+        temp_output_dir: Path,
+        tmp_path: Path,
+    ) -> None:
+        """An empty head list is valid and produces no extra head tags."""
+        config_file = tmp_path / "blogmore.yaml"
+        config = {
+            "output": str(temp_output_dir),
+            "head": [],
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(posts_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 0
+
+
 class TestConfigChangeHandler:
     """Test the ConfigChangeHandler class."""
 
@@ -1107,10 +1210,7 @@ class TestConfigChangeHandler:
         config_file.write_text("site_title: Test Blog\n")
 
         generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=posts_dir,
-                output_dir=temp_output_dir
-            )
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
         cli_overrides = {"site_title": "CLI Title"}
@@ -1139,10 +1239,7 @@ class TestConfigChangeHandler:
         config_file.write_text("site_title: Test Blog\n")
 
         generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=posts_dir,
-                output_dir=temp_output_dir
-            )
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
         handler = ConfigChangeHandler(
@@ -1169,10 +1266,7 @@ class TestConfigChangeHandler:
         config_file.write_text("site_title: Test Blog\n")
 
         generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=posts_dir,
-                output_dir=temp_output_dir
-            )
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
         handler = ConfigChangeHandler(
@@ -1207,10 +1301,7 @@ class TestConfigChangeHandler:
             yaml.dump(config_data, f)
 
         generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=posts_dir,
-                output_dir=temp_output_dir
-            )
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
         # Mock the generate method to verify it's called
@@ -1266,7 +1357,7 @@ class TestConfigChangeHandler:
             site_config=SiteConfig(
                 content_dir=posts_dir,
                 output_dir=temp_output_dir,
-                site_title="CLI Title"
+                site_title="CLI Title",
             )
         )
 
@@ -1298,8 +1389,12 @@ class TestConfigChangeHandler:
             mock_generate.assert_called_once_with()
 
             # Verify CLI override was preserved but config values were updated
-            assert generator.site_config.site_title == "CLI Title"  # CLI override preserved
-            assert generator.site_config.site_subtitle == "Updated Subtitle"  # Config updated
+            assert (
+                generator.site_config.site_title == "CLI Title"
+            )  # CLI override preserved
+            assert (
+                generator.site_config.site_subtitle == "Updated Subtitle"
+            )  # Config updated
             assert generator.site_config.posts_per_feed == 50  # Config updated
 
     def test_on_any_event_updates_extra_stylesheets(
@@ -1319,10 +1414,7 @@ class TestConfigChangeHandler:
             yaml.dump(config_data, f)
 
         generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=posts_dir,
-                output_dir=temp_output_dir
-            )
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
         with patch.object(generator, "generate"):
@@ -1371,10 +1463,7 @@ class TestConfigChangeHandler:
             yaml.dump(config_data, f)
 
         generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=posts_dir,
-                output_dir=temp_output_dir
-            )
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
         with patch.object(generator, "generate"):
@@ -1403,7 +1492,10 @@ class TestConfigChangeHandler:
             time.sleep(0.2)
 
             # Verify sidebar config was updated
-            assert generator.site_config.sidebar_config["site_logo"] == "/images/newlogo.png"
+            assert (
+                generator.site_config.sidebar_config["site_logo"]
+                == "/images/newlogo.png"
+            )
             assert len(generator.site_config.sidebar_config["links"]) == 2
             assert generator.site_config.sidebar_config["socials"] == [
                 {"site": "github", "url": "https://github.com/user"}
@@ -1422,10 +1514,7 @@ class TestConfigChangeHandler:
         config_file.write_text("site_title: Test Blog\n")
 
         generator = SiteGenerator(
-            site_config=SiteConfig(
-                content_dir=posts_dir,
-                output_dir=temp_output_dir
-            )
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
         with patch.object(generator, "generate") as mock_generate:

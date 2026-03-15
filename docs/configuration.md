@@ -500,6 +500,45 @@ extra_stylesheets:
 
 **Note:** Stylesheets are included in the order specified.
 
+#### `head`
+
+Extra tags to inject into the `<head>` element of every generated page. This is a quick way to add custom `<link>`, `<meta>`, or other head tags without creating or overriding templates.
+
+**Type:** List of single-key mappings (tag name → attribute dict)  
+**Default:** Empty list  
+**Configuration file only** — cannot be set on the command line.
+
+Each entry is a tag name mapped to a dict of its HTML attributes. All attribute values are converted to strings and always emitted in double quotes.
+
+```yaml
+head:
+  - link:
+      rel: author
+      href: /humans.txt
+  - meta:
+      name: theme-color
+      content: "#ffffff"
+  - link:
+      rel: human-json
+      href: /human.json
+```
+
+The above configuration produces:
+
+```html
+<link rel="author" href="/humans.txt">
+<meta name="theme-color" content="#ffffff">
+<link rel="human-json" href="/human.json">
+```
+
+Tags appear in the order listed and are added to **every** generated page.
+
+!!! tip
+    Use `head` for small additions like a `humans.txt` link or a theme-colour
+    meta tag.  If you need to make extensive changes to the `<head>` element —
+    for example to add complex scripts or conditionally include tags — use
+    [template overrides](theming.md) instead.
+
 #### `site_logo`
 
 Path or URL to a logo image displayed in the sidebar.
@@ -674,6 +713,15 @@ minify_js: true
 extra_stylesheets:
   - https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700
   - /assets/custom.css
+
+# Extra head tags (configuration file only)
+head:
+  - link:
+      rel: author
+      href: /humans.txt
+  - meta:
+      name: theme-color
+      content: "#ffffff"
 
 # Sidebar configuration
 site_logo: /images/logo.png

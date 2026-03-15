@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added `head` configuration file option. This allows extra `<head>` tags
+  (such as `<link>` or `<meta>`) to be injected into every generated page
+  without needing to create or override templates.
+  ([#PR](https://github.com/davep/blogmore/pull/PR))
+
 ## v1.14.0
 
 **Released: 2026-03-14**
