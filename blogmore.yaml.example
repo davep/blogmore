@@ -78,6 +78,23 @@ posts_per_feed: 20
 # /posts/my-first-post/index.html). Configuration file only.
 # clean_urls: false
 
+# Optional: Extra tags to inject into <head> on every generated page.
+# Useful for adding custom link, meta, or other head tags without overriding
+# templates. Each entry is a tag name mapped to a dict of its attributes.
+# All attribute values are always emitted as double-quoted strings.
+# Configuration file only. For extensive <head> customisation, use template
+# overrides instead.
+# head:
+#   - link:
+#       rel: author
+#       href: /humans.txt
+#   - meta:
+#       name: theme-color
+#       content: "#ffffff"
+#   - link:
+#       rel: human-json
+#       href: /human.json
+
 # Styling options
 
 # Optional: Minify the CSS, writing it as styles.min.css (default: false)

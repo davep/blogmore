@@ -51,6 +51,10 @@
     {% if prev_page_url %}<link rel="prev" href="{{ prev_page_url }}">{% endif %}
     {% if next_page_url %}<link rel="next" href="{{ next_page_url }}">{% endif %}
     {% block extra_head %}{% endblock %}
+    {% for tag_spec in extra_head_tags %}
+    {% for tag_name, attributes in tag_spec.items() %}<{{ tag_name }}{% for attr, value in attributes.items() %} {{ attr }}="{{ value }}"{% endfor %}>
+    {% endfor %}
+    {% endfor %}
 </head>
 <body>
     <div class="site-container">

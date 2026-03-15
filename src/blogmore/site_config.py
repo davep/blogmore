@@ -118,6 +118,22 @@ class SiteConfig:
     with_advert: bool = True
     """Whether to show the "Generated with BlogMore" footer line."""
 
+    head: list[dict[str, Any]] = field(default_factory=list)
+    """Extra ``<head>`` tags to inject into every generated page.
+
+    Each entry is a single-key mapping from an HTML tag name to a dict of
+    attribute name/value pairs.  For example::
+
+        [{"link": {"rel": "author", "href": "/humans.txt"}}]
+
+    yields::
+
+        <link rel="author" href="/humans.txt">
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Empty by default.
+    """
+
     def __post_init__(self) -> None:
         """Normalise fields after initialisation."""
         self.site_url = normalize_site_url(self.site_url)
