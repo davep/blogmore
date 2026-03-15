@@ -268,6 +268,7 @@ class Page:
     content: str
     html_content: str
     metadata: dict[str, Any] | None = None
+    url_path: str | None = field(default=None, repr=False, compare=False)
 
     @property
     def slug(self) -> str:
@@ -276,7 +277,18 @@ class Page:
 
     @property
     def url(self) -> str:
-        """Generate the URL path for the page."""
+        """Generate the URL path for the page.
+
+        If the generator has resolved a custom URL via the ``page_path``
+        configuration option it will be stored in ``url_path`` and returned
+        directly.  Otherwise the URL is derived from the page slug using the
+        default ``/{slug}.html`` scheme.
+
+        Returns:
+            The URL path for the page, always beginning with ``/``.
+        """
+        if self.url_path is not None:
+            return self.url_path
         return f"/{self.slug}.html"
 
     @property

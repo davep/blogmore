@@ -400,6 +400,60 @@ Posts organised by author, then year and slug:
 post_path: "{author}/{year}/{slug}.html"
 ```
 
+#### `page_path`
+
+Format string that controls the output path (and therefore the URL) of every static page.  This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** String  
+**Default:** `{slug}.html`
+
+```yaml
+page_path: "{slug}.html"
+```
+
+##### How it works
+
+The format string uses a Python-style `{slug}` placeholder that is substituted with the page's filename stem.  The result is joined onto the `output` directory, so the path is always relative to your site root.  Any intermediate subdirectories are created automatically.
+
+##### Available variables
+
+| Variable | Description                      | Example value |
+|----------|----------------------------------|---------------|
+| `{slug}` | Page slug derived from filename. **Required.** | `about` |
+
+The `{slug}` variable is the only placeholder available for pages — pages have no date, category, author, or other post-specific metadata.
+
+##### Safety
+
+BlogMore always ensures the resolved path remains inside the `output` directory.  A `page_path` value containing `..` segments or other path-traversal constructs is detected and rejected at startup with an error message.
+
+##### Examples
+
+Default — each page as a flat `.html` file:
+
+```yaml
+page_path: "{slug}.html"
+```
+
+Each page in its own directory (combine with `clean_urls`):
+
+```yaml
+page_path: "{slug}/index.html"
+```
+
+All pages under a `/pages/` prefix:
+
+```yaml
+page_path: "pages/{slug}.html"
+```
+
+Pages in a subdirectory with clean URLs:
+
+```yaml
+page_path: "pages/{slug}/index.html"
+clean_urls: true
+```
+
 #### `with_advert`
 
 When `true` (the default), a small "Generated with BlogMore vX.Y.Z" line is included in the footer of every page, linking to the BlogMore website. Set this to `false` to suppress the footer line entirely.  This is a **configuration file only** option — it cannot be set on the command line.
@@ -413,7 +467,7 @@ with_advert: false
 
 #### `clean_urls`
 
-When `true`, any post whose resolved URL ends with `/index.html` has the `index.html` portion removed so that the URL ends with a trailing slash instead.  For example, if `post_path` is set to `posts/{slug}/index.html`, a post with slug `my-first-post` would normally be referenced as:
+When `true`, any post or page whose resolved URL ends with `/index.html` has the `index.html` portion removed so that the URL ends with a trailing slash instead.  For example, if `post_path` is set to `posts/{slug}/index.html`, a post with slug `my-first-post` would normally be referenced as:
 
 ```
 https://example.com/posts/my-first-post/index.html
@@ -425,9 +479,11 @@ With `clean_urls: true` every mention of that URL — in the generated HTML, RSS
 https://example.com/posts/my-first-post/
 ```
 
-The output *file* is still written to `posts/my-first-post/index.html` on disk; only the URLs embedded in the generated site change.
+The same applies to pages: if `page_path` is set to `pages/{slug}/index.html`, the page URL becomes `pages/about/` instead of `pages/about/index.html`.
 
-This setting has no effect when `post_path` does not produce paths that end in `index.html`.
+The output *file* is still written to its configured path on disk; only the URLs embedded in the generated site change.
+
+This setting has no effect when neither `post_path` nor `page_path` produces paths that end in `index.html`.
 
 This is a **configuration file only** option — it cannot be set on the command line.  Off by default.
 
@@ -440,14 +496,15 @@ clean_urls: true
 
 ##### Typical usage
 
-Combine `clean_urls` with a `post_path` that places each post in its own directory:
+Combine `clean_urls` with a `post_path` and/or `page_path` that places content in its own directory:
 
 ```yaml
 post_path: "posts/{slug}/index.html"
+page_path: "pages/{slug}/index.html"
 clean_urls: true
 ```
 
-This gives every post a clean, shareable URL such as `https://example.com/posts/my-first-post/`.
+This gives every post and page a clean, shareable URL such as `https://example.com/posts/my-first-post/` and `https://example.com/pages/about/`.
 
 ### Styling Options
 

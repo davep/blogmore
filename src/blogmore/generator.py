@@ -23,6 +23,7 @@ from blogmore.fontawesome import (
     FontAwesomeOptimizer,
 )
 from blogmore.icons import IconGenerator, detect_source_icon
+from blogmore.page_path import compute_page_output_path
 from blogmore.parser import (
     CUSTOM_404_HTML,
     Page,
@@ -405,8 +406,9 @@ class SiteGenerator:
         # Generate static pages
         if pages:
             print("Generating static pages...")
+            page_output_paths = self._resolve_page_output_paths(pages)
             for page in pages:
-                self._generate_page(page, pages)
+                self._generate_page(page, pages, page_output_paths[id(page)])
 
         # Generate custom 404 page if present
         if page_404 is not None:
@@ -743,12 +745,66 @@ class SiteGenerator:
         html = self.renderer.render_post(post, **context)
         self._write_html(output_path, html)
 
-    def _generate_page(self, page: Page, pages: list[Page]) -> None:
-        """Generate a single static page."""
+    def _resolve_page_output_paths(self, pages: list[Page]) -> dict[int, Path]:
+        """Resolve the output path for every static page.
+
+        For each page the method:
+
+        1. Computes the absolute output file path using the configured
+           ``page_path`` template.
+        2. Sets ``page.url_path`` so that templates always use the correct URL
+           regardless of the configured format.
+
+        Args:
+            pages: All static pages to resolve paths for.
+
+        Returns:
+            Mapping from ``id(page)`` to the page's resolved output path.
+        """
+        page_output_paths: dict[int, Path] = {}
+
+        for page in pages:
+            output_path = compute_page_output_path(
+                self.site_config.output_dir, page, self.site_config.page_path
+            )
+            page_output_paths[id(page)] = output_path
+
+            # Set the page's URL so all templates reflect the configured scheme.
+            relative = output_path.relative_to(self.site_config.output_dir)
+            url_path = "/" + relative.as_posix()
+
+            # Apply clean URL transformation: strip index filenames (e.g.
+            # "index.html") from paths so the URL ends with a trailing slash.
+            if self.site_config.clean_urls:
+                url_path = make_url_clean(url_path)
+
+            page.url_path = url_path
+
+        return page_output_paths
+
+    def _generate_page(self, page: Page, pages: list[Page], output_path: Path) -> None:
+        """Generate a single static page.
+
+        Args:
+            page: The static page to generate.
+            pages: All static pages, passed to the template context.
+            output_path: The pre-resolved absolute output file path for this page.
+        """
         context = self._get_global_context()
         context["pages"] = pages
-        output_path = self.site_config.output_dir / f"{page.slug}.html"
-        context["canonical_url"] = self._canonical_url_for_path(output_path)
+
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # When clean URLs are enabled, page.url already has index.html stripped;
+        # use it directly so the canonical URL matches what we advertise everywhere.
+        if self.site_config.clean_urls:
+            context["canonical_url"] = (
+                f"{self.site_config.site_url}{page.url}"
+                if self.site_config.site_url
+                else page.url
+            )
+        else:
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_page(page, **context)
 
