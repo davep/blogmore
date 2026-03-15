@@ -1199,6 +1199,124 @@ class TestHeadConfigValidation:
         assert result == 0
 
 
+class TestPagePathConfigValidation:
+    """Tests for `page_path` configuration file loading and validation."""
+
+    def test_page_path_from_config_is_applied(
+        self,
+        tmp_path: Path,
+        temp_output_dir: Path,
+    ) -> None:
+        """A valid page_path in the config file is applied to the generated site."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        pages_subdir = content_dir / "pages"
+        pages_subdir.mkdir()
+        (pages_subdir / "about.md").write_text(
+            "---\ntitle: About Me\n---\n\nAbout content."
+        )
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: A Post\ndate: 2024-01-01\n---\n\nPost content."
+        )
+        config_file = tmp_path / "blogmore.yaml"
+        config_file.write_text(
+            f"output: {temp_output_dir}\n"
+            'page_path: "{slug}/index.html"\n'
+        )
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(content_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 0
+        # The page should be generated at about/index.html, not about.html
+        assert (temp_output_dir / "about" / "index.html").exists()
+        assert not (temp_output_dir / "about.html").exists()
+
+    def test_page_path_not_a_string_returns_error(
+        self,
+        posts_dir: Path,
+        tmp_path: Path,
+    ) -> None:
+        """A non-string page_path causes main() to return 1."""
+        config_file = tmp_path / "blogmore.yaml"
+        config = {
+            "output": str(tmp_path / "output"),
+            "page_path": 42,
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(posts_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 1
+
+    def test_invalid_page_path_returns_error(
+        self,
+        posts_dir: Path,
+        tmp_path: Path,
+    ) -> None:
+        """An invalid page_path (missing {slug}) causes main() to return 1."""
+        config_file = tmp_path / "blogmore.yaml"
+        config = {
+            "output": str(tmp_path / "output"),
+            "page_path": "pages/index.html",
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(posts_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 1
+
+    def test_404_page_always_generated_at_root(
+        self,
+        tmp_path: Path,
+        temp_output_dir: Path,
+    ) -> None:
+        """The 404.md page is always generated as /404.html regardless of page_path."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        pages_subdir = content_dir / "pages"
+        pages_subdir.mkdir()
+        (pages_subdir / "404.md").write_text(
+            "---\ntitle: Not Found\n---\n\nPage not found."
+        )
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: A Post\ndate: 2024-01-01\n---\n\nPost content."
+        )
+        config_file = tmp_path / "blogmore.yaml"
+        config_file.write_text(
+            f"output: {temp_output_dir}\n"
+            'page_path: "pages/{slug}/index.html"\n'
+        )
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(content_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 0
+        # 404.html must always be at the root, not affected by page_path
+        assert (temp_output_dir / "404.html").exists()
+        assert not (temp_output_dir / "pages" / "404" / "index.html").exists()
+
+
 class TestConfigChangeHandler:
     """Test the ConfigChangeHandler class."""
 
