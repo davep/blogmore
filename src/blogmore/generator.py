@@ -1,7 +1,9 @@
 """Static site generator for blog content."""
 
+import concurrent.futures
 import datetime as dt
 import shutil
+import sys
 import time
 import urllib.error
 from collections import defaultdict
@@ -364,6 +366,8 @@ class SiteGenerator:
             content_dir,
             include_drafts=self.site_config.include_drafts,
             exclude_dirs=[pages_dir],
+            parallel=self.site_config.parallel_generation,
+            max_workers=self.site_config.parallel_generation_workers,
         )
         print(f"Found {len(posts)} posts")
 
@@ -391,21 +395,27 @@ class SiteGenerator:
         # Generate individual post pages
         print("Generating post pages...")
         post_output_paths = self._resolve_post_output_paths(posts)
-        generated_paths: set[str] = set()
-        for post in posts:
-            output_path = post_output_paths[id(post)]
-            path_key = str(output_path)
-            if path_key in generated_paths:
-                # A newer post has already claimed this path; skip this older one.
-                continue
-            generated_paths.add(path_key)
-            self._generate_post_page(post, posts, pages, output_path)
+        if self.site_config.parallel_generation:
+            self._generate_posts_parallel(posts, pages, post_output_paths)
+        else:
+            generated_paths: set[str] = set()
+            for post in posts:
+                output_path = post_output_paths[id(post)]
+                path_key = str(output_path)
+                if path_key in generated_paths:
+                    # A newer post has already claimed this path; skip this older one.
+                    continue
+                generated_paths.add(path_key)
+                self._generate_post_page(post, posts, pages, output_path)
 
         # Generate static pages
         if pages:
             print("Generating static pages...")
-            for page in pages:
-                self._generate_page(page, pages)
+            if self.site_config.parallel_generation:
+                self._generate_pages_parallel(pages)
+            else:
+                for page in pages:
+                    self._generate_page(page, pages)
 
         # Generate custom 404 page if present
         if page_404 is not None:
@@ -689,6 +699,92 @@ class SiteGenerator:
                 print()
 
         return post_output_paths
+
+    def _generate_posts_parallel(
+        self,
+        posts: list[Post],
+        pages: list[Page],
+        post_output_paths: dict[int, Path],
+    ) -> None:
+        """Generate post pages concurrently using a thread pool.
+
+        Builds the de-duplicated task list (same path-clash filtering as the
+        sequential path) and then dispatches each :meth:`_generate_post_page`
+        call to a :class:`~concurrent.futures.ThreadPoolExecutor`.  Errors are
+        collected so that all posts are attempted before any exception is
+        raised.
+
+        Args:
+            posts: All posts sorted by date (newest first).
+            pages: All static pages passed to every post's template context.
+            post_output_paths: Mapping from ``id(post)`` to resolved output path.
+        """
+        tasks: list[tuple[Post, Path]] = []
+        generated_paths: set[str] = set()
+        for post in posts:
+            output_path = post_output_paths[id(post)]
+            path_key = str(output_path)
+            if path_key in generated_paths:
+                # A newer post has already claimed this path; skip this older one.
+                continue
+            generated_paths.add(path_key)
+            tasks.append((post, output_path))
+
+        errors: list[tuple[Post, Exception]] = []
+        max_workers = self.site_config.parallel_generation_workers
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_post = {
+                executor.submit(
+                    self._generate_post_page, post, posts, pages, output_path
+                ): post
+                for post, output_path in tasks
+            }
+            for future in concurrent.futures.as_completed(future_to_post):
+                post = future_to_post[future]
+                try:
+                    future.result()
+                except Exception as exc:
+                    errors.append((post, exc))
+                    print(
+                        f"Error generating post '{post.title}': {exc}",
+                        file=sys.stderr,
+                    )
+        if errors:
+            raise RuntimeError(
+                f"Parallel generation failed for {len(errors)} post(s)"
+            ) from errors[0][1]
+
+    def _generate_pages_parallel(self, pages: list[Page]) -> None:
+        """Generate static pages concurrently using a thread pool.
+
+        Dispatches each :meth:`_generate_page` call to a
+        :class:`~concurrent.futures.ThreadPoolExecutor`.  Errors are collected
+        so that all pages are attempted before any exception is raised.
+
+        Args:
+            pages: All static pages to generate.
+        """
+        errors: list[tuple[Page, Exception]] = []
+        max_workers = self.site_config.parallel_generation_workers
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_page = {
+                executor.submit(self._generate_page, page, pages): page
+                for page in pages
+            }
+            for future in concurrent.futures.as_completed(future_to_page):
+                page = future_to_page[future]
+                try:
+                    future.result()
+                except Exception as exc:
+                    errors.append((page, exc))
+                    print(
+                        f"Error generating page '{page.title}': {exc}",
+                        file=sys.stderr,
+                    )
+        if errors:
+            raise RuntimeError(
+                f"Parallel generation failed for {len(errors)} page(s)"
+            ) from errors[0][1]
 
     def _generate_post_page(
         self,

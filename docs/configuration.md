@@ -449,6 +449,45 @@ clean_urls: true
 
 This gives every post a clean, shareable URL such as `https://example.com/posts/my-first-post/`.
 
+### Performance Options
+
+#### `parallel_generation`
+
+Enable parallel generation of posts and pages using a thread pool.  When `true`, BlogMore uses a
+[`ThreadPoolExecutor`](https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor)
+to parse Markdown files and render HTML for all posts and static pages concurrently.
+
+Off by default to preserve the deterministic, single-threaded behaviour of previous releases.
+Turn it on when you have a large number of posts and want to reduce build times.
+
+The generated output is identical in both modes.
+
+**Type:** Boolean  
+**Default:** `false`  
+**CLI equivalent:** `--parallel-generation`
+
+```yaml
+parallel_generation: true
+```
+
+#### `parallel_generation_workers`
+
+Maximum number of worker threads used when `parallel_generation` is `true`.
+
+When omitted (or set to `null`), Python chooses a sensible default — typically
+`min(32, cpu_count + 4)`.  Set this to a positive integer to pin the thread-pool
+size; for example, `4` limits concurrency to four threads regardless of how many
+CPU cores the machine has.
+
+**Type:** Integer or null  
+**Default:** `null` (auto — uses system CPU count)  
+**CLI equivalent:** `--parallel-generation-workers N`
+
+```yaml
+parallel_generation: true
+parallel_generation_workers: 4
+```
+
 ### Styling Options
 
 #### `minify_css`

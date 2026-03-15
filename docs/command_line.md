@@ -245,6 +245,39 @@ HTML minification is **disabled by default**. Pass this flag to opt in.
 blogmore build posts/ --minify-html
 ```
 
+#### `--parallel-generation`
+
+Parse Markdown files and render HTML for posts and pages concurrently using a thread pool.  Speeds up builds for large sites while producing identical output to the sequential (default) mode.
+
+Parallel generation is **disabled by default**. Pass this flag to opt in.
+
+```bash
+blogmore build posts/ --parallel-generation
+```
+
+Can also be set in the configuration file:
+
+```yaml
+parallel_generation: true
+```
+
+#### `--parallel-generation-workers N`
+
+Maximum number of worker threads to use when `--parallel-generation` is active.
+When omitted, Python selects a sensible default — typically `min(32, cpu_count + 4)`.
+Set this to a positive integer to pin the thread-pool size.
+
+```bash
+blogmore build posts/ --parallel-generation --parallel-generation-workers 4
+```
+
+Can also be set in the configuration file:
+
+```yaml
+parallel_generation: true
+parallel_generation_workers: 4
+```
+
 ### Examples
 
 Basic site generation:
@@ -330,6 +363,8 @@ The serve command also accepts all the build command options:
 - `--minify-html`
 - `--with-read-time`
 - `--socials-title`
+- `--parallel-generation`
+- `--parallel-generation-workers`
 
 ### Examples
 

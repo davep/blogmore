@@ -78,6 +78,20 @@ posts_per_feed: 20
 # /posts/my-first-post/index.html). Configuration file only.
 # clean_urls: false
 
+# Performance options
+
+# Optional: Enable parallel generation (default: false)
+# When enabled, posts and pages are parsed and rendered concurrently using a
+# thread pool. Speeds up builds for large sites. Identical output to
+# sequential mode.
+# parallel_generation: false
+
+# Optional: Number of worker threads for parallel generation (default: auto)
+# Only used when parallel_generation is true. Set to a positive integer to
+# fix the pool size; omit (or set to null) to let Python choose automatically
+# (typically min(32, cpu_count + 4)).
+# parallel_generation_workers: 4
+
 # Styling options
 
 # Optional: Minify the CSS, writing it as styles.min.css (default: false)

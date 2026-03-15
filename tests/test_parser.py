@@ -965,3 +965,107 @@ This post has [an external link](https://external.com) and
         assert 'href="/posts/my-post"' in post.html_content
         # Only the external link should have target="_blank"
         assert post.html_content.count('target="_blank"') == 1
+
+
+class TestPostParserThreadSafety:
+    """Test that PostParser is thread-safe for parallel execution."""
+
+    def test_markdown_property_returns_thread_local_instance(self) -> None:
+        """Test that the markdown property returns a per-thread instance."""
+        import threading
+
+        parser = PostParser()
+        main_thread_md = parser.markdown
+        worker_processors: list[object] = []
+
+        def get_worker_md() -> None:
+            worker_processors.append(parser.markdown)
+
+        thread = threading.Thread(target=get_worker_md)
+        thread.start()
+        thread.join()
+
+        assert len(worker_processors) == 1
+        # Worker thread should have its own instance, different from main-thread's
+        assert worker_processors[0] is not main_thread_md
+
+    def test_parse_file_is_thread_safe(self, posts_dir: Path) -> None:
+        """Test that parse_file can be called concurrently from multiple threads."""
+        import concurrent.futures
+
+        parser = PostParser()
+        md_files = [
+            posts_dir / "2024-01-15-first-post.md",
+            posts_dir / "2024-01-10-complex-post.md",
+        ]
+        parsed_posts: list[Post] = []
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            futures = [executor.submit(parser.parse_file, path) for path in md_files]
+            for future in concurrent.futures.as_completed(futures):
+                parsed_posts.append(future.result())
+
+        assert len(parsed_posts) == 2
+        titles = {p.title for p in parsed_posts}
+        assert "My First Post" in titles
+        assert "Complex Post with Many Features" in titles
+
+    def test_parse_directory_parallel_returns_same_posts_as_sequential(
+        self, posts_dir: Path
+    ) -> None:
+        """Test that parallel parse_directory produces the same posts as sequential."""
+        parser = PostParser()
+
+        sequential_posts = parser.parse_directory(posts_dir, include_drafts=False)
+        parallel_posts = parser.parse_directory(
+            posts_dir, include_drafts=False, parallel=True
+        )
+
+        # Same number of posts
+        assert len(parallel_posts) == len(sequential_posts)
+        # Same titles (order is by date, so sets must match)
+        assert {p.title for p in parallel_posts} == {p.title for p in sequential_posts}
+
+    def test_parse_directory_parallel_sorted_by_date(self, posts_dir: Path) -> None:
+        """Test that parallel parse_directory returns posts sorted newest first."""
+        parser = PostParser()
+        posts = parser.parse_directory(posts_dir, parallel=True)
+
+        # Posts with dates should appear before posts without dates
+        dated = [p for p in posts if p.date is not None]
+        for i in range(len(dated) - 1):
+            assert dated[i].date >= dated[i + 1].date  # type: ignore[operator]
+
+    def test_parse_directory_parallel_with_single_file(self, tmp_path: Path) -> None:
+        """Test that parallel parse_directory handles a single file."""
+        parser = PostParser()
+        (tmp_path / "solo.md").write_text(
+            "---\ntitle: Solo Post\ndate: 2024-01-01\n---\nContent"
+        )
+        posts = parser.parse_directory(tmp_path, parallel=True)
+        assert len(posts) == 1
+        assert posts[0].title == "Solo Post"
+
+    def test_parse_directory_parallel_with_workers(self, posts_dir: Path) -> None:
+        """Test that parse_directory respects the max_workers parameter."""
+        parser = PostParser()
+        posts = parser.parse_directory(
+            posts_dir, include_drafts=False, parallel=True, max_workers=2
+        )
+        assert len(posts) == 7
+
+    def test_parse_directory_parallel_skips_invalid_files(
+        self, tmp_path: Path
+    ) -> None:
+        """Test that parallel parse_directory skips invalid files with a warning."""
+        parser = PostParser()
+        # Valid post
+        (tmp_path / "good.md").write_text(
+            "---\ntitle: Good Post\ndate: 2024-01-01\n---\nContent"
+        )
+        # Post with missing title (will print a warning and be skipped)
+        (tmp_path / "bad.md").write_text("---\ndate: 2024-01-02\n---\nContent")
+
+        posts = parser.parse_directory(tmp_path, parallel=True)
+        assert len(posts) == 1
+        assert posts[0].title == "Good Post"

@@ -92,6 +92,20 @@ def main() -> int:
         )
         return 1
 
+    # Load parallel_generation_workers from config when not supplied on CLI.
+    # The CLI default is None; if the config provides an integer value and the
+    # CLI argument is still at its default (None), adopt the config value.
+    raw_parallel_workers = config.get(
+        "parallel_generation_workers",
+        args.parallel_generation_workers,
+    )
+    if raw_parallel_workers is not None and not isinstance(raw_parallel_workers, int):
+        print(
+            "Error: parallel_generation_workers in the configuration file must be an integer",
+            file=sys.stderr,
+        )
+        return 1
+
     # Build the shared site configuration object
     site_config = SiteConfig(
         content_dir=args.content_dir,
@@ -118,6 +132,8 @@ def main() -> int:
         post_path=raw_post_path,
         with_advert=raw_with_advert,
         clean_urls=raw_clean_urls,
+        parallel_generation=args.parallel_generation,
+        parallel_generation_workers=raw_parallel_workers,
     )
 
     # Handle serve command
@@ -274,6 +290,8 @@ def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
         "minify_html": False,
         "with_read_time": False,
         "socials_title": "Social",
+        "parallel_generation": False,
+        "parallel_generation_workers": None,
     }
 
     overrides: dict[str, Any] = {}

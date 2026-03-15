@@ -3782,3 +3782,122 @@ class TestCacheBusting:
         content = (temp_output_dir / "index.html").read_text()
         assert external_url in content
         assert f"{external_url}?v=" not in content
+
+
+class TestParallelGeneration:
+    """Tests for the parallel generation feature."""
+
+    def test_parallel_generation_produces_same_output_as_sequential(
+        self, posts_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that parallel generation produces identical HTML to sequential mode."""
+        seq_output = tmp_path / "sequential"
+        par_output = tmp_path / "parallel"
+        seq_output.mkdir()
+        par_output.mkdir()
+
+        for output_dir, parallel in [(seq_output, False), (par_output, True)]:
+            generator = SiteGenerator(
+                site_config=SiteConfig(
+                    content_dir=posts_dir,
+                    output_dir=output_dir,
+                    site_title="Test Blog",
+                    site_url="https://example.com",
+                    parallel_generation=parallel,
+                )
+            )
+            generator.generate()
+
+        # Both output directories should contain the same HTML files
+        seq_files = {
+            p.relative_to(seq_output) for p in seq_output.rglob("*.html")
+        }
+        par_files = {
+            p.relative_to(par_output) for p in par_output.rglob("*.html")
+        }
+        assert seq_files == par_files
+
+    def test_parallel_generation_creates_all_post_files(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that parallel generation creates all expected post HTML files."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                parallel_generation=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "index.html").exists()
+        assert (temp_output_dir / "archive.html").exists()
+        post_file = temp_output_dir / "2024" / "01" / "15" / "first-post.html"
+        assert post_file.exists()
+        content = post_file.read_text()
+        assert "My First Post" in content
+
+    def test_parallel_generation_with_workers_argument(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that parallel_generation_workers limits the thread-pool size."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                parallel_generation=True,
+                parallel_generation_workers=2,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "index.html").exists()
+
+    def test_parallel_generation_with_pages(
+        self, posts_dir: Path, pages_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that parallel generation correctly generates static pages."""
+        import shutil
+
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        shutil.copytree(posts_dir, content_dir / "posts")
+        shutil.copytree(pages_dir, content_dir / "pages")
+
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=output_dir,
+                parallel_generation=True,
+            )
+        )
+        generator.generate()
+
+        assert (output_dir / "about.html").exists()
+
+    def test_sequential_generation_is_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that generation is sequential by default."""
+        site_config = SiteConfig(
+            content_dir=posts_dir,
+            output_dir=temp_output_dir,
+        )
+        assert site_config.parallel_generation is False
+        assert site_config.parallel_generation_workers is None
+
+    def test_parallel_generation_flag_is_respected(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that setting parallel_generation=True is preserved in SiteConfig."""
+        site_config = SiteConfig(
+            content_dir=posts_dir,
+            output_dir=temp_output_dir,
+            parallel_generation=True,
+            parallel_generation_workers=4,
+        )
+        assert site_config.parallel_generation is True
+        assert site_config.parallel_generation_workers == 4

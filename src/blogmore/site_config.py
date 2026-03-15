@@ -118,6 +118,22 @@ class SiteConfig:
     with_advert: bool = True
     """Whether to show the "Generated with BlogMore" footer line."""
 
+    parallel_generation: bool = False
+    """Whether to generate posts and pages in parallel using a thread pool.
+
+    When ``True`` a :class:`~concurrent.futures.ThreadPoolExecutor` is used to
+    render post and page HTML concurrently.  Off by default to preserve the
+    deterministic, single-threaded behaviour of previous releases.
+    """
+
+    parallel_generation_workers: int | None = None
+    """Maximum number of worker threads for parallel generation.
+
+    Only used when :attr:`parallel_generation` is ``True``.  ``None`` lets
+    Python choose a sensible default (typically ``min(32, cpu_count + 4)``).
+    Set to a positive integer to pin the thread-pool size.
+    """
+
     def __post_init__(self) -> None:
         """Normalise fields after initialisation."""
         self.site_url = normalize_site_url(self.site_url)

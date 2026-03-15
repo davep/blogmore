@@ -155,6 +155,22 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     )
 
     parser.add_argument(
+        "--parallel-generation",
+        action="store_true",
+        default=_SITE_CONFIG_DEFAULTS["parallel_generation"],
+        help="Generate posts and pages in parallel using a thread pool (default: disabled)",
+    )
+
+    parser.add_argument(
+        "--parallel-generation-workers",
+        type=int,
+        default=_SITE_CONFIG_DEFAULTS["parallel_generation_workers"],
+        dest="parallel_generation_workers",
+        metavar="N",
+        help="Number of worker threads for parallel generation (default: auto)",
+    )
+
+    parser.add_argument(
         "--socials-title",
         default="Social",
         help="Title for the social media icons section in the sidebar (default: Social)",

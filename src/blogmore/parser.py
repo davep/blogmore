@@ -1,7 +1,9 @@
 """Markdown parser with frontmatter support for blog posts."""
 
+import concurrent.futures
 import datetime as dt
 import re
+import threading
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -303,12 +305,26 @@ class PostParser:
         Args:
             site_url: Optional base URL of the site for determining internal vs external links
         """
-        # Create custom extension instances
-        external_links_ext = ExternalLinksExtension(site_url=site_url or "")
+        self._site_url = site_url or ""
+        self._thread_local: threading.local = threading.local()
+        # Prime the main thread's markdown instance eagerly so that
+        # `parser.markdown` continues to work in existing sequential code.
+        self._thread_local.markdown = self._make_markdown_instance()
+
+    def _make_markdown_instance(self) -> markdown.Markdown:
+        """Create a fresh, fully-configured :class:`markdown.Markdown` processor.
+
+        Each call returns an independent instance so that the processor can
+        safely be used concurrently across multiple threads.
+
+        Returns:
+            A new Markdown processor with all required extensions registered.
+        """
+        external_links_ext = ExternalLinksExtension(site_url=self._site_url)
         admonitions_ext = AdmonitionsExtension()
         heading_anchors_ext = HeadingAnchorsExtension()
 
-        self.markdown = markdown.Markdown(
+        return markdown.Markdown(
             extensions=[
                 "meta",
                 "attr_list",
@@ -332,6 +348,21 @@ class PostParser:
                 },
             },
         )
+
+    @property
+    def markdown(self) -> markdown.Markdown:
+        """Return the thread-local :class:`markdown.Markdown` processor.
+
+        Each thread receives its own independent instance so that concurrent
+        calls to :meth:`parse_file` and :meth:`parse_page` cannot interfere
+        with each other.
+
+        Returns:
+            The Markdown processor for the calling thread.
+        """
+        if not hasattr(self._thread_local, "markdown"):
+            self._thread_local.markdown = self._make_markdown_instance()
+        return self._thread_local.markdown  # type: ignore[no-any-return]
 
     def _load_frontmatter(
         self, path: Path, content_type: str = "file"
@@ -479,6 +510,8 @@ class PostParser:
         directory: Path,
         include_drafts: bool = False,
         exclude_dirs: list[Path] | None = None,
+        parallel: bool = False,
+        max_workers: int | None = None,
     ) -> list[Post]:
         """Parse all markdown files in a directory.
 
@@ -486,6 +519,9 @@ class PostParser:
             directory: Directory containing markdown files
             include_drafts: Whether to include posts marked as drafts
             exclude_dirs: Optional list of subdirectories to exclude from scanning
+            parallel: When ``True``, parse files concurrently using a thread pool.
+            max_workers: Maximum number of worker threads when ``parallel`` is
+                ``True``.  ``None`` lets Python choose a sensible default.
 
         Returns:
             List of Post objects sorted by date (newest first)
@@ -495,20 +531,50 @@ class PostParser:
 
         resolved_exclude_dirs = [d.resolve() for d in (exclude_dirs or [])]
 
-        posts = []
-        for md_file in directory.rglob("*.md"):
-            if any(
+        md_files = [
+            md_file
+            for md_file in directory.rglob("*.md")
+            if not any(
                 md_file.resolve().is_relative_to(excluded)
                 for excluded in resolved_exclude_dirs
-            ):
-                continue
-            try:
-                post = self.parse_file(md_file)
-                if not post.draft or include_drafts:
-                    posts.append(post)
-            except (ValueError, FileNotFoundError) as e:
-                print(f"Warning: Skipping {md_file}: {e}")
-                continue
+            )
+        ]
+
+        posts: list[Post] = []
+
+        if parallel and len(md_files) > 1:
+            errors: list[tuple[Path, Exception]] = []
+            with concurrent.futures.ThreadPoolExecutor(
+                max_workers=max_workers
+            ) as executor:
+                future_to_path = {
+                    executor.submit(self.parse_file, md_file): md_file
+                    for md_file in md_files
+                }
+                for future in concurrent.futures.as_completed(future_to_path):
+                    md_file = future_to_path[future]
+                    try:
+                        post = future.result()
+                        if not post.draft or include_drafts:
+                            posts.append(post)
+                    except (ValueError, FileNotFoundError) as exc:
+                        print(f"Warning: Skipping {md_file}: {exc}")
+                    except Exception as exc:
+                        print(f"Warning: Skipping {md_file}: {exc}")
+                        errors.append((md_file, exc))
+            if errors:
+                raise RuntimeError(
+                    f"Parallel parsing failed for {len(errors)} file(s)"
+                ) from errors[0][1]
+        else:
+            for md_file in md_files:
+                try:
+                    post = self.parse_file(md_file)
+                    if not post.draft or include_drafts:
+                        posts.append(post)
+                except (ValueError, FileNotFoundError) as e:
+                    print(f"Warning: Skipping {md_file}: {e}")
+                    continue
 
         # Sort by date (newest first)
         posts.sort(key=post_sort_key, reverse=True)

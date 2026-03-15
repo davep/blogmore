@@ -1,5 +1,17 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added optional parallel generation mode. When `parallel_generation: true` is
+  set in the configuration file (or `--parallel-generation` is passed on the
+  command line), BlogMore uses a thread pool to parse Markdown files and render
+  post/page HTML concurrently, reducing build times for large sites. A companion
+  `parallel_generation_workers` option (and `--parallel-generation-workers N`
+  flag) lets users pin the thread-pool size. Off by default; output is identical
+  to the sequential mode. ([#TBD](https://github.com/davep/blogmore/pull/TBD))
+
 ## v1.14.0
 
 **Released: 2026-03-14**
