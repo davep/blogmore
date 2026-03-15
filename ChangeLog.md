@@ -8,6 +8,8 @@
   as `<link>` or `<meta>`) to be injected into every generated page without
   needing to create or override templates.
   ([#286](https://github.com/davep/blogmore/pull/286))
+- Added configurable page output path scheme via the `page_path`
+  configuration option. ([#288](https://github.com/davep/blogmore/pull/288))
 
 ## v1.14.0
 

@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from blogmore.page_path import DEFAULT_PAGE_PATH
 from blogmore.post_path import DEFAULT_POST_PATH
 from blogmore.utils import normalize_site_url
 
@@ -102,14 +103,20 @@ class SiteConfig:
     ``{slug}``.  The ``{slug}`` placeholder is required.
     """
 
-    clean_urls: bool = False
-    """Whether to generate clean URLs for posts whose path ends in ``index.html``.
+    page_path: str = DEFAULT_PAGE_PATH
+    """Format string used to determine each static page's output path and URL.
 
-    When enabled, any post whose resolved URL ends with ``/index.html`` will
+    The only available variable placeholder is ``{slug}``, which is required.
+    """
+
+    clean_urls: bool = False
+    """Whether to generate clean URLs for posts and pages whose path ends in ``index.html``.
+
+    When enabled, any post or page whose resolved URL ends with ``/index.html`` will
     have the ``index.html`` portion removed so that the URL ends with a
-    trailing slash instead.  For example, a post at
-    ``posts/my-first-post/index.html`` will be referenced everywhere as
-    ``posts/my-first-post/`` rather than ``posts/my-first-post/index.html``.
+    trailing slash instead.  For example, a page at
+    ``pages/about/index.html`` will be referenced everywhere as
+    ``pages/about/`` rather than ``pages/about/index.html``.
 
     This is a **configuration file only** option — it cannot be set on the
     command line.  Off by default.

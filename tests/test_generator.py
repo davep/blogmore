@@ -3396,6 +3396,214 @@ class TestCleanUrls:
         assert "/posts/second-post/index.html" not in first_post_content
 
 
+class TestPagePathConfiguration:
+    """Tests for the configurable page_path feature."""
+
+    def test_default_page_path_produces_flat_slug_html(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """The default page_path generates {slug}.html flat in the output directory."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        pages_subdir = content_dir / "pages"
+        pages_subdir.mkdir()
+        (pages_subdir / "about.md").write_text(
+            "---\ntitle: About Me\n---\n\nAbout content."
+        )
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: A Post\ndate: 2024-01-01\n---\n\nPost content."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator.generate()
+
+        # about.md should produce about.html at the root of the output directory
+        about_file = temp_output_dir / "about.html"
+        assert about_file.exists()
+        assert "About Me" in about_file.read_text()
+
+    def test_custom_page_path_nested_directory(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """A page_path with a subdirectory places pages in that subdirectory."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        pages_subdir = content_dir / "pages"
+        pages_subdir.mkdir()
+        (pages_subdir / "about.md").write_text(
+            "---\ntitle: About Me\n---\n\nAbout content."
+        )
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: A Post\ndate: 2024-01-01\n---\n\nPost content."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_path="pages/{slug}.html",
+            )
+        )
+        generator.generate()
+
+        page_file = temp_output_dir / "pages" / "about.html"
+        assert page_file.exists()
+        assert "About Me" in page_file.read_text()
+
+    def test_custom_page_path_per_page_directory(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """A page_path ending in index.html gives every page its own directory."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        pages_subdir = content_dir / "pages"
+        pages_subdir.mkdir()
+        (pages_subdir / "about.md").write_text(
+            "---\ntitle: About Me\n---\n\nAbout content."
+        )
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: A Post\ndate: 2024-01-01\n---\n\nPost content."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_path="{slug}/index.html",
+            )
+        )
+        generator.generate()
+
+        page_file = temp_output_dir / "about" / "index.html"
+        assert page_file.exists()
+        assert "About Me" in page_file.read_text()
+
+    def test_page_url_reflects_configured_page_path(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Page URLs in generated HTML (sidebar) reflect the configured page_path."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        pages_subdir = content_dir / "pages"
+        pages_subdir.mkdir()
+        (pages_subdir / "about.md").write_text(
+            "---\ntitle: About Me\n---\n\nAbout content."
+        )
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: A Post\ndate: 2024-01-01\n---\n\nPost content."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_path="pages/{slug}.html",
+            )
+        )
+        generator.generate()
+
+        # The index page includes sidebar page links; the URL should use the new scheme.
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/pages/about.html" in index_content
+
+    def test_page_path_deep_subdirectory_created(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """When page_path uses deeply nested directories, they are created automatically."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        pages_subdir = content_dir / "pages"
+        pages_subdir.mkdir()
+        (pages_subdir / "about.md").write_text(
+            "---\ntitle: About Me\n---\n\nAbout content."
+        )
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: A Post\ndate: 2024-01-01\n---\n\nPost content."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_path="site/pages/{slug}/index.html",
+            )
+        )
+        generator.generate()
+
+        page_file = temp_output_dir / "site" / "pages" / "about" / "index.html"
+        assert page_file.exists()
+
+    def test_page_clean_urls_strips_index_html(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls is True, page URLs ending in index.html are stripped."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        pages_subdir = content_dir / "pages"
+        pages_subdir.mkdir()
+        (pages_subdir / "about.md").write_text(
+            "---\ntitle: About Me\n---\n\nAbout content."
+        )
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: A Post\ndate: 2024-01-01\n---\n\nPost content."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_path="pages/{slug}/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/pages/about/" in index_content
+        assert "/pages/about/index.html" not in index_content
+
+    def test_page_clean_urls_disabled_keeps_index_html(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls is False, page URLs ending in index.html are unchanged."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        pages_subdir = content_dir / "pages"
+        pages_subdir.mkdir()
+        (pages_subdir / "about.md").write_text(
+            "---\ntitle: About Me\n---\n\nAbout content."
+        )
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: A Post\ndate: 2024-01-01\n---\n\nPost content."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_path="pages/{slug}/index.html",
+                clean_urls=False,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/pages/about/index.html" in index_content
+
+    def test_page_path_default_value(self) -> None:
+        """The page_path setting defaults to {slug}.html."""
+        from blogmore.page_path import DEFAULT_PAGE_PATH
+
+        config = SiteConfig(output_dir=Path("output"))
+        assert config.page_path == DEFAULT_PAGE_PATH
+        assert config.page_path == "{slug}.html"
+
+
 class TestCacheBusting:
     """Test that stylesheets are served with generation-specific cache-busting tokens."""
 
