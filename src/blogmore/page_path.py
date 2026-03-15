@@ -1,7 +1,7 @@
 """Page path resolution for configurable output file paths."""
 
 ##############################################################################
-# Python imports.
+# Standard-library imports.
 import re
 from pathlib import Path
 from string import Formatter
