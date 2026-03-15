@@ -1098,6 +1098,67 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#page_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        page_path
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="page_path">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#available-variables_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#safety_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Safety
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#with_advert" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1191,6 +1252,17 @@
     <span class="md-ellipsis">
       
         extra_stylesheets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#head" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        head
       
     </span>
   </a>
@@ -1972,6 +2044,67 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#page_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        page_path
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="page_path">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#available-variables_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#safety_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Safety
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#with_advert" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2065,6 +2198,17 @@
     <span class="md-ellipsis">
       
         extra_stylesheets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#head" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        head
       
     </span>
   </a>
@@ -2656,6 +2800,48 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <p>Posts organised by author, then year and slug:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">post_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{author}/{year}/{slug}.html&quot;</span>
 </code></pre></div>
+<h4 id="page_path"><code>page_path</code></h4>
+<p>Format string that controls the output path (and therefore the URL) of every static page.  This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
+<p><strong>Type:</strong> String<br />
+<strong>Default:</strong> <code>{slug}.html</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">page_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{slug}.html&quot;</span>
+</code></pre></div>
+<h5 id="how-it-works_1">How it works</h5>
+<p>The format string uses a Python-style <code>{slug}</code> placeholder that is substituted with the page's filename stem.  The result is joined onto the <code>output</code> directory, so the path is always relative to your site root.  Any intermediate subdirectories are created automatically.</p>
+<h5 id="available-variables_1">Available variables</h5>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{slug}</code></td>
+<td>Page slug derived from filename. <strong>Required.</strong></td>
+<td><code>about</code></td>
+</tr>
+</tbody>
+</table>
+<p>The <code>{slug}</code> variable is the only placeholder available for pages — pages have no date, category, author, or other post-specific metadata.</p>
+<h5 id="safety_1">Safety</h5>
+<p>BlogMore always ensures the resolved path remains inside the <code>output</code> directory.  A <code>page_path</code> value containing <code>..</code> segments or other path-traversal constructs is detected and rejected at startup with an error message.</p>
+<h5 id="examples_1">Examples</h5>
+<p>Default — each page as a flat <code>.html</code> file:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">page_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{slug}.html&quot;</span>
+</code></pre></div>
+<p>Each page in its own directory (combine with <code>clean_urls</code>):</p>
+<div class="highlight"><pre><span></span><code><span class="nt">page_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{slug}/index.html&quot;</span>
+</code></pre></div>
+<p>All pages under a <code>/pages/</code> prefix:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">page_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;pages/{slug}.html&quot;</span>
+</code></pre></div>
+<p>Pages in a subdirectory with clean URLs:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">page_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;pages/{slug}/index.html&quot;</span>
+<span class="nt">clean_urls</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
 <h4 id="with_advert"><code>with_advert</code></h4>
 <p>When <code>true</code> (the default), a small "Generated with BlogMore vX.Y.Z" line is included in the footer of every page, linking to the BlogMore website. Set this to <code>false</code> to suppress the footer line entirely.  This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
 <p><strong>Type:</strong> Boolean<br />
@@ -2663,25 +2849,27 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <div class="highlight"><pre><span></span><code><span class="nt">with_advert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </code></pre></div>
 <h4 id="clean_urls"><code>clean_urls</code></h4>
-<p>When <code>true</code>, any post whose resolved URL ends with <code>/index.html</code> has the <code>index.html</code> portion removed so that the URL ends with a trailing slash instead.  For example, if <code>post_path</code> is set to <code>posts/{slug}/index.html</code>, a post with slug <code>my-first-post</code> would normally be referenced as:</p>
+<p>When <code>true</code>, any post or page whose resolved URL ends with <code>/index.html</code> has the <code>index.html</code> portion removed so that the URL ends with a trailing slash instead.  For example, if <code>post_path</code> is set to <code>posts/{slug}/index.html</code>, a post with slug <code>my-first-post</code> would normally be referenced as:</p>
 <div class="highlight"><pre><span></span><code>https://example.com/posts/my-first-post/index.html
 </code></pre></div>
 <p>With <code>clean_urls: true</code> every mention of that URL — in the generated HTML, RSS/Atom feeds, sitemap, and canonical <code>&lt;link&gt;</code> tags — becomes:</p>
 <div class="highlight"><pre><span></span><code>https://example.com/posts/my-first-post/
 </code></pre></div>
-<p>The output <em>file</em> is still written to <code>posts/my-first-post/index.html</code> on disk; only the URLs embedded in the generated site change.</p>
-<p>This setting has no effect when <code>post_path</code> does not produce paths that end in <code>index.html</code>.</p>
+<p>The same applies to pages: if <code>page_path</code> is set to <code>pages/{slug}/index.html</code>, the page URL becomes <code>pages/about/</code> instead of <code>pages/about/index.html</code>.</p>
+<p>The output <em>file</em> is still written to its configured path on disk; only the URLs embedded in the generated site change.</p>
+<p>This setting has no effect when neither <code>post_path</code> nor <code>page_path</code> produces paths that end in <code>index.html</code>.</p>
 <p>This is a <strong>configuration file only</strong> option — it cannot be set on the command line.  Off by default.</p>
 <p><strong>Type:</strong> Boolean<br />
 <strong>Default:</strong> <code>false</code></p>
 <div class="highlight"><pre><span></span><code><span class="nt">clean_urls</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 <h5 id="typical-usage">Typical usage</h5>
-<p>Combine <code>clean_urls</code> with a <code>post_path</code> that places each post in its own directory:</p>
+<p>Combine <code>clean_urls</code> with a <code>post_path</code> and/or <code>page_path</code> that places content in its own directory:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">post_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;posts/{slug}/index.html&quot;</span>
+<span class="nt">page_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;pages/{slug}/index.html&quot;</span>
 <span class="nt">clean_urls</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
-<p>This gives every post a clean, shareable URL such as <code>https://example.com/posts/my-first-post/</code>.</p>
+<p>This gives every post and page a clean, shareable URL such as <code>https://example.com/posts/my-first-post/</code> and <code>https://example.com/pages/about/</code>.</p>
 <h3 id="styling-options">Styling Options</h3>
 <h4 id="minify_css"><code>minify_css</code></h4>
 <p>Minify the generated CSS and write it as <code>styles.min.css</code> instead of <code>style.css</code>. This reduces the size of the stylesheet delivered to visitors.</p>
@@ -2711,6 +2899,36 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/assets/syntax-highlighting.css</span>
 </code></pre></div>
 <p><strong>Note:</strong> Stylesheets are included in the order specified.</p>
+<h4 id="head"><code>head</code></h4>
+<p>Extra tags to inject into the <code>&lt;head&gt;</code> element of every generated page. This is a quick way to add custom <code>&lt;link&gt;</code>, <code>&lt;meta&gt;</code>, or other head tags without creating or overriding templates.</p>
+<p><strong>Type:</strong> List of single-key mappings (tag name → attribute dict)<br />
+<strong>Default:</strong> Empty list<br />
+<strong>Configuration file only</strong> — cannot be set on the command line.</p>
+<p>Each entry is a tag name mapped to a dict of its HTML attributes. All attribute values are converted to strings and always emitted in double quotes.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">head</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">link</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">rel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">author</span>
+<span class="w">      </span><span class="nt">href</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/humans.txt</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">meta</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">theme-color</span>
+<span class="w">      </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;#ffffff&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">link</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">rel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">human-json</span>
+<span class="w">      </span><span class="nt">href</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/human.json</span>
+</code></pre></div>
+<p>The above configuration produces:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&quot;author&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/humans.txt&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;theme-color&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;#ffffff&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&quot;human-json&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/human.json&quot;</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>Tags appear in the order listed and are added to <strong>every</strong> generated page.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Use <code>head</code> for small additions like a <code>humans.txt</code> link or a theme-colour
+meta tag.  If you need to make extensive changes to the <code>&lt;head&gt;</code> element —
+for example to add complex scripts or conditionally include tags — use
+<a href="../theming/">template overrides</a> instead.</p>
+</div>
 <h4 id="site_logo"><code>site_logo</code></h4>
 <p>Path or URL to a logo image displayed in the sidebar.</p>
 <p><strong>Type:</strong> String (URL or path)<br />
@@ -2826,6 +3044,15 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <span class="nt">extra_stylesheets</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/assets/custom.css</span>
+
+<span class="c1"># Extra head tags (configuration file only)</span>
+<span class="nt">head</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">link</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">rel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">author</span>
+<span class="w">      </span><span class="nt">href</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/humans.txt</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">meta</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">theme-color</span>
+<span class="w">      </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;#ffffff&quot;</span>
 
 <span class="c1"># Sidebar configuration</span>
 <span class="nt">site_logo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/images/logo.png</span>
