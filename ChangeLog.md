@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v1.15.0
 
-**Released: WiP**
+**Released: 2026-03-15**
 
 - Added `head` configuration option. This allows extra `<head>` tags (such
   as `<link>` or `<meta>`) to be injected into every generated page without
