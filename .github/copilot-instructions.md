@@ -44,13 +44,11 @@
 
 ## Documentation
 
-- When adding new functionality that the user can interact with, especially
-  if it's configurable, ensure you update the README file to include details
-  of what the feature is, why you'd use it, an how you'd use it.
-- We are maintaining a change log in ChangeLog.md. When adding a new feature
-  or fixing a bug, be sure to add an appropriate change log entry. Follow
-  the format that is already there; be sure to link the PR that provides the
-  change.
+- When adding a significant new feature, be sure to update the "Key
+  Features" section of README.md.
+- When adding any new functionality that the user interacts with, especially
+  if it has a command line switch or can be configured, ensure that the
+  documentation in the `docs/` directory is updated.
 - Whenever you add, remove, or change a configuration option in
   `site_config.py` or `config.py`, you **must** update `blogmore.yaml.example`
   to keep it in sync. The example file should document every option that a
@@ -58,5 +56,16 @@
 - Be sure to read `THEME_DEVELOPMENT_GUIDELINES.md` in the root of the
   repository before making any changes that might impact on styling and
   templates.
+- We are maintaining a change log in ChangeLog.md. When adding a new feature
+  or fixing a bug, be sure to add an appropriate change log entry. Follow
+  the format that is already there; be sure to link the PR that provides the
+  change. If there is a `##` heading that has a version number, start a new
+  section in this format:
+
+```md
+## Unreleased
+
+**Released: WiP**
+```
 
 [//]: # (copilot-instructions.md ends here)
