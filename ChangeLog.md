@@ -4,15 +4,12 @@
 
 **Released: WiP**
 
-- Added `page_path` configuration option. This allows customising the output
-  path (and therefore the URL) of every static page, similar to `post_path`
-  for blog posts. The only available placeholder is `{slug}`. The `clean_urls`
-  option is now applied to page URLs as well.
-  ([#TBD](https://github.com/davep/blogmore/pull/TBD))
 - Added `head` configuration option. This allows extra `<head>` tags (such
   as `<link>` or `<meta>`) to be injected into every generated page without
   needing to create or override templates.
   ([#286](https://github.com/davep/blogmore/pull/286))
+- Added configurable page output path scheme via the `page_path`
+  configuration option. ([#288](https://github.com/davep/blogmore/pull/288))
 
 ## v1.14.0
 
