@@ -1410,7 +1410,7 @@ class SiteGenerator:
         context = self._get_global_context()
         context["pages"] = pages
         output_path = (
-            self.site_config.output_dir / self.site_config.search_path
+            self.site_config.output_dir / self.site_config.search_path.lstrip("/")
         ).resolve()
         output_path.parent.mkdir(parents=True, exist_ok=True)
         search_url = self._get_search_url()
@@ -1441,7 +1441,7 @@ class SiteGenerator:
 
         # Remove the search page at the configured path.
         stale_page = (
-            self.site_config.output_dir / self.site_config.search_path
+            self.site_config.output_dir / self.site_config.search_path.lstrip("/")
         ).resolve()
         if stale_page.exists():
             stale_page.unlink()

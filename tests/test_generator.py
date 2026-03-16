@@ -4335,3 +4335,25 @@ class TestSearchPathConfiguration:
 
         assert (temp_output_dir / "search_index.json").exists()
         assert not (temp_output_dir / "find" / "search_index.json").exists()
+
+    def test_search_path_with_leading_slash_is_treated_as_relative(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """A search_path with a leading slash is treated as relative to the output dir."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+                search_path="/search/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        # File is written under the output dir, not at the filesystem root.
+        assert (temp_output_dir / "search" / "index.html").exists()
+
+        # Navigation link uses the clean URL.
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/search/"' in index_content

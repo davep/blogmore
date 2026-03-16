@@ -115,7 +115,7 @@ def main() -> int:
         return 1
     # Verify that the resolved path does not escape the output directory.
     _output_resolved = args.output.resolve()
-    _search_resolved = (_output_resolved / raw_search_path).resolve()
+    _search_resolved = (_output_resolved / raw_search_path.lstrip("/")).resolve()
     if not _search_resolved.is_relative_to(_output_resolved):
         print(
             "Error: search_path in the configuration file must not escape the output directory",
