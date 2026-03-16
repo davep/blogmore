@@ -4,13 +4,8 @@
 
 **Released: WiP**
 
-- Added `search_path` configuration option. This controls where the search
-  page is generated (relative to the output directory). The default is
-  `search.html`, preserving the existing behaviour. Any intermediate
-  directories are created automatically. The `clean_urls` setting is
-  observed: if `search_path` ends in `index.html`, all links to the search
-  page omit the filename.
-  ([#PR](https://github.com/davep/blogmore/pull/0))
+- Added configurable search page path option via the `search_path`
+  configuration option. ([#304](https://github.com/davep/blogmore/pull/304))
 
 ## v1.16.0
 
