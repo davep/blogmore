@@ -964,6 +964,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-links-title" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --links-title
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-minify-css" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1770,6 +1781,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-links-title" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --links-title
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-minify-css" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2300,6 +2322,11 @@ blogmore<span class="w"> </span>gen<span class="w"> </span>&lt;content_dir&gt;<s
 <p><strong>Default:</strong> <code>Social</code></p>
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--socials-title<span class="w"> </span><span class="s2">&quot;Connect&quot;</span>
 </code></pre></div>
+<h4 id="-links-title"><code>--links-title</code></h4>
+<p>Override the title displayed above the links section in the sidebar. By default the section is labelled "Links".</p>
+<p><strong>Default:</strong> <code>Links</code></p>
+<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--links-title<span class="w"> </span><span class="s2">&quot;Elsewhere&quot;</span>
+</code></pre></div>
 <h4 id="-minify-css"><code>--minify-css</code></h4>
 <p>Minify the generated CSS and write it as <code>styles.min.css</code> instead of <code>style.css</code>. This reduces the size of the stylesheet delivered to visitors.</p>
 <p>CSS minification is <strong>disabled by default</strong>. Pass this flag to opt in.</p>
@@ -2373,7 +2400,8 @@ blogmore<span class="w"> </span>serve
 - <code>--minify-js</code>
 - <code>--minify-html</code>
 - <code>--with-read-time</code>
-- <code>--socials-title</code></p>
+- <code>--socials-title</code>
+- <code>--links-title</code></p>
 <h3 id="examples_1">Examples</h3>
 <p>Basic development server:
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>serve<span class="w"> </span>posts/
@@ -2436,7 +2464,8 @@ blogmore<span class="w"> </span>serve
 - <code>--minify-js</code>
 - <code>--minify-html</code>
 - <code>--with-read-time</code>
-- <code>--socials-title</code></p>
+- <code>--socials-title</code>
+- <code>--links-title</code></p>
 <h3 id="how-it-works">How It Works</h3>
 <p>When you run <code>publish</code>, BlogMore:</p>
 <ol>

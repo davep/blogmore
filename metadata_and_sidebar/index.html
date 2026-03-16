@@ -680,6 +680,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#pages-navigation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pages navigation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#custom-links" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1128,6 +1139,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#pages-navigation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pages navigation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#custom-links" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1284,6 +1306,16 @@
 </code></pre></div>
 <p>The necessary HTML <code>&lt;link&gt;</code> and <code>&lt;meta&gt;</code> tags are added to every page automatically, but only when the icons actually exist. There is nothing to configure beyond providing the source image.</p>
 <h2 id="sidebar-configuration">Sidebar configuration</h2>
+<h3 id="pages-navigation">Pages navigation</h3>
+<p>By default every page created from the <code>pages/</code> directory (except the special <code>404</code> page) is automatically listed in the sidebar.</p>
+<p>To control exactly which pages appear and in what order, set the <code>pages</code> option in your configuration file to a list of page slugs:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">pages</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">about</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-tools</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colophon</span>
+</code></pre></div>
+<p>Only pages whose slug matches an entry in the list are linked in the sidebar, and they appear in the order you define. Pages that are not listed are still generated as HTML files — they simply receive no automatic sidebar link.</p>
+<p>If <code>pages</code> is omitted (or set to an empty list), all pages are shown, which is the default behaviour.</p>
 <h3 id="custom-links">Custom links</h3>
 <p>Add custom navigation links to the sidebar. Each entry has a <code>title</code> and a <code>url</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">links</span><span class="p">:</span>
@@ -1302,6 +1334,13 @@
 <span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/username</span>
 </code></pre></div>
 <p>These links appear in the sidebar below any pages from your <code>pages/</code> directory.</p>
+<p>To change the section title from the default "Links", use <code>links_title</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">links_title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Elsewhere&quot;</span>
+<span class="nt">links</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">My Main Site</span>
+<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://example.com</span>
+</code></pre></div>
+<p>The same can be set from the command line with <code>--links-title</code>.</p>
 <h3 id="social-media-icons">Social media icons</h3>
 <p>Add social media links to the sidebar as icons. Each entry has a <code>site</code> (the platform name) and a <code>url</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">socials</span><span class="p">:</span>

@@ -1309,6 +1309,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#links_title" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        links_title
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#socials" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1324,6 +1335,17 @@
     <span class="md-ellipsis">
       
         socials_title
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pages
       
     </span>
   </a>
@@ -2255,6 +2277,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#links_title" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        links_title
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#socials" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2270,6 +2303,17 @@
     <span class="md-ellipsis">
       
         socials_title
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pages
       
     </span>
   </a>
@@ -2958,6 +3002,13 @@ for example to add complex scripts or conditionally include tags — use
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GitHub</span>
 <span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/username</span>
 </code></pre></div>
+<h4 id="links_title"><code>links_title</code></h4>
+<p>Override the title displayed above the links section in the sidebar. By default the section is labelled "Links".</p>
+<p><strong>Type:</strong> String<br />
+<strong>Default:</strong> <code>"Links"</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">links_title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Elsewhere&quot;</span>
+</code></pre></div>
+<p>Can also be set with the <code>--links-title</code> command-line option.</p>
 <h4 id="socials"><code>socials</code></h4>
 <p>Social media links displayed in the sidebar as icons. Each entry has a <code>site</code> (the social media platform) and <code>url</code>.</p>
 <p><strong>Type:</strong> List of objects with <code>site</code> and <code>url</code> fields<br />
@@ -2977,6 +3028,18 @@ for example to add complex scripts or conditionally include tags — use
 <strong>Default:</strong> <code>"Social"</code></p>
 <div class="highlight"><pre><span></span><code><span class="nt">socials_title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Connect&quot;</span>
 </code></pre></div>
+<h4 id="pages"><code>pages</code></h4>
+<p>Control which pages from the <code>pages/</code> directory are shown in the sidebar and the order in which they appear.</p>
+<p><strong>Type:</strong> List of strings (page slugs)<br />
+<strong>Default:</strong> None (all pages are shown)<br />
+<strong>Config file only</strong></p>
+<p>By default every page created from the <code>pages/</code> directory (except the special <code>404</code> page) is automatically linked in the sidebar. If you set <code>pages</code> to a list of page slugs, only those pages appear in the sidebar, in the order you specify. Pages not listed are still generated but have no automatic sidebar link.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">pages</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">about</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-tools</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colophon</span>
+</code></pre></div>
+<p>If <code>pages</code> is omitted entirely, or set to an empty list, all pages are shown (the default behaviour).</p>
 <h3 id="serve-command-options">Serve Command Options</h3>
 <p>Options specific to the <code>serve</code> command. These are only used when running <code>blogmore serve</code>.</p>
 <h4 id="port"><code>port</code></h4>
@@ -3056,6 +3119,10 @@ for example to add complex scripts or conditionally include tags — use
 
 <span class="c1"># Sidebar configuration</span>
 <span class="nt">site_logo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/images/logo.png</span>
+
+<span class="nt">pages</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">about</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colophon</span>
 
 <span class="nt">links</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">About</span>
