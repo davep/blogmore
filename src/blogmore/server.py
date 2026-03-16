@@ -17,7 +17,7 @@ from blogmore.generator import SiteGenerator
 from blogmore.page_path import DEFAULT_PAGE_PATH, validate_page_path_template
 from blogmore.parser import CUSTOM_404_HTML
 from blogmore.post_path import DEFAULT_POST_PATH, validate_post_path_template
-from blogmore.site_config import SiteConfig
+from blogmore.site_config import DEFAULT_SEARCH_PATH, SiteConfig
 
 
 class ReusingTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -338,6 +338,29 @@ class ConfigChangeHandler(FileSystemEventHandler):
         else:
             print(
                 "Warning: page_path in the configuration file must be a string; "
+                "using the default.",
+                file=sys.stderr,
+            )
+
+        raw_search_path = config.get("search_path", DEFAULT_SEARCH_PATH)
+        if isinstance(raw_search_path, str):
+            if not raw_search_path:
+                print(
+                    "Warning: search_path in the configuration file must not be empty; "
+                    "using the default.",
+                    file=sys.stderr,
+                )
+            elif not raw_search_path.endswith(".html"):
+                print(
+                    "Warning: search_path in the configuration file must end with '.html'; "
+                    "using the default.",
+                    file=sys.stderr,
+                )
+            else:
+                update_kwargs["search_path"] = raw_search_path
+        else:
+            print(
+                "Warning: search_path in the configuration file must be a string; "
                 "using the default.",
                 file=sys.stderr,
             )

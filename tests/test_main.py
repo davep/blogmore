@@ -2069,3 +2069,155 @@ class TestConfigChangeHandler:
 
         # Renderer must have an empty list, not the old stylesheet
         assert generator.renderer.extra_stylesheets == []
+
+    def test_search_path_updated_in_site_config_on_reload(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that a search_path change is picked up in site_config on config reload."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+
+        config_file = tmp_path / "blogmore.yaml"
+        initial_config_data: dict[str, object] = {"search_path": "search.html"}
+        with open(config_file, "w") as f:
+            yaml.dump(initial_config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
+        )
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides={},
+                debounce_seconds=0.05,
+            )
+
+            new_config_data: dict[str, object] = {"search_path": "find/index.html"}
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            assert generator.site_config.search_path == "find/index.html"
+
+    def test_search_path_with_leading_slash_updated_in_site_config_on_reload(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """A search_path with a leading slash is accepted during config reload."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+
+        config_file = tmp_path / "blogmore.yaml"
+        initial_config_data: dict[str, object] = {"search_path": "search.html"}
+        with open(config_file, "w") as f:
+            yaml.dump(initial_config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
+        )
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides={},
+                debounce_seconds=0.05,
+            )
+
+            new_config_data: dict[str, object] = {"search_path": "/search/index.html"}
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            assert generator.site_config.search_path == "/search/index.html"
+
+    def test_invalid_search_path_not_html_warns_and_keeps_default(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """An invalid search_path (not ending in .html) warns and keeps the default."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+        from blogmore.site_config import DEFAULT_SEARCH_PATH
+
+        config_file = tmp_path / "blogmore.yaml"
+        initial_config_data: dict[str, object] = {}
+        with open(config_file, "w") as f:
+            yaml.dump(initial_config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
+        )
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides={},
+                debounce_seconds=0.05,
+            )
+
+            new_config_data: dict[str, object] = {"search_path": "find/index.txt"}
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            # Default must be preserved
+            assert generator.site_config.search_path == DEFAULT_SEARCH_PATH
+            captured = capsys.readouterr()
+            assert "search_path" in captured.err
+
+    def test_non_string_search_path_warns_and_keeps_default(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """A non-string search_path warns and keeps the default."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+        from blogmore.site_config import DEFAULT_SEARCH_PATH
+
+        config_file = tmp_path / "blogmore.yaml"
+        initial_config_data: dict[str, object] = {}
+        with open(config_file, "w") as f:
+            yaml.dump(initial_config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
+        )
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides={},
+                debounce_seconds=0.05,
+            )
+
+            new_config_data: dict[str, object] = {"search_path": 42}
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            # Default must be preserved
+            assert generator.site_config.search_path == DEFAULT_SEARCH_PATH
+            captured = capsys.readouterr()
+            assert "search_path" in captured.err
