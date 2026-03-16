@@ -1965,6 +1965,86 @@ class TestConfigChangeHandler:
             # includes the <link> tag for /custom.css
             assert generator.site_config.extra_stylesheets is None
 
+    def test_sidebar_pages_updated_in_site_config(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that a pages: change is picked up in site_config on config reload."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+
+        config_file = tmp_path / "blogmore.yaml"
+        initial_config_data: dict[str, object] = {}
+        with open(config_file, "w") as f:
+            yaml.dump(initial_config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides={},
+                debounce_seconds=0.05,
+            )
+
+            new_config_data: dict[str, object] = {"pages": ["about", "colophon"]}
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            assert generator.site_config.sidebar_pages == ["about", "colophon"]
+
+    def test_sidebar_pages_cleared_when_removed_from_config(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that removing pages: from config resets sidebar_pages to None."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+
+        config_file = tmp_path / "blogmore.yaml"
+        initial_config_data: dict[str, object] = {"pages": ["about"]}
+        with open(config_file, "w") as f:
+            yaml.dump(initial_config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                sidebar_pages=["about"],
+            )
+        )
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides={},
+                debounce_seconds=0.05,
+            )
+
+            # Remove pages from the config
+            new_config_data: dict[str, object] = {"site_title": "My Blog"}
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            assert generator.site_config.sidebar_pages is None
+
     def test_extra_stylesheets_cleared_in_renderer_on_generate(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:

@@ -342,6 +342,37 @@ class ConfigChangeHandler(FileSystemEventHandler):
                 file=sys.stderr,
             )
 
+        raw_sidebar_pages = config.get("pages")
+        if raw_sidebar_pages is None:
+            # Option not present — show all pages (default behaviour)
+            update_kwargs["sidebar_pages"] = None
+        elif not isinstance(raw_sidebar_pages, list) or not all(
+            isinstance(item, str) for item in raw_sidebar_pages
+        ):
+            print(
+                "Warning: pages in the configuration file must be a list of page "
+                "slugs; ignoring the value.",
+                file=sys.stderr,
+            )
+        else:
+            update_kwargs["sidebar_pages"] = (
+                raw_sidebar_pages if raw_sidebar_pages else None
+            )
+
+        raw_head = config.get("head")
+        if raw_head is None:
+            # Key not present in config — clear any previously set head tags.
+            update_kwargs["head"] = []
+        elif isinstance(raw_head, list) and all(
+            isinstance(item, dict) and len(item) == 1 for item in raw_head
+        ):
+            update_kwargs["head"] = raw_head
+        else:
+            print(
+                "Warning: head in the configuration file is invalid; ignoring the value.",
+                file=sys.stderr,
+            )
+
         self.generator.site_config = dataclasses.replace(
             self.generator.site_config, **update_kwargs
         )
