@@ -23,6 +23,7 @@ below lists all variables that are available in every template.
 | `site_url` | `str` | Base URL of the site (e.g. `https://example.com`). |
 | `blogmore_version` | `str` | BlogMore version string (e.g. `1.13.0`). |
 | `with_search` | `bool` | `True` when search is enabled. |
+| `search_url` | `str` | URL to the search page (respects `search_path` and `clean_urls`). |
 | `with_read_time` | `bool` | `True` when reading time display is enabled. |
 | `with_advert` | `bool` | `True` when the "Generated with BlogMore" footer is shown. |
 | `default_author` | `str \| None` | Default author name from configuration. |
