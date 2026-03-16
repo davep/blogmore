@@ -138,6 +138,9 @@ posts_per_feed: 20
 #   - title: Contact
 #     url: /contact.html
 
+# Optional: Custom title for the links section in sidebar (default: "Links")
+# links_title: "Links"
+
 # Optional: Social media links in sidebar (displayed as Font Awesome brand icons)
 # socials:
 #   - site: mastodon

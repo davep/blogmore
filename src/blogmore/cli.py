@@ -160,6 +160,12 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
         help="Title for the social media icons section in the sidebar (default: Social)",
     )
 
+    parser.add_argument(
+        "--links-title",
+        default="Links",
+        help="Title for the links section in the sidebar (default: Links)",
+    )
+
 
 def create_parser() -> argparse.ArgumentParser:
     """Create and configure the argument parser for blogmore.

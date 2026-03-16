@@ -10,6 +10,8 @@
   link. Omitting the option (or leaving it empty) preserves the existing
   behaviour where all pages are shown.
   ([#294](https://github.com/davep/blogmore/pull/294))
+- The title of the "Links" section in the sidebar can now be customised.
+  ([#295](https://github.com/davep/blogmore/pull/295))
 
 ## v1.15.0
 
