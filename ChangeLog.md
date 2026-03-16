@@ -4,18 +4,14 @@
 
 **Released: WiP**
 
-- Added `links_title` configuration option and `--links-title` command-line
-  flag. This allows overriding the title of the "Links" section in the
-  sidebar. Omitting the option preserves the existing "Links" default.
-  Changes made while in `serve` mode are picked up on the next
-  regeneration.
-  ([#296](https://github.com/davep/blogmore/pull/296))
 - Added optional `pages` configuration option. When set to a list of page
   slugs, only those pages are linked in the sidebar, in the order given.
   Pages not listed are still generated but receive no automatic sidebar
   link. Omitting the option (or leaving it empty) preserves the existing
   behaviour where all pages are shown.
   ([#294](https://github.com/davep/blogmore/pull/294))
+- The title of the "Links" section in the sidebar can now be customised.
+  ([#295](https://github.com/davep/blogmore/pull/295))
 
 ## v1.15.0
 
