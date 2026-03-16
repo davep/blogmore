@@ -6,10 +6,10 @@
 
 - Added optional `pages` configuration option. When set to a list of page
   slugs, only those pages are linked in the sidebar, in the order given.
-  Pages not listed are still generated but receive no automatic sidebar link.
-  Omitting the option (or leaving it empty) preserves the existing behaviour
-  where all pages are shown.
-  ([#291](https://github.com/davep/blogmore/pull/291))
+  Pages not listed are still generated but receive no automatic sidebar
+  link. Omitting the option (or leaving it empty) preserves the existing
+  behaviour where all pages are shown.
+  ([#294](https://github.com/davep/blogmore/pull/294))
 
 ## v1.15.0
 
