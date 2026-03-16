@@ -465,6 +465,48 @@ When `true` (the default), a small "Generated with BlogMore vX.Y.Z" line is incl
 with_advert: false
 ```
 
+#### `search_path`
+
+Path (relative to the output directory) where the search page is generated.  This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** String  
+**Default:** `search.html`
+
+```yaml
+search_path: "search.html"
+```
+
+##### How it works
+
+The path is joined onto the `output` directory.  Any intermediate subdirectories are created automatically, so you can place the search page anywhere under your site root without having to create those directories yourself.
+
+When `clean_urls` is enabled and the path ends in `index.html`, the `index.html` portion is omitted in any URL reference to the search page (navigation links, form action, etc.), so the page is accessible at the clean trailing-slash URL.
+
+> **Note:** The location of the search *data* (`search_index.json`) is not affected by this setting — it is always written to the root of the output directory.
+
+##### Examples
+
+Default — search page at the site root:
+
+```yaml
+search_path: "search.html"
+```
+
+Search page in its own subdirectory:
+
+```yaml
+search_path: "blog/search.html"
+```
+
+Search page in its own directory with clean URLs:
+
+```yaml
+search_path: "search/index.html"
+clean_urls: true
+```
+
+This makes the search page accessible at `/search/` rather than `/search/index.html`.
+
 #### `clean_urls`
 
 When `true`, any post or page whose resolved URL ends with `/index.html` has the `index.html` portion removed so that the URL ends with a trailing slash instead.  For example, if `post_path` is set to `posts/{slug}/index.html`, a post with slug `my-first-post` would normally be referenced as:
@@ -479,11 +521,11 @@ With `clean_urls: true` every mention of that URL — in the generated HTML, RSS
 https://example.com/posts/my-first-post/
 ```
 
-The same applies to pages: if `page_path` is set to `pages/{slug}/index.html`, the page URL becomes `pages/about/` instead of `pages/about/index.html`.
+The same applies to pages: if `page_path` is set to `pages/{slug}/index.html`, the page URL becomes `pages/about/` instead of `pages/about/index.html`.  The same transformation is applied to the search page if `search_path` ends in `index.html`.
 
 The output *file* is still written to its configured path on disk; only the URLs embedded in the generated site change.
 
-This setting has no effect when neither `post_path` nor `page_path` produces paths that end in `index.html`.
+This setting has no effect when neither `post_path`, `page_path`, nor `search_path` produces paths that end in `index.html`.
 
 This is a **configuration file only** option — it cannot be set on the command line.  Off by default.
 

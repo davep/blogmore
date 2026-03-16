@@ -76,6 +76,14 @@ posts_per_feed: 20
 # The only available placeholder is {slug}, which is required.
 # page_path: "{slug}.html"
 
+# Optional: Output path for the search page (default: "search.html")
+# Controls where the search page is generated, relative to the output
+# directory. The full directory path is created automatically.
+# When clean_urls is enabled and the path ends in index.html, the
+# index.html portion is omitted in links to the page.
+# Configuration file only.
+# search_path: "search.html"
+
 # Optional: Generate clean URLs for posts and pages (default: false)
 # When enabled, posts and pages whose URL ends with /index.html will use the
 # shorter trailing-slash form instead (e.g. /pages/about/ instead of

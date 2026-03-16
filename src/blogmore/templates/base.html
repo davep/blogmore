@@ -126,7 +126,7 @@
                         <li><a href="/tags.html">Tags</a></li>
                         <li><a href="/archive.html">Archive</a></li>
                         {% if with_search %}
-                        <li><a href="/search.html">Search</a></li>
+                        <li><a href="{{ search_url }}">Search</a></li>
                         {% endif %}
                         {% block feed_nav_links %}
                         <li><a href="/feed.xml" title="Subscribe via RSS feed">RSS</a></li>

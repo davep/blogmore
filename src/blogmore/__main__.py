@@ -18,7 +18,7 @@ from blogmore.page_path import DEFAULT_PAGE_PATH, validate_page_path_template
 from blogmore.post_path import DEFAULT_POST_PATH, validate_post_path_template
 from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
-from blogmore.site_config import SiteConfig
+from blogmore.site_config import DEFAULT_SEARCH_PATH, SiteConfig
 
 
 def main() -> int:
@@ -91,6 +91,36 @@ def main() -> int:
         validate_page_path_template(raw_page_path)
     except ValueError as e:
         print(f"Error: Invalid page_path in configuration file: {e}", file=sys.stderr)
+        return 1
+
+    # Load search_path from config file only (not available as a CLI argument).
+    raw_search_path = config.get("search_path", DEFAULT_SEARCH_PATH)
+    if not isinstance(raw_search_path, str):
+        print(
+            "Error: search_path in the configuration file must be a string",
+            file=sys.stderr,
+        )
+        return 1
+    if not raw_search_path:
+        print(
+            "Error: search_path in the configuration file must not be empty",
+            file=sys.stderr,
+        )
+        return 1
+    if not raw_search_path.endswith(".html"):
+        print(
+            "Error: search_path in the configuration file must end with '.html'",
+            file=sys.stderr,
+        )
+        return 1
+    # Verify that the resolved path does not escape the output directory.
+    _output_resolved = args.output.resolve()
+    _search_resolved = (_output_resolved / raw_search_path).resolve()
+    if not _search_resolved.is_relative_to(_output_resolved):
+        print(
+            "Error: search_path in the configuration file must not escape the output directory",
+            file=sys.stderr,
+        )
         return 1
 
     # Load with_advert from config file only (not available as a CLI argument).
@@ -187,6 +217,7 @@ def main() -> int:
         include_drafts=args.include_drafts,
         post_path=raw_post_path,
         page_path=raw_page_path,
+        search_path=raw_search_path,
         with_advert=raw_with_advert,
         clean_urls=raw_clean_urls,
         sidebar_pages=sidebar_pages,

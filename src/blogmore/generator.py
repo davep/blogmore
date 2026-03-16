@@ -225,6 +225,21 @@ class SiteGenerator:
             return url
         return f"{url}?v={self._cache_bust_token}"
 
+    def _get_search_url(self) -> str:
+        """Return the URL path for the configured search page.
+
+        Derives the URL from the ``search_path`` configuration option.  When
+        ``clean_urls`` is enabled and the path ends in ``index.html``, the
+        index filename is stripped so the URL ends with a trailing slash.
+
+        Returns:
+            The URL path for the search page, always starting with ``/``.
+        """
+        url = "/" + self.site_config.search_path.lstrip("/")
+        if self.site_config.clean_urls:
+            url = make_url_clean(url)
+        return url
+
     def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
         styles_css_url = self._with_cache_bust(
@@ -254,6 +269,7 @@ class SiteGenerator:
             "has_platform_icons": self._detect_generated_icons(),
             "blogmore_version": __version__,
             "with_search": self.site_config.with_search,
+            "search_url": self._get_search_url(),
             "with_read_time": self.site_config.with_read_time,
             "with_advert": self.site_config.with_advert,
             "default_author": self.site_config.default_author,
@@ -1393,23 +1409,48 @@ class SiteGenerator:
         """
         context = self._get_global_context()
         context["pages"] = pages
-        output_path = self.site_config.output_dir / "search.html"
-        context["canonical_url"] = self._canonical_url_for_path(output_path)
+        output_path = (
+            self.site_config.output_dir / self.site_config.search_path
+        ).resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        search_url = self._get_search_url()
+        if self.site_config.clean_urls:
+            context["canonical_url"] = (
+                f"{self.site_config.site_url}{search_url}"
+                if self.site_config.site_url
+                else search_url
+            )
+        else:
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
         html = self.renderer.render_search_page(**context)
         self._write_html(output_path, html)
 
     def _remove_stale_search_files(self) -> None:
         """Remove search-related files left over from a previous build.
 
-        When search is disabled, any ``search.html`` or
+        When search is disabled, any search page (at the configured
+        ``search_path`` or the default ``search.html``) and
         ``search_index.json`` that may have been written by an earlier
         build that had search enabled are deleted so they do not appear
         in the output directory.
         """
-        for filename in ("search.html", "search_index.json"):
-            stale_path = self.site_config.output_dir / filename
-            if stale_path.exists():
-                stale_path.unlink()
+        # Always remove search_index.json (fixed location).
+        stale_json = self.site_config.output_dir / "search_index.json"
+        if stale_json.exists():
+            stale_json.unlink()
+
+        # Remove the search page at the configured path.
+        stale_page = (
+            self.site_config.output_dir / self.site_config.search_path
+        ).resolve()
+        if stale_page.exists():
+            stale_page.unlink()
+
+        # Also remove the default search.html location for backward
+        # compatibility (in case the user previously used the default path).
+        default_page = (self.site_config.output_dir / "search.html").resolve()
+        if default_page.exists() and default_page != stale_page:
+            default_page.unlink()
 
     def _generate_sitemap(self) -> None:
         """Generate the XML sitemap file.

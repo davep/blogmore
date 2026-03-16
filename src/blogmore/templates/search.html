@@ -14,7 +14,7 @@
 {% block content %}
 <div class="search-page">
     <h1>Search</h1>
-    <form id="search-form" class="search-form" role="search" action="/search.html" method="get">
+    <form id="search-form" class="search-form" role="search" action="{{ search_url }}" method="get">
         <label for="search-input" class="search-label">Search posts by title or content:</label>
         <div class="search-input-row">
             <input
