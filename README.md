@@ -1,6 +1,6 @@
 # BlogMore
 
-![BlogMore](./.images/blogmore-social-banner.png)
+![BlogMore](https://raw.githubusercontent.com/davep/blogmore/refs/heads/main/.images/blogmore-social-banner.png)
 
 A blog-oriented static site generation engine built in Python.
 
