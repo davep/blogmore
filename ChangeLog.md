@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v1.16.0
 
-**Released: WiP**
+**Released: 2026-03-16**
 
 - Added optional `pages` configuration option. When set to a list of page
   slugs, only those pages are linked in the sidebar, in the order given.
