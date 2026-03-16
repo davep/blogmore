@@ -1199,6 +1199,130 @@ class TestHeadConfigValidation:
         assert result == 0
 
 
+class TestPagesConfigValidation:
+    """Tests for ``pages`` configuration file option."""
+
+    def test_pages_config_filters_sidebar(
+        self,
+        tmp_path: Path,
+        temp_output_dir: Path,
+    ) -> None:
+        """Only pages listed in ``pages`` appear in the sidebar."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        pages_subdir = content_dir / "pages"
+        pages_subdir.mkdir()
+        (pages_subdir / "about.md").write_text(
+            "---\ntitle: About Me\n---\n\nAbout content."
+        )
+        (pages_subdir / "colophon.md").write_text(
+            "---\ntitle: Colophon\n---\n\nColophon content."
+        )
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: A Post\ndate: 2024-01-01\n---\n\nPost content."
+        )
+        config_file = tmp_path / "blogmore.yaml"
+        config_file.write_text(
+            f"output: {temp_output_dir}\n"
+            "pages:\n"
+            "  - about\n"
+        )
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(content_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 0
+        # Both HTML files are generated.
+        assert (temp_output_dir / "about.html").exists()
+        assert (temp_output_dir / "colophon.html").exists()
+        # Only "about" is linked in the sidebar.
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "About Me" in index_content
+        assert "Colophon" not in index_content
+
+    def test_pages_config_not_a_list_returns_error(
+        self,
+        posts_dir: Path,
+        tmp_path: Path,
+    ) -> None:
+        """A non-list ``pages`` value causes main() to return 1."""
+        config_file = tmp_path / "blogmore.yaml"
+        config = {
+            "output": str(tmp_path / "output"),
+            "pages": "about",
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(posts_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 1
+
+    def test_pages_config_non_string_item_returns_error(
+        self,
+        posts_dir: Path,
+        tmp_path: Path,
+    ) -> None:
+        """A non-string item inside ``pages`` causes main() to return 1."""
+        config_file = tmp_path / "blogmore.yaml"
+        config_file.write_text(
+            f"output: {tmp_path / 'output'}\n"
+            "pages:\n"
+            "  - 42\n"
+        )
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(posts_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 1
+
+    def test_pages_config_empty_list_shows_all_pages(
+        self,
+        tmp_path: Path,
+        temp_output_dir: Path,
+    ) -> None:
+        """An empty ``pages`` list is treated the same as omitting the option."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        pages_subdir = content_dir / "pages"
+        pages_subdir.mkdir()
+        (pages_subdir / "about.md").write_text(
+            "---\ntitle: About Me\n---\n\nAbout content."
+        )
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: A Post\ndate: 2024-01-01\n---\n\nPost content."
+        )
+        config_file = tmp_path / "blogmore.yaml"
+        config_file.write_text(
+            f"output: {temp_output_dir}\n"
+            "pages: []\n"
+        )
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(content_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 0
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "About Me" in index_content
+
+
 class TestPagePathConfigValidation:
     """Tests for `page_path` configuration file loading and validation."""
 
@@ -1840,6 +1964,86 @@ class TestConfigChangeHandler:
             # extra_stylesheets must be cleared so generate() no longer
             # includes the <link> tag for /custom.css
             assert generator.site_config.extra_stylesheets is None
+
+    def test_sidebar_pages_updated_in_site_config(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that a pages: change is picked up in site_config on config reload."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+
+        config_file = tmp_path / "blogmore.yaml"
+        initial_config_data: dict[str, object] = {}
+        with open(config_file, "w") as f:
+            yaml.dump(initial_config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides={},
+                debounce_seconds=0.05,
+            )
+
+            new_config_data: dict[str, object] = {"pages": ["about", "colophon"]}
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            assert generator.site_config.sidebar_pages == ["about", "colophon"]
+
+    def test_sidebar_pages_cleared_when_removed_from_config(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that removing pages: from config resets sidebar_pages to None."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+
+        config_file = tmp_path / "blogmore.yaml"
+        initial_config_data: dict[str, object] = {"pages": ["about"]}
+        with open(config_file, "w") as f:
+            yaml.dump(initial_config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                sidebar_pages=["about"],
+            )
+        )
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides={},
+                debounce_seconds=0.05,
+            )
+
+            # Remove pages from the config
+            new_config_data: dict[str, object] = {"site_title": "My Blog"}
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            assert generator.site_config.sidebar_pages is None
 
     def test_extra_stylesheets_cleared_in_renderer_on_generate(
         self, posts_dir: Path, temp_output_dir: Path

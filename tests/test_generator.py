@@ -12,7 +12,7 @@ from blogmore.generator import (
     paginate_posts,
     sanitize_for_url,
 )
-from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN, Post
+from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN, Page, Post
 from blogmore.site_config import SiteConfig
 
 
@@ -85,6 +85,109 @@ class TestPaginatePosts:
 
 class TestSiteGenerator:
     """Test the SiteGenerator class."""
+
+    def test_resolve_sidebar_pages_no_config(
+        self, sample_page: Page, temp_output_dir: Path
+    ) -> None:
+        """Test _resolve_sidebar_pages returns all pages when sidebar_pages is None."""
+        page2 = Page(
+            path=Path("tools.md"),
+            title="My Tools",
+            content="Tools content.",
+            html_content="<p>Tools content.</p>",
+        )
+        pages = [sample_page, page2]
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=temp_output_dir,
+                output_dir=temp_output_dir,
+                sidebar_pages=None,
+            )
+        )
+
+        result = generator._resolve_sidebar_pages(pages)
+        assert result == pages
+
+    def test_resolve_sidebar_pages_empty_list(
+        self, sample_page: Page, temp_output_dir: Path
+    ) -> None:
+        """Test _resolve_sidebar_pages returns all pages when sidebar_pages is empty."""
+        pages = [sample_page]
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=temp_output_dir,
+                output_dir=temp_output_dir,
+                sidebar_pages=[],
+            )
+        )
+
+        result = generator._resolve_sidebar_pages(pages)
+        assert result == pages
+
+    def test_resolve_sidebar_pages_filters_to_listed_slugs(
+        self, sample_page: Page, temp_output_dir: Path
+    ) -> None:
+        """Test _resolve_sidebar_pages keeps only pages with matching slugs."""
+        page2 = Page(
+            path=Path("tools.md"),
+            title="My Tools",
+            content="Tools content.",
+            html_content="<p>Tools content.</p>",
+        )
+        pages = [sample_page, page2]  # slugs: "about", "tools"
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=temp_output_dir,
+                output_dir=temp_output_dir,
+                sidebar_pages=["tools"],
+            )
+        )
+
+        result = generator._resolve_sidebar_pages(pages)
+        assert result == [page2]
+
+    def test_resolve_sidebar_pages_respects_order(
+        self, sample_page: Page, temp_output_dir: Path
+    ) -> None:
+        """Test _resolve_sidebar_pages returns pages in the order of sidebar_pages."""
+        page2 = Page(
+            path=Path("tools.md"),
+            title="My Tools",
+            content="Tools content.",
+            html_content="<p>Tools content.</p>",
+        )
+        pages = [sample_page, page2]  # slugs: "about", "tools"
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=temp_output_dir,
+                output_dir=temp_output_dir,
+                sidebar_pages=["tools", "about"],
+            )
+        )
+
+        result = generator._resolve_sidebar_pages(pages)
+        assert result == [page2, sample_page]
+
+    def test_resolve_sidebar_pages_ignores_unknown_slugs(
+        self, sample_page: Page, temp_output_dir: Path
+    ) -> None:
+        """Test _resolve_sidebar_pages silently ignores unknown slugs."""
+        pages = [sample_page]  # slug: "about"
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=temp_output_dir,
+                output_dir=temp_output_dir,
+                sidebar_pages=["about", "does-not-exist"],
+            )
+        )
+
+        result = generator._resolve_sidebar_pages(pages)
+        assert result == [sample_page]
 
     def test_init(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """Test initializing SiteGenerator."""
@@ -326,6 +429,113 @@ class TestSiteGenerator:
         # must not inflate this count to 9.
         index_content = (temp_output_dir / "index.html").read_text()
         assert index_content.count('<article class="post-summary">') == 7
+
+    def test_generate_with_sidebar_pages_filter(
+        self, posts_dir: Path, pages_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that sidebar_pages limits which pages appear in the sidebar."""
+        content_dir = temp_output_dir.parent / "content_sb"
+        content_dir.mkdir(exist_ok=True)
+
+        # Copy posts
+        posts_dest = content_dir / "posts"
+        if posts_dest.exists():
+            shutil.rmtree(posts_dest)
+        shutil.copytree(posts_dir, posts_dest)
+
+        # Copy pages
+        pages_dest = content_dir / "pages"
+        if pages_dest.exists():
+            shutil.rmtree(pages_dest)
+        shutil.copytree(pages_dir, pages_dest)
+
+        # Only show "about" in the sidebar (not "seo-test-page")
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                sidebar_pages=["about"],
+            )
+        )
+
+        generator.generate()
+
+        # Both pages must still be generated as HTML files.
+        assert (temp_output_dir / "about.html").exists()
+        assert (temp_output_dir / "seo-test-page.html").exists()
+
+        # Only the listed page appears in the sidebar of the index.
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "About Me" in index_content
+        assert "SEO Test Page" not in index_content
+
+    def test_generate_with_sidebar_pages_order(
+        self, posts_dir: Path, pages_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that sidebar_pages controls the order of pages in the sidebar."""
+        content_dir = temp_output_dir.parent / "content_order"
+        content_dir.mkdir(exist_ok=True)
+
+        posts_dest = content_dir / "posts"
+        if posts_dest.exists():
+            shutil.rmtree(posts_dest)
+        shutil.copytree(posts_dir, posts_dest)
+
+        pages_dest = content_dir / "pages"
+        if pages_dest.exists():
+            shutil.rmtree(pages_dest)
+        shutil.copytree(pages_dir, pages_dest)
+
+        # Request "seo-test-page" before "about"
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                sidebar_pages=["seo-test-page", "about"],
+            )
+        )
+
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        seo_pos = index_content.find("SEO Test Page")
+        about_pos = index_content.find("About Me")
+        assert seo_pos != -1
+        assert about_pos != -1
+        assert seo_pos < about_pos, (
+            "SEO Test Page should appear before About Me in the sidebar"
+        )
+
+    def test_generate_with_sidebar_pages_unknown_slug_ignored(
+        self, posts_dir: Path, pages_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that unknown slugs in sidebar_pages are silently ignored."""
+        content_dir = temp_output_dir.parent / "content_unk"
+        content_dir.mkdir(exist_ok=True)
+
+        posts_dest = content_dir / "posts"
+        if posts_dest.exists():
+            shutil.rmtree(posts_dest)
+        shutil.copytree(posts_dir, posts_dest)
+
+        pages_dest = content_dir / "pages"
+        if pages_dest.exists():
+            shutil.rmtree(pages_dest)
+        shutil.copytree(pages_dir, pages_dest)
+
+        # Include a slug that does not exist; the generator must not raise.
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                sidebar_pages=["about", "nonexistent-page"],
+            )
+        )
+
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "About Me" in index_content
 
     def test_generate_excludes_drafts_by_default(
         self, posts_dir: Path, temp_output_dir: Path
