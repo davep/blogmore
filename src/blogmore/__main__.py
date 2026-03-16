@@ -107,6 +107,28 @@ def main() -> int:
         )
         return 1
 
+    # Load pages from config file only (not available as a CLI argument).
+    raw_sidebar_pages = config.get("pages", None)
+    if raw_sidebar_pages is not None:
+        if not isinstance(raw_sidebar_pages, list):
+            print(
+                "Error: pages in the configuration file must be a list of page slugs",
+                file=sys.stderr,
+            )
+            return 1
+        for item in raw_sidebar_pages:
+            if not isinstance(item, str):
+                print(
+                    "Error: each entry in pages must be a string (page slug)",
+                    file=sys.stderr,
+                )
+                return 1
+        sidebar_pages: list[str] | None = (
+            raw_sidebar_pages if raw_sidebar_pages else None
+        )
+    else:
+        sidebar_pages = None
+
     # Load head from config file only (not available as a CLI argument).
     raw_head = config.get("head", [])
     if not isinstance(raw_head, list):
@@ -163,6 +185,7 @@ def main() -> int:
         page_path=raw_page_path,
         with_advert=raw_with_advert,
         clean_urls=raw_clean_urls,
+        sidebar_pages=sidebar_pages,
         head=raw_head,
     )
 

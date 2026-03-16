@@ -125,6 +125,18 @@ class SiteConfig:
     with_advert: bool = True
     """Whether to show the "Generated with BlogMore" footer line."""
 
+    sidebar_pages: list[str] | None = None
+    """Optional ordered list of page slugs to display in the sidebar.
+
+    When ``None`` or empty, all pages from the ``pages/`` directory are listed
+    in the sidebar (the default behaviour).  When set to a non-empty list, only
+    the pages whose slug matches an entry in the list are linked in the sidebar,
+    and they appear in the order defined here.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.
+    """
+
     head: list[dict[str, Any]] = field(default_factory=list)
     """Extra ``<head>`` tags to inject into every generated page.
 

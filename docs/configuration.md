@@ -670,6 +670,25 @@ Override the title displayed above the social media icons section in the sidebar
 socials_title: "Connect"
 ```
 
+#### `pages`
+
+Control which pages from the `pages/` directory are shown in the sidebar and the order in which they appear.
+
+**Type:** List of strings (page slugs)  
+**Default:** None (all pages are shown)  
+**Config file only**
+
+By default every page created from the `pages/` directory (except the special `404` page) is automatically linked in the sidebar. If you set `pages` to a list of page slugs, only those pages appear in the sidebar, in the order you specify. Pages not listed are still generated but have no automatic sidebar link.
+
+```yaml
+pages:
+  - about
+  - my-tools
+  - colophon
+```
+
+If `pages` is omitted entirely, or set to an empty list, all pages are shown (the default behaviour).
+
 ### Serve Command Options
 
 Options specific to the `serve` command. These are only used when running `blogmore serve`.
@@ -782,6 +801,10 @@ head:
 
 # Sidebar configuration
 site_logo: /images/logo.png
+
+pages:
+  - about
+  - colophon
 
 links:
   - title: About

@@ -377,6 +377,11 @@ class SiteGenerator:
         if pages:
             print(f"Found {len(pages)} pages")
 
+        # Resolve the list of pages to display in the sidebar.  This may be a
+        # filtered/reordered subset when the user has configured ``pages:`` in
+        # the config file; otherwise it equals ``pages`` unchanged.
+        sidebar_pages = self._resolve_sidebar_pages(pages)
+
         # Create output directory
         self.site_config.output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -401,47 +406,47 @@ class SiteGenerator:
                 # A newer post has already claimed this path; skip this older one.
                 continue
             generated_paths.add(path_key)
-            self._generate_post_page(post, posts, pages, output_path)
+            self._generate_post_page(post, posts, sidebar_pages, output_path)
 
         # Generate static pages
         if pages:
             print("Generating static pages...")
             page_output_paths = self._resolve_page_output_paths(pages)
             for page in pages:
-                self._generate_page(page, pages, page_output_paths[id(page)])
+                self._generate_page(page, sidebar_pages, page_output_paths[id(page)])
 
         # Generate custom 404 page if present
         if page_404 is not None:
             print("Generating custom 404 page...")
-            self._generate_404_page(page_404, pages)
+            self._generate_404_page(page_404, sidebar_pages)
 
         # Generate index page
         print("Generating index page...")
-        self._generate_index_page(posts, pages)
+        self._generate_index_page(posts, sidebar_pages)
 
         # Generate archive page
         print("Generating archive page...")
-        self._generate_archive_page(posts, pages)
+        self._generate_archive_page(posts, sidebar_pages)
 
         # Generate date-based archive pages
         print("Generating date-based archive pages...")
-        self._generate_date_archives(posts, pages)
+        self._generate_date_archives(posts, sidebar_pages)
 
         # Generate tag pages
         print("Generating tag pages...")
-        self._generate_tag_pages(posts, pages)
+        self._generate_tag_pages(posts, sidebar_pages)
 
         # Generate tags overview page
         print("Generating tags overview page...")
-        self._generate_tags_page(posts, pages)
+        self._generate_tags_page(posts, sidebar_pages)
 
         # Generate category pages
         print("Generating category pages...")
-        self._generate_category_pages(posts, pages)
+        self._generate_category_pages(posts, sidebar_pages)
 
         # Generate categories overview page
         print("Generating categories overview page...")
-        self._generate_categories_page(posts, pages)
+        self._generate_categories_page(posts, sidebar_pages)
 
         # Generate feeds
         print("Generating RSS and Atom feeds...")
@@ -451,7 +456,7 @@ class SiteGenerator:
         if self.site_config.with_search:
             print("Generating search index and search page...")
             self._generate_search_index(posts)
-            self._generate_search_page(pages)
+            self._generate_search_page(sidebar_pages)
         else:
             # Remove any stale search files left over from a previous build
             # that had search enabled.
@@ -744,6 +749,31 @@ class SiteGenerator:
             context["canonical_url"] = self._canonical_url_for_path(output_path)
         html = self.renderer.render_post(post, **context)
         self._write_html(output_path, html)
+
+    def _resolve_sidebar_pages(self, pages: list[Page]) -> list[Page]:
+        """Resolve which pages appear in the sidebar and in what order.
+
+        When ``site_config.sidebar_pages`` is ``None`` or empty every page in
+        ``pages`` is returned unchanged (the default behaviour).  When a list
+        of slugs is provided, only pages whose slug appears in that list are
+        returned, in the order defined by the list.  Slugs that do not match
+        any existing page are silently ignored.
+
+        Args:
+            pages: All parsed static pages.
+
+        Returns:
+            The ordered list of pages to display in the sidebar.
+        """
+        if not self.site_config.sidebar_pages:
+            return pages
+
+        pages_by_slug: dict[str, Page] = {page.slug: page for page in pages}
+        return [
+            pages_by_slug[slug]
+            for slug in self.site_config.sidebar_pages
+            if slug in pages_by_slug
+        ]
 
     def _resolve_page_output_paths(self, pages: list[Page]) -> dict[int, Path]:
         """Resolve the output path for every static page.

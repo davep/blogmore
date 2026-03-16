@@ -162,6 +162,23 @@ The necessary HTML `<link>` and `<meta>` tags are added to every page automatica
 
 ## Sidebar configuration
 
+### Pages navigation
+
+By default every page created from the `pages/` directory (except the special `404` page) is automatically listed in the sidebar.
+
+To control exactly which pages appear and in what order, set the `pages` option in your configuration file to a list of page slugs:
+
+```yaml
+pages:
+  - about
+  - my-tools
+  - colophon
+```
+
+Only pages whose slug matches an entry in the list are linked in the sidebar, and they appear in the order you define. Pages that are not listed are still generated as HTML files — they simply receive no automatic sidebar link.
+
+If `pages` is omitted (or set to an empty list), all pages are shown, which is the default behaviour.
+
 ### Custom links
 
 Add custom navigation links to the sidebar. Each entry has a `title` and a `url`:

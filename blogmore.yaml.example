@@ -119,6 +119,16 @@ posts_per_feed: 20
 # Optional: Site logo displayed in the sidebar (requires sidebar configuration)
 # site_logo: /images/logo.png
 
+# Optional: Control which pages appear in the sidebar and in what order.
+# By default all pages from the pages/ directory are listed. When this list is
+# set, only pages whose slug matches an entry are linked in the sidebar, in the
+# order given here. Pages not listed are still generated but have no sidebar link.
+# Configuration file only.
+# pages:
+#   - about
+#   - my-tools
+#   - colophon
+
 # Optional: Links section in sidebar
 # links:
 #   - title: About
