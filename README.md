@@ -1,5 +1,7 @@
 # BlogMore
 
+![BlogMore](./.images/blogmore-social-banner.png)
+
 A blog-oriented static site generation engine built in Python.
 
 > [!IMPORTANT]
