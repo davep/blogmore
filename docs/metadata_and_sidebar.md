@@ -205,6 +205,17 @@ links:
 
 These links appear in the sidebar below any pages from your `pages/` directory.
 
+To change the section title from the default "Links", use `links_title`:
+
+```yaml
+links_title: "Elsewhere"
+links:
+  - title: My Main Site
+    url: https://example.com
+```
+
+The same can be set from the command line with `--links-title`.
+
 ### Social media icons
 
 Add social media links to the sidebar as icons. Each entry has a `site` (the platform name) and a `url`:

@@ -58,6 +58,10 @@ def main() -> int:
     if hasattr(args, "socials_title"):
         sidebar_config["socials_title"] = args.socials_title
 
+    # Apply links_title from args (CLI overrides config file value)
+    if hasattr(args, "links_title"):
+        sidebar_config["links_title"] = args.links_title
+
     # Normalize site_keywords: CLI provides a string, config provides a list or string
     site_keywords = normalize_site_keywords(getattr(args, "site_keywords", None))
 
@@ -343,6 +347,7 @@ def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
         "minify_html": False,
         "with_read_time": False,
         "socials_title": "Social",
+        "links_title": "Links",
     }
 
     overrides: dict[str, Any] = {}

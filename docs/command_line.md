@@ -215,6 +215,16 @@ Override the title displayed above the social media icons section in the sidebar
 blogmore build posts/ --socials-title "Connect"
 ```
 
+#### `--links-title`
+
+Override the title displayed above the links section in the sidebar. By default the section is labelled "Links".
+
+**Default:** `Links`
+
+```bash
+blogmore build posts/ --links-title "Elsewhere"
+```
+
 #### `--minify-css`
 
 Minify the generated CSS and write it as `styles.min.css` instead of `style.css`. This reduces the size of the stylesheet delivered to visitors.
@@ -330,6 +340,7 @@ The serve command also accepts all the build command options:
 - `--minify-html`
 - `--with-read-time`
 - `--socials-title`
+- `--links-title`
 
 ### Examples
 
@@ -422,6 +433,7 @@ The publish command also accepts all the build command options:
 - `--minify-html`
 - `--with-read-time`
 - `--socials-title`
+- `--links-title`
 
 ### How It Works
 

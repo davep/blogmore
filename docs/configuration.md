@@ -640,6 +640,19 @@ links:
     url: https://github.com/username
 ```
 
+#### `links_title`
+
+Override the title displayed above the links section in the sidebar. By default the section is labelled "Links".
+
+**Type:** String  
+**Default:** `"Links"`
+
+```yaml
+links_title: "Elsewhere"
+```
+
+Can also be set with the `--links-title` command-line option.
+
 #### `socials`
 
 Social media links displayed in the sidebar as icons. Each entry has a `site` (the social media platform) and `url`.

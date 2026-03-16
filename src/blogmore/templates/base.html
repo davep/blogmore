@@ -94,7 +94,7 @@
 
                 {% if links %}
                 <section class="sidebar-section">
-                    <h2>Links</h2>
+                    <h2>{{ links_title | default('Links') }}</h2>
                     <ul class="sidebar-links">
                         {% for link in links %}
                         <li><a href="{{ link.url }}"{% if link.url|is_external_link %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.title }}</a></li>

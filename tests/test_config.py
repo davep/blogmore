@@ -603,6 +603,42 @@ class TestGetSidebarConfig:
         result = get_sidebar_config(config)
         assert "socials_title" not in result
 
+    def test_extract_links_title(self) -> None:
+        """Test extracting links_title from config."""
+        config = {
+            "links_title": "Elsewhere",
+            "links": [{"title": "Home", "url": "/"}],
+        }
+        result = get_sidebar_config(config)
+        assert result["links_title"] == "Elsewhere"
+
+    def test_extract_all_sidebar_options_with_links_title(self) -> None:
+        """Test that links_title is included when all sidebar options are present."""
+        config = {
+            "site_logo": "/images/logo.png",
+            "links": [{"title": "Home", "url": "/"}],
+            "links_title": "Navigate",
+            "socials": [{"site": "github", "url": "https://github.com"}],
+            "socials_title": "Follow Me",
+            "site_title": "My Blog",
+        }
+        result = get_sidebar_config(config)
+        assert result == {
+            "site_logo": "/images/logo.png",
+            "links": [{"title": "Home", "url": "/"}],
+            "links_title": "Navigate",
+            "socials": [{"site": "github", "url": "https://github.com"}],
+            "socials_title": "Follow Me",
+        }
+
+    def test_links_title_absent_when_not_in_config(self) -> None:
+        """Test that links_title is absent from sidebar config when not set."""
+        config = {
+            "links": [{"title": "Home", "url": "/"}],
+        }
+        result = get_sidebar_config(config)
+        assert "links_title" not in result
+
 
 class TestCleanFirstConfig:
     """Test the clean_first configuration option."""
@@ -670,6 +706,40 @@ class TestSocialsTitleConfig:
         merge_config_with_args(config, args)
 
         assert args.socials_title == "Social"
+
+
+class TestLinksTitleConfig:
+    """Test the links_title configuration option."""
+
+    def test_links_title_from_config(self) -> None:
+        """Test loading links_title from config."""
+        config = {"links_title": "Elsewhere"}
+        args = Mock()
+        args.links_title = "Links"  # default
+
+        merge_config_with_args(config, args)
+
+        assert args.links_title == "Elsewhere"
+
+    def test_cli_links_title_overrides_config(self) -> None:
+        """Test that CLI links_title overrides config."""
+        config = {"links_title": "Elsewhere"}
+        args = Mock()
+        args.links_title = "Navigate"  # explicitly set via CLI
+
+        merge_config_with_args(config, args)
+
+        assert args.links_title == "Navigate"
+
+    def test_links_title_defaults_to_links(self) -> None:
+        """Test that links_title defaults to 'Links' when not in config."""
+        config = {}
+        args = Mock()
+        args.links_title = "Links"  # default
+
+        merge_config_with_args(config, args)
+
+        assert args.links_title == "Links"
 
 
 class TestNormalizeSiteKeywords:
