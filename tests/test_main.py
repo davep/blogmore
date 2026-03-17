@@ -1441,6 +1441,163 @@ class TestPagePathConfigValidation:
         assert not (temp_output_dir / "pages" / "404" / "index.html").exists()
 
 
+class TestPaginationPathConfigValidation:
+    """Tests for `page_1_path` / `page_n_path` configuration file loading and validation."""
+
+    def test_page_1_path_from_config_is_applied(
+        self,
+        tmp_path: Path,
+        temp_output_dir: Path,
+    ) -> None:
+        """A valid page_1_path in the config file is used when generating the site."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent."
+            )
+        config_file = tmp_path / "blogmore.yaml"
+        config_file.write_text(
+            f"output: {temp_output_dir}\n"
+            'page_1_path: "page/{page}/index.html"\n'
+            'page_n_path: "page/{page}/index.html"\n'
+        )
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(content_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 0
+        # With page_1_path set to page/{page}/index.html, page 1 should be at page/1/index.html
+        assert (temp_output_dir / "page" / "1" / "index.html").exists()
+        assert not (temp_output_dir / "index.html").exists()
+
+    def test_page_n_path_from_config_is_applied(
+        self,
+        tmp_path: Path,
+        temp_output_dir: Path,
+    ) -> None:
+        """A valid page_n_path in the config file is used for page 2+."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent."
+            )
+        config_file = tmp_path / "blogmore.yaml"
+        config_file.write_text(
+            f"output: {temp_output_dir}\n"
+            'page_n_path: "p{page}.html"\n'
+        )
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(content_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 0
+        # With page_n_path set to p{page}.html, page 2 should be at p2.html
+        assert (temp_output_dir / "p2.html").exists()
+        assert not (temp_output_dir / "page" / "2.html").exists()
+
+    def test_page_1_path_not_a_string_returns_error(
+        self,
+        posts_dir: Path,
+        tmp_path: Path,
+    ) -> None:
+        """A non-string page_1_path causes main() to return 1."""
+        config_file = tmp_path / "blogmore.yaml"
+        config = {
+            "output": str(tmp_path / "output"),
+            "page_1_path": 42,
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(posts_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 1
+
+    def test_page_n_path_not_a_string_returns_error(
+        self,
+        posts_dir: Path,
+        tmp_path: Path,
+    ) -> None:
+        """A non-string page_n_path causes main() to return 1."""
+        config_file = tmp_path / "blogmore.yaml"
+        config = {
+            "output": str(tmp_path / "output"),
+            "page_n_path": 42,
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(posts_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 1
+
+    def test_invalid_page_1_path_returns_error(
+        self,
+        posts_dir: Path,
+        tmp_path: Path,
+    ) -> None:
+        """An invalid page_1_path (unknown variable) causes main() to return 1."""
+        config_file = tmp_path / "blogmore.yaml"
+        config = {
+            "output": str(tmp_path / "output"),
+            "page_1_path": "{bad_var}/index.html",
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(posts_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 1
+
+    def test_invalid_page_n_path_returns_error(
+        self,
+        posts_dir: Path,
+        tmp_path: Path,
+    ) -> None:
+        """An invalid page_n_path (missing {page}) causes main() to return 1."""
+        config_file = tmp_path / "blogmore.yaml"
+        config = {
+            "output": str(tmp_path / "output"),
+            "page_n_path": "fixed.html",
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "build", str(posts_dir), "--config", str(config_file)],
+        ):
+            result = main()
+
+        assert result == 1
+
+
 class TestConfigChangeHandler:
     """Test the ConfigChangeHandler class."""
 
@@ -2221,3 +2378,165 @@ class TestConfigChangeHandler:
             assert generator.site_config.search_path == DEFAULT_SEARCH_PATH
             captured = capsys.readouterr()
             assert "search_path" in captured.err
+
+    def test_page_1_path_updated_in_site_config_on_reload(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """A page_1_path change in the config file is picked up on reload."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+
+        config_file = tmp_path / "blogmore.yaml"
+        initial_config_data: dict[str, object] = {}
+        with open(config_file, "w") as f:
+            yaml.dump(initial_config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
+        )
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides={},
+                debounce_seconds=0.05,
+            )
+
+            new_config_data: dict[str, object] = {
+                "page_1_path": "page/{page}/index.html"
+            }
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            assert generator.site_config.page_1_path == "page/{page}/index.html"
+
+    def test_page_n_path_updated_in_site_config_on_reload(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """A page_n_path change in the config file is picked up on reload."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+
+        config_file = tmp_path / "blogmore.yaml"
+        initial_config_data: dict[str, object] = {}
+        with open(config_file, "w") as f:
+            yaml.dump(initial_config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
+        )
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides={},
+                debounce_seconds=0.05,
+            )
+
+            new_config_data: dict[str, object] = {"page_n_path": "p{page}.html"}
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            assert generator.site_config.page_n_path == "p{page}.html"
+
+    def test_invalid_page_1_path_warns_and_keeps_default_on_reload(
+        self,
+        posts_dir: Path,
+        temp_output_dir: Path,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        """An invalid page_1_path warns and keeps the previous value on reload."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+        from blogmore.pagination_path import DEFAULT_PAGE_1_PATH
+
+        config_file = tmp_path / "blogmore.yaml"
+        initial_config_data: dict[str, object] = {}
+        with open(config_file, "w") as f:
+            yaml.dump(initial_config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
+        )
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides={},
+                debounce_seconds=0.05,
+            )
+
+            new_config_data: dict[str, object] = {
+                "page_1_path": "{unknown_var}/index.html"
+            }
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            assert generator.site_config.page_1_path == DEFAULT_PAGE_1_PATH
+            captured = capsys.readouterr()
+            assert "page_1_path" in captured.err
+
+    def test_invalid_page_n_path_warns_and_keeps_default_on_reload(
+        self,
+        posts_dir: Path,
+        temp_output_dir: Path,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        """An invalid page_n_path (missing {page}) warns and keeps the previous value on reload."""
+
+        from watchdog.events import FileModifiedEvent
+
+        from blogmore.generator import SiteGenerator
+        from blogmore.pagination_path import DEFAULT_PAGE_N_PATH
+
+        config_file = tmp_path / "blogmore.yaml"
+        initial_config_data: dict[str, object] = {}
+        with open(config_file, "w") as f:
+            yaml.dump(initial_config_data, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
+        )
+
+        with patch.object(generator, "generate"):
+            handler = ConfigChangeHandler(
+                config_path=config_file,
+                generator=generator,
+                cli_overrides={},
+                debounce_seconds=0.05,
+            )
+
+            new_config_data: dict[str, object] = {"page_n_path": "fixed.html"}
+            with open(config_file, "w") as f:
+                yaml.dump(new_config_data, f)
+
+            event = FileModifiedEvent(str(config_file))
+            handler.on_any_event(event)
+            time.sleep(0.2)
+
+            assert generator.site_config.page_n_path == DEFAULT_PAGE_N_PATH
+            captured = capsys.readouterr()
+            assert "page_n_path" in captured.err

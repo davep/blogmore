@@ -348,6 +348,40 @@ class ConfigChangeHandler(FileSystemEventHandler):
                 file=sys.stderr,
             )
 
+        raw_page_1_path = config.get("page_1_path", DEFAULT_PAGE_1_PATH)
+        if isinstance(raw_page_1_path, str):
+            try:
+                validate_page_1_path_template(raw_page_1_path)
+                update_kwargs["page_1_path"] = raw_page_1_path
+            except ValueError as error:
+                print(
+                    f"Warning: Invalid page_1_path in configuration file: {error}",
+                    file=sys.stderr,
+                )
+        else:
+            print(
+                "Warning: page_1_path in the configuration file must be a string; "
+                "using the default.",
+                file=sys.stderr,
+            )
+
+        raw_page_n_path = config.get("page_n_path", DEFAULT_PAGE_N_PATH)
+        if isinstance(raw_page_n_path, str):
+            try:
+                validate_page_n_path_template(raw_page_n_path)
+                update_kwargs["page_n_path"] = raw_page_n_path
+            except ValueError as error:
+                print(
+                    f"Warning: Invalid page_n_path in configuration file: {error}",
+                    file=sys.stderr,
+                )
+        else:
+            print(
+                "Warning: page_n_path in the configuration file must be a string; "
+                "using the default.",
+                file=sys.stderr,
+            )
+
         raw_search_path = config.get("search_path", DEFAULT_SEARCH_PATH)
         if isinstance(raw_search_path, str):
             if not raw_search_path:
