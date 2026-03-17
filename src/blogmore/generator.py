@@ -319,9 +319,7 @@ class SiteGenerator:
             url = make_url_clean(url)
         return url
 
-    def _build_pagination_page_urls(
-        self, base_url: str, total_pages: int
-    ) -> list[str]:
+    def _build_pagination_page_urls(self, base_url: str, total_pages: int) -> list[str]:
         """Build the full list of page URLs for a paginated section.
 
         Args:
@@ -337,9 +335,7 @@ class SiteGenerator:
             for page_num in range(1, total_pages + 1)
         ]
 
-    def _get_pagination_output_path(
-        self, base_dir: Path, page_num: int
-    ) -> Path:
+    def _get_pagination_output_path(self, base_dir: Path, page_num: int) -> Path:
         """Compute the output file path for a given pagination page.
 
         Resolves the appropriate path template from the site configuration

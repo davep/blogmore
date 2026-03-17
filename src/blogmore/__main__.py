@@ -110,9 +110,7 @@ def main() -> int:
     try:
         validate_page_1_path_template(raw_page_1_path)
     except ValueError as e:
-        print(
-            f"Error: Invalid page_1_path in configuration file: {e}", file=sys.stderr
-        )
+        print(f"Error: Invalid page_1_path in configuration file: {e}", file=sys.stderr)
         return 1
 
     # Load page_n_path from config file only (not available as a CLI argument).
@@ -126,9 +124,7 @@ def main() -> int:
     try:
         validate_page_n_path_template(raw_page_n_path)
     except ValueError as e:
-        print(
-            f"Error: Invalid page_n_path in configuration file: {e}", file=sys.stderr
-        )
+        print(f"Error: Invalid page_n_path in configuration file: {e}", file=sys.stderr)
         return 1
 
     # Load search_path from config file only (not available as a CLI argument).
