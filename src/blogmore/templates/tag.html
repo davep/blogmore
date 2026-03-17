@@ -13,7 +13,7 @@
 {% block content %}
 <div class="tag-page">
     <h1>Posts tagged with "{{ tag }}"</h1>
-    {{ pagination(page, total_pages, '/' ~ tag_dir ~ '/' ~ safe_tag ~ '.html', '/' ~ tag_dir ~ '/' ~ safe_tag ~ '/', '.html') }}
+    {{ pagination(page, total_pages, pagination_page_urls) }}
 
     {% if posts %}
     {% for post in posts %}
@@ -23,6 +23,6 @@
     <p>No posts with this tag.</p>
     {% endif %}
 
-    {{ pagination(page, total_pages, '/' ~ tag_dir ~ '/' ~ safe_tag ~ '.html', '/' ~ tag_dir ~ '/' ~ safe_tag ~ '/', '.html') }}
+    {{ pagination(page, total_pages, pagination_page_urls) }}
 </div>
 {% endblock %}

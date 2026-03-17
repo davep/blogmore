@@ -15,6 +15,12 @@ from blogmore.config import (
 )
 from blogmore.generator import SiteGenerator
 from blogmore.page_path import DEFAULT_PAGE_PATH, validate_page_path_template
+from blogmore.pagination_path import (
+    DEFAULT_PAGE_1_PATH,
+    DEFAULT_PAGE_N_PATH,
+    validate_page_1_path_template,
+    validate_page_n_path_template,
+)
 from blogmore.post_path import DEFAULT_POST_PATH, validate_post_path_template
 from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
@@ -91,6 +97,34 @@ def main() -> int:
         validate_page_path_template(raw_page_path)
     except ValueError as e:
         print(f"Error: Invalid page_path in configuration file: {e}", file=sys.stderr)
+        return 1
+
+    # Load page_1_path from config file only (not available as a CLI argument).
+    raw_page_1_path = config.get("page_1_path", DEFAULT_PAGE_1_PATH)
+    if not isinstance(raw_page_1_path, str):
+        print(
+            "Error: page_1_path in the configuration file must be a string",
+            file=sys.stderr,
+        )
+        return 1
+    try:
+        validate_page_1_path_template(raw_page_1_path)
+    except ValueError as e:
+        print(f"Error: Invalid page_1_path in configuration file: {e}", file=sys.stderr)
+        return 1
+
+    # Load page_n_path from config file only (not available as a CLI argument).
+    raw_page_n_path = config.get("page_n_path", DEFAULT_PAGE_N_PATH)
+    if not isinstance(raw_page_n_path, str):
+        print(
+            "Error: page_n_path in the configuration file must be a string",
+            file=sys.stderr,
+        )
+        return 1
+    try:
+        validate_page_n_path_template(raw_page_n_path)
+    except ValueError as e:
+        print(f"Error: Invalid page_n_path in configuration file: {e}", file=sys.stderr)
         return 1
 
     # Load search_path from config file only (not available as a CLI argument).
@@ -217,6 +251,8 @@ def main() -> int:
         include_drafts=args.include_drafts,
         post_path=raw_post_path,
         page_path=raw_page_path,
+        page_1_path=raw_page_1_path,
+        page_n_path=raw_page_n_path,
         search_path=raw_search_path,
         with_advert=raw_with_advert,
         clean_urls=raw_clean_urls,

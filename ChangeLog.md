@@ -6,6 +6,15 @@
 
 - Added configurable search page path option via the `search_path`
   configuration option. ([#304](https://github.com/davep/blogmore/pull/304))
+- BREAKING CHANGE: Added configurable pagination path options `page_1_path`
+  and `page_n_path`. These configuration file settings control the output
+  path template for the first page and for pages 2+ of any paginated listing
+  (main index, year/month/day archives, tag pages, and category pages). The
+  defaults (`index.html` and `page/{page}.html`) keep the existing URL
+  structure in some cases, but break the pre-existing default structure for
+  categories and tags. When `clean_urls` is enabled, the same trailing-slash
+  transformation is applied to pagination URLs as to post and page URLs.
+  ([#307](https://github.com/davep/blogmore/pull/307))
 
 ## v1.16.0
 

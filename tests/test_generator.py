@@ -339,7 +339,7 @@ class TestSiteGenerator:
         assert tag_dir.exists()
 
         # Check for specific tag pages (python tag exists in fixtures)
-        assert (tag_dir / "python.html").exists()
+        assert (tag_dir / "python" / "index.html").exists()
 
     def test_generate_creates_category_pages(
         self, posts_dir: Path, temp_output_dir: Path
@@ -356,7 +356,7 @@ class TestSiteGenerator:
         assert category_dir.exists()
 
         # Check for specific category pages (python category exists in fixtures)
-        assert (category_dir / "python.html").exists()
+        assert (category_dir / "python" / "index.html").exists()
 
     def test_generate_creates_feeds(
         self, posts_dir: Path, temp_output_dir: Path
@@ -1464,7 +1464,7 @@ class TestSiteGenerator:
 
         generator.generate()
 
-        tag_content = (temp_output_dir / "tag" / "python.html").read_text()
+        tag_content = (temp_output_dir / "tag" / "python" / "index.html").read_text()
         assert '<meta name="keywords" content="blog, posts">' in tag_content
 
     def test_site_keywords_not_shown_when_not_configured(
@@ -2432,11 +2432,11 @@ class TestPaginationHeadLinkTags:
         )
         generator.generate()
 
-        tag_page2_file = temp_output_dir / "tag" / "python" / "2.html"
+        tag_page2_file = temp_output_dir / "tag" / "python" / "page" / "2.html"
         assert tag_page2_file.exists()
         content = tag_page2_file.read_text()
 
-        assert '<link rel="prev" href="/tag/python.html">' in content
+        assert '<link rel="prev" href="/tag/python/index.html">' in content
         assert 'rel="next"' not in content
 
     def test_tag_page_1_has_next_link_tag(
@@ -2456,12 +2456,12 @@ class TestPaginationHeadLinkTags:
         )
         generator.generate()
 
-        tag_page1_file = temp_output_dir / "tag" / "python.html"
+        tag_page1_file = temp_output_dir / "tag" / "python" / "index.html"
         assert tag_page1_file.exists()
         content = tag_page1_file.read_text()
 
         assert 'rel="prev"' not in content
-        assert '<link rel="next" href="/tag/python/2.html">' in content
+        assert '<link rel="next" href="/tag/python/page/2.html">' in content
 
     def test_category_page_2_has_prev_link_tag(
         self, tmp_path: Path, temp_output_dir: Path
@@ -2480,11 +2480,11 @@ class TestPaginationHeadLinkTags:
         )
         generator.generate()
 
-        cat_page2_file = temp_output_dir / "category" / "tech" / "2.html"
+        cat_page2_file = temp_output_dir / "category" / "tech" / "page" / "2.html"
         assert cat_page2_file.exists()
         content = cat_page2_file.read_text()
 
-        assert '<link rel="prev" href="/category/tech.html">' in content
+        assert '<link rel="prev" href="/category/tech/index.html">' in content
         assert 'rel="next"' not in content
 
     def test_category_page_1_has_next_link_tag(
@@ -2504,12 +2504,12 @@ class TestPaginationHeadLinkTags:
         )
         generator.generate()
 
-        cat_page1_file = temp_output_dir / "category" / "tech.html"
+        cat_page1_file = temp_output_dir / "category" / "tech" / "index.html"
         assert cat_page1_file.exists()
         content = cat_page1_file.read_text()
 
         assert 'rel="prev"' not in content
-        assert '<link rel="next" href="/category/tech/2.html">' in content
+        assert '<link rel="next" href="/category/tech/page/2.html">' in content
 
     def test_year_archive_page_2_has_prev_link_tag(
         self, tmp_path: Path, temp_output_dir: Path
@@ -2553,8 +2553,8 @@ class TestPaginationHeadLinkTags:
         generator.generate()
 
         index_file = temp_output_dir / "index.html"
-        tag_page = temp_output_dir / "tag" / "python.html"
-        cat_page = temp_output_dir / "category" / "tech.html"
+        tag_page = temp_output_dir / "tag" / "python" / "index.html"
+        cat_page = temp_output_dir / "category" / "tech" / "index.html"
 
         for page_file in (index_file, tag_page, cat_page):
             assert page_file.exists()
@@ -2721,12 +2721,12 @@ class TestCanonicalLinkTags:
         )
         generator.generate()
 
-        tag_file = temp_output_dir / "tag" / "python.html"
+        tag_file = temp_output_dir / "tag" / "python" / "index.html"
         assert tag_file.exists()
         content = tag_file.read_text()
 
         assert (
-            '<link rel="canonical" href="https://example.com/tag/python.html">'
+            '<link rel="canonical" href="https://example.com/tag/python/index.html">'
             in content
         )
 
@@ -2779,12 +2779,12 @@ class TestCanonicalLinkTags:
         )
         generator.generate()
 
-        category_file = temp_output_dir / "category" / "python.html"
+        category_file = temp_output_dir / "category" / "python" / "index.html"
         assert category_file.exists()
         content = category_file.read_text()
 
         assert (
-            '<link rel="canonical" href="https://example.com/category/python.html">'
+            '<link rel="canonical" href="https://example.com/category/python/index.html">'
             in content
         )
 
@@ -2988,7 +2988,7 @@ class TestWithReadTime:
         )
         generator.generate()
 
-        category_file = temp_output_dir / "category" / "tech.html"
+        category_file = temp_output_dir / "category" / "tech" / "index.html"
         assert category_file.exists()
         content = category_file.read_text()
         assert "min read" not in content
@@ -3010,7 +3010,7 @@ class TestWithReadTime:
         )
         generator.generate()
 
-        category_file = temp_output_dir / "category" / "tech.html"
+        category_file = temp_output_dir / "category" / "tech" / "index.html"
         assert category_file.exists()
         content = category_file.read_text()
         assert "min read" in content
@@ -3030,7 +3030,7 @@ class TestWithReadTime:
         )
         generator.generate()
 
-        tag_file = temp_output_dir / "tag" / "python.html"
+        tag_file = temp_output_dir / "tag" / "python" / "index.html"
         assert tag_file.exists()
         content = tag_file.read_text()
         assert "min read" not in content
@@ -3052,7 +3052,7 @@ class TestWithReadTime:
         )
         generator.generate()
 
-        tag_file = temp_output_dir / "tag" / "python.html"
+        tag_file = temp_output_dir / "tag" / "python" / "index.html"
         assert tag_file.exists()
         content = tag_file.read_text()
         assert "min read" in content
@@ -4357,3 +4357,313 @@ class TestSearchPathConfiguration:
         # Navigation link uses the clean URL.
         index_content = (temp_output_dir / "index.html").read_text()
         assert 'href="/search/"' in index_content
+
+
+class TestPaginationPathConfiguration:
+    """Tests for the configurable page_1_path and page_n_path features."""
+
+    def test_default_page_1_path_is_index_html(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """With default settings, page 1 of the main index is index.html."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-01\n---\n\nContent."
+        )
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
+        )
+        generator.generate()
+        assert (temp_output_dir / "index.html").exists()
+
+    def test_default_page_n_path_uses_page_dir(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """With default settings, page 2+ of the main index uses page/{page}.html."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent {i}."
+            )
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
+        )
+        generator.generate()
+        assert (temp_output_dir / "page" / "2.html").exists()
+
+    def test_custom_page_1_path_changes_main_index_output(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """page_1_path does NOT change the main index; it always stays at index.html."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-01\n---\n\nContent."
+        )
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_1_path="start.html",
+            )
+        )
+        generator.generate()
+        # Main index is always index.html regardless of page_1_path.
+        assert (temp_output_dir / "index.html").exists()
+        assert not (temp_output_dir / "start.html").exists()
+
+    def test_custom_page_n_path_changes_subsequent_page_output(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """A custom page_n_path changes where pages 2+ of the main index are written."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent {i}."
+            )
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_n_path="p{page}.html",
+            )
+        )
+        generator.generate()
+        assert (temp_output_dir / "p2.html").exists()
+        assert not (temp_output_dir / "page" / "2.html").exists()
+
+    def test_custom_page_1_path_subdirectory(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """A page_1_path with a subdirectory is applied to archive pages (not main index)."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        for i in range(1, 5):
+            (content_dir / f"2024-01-{i:02d}-post.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent."
+            )
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_1_path="posts/index.html",
+            )
+        )
+        generator.generate()
+        # Main index is always index.html.
+        assert (temp_output_dir / "index.html").exists()
+        # Year archive page 1 uses page_1_path.
+        assert (temp_output_dir / "2024" / "posts" / "index.html").exists()
+
+    def test_page_1_path_with_page_placeholder(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """The {page} placeholder works in page_1_path for archive/tag pages (not main index)."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        for i in range(1, 5):
+            (content_dir / f"2024-01-{i:02d}-post.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent."
+            )
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_1_path="page-{page}.html",
+            )
+        )
+        generator.generate()
+        # Main index is always index.html regardless of page_1_path.
+        assert (temp_output_dir / "index.html").exists()
+        assert not (temp_output_dir / "page-1.html").exists()
+        # Year archive page 1 uses page_1_path → page-1.html.
+        assert (temp_output_dir / "2024" / "page-1.html").exists()
+
+    def test_custom_paths_apply_to_year_archive(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Custom page_1_path and page_n_path apply to year archive pages."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent {i}."
+            )
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_1_path="all.html",
+                page_n_path="p{page}.html",
+            )
+        )
+        generator.generate()
+        year_dir = temp_output_dir / "2024"
+        assert (year_dir / "all.html").exists()
+        assert (year_dir / "p2.html").exists()
+
+    def test_custom_paths_apply_to_tag_pages(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Custom page_1_path and page_n_path apply to tag listing pages."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\ntags: [python]\n---\n\nContent {i}."
+            )
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_1_path="first.html",
+                page_n_path="p{page}.html",
+            )
+        )
+        generator.generate()
+        tag_base_dir = temp_output_dir / "tag" / "python"
+        assert (tag_base_dir / "first.html").exists()
+        assert (tag_base_dir / "p2.html").exists()
+
+    def test_custom_paths_apply_to_category_pages(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Custom page_1_path and page_n_path apply to category listing pages."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\ncategory: Tech\n---\n\nContent {i}."
+            )
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_1_path="first.html",
+                page_n_path="p{page}.html",
+            )
+        )
+        generator.generate()
+        cat_base_dir = temp_output_dir / "category" / "tech"
+        assert (cat_base_dir / "first.html").exists()
+        assert (cat_base_dir / "p2.html").exists()
+
+    def test_pagination_page_urls_in_context_match_page_1_path(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Main index page 1 is always /index.html; page 2's prev link points to /index.html."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent {i}."
+            )
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_1_path="start.html",
+                page_n_path="p{page}.html",
+            )
+        )
+        generator.generate()
+
+        # Main index page 1 is always index.html regardless of page_1_path.
+        assert (temp_output_dir / "index.html").exists()
+        # Page 2 of the main index should link back to /index.html (not /start.html).
+        page2_content = (temp_output_dir / "p2.html").read_text()
+        assert 'href="/index.html"' in page2_content
+
+    def test_pagination_page_urls_in_context_match_page_n_path(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Pagination links in rendered HTML reflect the configured page_n_path."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent {i}."
+            )
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_1_path="index.html",
+                page_n_path="p{page}.html",
+            )
+        )
+        generator.generate()
+
+        # Page 1 should link to p2.html as next
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/p2.html"' in index_content
+
+    def test_clean_urls_applied_to_page_1_path(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """With clean_urls enabled, page_1_path index.html links use trailing slash."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        for i in range(1, 12):
+            (content_dir / f"2024-01-{i:02d}-post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent {i}."
+            )
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        # Page 2 should link back to / (clean URL for /index.html) as prev
+        page2_content = (temp_output_dir / "page" / "2.html").read_text()
+        assert 'href="/"' in page2_content
+
+    def test_pagination_page1_suffix_in_tag_links(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Tag links in post summaries use the resolved page_1_path suffix."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-01\ntags: [python]\n---\n\nContent."
+        )
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator.generate()
+
+        # Default page_1_path = "index.html", so tag links on index should use /tag/python/index.html
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/tag/python/index.html" in index_content
+
+    def test_pagination_page1_suffix_with_clean_urls(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """With clean_urls, tag links in post summaries use trailing slash form."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-01\ntags: [python]\n---\n\nContent."
+        )
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        # With clean_urls, tag links should use /tag/python/ (trailing slash)
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/tag/python/" in index_content
+        assert "/tag/python/index.html" not in index_content

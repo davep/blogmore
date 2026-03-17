@@ -29,7 +29,7 @@
     {% endif %}
     {% if include_category and post.category %}
     <div class="category">
-        <a href="/{{ category_dir }}/{{ post.safe_category }}.html" class="category-link">{{ post.category }}</a>
+        <a href="/{{ category_dir }}/{{ post.safe_category }}/{{ pagination_page1_suffix }}" class="category-link">{{ post.category }}</a>
     </div>
     {% endif %}
     <div class="post-content">
@@ -38,7 +38,7 @@
     {% if post.tags %}
     <div class="tags">
         {% for tag, safe_tag in post.sorted_tag_pairs() %}
-        <a href="/{{ tag_dir }}/{{ safe_tag }}.html" class="tag">{{ tag }}</a>
+        <a href="/{{ tag_dir }}/{{ safe_tag }}/{{ pagination_page1_suffix }}" class="tag">{{ tag }}</a>
         {% endfor %}
     </div>
     {% endif %}

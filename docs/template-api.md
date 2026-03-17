@@ -60,18 +60,41 @@ These variables are present on paginated templates (`index.html`,
 | `prev_page_url` | `str \| None` | URL of the previous page, or `None`. |
 | `next_page_url` | `str \| None` | URL of the next page, or `None`. |
 | `canonical_url` | `str \| None` | Canonical URL for this page. |
+| `pagination_page_urls` | `list[str]` | Ordered list of all page URLs for this paginated section (index 0 = page 1). Used by the `_pagination.html` macro. |
+
+`pagination_page_urls` is the primary way templates link between pages.  It is
+pre-computed by the generator from the `page_1_path` and `page_n_path`
+configuration options and respects the `clean_urls` setting.
+
+#### Global context — pagination helpers
+
+Available in every template (including post pages, static pages, etc.):
+
+| Variable | Type | Description |
+|---|---|---|
+| `pagination_page1_suffix` | `str` | Resolved suffix for a paginated section's first page (e.g. `index.html`, or `""` with `clean_urls`). Used in templates to build links to tag and category first pages. |
+
+This variable lets templates construct tag and category listing URLs without
+hard-coding the pagination scheme.  For example:
+
+```jinja2
+<a href="/{{ tag_dir }}/{{ safe_tag }}/{{ pagination_page1_suffix }}">{{ tag }}</a>
+```
+
+With the default `page_1_path: index.html` this produces `/tag/python/index.html`,
+or `/tag/python/` when `clean_urls` is enabled.
 
 ### Template-specific context
 
 | Template | Extra variables |
 |---|---|
-| `index.html` | `all_posts` (full post list), `pages` (static pages list), `prev_page_url`, `next_page_url`, `canonical_url` |
+| `index.html` | `all_posts` (full post list), `pages` (static pages list), `prev_page_url`, `next_page_url`, `canonical_url`, `pagination_page_urls` |
 | `post.html` | `all_posts`, `pages`, `prev_post` (`Post \| None`), `next_post` (`Post \| None`), `canonical_url` |
 | `page.html` | `page` (`Page`), `pages`, `canonical_url` |
-| `archive.html` | `all_posts`, `pages`, `canonical_url` |
-| `tag.html` | `tag` (display name), `safe_tag` (URL slug), `all_posts`, `pages`, `prev_page_url`, `next_page_url`, `canonical_url` |
+| `archive.html` | `all_posts`, `pages`, `canonical_url`, `pagination_page_urls` |
+| `tag.html` | `tag` (display name), `safe_tag` (URL slug), `all_posts`, `pages`, `prev_page_url`, `next_page_url`, `canonical_url`, `pagination_page_urls` |
 | `tags.html` | `tags` (dict of display name → post list), `pages`, `canonical_url` |
-| `category.html` | `category`, `safe_category`, `all_posts`, `pages`, `prev_page_url`, `next_page_url`, `canonical_url` |
+| `category.html` | `category`, `safe_category`, `all_posts`, `pages`, `prev_page_url`, `next_page_url`, `canonical_url`, `pagination_page_urls` |
 | `categories.html` | `categories` (dict of display name → post list), `pages`, `canonical_url` |
 | `search.html` | `pages`, `canonical_url` |
 
@@ -143,6 +166,22 @@ Partial templates included by the above:
 | `_pagination.html` | `index.html`, `tag.html`, `category.html`, `archive.html` | Renders page navigation. |
 | `_listing_meta_tags.html` | `index.html`, `tag.html`, `category.html`, `archive.html` | Renders `<meta>` tags for listing pages. |
 | `meta_tags.html` | `post.html`, `page.html` | Renders Open Graph and SEO `<meta>` tags. |
+
+### `_pagination.html` macro
+
+The `pagination` macro in `_pagination.html` renders the numbered page navigation
+widget.  It is called like this:
+
+```jinja2
+{% from '_pagination.html' import pagination %}
+{{ pagination(page, total_pages, pagination_page_urls) }}
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `page` | `int` | Current 1-based page number. |
+| `total_pages` | `int` | Total number of pages. |
+| `page_urls` | `list[str]` | Pre-computed list of page URLs (index 0 = page 1). Pass the `pagination_page_urls` context variable here. |
 
 ## Template blocks
 

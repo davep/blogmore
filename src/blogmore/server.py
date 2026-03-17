@@ -15,6 +15,12 @@ from watchdog.observers import Observer
 from blogmore.config import get_sidebar_config, load_config, normalize_site_keywords
 from blogmore.generator import SiteGenerator
 from blogmore.page_path import DEFAULT_PAGE_PATH, validate_page_path_template
+from blogmore.pagination_path import (
+    DEFAULT_PAGE_1_PATH,
+    DEFAULT_PAGE_N_PATH,
+    validate_page_1_path_template,
+    validate_page_n_path_template,
+)
 from blogmore.parser import CUSTOM_404_HTML
 from blogmore.post_path import DEFAULT_POST_PATH, validate_post_path_template
 from blogmore.site_config import DEFAULT_SEARCH_PATH, SiteConfig
@@ -338,6 +344,40 @@ class ConfigChangeHandler(FileSystemEventHandler):
         else:
             print(
                 "Warning: page_path in the configuration file must be a string; "
+                "using the default.",
+                file=sys.stderr,
+            )
+
+        raw_page_1_path = config.get("page_1_path", DEFAULT_PAGE_1_PATH)
+        if isinstance(raw_page_1_path, str):
+            try:
+                validate_page_1_path_template(raw_page_1_path)
+                update_kwargs["page_1_path"] = raw_page_1_path
+            except ValueError as error:
+                print(
+                    f"Warning: Invalid page_1_path in configuration file: {error}",
+                    file=sys.stderr,
+                )
+        else:
+            print(
+                "Warning: page_1_path in the configuration file must be a string; "
+                "using the default.",
+                file=sys.stderr,
+            )
+
+        raw_page_n_path = config.get("page_n_path", DEFAULT_PAGE_N_PATH)
+        if isinstance(raw_page_n_path, str):
+            try:
+                validate_page_n_path_template(raw_page_n_path)
+                update_kwargs["page_n_path"] = raw_page_n_path
+            except ValueError as error:
+                print(
+                    f"Warning: Invalid page_n_path in configuration file: {error}",
+                    file=sys.stderr,
+                )
+        else:
+            print(
+                "Warning: page_n_path in the configuration file must be a string; "
                 "using the default.",
                 file=sys.stderr,
             )

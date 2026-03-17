@@ -66,6 +66,12 @@ class TemplateRenderer:
         self.env.filters["format_date"] = self._format_date
         self.env.filters["is_external_link"] = self._is_external_link
 
+        # Provide default values for pagination context variables so that
+        # templates rendering without a full generator context (e.g. tests)
+        # do not raise UndefinedError.
+        self.env.globals["pagination_page_urls"] = []
+        self.env.globals["pagination_page1_suffix"] = "index.html"
+
     @staticmethod
     def _format_date(date: dt.datetime | None) -> Markup:
         """Format a datetime object as HTML with archive links.

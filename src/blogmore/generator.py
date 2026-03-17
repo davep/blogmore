@@ -24,6 +24,7 @@ from blogmore.fontawesome import (
 )
 from blogmore.icons import IconGenerator, detect_source_icon
 from blogmore.page_path import compute_page_output_path
+from blogmore.pagination_path import resolve_pagination_page_path
 from blogmore.parser import (
     CUSTOM_404_HTML,
     Page,
@@ -257,6 +258,9 @@ class SiteGenerator:
             if self.site_config.minify_js
             else f"/static/{SEARCH_JS_FILENAME}"
         )
+        page1_suffix = resolve_pagination_page_path(self.site_config.page_1_path, 1)
+        if self.site_config.clean_urls:
+            page1_suffix = make_url_clean(page1_suffix)
         context = {
             "site_title": self.site_config.site_title,
             "site_subtitle": self.site_config.site_subtitle,
@@ -279,45 +283,101 @@ class SiteGenerator:
             "styles_css_url": styles_css_url,
             "theme_js_url": theme_js_url,
             "search_js_url": search_js_url,
+            "pagination_page1_suffix": page1_suffix,
         }
         # Merge sidebar config into context
         context.update(self.site_config.sidebar_config)
         return context
 
+    def _get_pagination_url(self, base_url: str, page_num: int) -> str:
+        """Compute the URL for a given pagination page.
+
+        Joins *base_url* with the path resolved from the configured
+        ``page_1_path`` or ``page_n_path`` template.  When ``clean_urls``
+        is enabled and the resolved URL ends in ``index.html``, that
+        suffix is stripped.
+
+        Args:
+            base_url: The URL prefix for the paginated section (e.g.
+                ``/2024`` for a year archive).  May be an empty string
+                for the main index.
+            page_num: The 1-based page number.
+
+        Returns:
+            The fully-formed URL for the requested page.
+        """
+        if page_num == 1:
+            relative = resolve_pagination_page_path(self.site_config.page_1_path, 1)
+        else:
+            relative = resolve_pagination_page_path(
+                self.site_config.page_n_path, page_num
+            )
+        url = f"{base_url}/{relative}"
+        # Collapse any double slashes introduced when base_url is empty.
+        url = url.replace("//", "/")
+        if self.site_config.clean_urls:
+            url = make_url_clean(url)
+        return url
+
+    def _build_pagination_page_urls(self, base_url: str, total_pages: int) -> list[str]:
+        """Build the full list of page URLs for a paginated section.
+
+        Args:
+            base_url: The URL prefix for the paginated section.
+            total_pages: The total number of pages.
+
+        Returns:
+            A list of URLs, one per page, ordered from page 1 to
+            *total_pages*.
+        """
+        return [
+            self._get_pagination_url(base_url, page_num)
+            for page_num in range(1, total_pages + 1)
+        ]
+
+    def _get_pagination_output_path(self, base_dir: Path, page_num: int) -> Path:
+        """Compute the output file path for a given pagination page.
+
+        Resolves the appropriate path template from the site configuration
+        and joins it onto *base_dir*.  Any required parent directories are
+        created automatically.
+
+        Args:
+            base_dir: The base directory for this paginated section.
+            page_num: The 1-based page number.
+
+        Returns:
+            The absolute output file path for the given page.
+        """
+        if page_num == 1:
+            relative = resolve_pagination_page_path(self.site_config.page_1_path, 1)
+        else:
+            relative = resolve_pagination_page_path(
+                self.site_config.page_n_path, page_num
+            )
+        output_path = base_dir / relative
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        return output_path
+
     @staticmethod
-    def _compute_pagination_urls(
+    def _pagination_prev_next(
         page_num: int,
-        total_pages: int,
-        page1_url: str,
-        page_n_url_prefix: str,
-        page_n_url_suffix: str = ".html",
+        page_urls: list[str],
     ) -> tuple[str | None, str | None]:
-        """Compute the previous and next page URLs for a paginated page.
+        """Return the previous and next page URLs for a paginated page.
 
         Args:
             page_num: The current page number (1-based).
-            total_pages: The total number of pages.
-            page1_url: The URL for page 1.
-            page_n_url_prefix: The URL prefix for pages 2 and above (page number appended).
-            page_n_url_suffix: The URL suffix for pages 2 and above.
+            page_urls: Ordered list of all page URLs (index 0 = page 1).
 
         Returns:
-            A tuple of (prev_url, next_url) where each is None if there is no
-            previous or next page respectively.
+            A tuple of ``(prev_url, next_url)`` where each element is
+            ``None`` when there is no adjacent page.
         """
-        prev_url: str | None = None
-        next_url: str | None = None
-
-        if page_num > 1:
-            prev_url = (
-                page1_url
-                if page_num == 2
-                else f"{page_n_url_prefix}{page_num - 1}{page_n_url_suffix}"
-            )
-
-        if page_num < total_pages:
-            next_url = f"{page_n_url_prefix}{page_num + 1}{page_n_url_suffix}"
-
+        prev_url: str | None = page_urls[page_num - 2] if page_num > 1 else None
+        next_url: str | None = (
+            page_urls[page_num] if page_num < len(page_urls) else None
+        )
         return prev_url, next_url
 
     def _canonical_url_for_path(self, output_path: Path) -> str:
@@ -868,7 +928,15 @@ class SiteGenerator:
         self._write_html(output_path, html)
 
     def _generate_index_page(self, posts: list[Post], pages: list[Page]) -> None:
-        """Generate the main index page with pagination."""
+        """Generate the main index page with pagination.
+
+        Page 1 of the main index is always written to ``index.html`` at the
+        output root, regardless of the ``page_1_path`` configuration.  This
+        guarantees that the site always has a root ``index.html``.  The
+        ``page_1_path`` setting still applies to all other paginated sections
+        (archives, tags, categories).  Pages 2 and above of the main index
+        use ``page_n_path`` as configured.
+        """
         context = self._get_global_context()
         context["pages"] = pages
 
@@ -879,23 +947,30 @@ class SiteGenerator:
 
         total_pages = len(paginated_posts)
 
+        # Page 1 of the main index is always /index.html (with clean_urls: /)
+        # regardless of page_1_path, so that the site root is never displaced.
+        page1_url: str = "/index.html"
+        if self.site_config.clean_urls:
+            page1_url = make_url_clean(page1_url)
+        page_urls = [page1_url] + [
+            self._get_pagination_url("", page_num)
+            for page_num in range(2, total_pages + 1)
+        ]
+
         # Generate each page
         for page_num, page_posts in enumerate(paginated_posts, start=1):
             if page_num == 1:
-                # First page is at root
                 output_path = self.site_config.output_dir / "index.html"
+                output_path.parent.mkdir(parents=True, exist_ok=True)
             else:
-                # Additional pages in page/ directory
-                page_dir = self.site_config.output_dir / "page"
-                page_dir.mkdir(exist_ok=True)
-                output_path = page_dir / f"{page_num}.html"
-
+                output_path = self._get_pagination_output_path(
+                    self.site_config.output_dir, page_num
+                )
             context["canonical_url"] = self._canonical_url_for_path(output_path)
-            prev_url, next_url = self._compute_pagination_urls(
-                page_num, total_pages, "/index.html", "/page/", ".html"
-            )
+            prev_url, next_url = self._pagination_prev_next(page_num, page_urls)
             context["prev_page_url"] = prev_url
             context["next_page_url"] = next_url
+            context["pagination_page_urls"] = page_urls
             html = self.renderer.render_index(
                 page_posts, page=page_num, total_pages=total_pages, **context
             )
@@ -941,31 +1016,17 @@ class SiteGenerator:
             # Paginate posts
             paginated_posts = paginate_posts(year_posts, self.POSTS_PER_PAGE_ARCHIVE)
             total_pages = len(paginated_posts)
+            base_path = f"/{year}"
+            page_urls = self._build_pagination_page_urls(base_path, total_pages)
 
             # Generate each page
             for page_num, page_posts in enumerate(paginated_posts, start=1):
-                # Base path for pagination links
-                base_path = f"/{year}"
-
-                if page_num == 1:
-                    # First page is at year/index.html
-                    output_path = year_dir / "index.html"
-                else:
-                    # Additional pages in year/page/ directory
-                    page_dir = year_dir / "page"
-                    page_dir.mkdir(exist_ok=True)
-                    output_path = page_dir / f"{page_num}.html"
-
+                output_path = self._get_pagination_output_path(year_dir, page_num)
                 context["canonical_url"] = self._canonical_url_for_path(output_path)
-                prev_url, next_url = self._compute_pagination_urls(
-                    page_num,
-                    total_pages,
-                    f"{base_path}/index.html",
-                    f"{base_path}/page/",
-                    ".html",
-                )
+                prev_url, next_url = self._pagination_prev_next(page_num, page_urls)
                 context["prev_page_url"] = prev_url
                 context["next_page_url"] = next_url
+                context["pagination_page_urls"] = page_urls
                 html = self.renderer.render_archive(
                     page_posts,
                     archive_title=f"Posts from {year}",
@@ -987,31 +1048,17 @@ class SiteGenerator:
             # Paginate posts
             paginated_posts = paginate_posts(month_posts, self.POSTS_PER_PAGE_ARCHIVE)
             total_pages = len(paginated_posts)
+            base_path = f"/{year}/{month:02d}"
+            page_urls = self._build_pagination_page_urls(base_path, total_pages)
 
             # Generate each page
             for page_num, page_posts in enumerate(paginated_posts, start=1):
-                # Base path for pagination links
-                base_path = f"/{year}/{month:02d}"
-
-                if page_num == 1:
-                    # First page is at year/month/index.html
-                    output_path = month_dir / "index.html"
-                else:
-                    # Additional pages in year/month/page/ directory
-                    page_dir = month_dir / "page"
-                    page_dir.mkdir(exist_ok=True)
-                    output_path = page_dir / f"{page_num}.html"
-
+                output_path = self._get_pagination_output_path(month_dir, page_num)
                 context["canonical_url"] = self._canonical_url_for_path(output_path)
-                prev_url, next_url = self._compute_pagination_urls(
-                    page_num,
-                    total_pages,
-                    f"{base_path}/index.html",
-                    f"{base_path}/page/",
-                    ".html",
-                )
+                prev_url, next_url = self._pagination_prev_next(page_num, page_urls)
                 context["prev_page_url"] = prev_url
                 context["next_page_url"] = next_url
+                context["pagination_page_urls"] = page_urls
                 html = self.renderer.render_archive(
                     page_posts,
                     archive_title=f"Posts from {month_name}",
@@ -1035,31 +1082,17 @@ class SiteGenerator:
             # Paginate posts
             paginated_posts = paginate_posts(day_posts, self.POSTS_PER_PAGE_ARCHIVE)
             total_pages = len(paginated_posts)
+            base_path = f"/{year}/{month:02d}/{day:02d}"
+            page_urls = self._build_pagination_page_urls(base_path, total_pages)
 
             # Generate each page
             for page_num, page_posts in enumerate(paginated_posts, start=1):
-                # Base path for pagination links
-                base_path = f"/{year}/{month:02d}/{day:02d}"
-
-                if page_num == 1:
-                    # First page is at year/month/day/index.html
-                    output_path = day_dir / "index.html"
-                else:
-                    # Additional pages in year/month/day/page/ directory
-                    page_dir = day_dir / "page"
-                    page_dir.mkdir(exist_ok=True)
-                    output_path = page_dir / f"{page_num}.html"
-
+                output_path = self._get_pagination_output_path(day_dir, page_num)
                 context["canonical_url"] = self._canonical_url_for_path(output_path)
-                prev_url, next_url = self._compute_pagination_urls(
-                    page_num,
-                    total_pages,
-                    f"{base_path}/index.html",
-                    f"{base_path}/page/",
-                    ".html",
-                )
+                prev_url, next_url = self._pagination_prev_next(page_num, page_urls)
                 context["prev_page_url"] = prev_url
                 context["next_page_url"] = next_url
+                context["pagination_page_urls"] = page_urls
                 html = self.renderer.render_archive(
                     page_posts,
                     archive_title=f"Posts from {date_str}",
@@ -1093,30 +1126,22 @@ class SiteGenerator:
             paginated_posts = paginate_posts(tag_posts, self.POSTS_PER_PAGE_TAG)
             total_pages = len(paginated_posts)
 
+            base_url = f"/{self.TAG_DIR}/{safe_tag}"
+            # Each tag's pages live inside tag/{safe_tag}/ directory.
+            tag_base_dir = tag_dir / safe_tag
+            page_urls = self._build_pagination_page_urls(base_url, total_pages)
+
             context = self._get_global_context()
             context["pages"] = pages
 
             # Generate each page
             for page_num, page_posts in enumerate(paginated_posts, start=1):
-                if page_num == 1:
-                    # First page is at tag/{tag}.html
-                    output_path = tag_dir / f"{safe_tag}.html"
-                else:
-                    # Additional pages in tag/{tag}/ directory
-                    tag_page_dir = tag_dir / safe_tag
-                    tag_page_dir.mkdir(exist_ok=True)
-                    output_path = tag_page_dir / f"{page_num}.html"
-
+                output_path = self._get_pagination_output_path(tag_base_dir, page_num)
                 context["canonical_url"] = self._canonical_url_for_path(output_path)
-                prev_url, next_url = self._compute_pagination_urls(
-                    page_num,
-                    total_pages,
-                    f"/{self.TAG_DIR}/{safe_tag}.html",
-                    f"/{self.TAG_DIR}/{safe_tag}/",
-                    ".html",
-                )
+                prev_url, next_url = self._pagination_prev_next(page_num, page_urls)
                 context["prev_page_url"] = prev_url
                 context["next_page_url"] = next_url
+                context["pagination_page_urls"] = page_urls
                 html = self.renderer.render_tag_page(
                     tag_display,  # Use display name for rendering
                     page_posts,
@@ -1310,30 +1335,24 @@ class SiteGenerator:
             )
             total_pages = len(paginated_posts)
 
+            base_url = f"/{self.CATEGORY_DIR}/{safe_category}"
+            # Each category's pages live inside category/{safe_category}/ directory.
+            category_base_dir = category_dir / safe_category
+            page_urls = self._build_pagination_page_urls(base_url, total_pages)
+
             context = self._get_global_context()
             context["pages"] = pages
 
             # Generate each page
             for page_num, page_posts in enumerate(paginated_posts, start=1):
-                if page_num == 1:
-                    # First page is at category/{category}.html
-                    output_path = category_dir / f"{safe_category}.html"
-                else:
-                    # Additional pages in category/{category}/ directory
-                    category_page_dir = category_dir / safe_category
-                    category_page_dir.mkdir(exist_ok=True)
-                    output_path = category_page_dir / f"{page_num}.html"
-
-                context["canonical_url"] = self._canonical_url_for_path(output_path)
-                prev_url, next_url = self._compute_pagination_urls(
-                    page_num,
-                    total_pages,
-                    f"/{self.CATEGORY_DIR}/{safe_category}.html",
-                    f"/{self.CATEGORY_DIR}/{safe_category}/",
-                    ".html",
+                output_path = self._get_pagination_output_path(
+                    category_base_dir, page_num
                 )
+                context["canonical_url"] = self._canonical_url_for_path(output_path)
+                prev_url, next_url = self._pagination_prev_next(page_num, page_urls)
                 context["prev_page_url"] = prev_url
                 context["next_page_url"] = next_url
+                context["pagination_page_urls"] = page_urls
                 html = self.renderer.render_category_page(
                     category_display,  # Use display name for rendering
                     page_posts,
