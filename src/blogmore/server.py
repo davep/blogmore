@@ -23,7 +23,13 @@ from blogmore.pagination_path import (
 )
 from blogmore.parser import CUSTOM_404_HTML
 from blogmore.post_path import DEFAULT_POST_PATH, validate_post_path_template
-from blogmore.site_config import DEFAULT_ARCHIVE_PATH, DEFAULT_SEARCH_PATH, SiteConfig
+from blogmore.site_config import (
+    DEFAULT_ARCHIVE_PATH,
+    DEFAULT_CATEGORIES_PATH,
+    DEFAULT_SEARCH_PATH,
+    DEFAULT_TAGS_PATH,
+    SiteConfig,
+)
 
 
 class ReusingTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -424,6 +430,52 @@ class ConfigChangeHandler(FileSystemEventHandler):
         else:
             print(
                 "Warning: archive_path in the configuration file must be a string; "
+                "using the default.",
+                file=sys.stderr,
+            )
+
+        raw_tags_path = config.get("tags_path", DEFAULT_TAGS_PATH)
+        if isinstance(raw_tags_path, str):
+            if not raw_tags_path:
+                print(
+                    "Warning: tags_path in the configuration file must not be empty; "
+                    "using the default.",
+                    file=sys.stderr,
+                )
+            elif not raw_tags_path.endswith(".html"):
+                print(
+                    "Warning: tags_path in the configuration file must end with '.html'; "
+                    "using the default.",
+                    file=sys.stderr,
+                )
+            else:
+                update_kwargs["tags_path"] = raw_tags_path
+        else:
+            print(
+                "Warning: tags_path in the configuration file must be a string; "
+                "using the default.",
+                file=sys.stderr,
+            )
+
+        raw_categories_path = config.get("categories_path", DEFAULT_CATEGORIES_PATH)
+        if isinstance(raw_categories_path, str):
+            if not raw_categories_path:
+                print(
+                    "Warning: categories_path in the configuration file must not be empty; "
+                    "using the default.",
+                    file=sys.stderr,
+                )
+            elif not raw_categories_path.endswith(".html"):
+                print(
+                    "Warning: categories_path in the configuration file must end with '.html'; "
+                    "using the default.",
+                    file=sys.stderr,
+                )
+            else:
+                update_kwargs["categories_path"] = raw_categories_path
+        else:
+            print(
+                "Warning: categories_path in the configuration file must be a string; "
                 "using the default.",
                 file=sys.stderr,
             )

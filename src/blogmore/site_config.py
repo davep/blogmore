@@ -20,6 +20,14 @@ DEFAULT_ARCHIVE_PATH = "archive.html"
 # Default search page path (relative to the output directory).
 DEFAULT_SEARCH_PATH = "search.html"
 
+##############################################################################
+# Default tags page path (relative to the output directory).
+DEFAULT_TAGS_PATH = "tags.html"
+
+##############################################################################
+# Default categories page path (relative to the output directory).
+DEFAULT_CATEGORIES_PATH = "categories.html"
+
 
 @dataclass
 class SiteConfig:
@@ -150,6 +158,44 @@ class SiteConfig:
 
     This is a **configuration file only** option — it cannot be set on the
     command line.  Defaults to ``archive.html``.
+    """
+
+    tags_path: str = DEFAULT_TAGS_PATH
+    """Path (relative to the output directory) where the tags overview page is written.
+
+    The path is joined onto the ``output`` directory, so ``tags.html``
+    produces ``<output>/tags.html``, and ``blog/tags/index.html``
+    produces ``<output>/blog/tags/index.html``.
+
+    Parent directories are created automatically.  When ``clean_urls`` is
+    enabled and the path ends in ``index.html``, the ``index.html`` portion
+    is omitted in any URL reference to the page.
+
+    The path is always treated as relative to the output directory root, so
+    both ``/tags/index.html`` and ``tags/index.html`` produce the same
+    output location.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``tags.html``.
+    """
+
+    categories_path: str = DEFAULT_CATEGORIES_PATH
+    """Path (relative to the output directory) where the categories overview page is written.
+
+    The path is joined onto the ``output`` directory, so ``categories.html``
+    produces ``<output>/categories.html``, and ``blog/categories/index.html``
+    produces ``<output>/blog/categories/index.html``.
+
+    Parent directories are created automatically.  When ``clean_urls`` is
+    enabled and the path ends in ``index.html``, the ``index.html`` portion
+    is omitted in any URL reference to the page.
+
+    The path is always treated as relative to the output directory root, so
+    both ``/categories/index.html`` and ``categories/index.html`` produce the
+    same output location.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``categories.html``.
     """
 
     page_1_path: str = DEFAULT_PAGE_1_PATH

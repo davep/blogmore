@@ -256,6 +256,36 @@ class SiteGenerator:
             url = make_url_clean(url)
         return url
 
+    def _get_tags_url(self) -> str:
+        """Return the URL path for the configured tags overview page.
+
+        Derives the URL from the ``tags_path`` configuration option.  When
+        ``clean_urls`` is enabled and the path ends in ``index.html``, the
+        index filename is stripped so the URL ends with a trailing slash.
+
+        Returns:
+            The URL path for the tags page, always starting with ``/``.
+        """
+        url = "/" + self.site_config.tags_path.lstrip("/")
+        if self.site_config.clean_urls:
+            url = make_url_clean(url)
+        return url
+
+    def _get_categories_url(self) -> str:
+        """Return the URL path for the configured categories overview page.
+
+        Derives the URL from the ``categories_path`` configuration option.  When
+        ``clean_urls`` is enabled and the path ends in ``index.html``, the
+        index filename is stripped so the URL ends with a trailing slash.
+
+        Returns:
+            The URL path for the categories page, always starting with ``/``.
+        """
+        url = "/" + self.site_config.categories_path.lstrip("/")
+        if self.site_config.clean_urls:
+            url = make_url_clean(url)
+        return url
+
     def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
         styles_css_url = self._with_cache_bust(
@@ -290,6 +320,8 @@ class SiteGenerator:
             "with_search": self.site_config.with_search,
             "search_url": self._get_search_url(),
             "archive_url": self._get_archive_url(),
+            "tags_url": self._get_tags_url(),
+            "categories_url": self._get_categories_url(),
             "with_read_time": self.site_config.with_read_time,
             "with_advert": self.site_config.with_advert,
             "default_author": self.site_config.default_author,
@@ -1260,8 +1292,19 @@ class SiteGenerator:
         # Render the tags page
         context = self._get_global_context()
         context["pages"] = pages
-        output_path = self.site_config.output_dir / "tags.html"
-        context["canonical_url"] = self._canonical_url_for_path(output_path)
+        output_path = (
+            self.site_config.output_dir / self.site_config.tags_path.lstrip("/")
+        ).resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        tags_url = self._get_tags_url()
+        if self.site_config.clean_urls:
+            context["canonical_url"] = (
+                f"{self.site_config.site_url}{tags_url}"
+                if self.site_config.site_url
+                else tags_url
+            )
+        else:
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_tags_page(tag_data, **context)
 
@@ -1328,8 +1371,19 @@ class SiteGenerator:
         # Render the categories page
         context = self._get_global_context()
         context["pages"] = pages
-        output_path = self.site_config.output_dir / "categories.html"
-        context["canonical_url"] = self._canonical_url_for_path(output_path)
+        output_path = (
+            self.site_config.output_dir / self.site_config.categories_path.lstrip("/")
+        ).resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        categories_url = self._get_categories_url()
+        if self.site_config.clean_urls:
+            context["canonical_url"] = (
+                f"{self.site_config.site_url}{categories_url}"
+                if self.site_config.site_url
+                else categories_url
+            )
+        else:
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_categories_page(category_data, **context)
 

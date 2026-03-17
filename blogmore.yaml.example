@@ -104,6 +104,22 @@ posts_per_feed: 20
 # Configuration file only.
 # archive_path: "archive.html"
 
+# Optional: Path for the tags overview page relative to the output directory
+# (default: tags.html). The full directory path is created automatically.
+# When clean_urls is enabled and the path ends in index.html, the
+# index.html portion is omitted in links to the page. Leading slashes are
+# stripped so both tags.html and /tags.html produce the same result.
+# Configuration file only.
+# tags_path: "tags.html"
+
+# Optional: Path for the categories overview page relative to the output directory
+# (default: categories.html). The full directory path is created automatically.
+# When clean_urls is enabled and the path ends in index.html, the
+# index.html portion is omitted in links to the page. Leading slashes are
+# stripped so both categories.html and /categories.html produce the same result.
+# Configuration file only.
+# categories_path: "categories.html"
+
 # Optional: Generate clean URLs for posts and pages (default: false)
 # When enabled, posts and pages whose URL ends with /index.html will use the
 # shorter trailing-slash form instead (e.g. /pages/about/ instead of

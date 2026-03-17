@@ -4,6 +4,10 @@
 
 **Released: WiP**
 
+- Added configurable tags overview page path via the `tags_path` configuration
+  option. ([#TBD](https://github.com/davep/blogmore/pull/TBD))
+- Added configurable categories overview page path via the `categories_path`
+  configuration option. ([#TBD](https://github.com/davep/blogmore/pull/TBD))
 - Added configurable search page path option via the `search_path`
   configuration option. ([#304](https://github.com/davep/blogmore/pull/304))
 - BREAKING CHANGE: Added configurable pagination path options `page_1_path`
