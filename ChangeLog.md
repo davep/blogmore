@@ -5,7 +5,7 @@
 **Released: 2026-03-17**
 
 - Fixed `categories_path` and `tags_path` not loading correctly from the
-  configuration file.
+  configuration file. ([#313](https://github.com/davep/blogmore/pull/313))
 
 ## v2.0.0
 
