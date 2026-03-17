@@ -4,12 +4,6 @@
 
 **Released: WiP**
 
-- Added configurable archive page path via the `archive_path` configuration
-  option.  The default (`archive.html`) keeps the existing URL structure;
-  any path ending in `index.html` is automatically cleaned when `clean_urls`
-  is enabled.  The `archive_url` template context variable is now always
-  available in all templates.
-  ([#308](https://github.com/davep/blogmore/pull/308))
 - Added configurable search page path option via the `search_path`
   configuration option. ([#304](https://github.com/davep/blogmore/pull/304))
 - BREAKING CHANGE: Added configurable pagination path options `page_1_path`
@@ -21,6 +15,8 @@
   categories and tags. When `clean_urls` is enabled, the same trailing-slash
   transformation is applied to pagination URLs as to post and page URLs.
   ([#307](https://github.com/davep/blogmore/pull/307))
+- Added configurable archive page path via the `archive_path` configuration
+  option. ([#308](https://github.com/davep/blogmore/pull/308))
 
 ## v1.16.0
 
