@@ -15,6 +15,12 @@ from watchdog.observers import Observer
 from blogmore.config import get_sidebar_config, load_config, normalize_site_keywords
 from blogmore.generator import SiteGenerator
 from blogmore.page_path import DEFAULT_PAGE_PATH, validate_page_path_template
+from blogmore.pagination_path import (
+    DEFAULT_PAGE_1_PATH,
+    DEFAULT_PAGE_N_PATH,
+    validate_page_1_path_template,
+    validate_page_n_path_template,
+)
 from blogmore.parser import CUSTOM_404_HTML
 from blogmore.post_path import DEFAULT_POST_PATH, validate_post_path_template
 from blogmore.site_config import DEFAULT_SEARCH_PATH, SiteConfig
