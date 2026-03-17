@@ -157,5 +157,9 @@ Rules:
 - Keep commits focused; one logical change per commit is preferred.
 - Every PR that adds a feature or fixes a bug must have a corresponding
   `ChangeLog.md` entry that links back to the PR number.
+- When adding a new configuration property to the configuration file,
+  *ensure* that if the user were to change it while in `serve` mode, that
+  the new value, no matter what it is, will be reflected in the
+  freshly-generated site.
 
 [//]: # (AGENTS.md ends here)
