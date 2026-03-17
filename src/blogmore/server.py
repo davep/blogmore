@@ -23,7 +23,7 @@ from blogmore.pagination_path import (
 )
 from blogmore.parser import CUSTOM_404_HTML
 from blogmore.post_path import DEFAULT_POST_PATH, validate_post_path_template
-from blogmore.site_config import DEFAULT_SEARCH_PATH, SiteConfig
+from blogmore.site_config import DEFAULT_ARCHIVE_PATH, DEFAULT_SEARCH_PATH, SiteConfig
 
 
 class ReusingTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -401,6 +401,29 @@ class ConfigChangeHandler(FileSystemEventHandler):
         else:
             print(
                 "Warning: search_path in the configuration file must be a string; "
+                "using the default.",
+                file=sys.stderr,
+            )
+
+        raw_archive_path = config.get("archive_path", DEFAULT_ARCHIVE_PATH)
+        if isinstance(raw_archive_path, str):
+            if not raw_archive_path:
+                print(
+                    "Warning: archive_path in the configuration file must not be empty; "
+                    "using the default.",
+                    file=sys.stderr,
+                )
+            elif not raw_archive_path.endswith(".html"):
+                print(
+                    "Warning: archive_path in the configuration file must end with '.html'; "
+                    "using the default.",
+                    file=sys.stderr,
+                )
+            else:
+                update_kwargs["archive_path"] = raw_archive_path
+        else:
+            print(
+                "Warning: archive_path in the configuration file must be a string; "
                 "using the default.",
                 file=sys.stderr,
             )
