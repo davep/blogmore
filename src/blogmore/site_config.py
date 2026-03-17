@@ -11,6 +11,10 @@ from blogmore.page_path import DEFAULT_PAGE_PATH
 from blogmore.post_path import DEFAULT_POST_PATH
 from blogmore.utils import normalize_site_url
 
+##############################################################################
+# Default search page path (relative to the output directory).
+DEFAULT_SEARCH_PATH = "search.html"
+
 
 @dataclass
 class SiteConfig:
@@ -107,6 +111,21 @@ class SiteConfig:
     """Format string used to determine each static page's output path and URL.
 
     The only available variable placeholder is ``{slug}``, which is required.
+    """
+
+    search_path: str = DEFAULT_SEARCH_PATH
+    """Path (relative to the output directory) where the search page is written.
+
+    The path is joined onto the ``output`` directory, so ``search.html``
+    produces ``<output>/search.html``, and ``blog/search/index.html``
+    produces ``<output>/blog/search/index.html``.
+
+    Parent directories are created automatically.  When ``clean_urls`` is
+    enabled and the path ends in ``index.html``, the ``index.html`` portion
+    is omitted in any URL reference to the page.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``search.html``.
     """
 
     clean_urls: bool = False

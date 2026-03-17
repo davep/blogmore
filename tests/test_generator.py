@@ -4135,3 +4135,225 @@ class TestHeadTags:
         assert '<link rel="human-json" href="/human.json">' in content
         assert '<meta name="example" content="wibble">' in content
         assert '<link type="text/plain" rel="author" href="/humans.txt">' in content
+
+
+class TestSearchPathConfiguration:
+    """Tests for the configurable search_path feature."""
+
+    def test_default_search_path_generates_search_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The default search_path generates search.html at the output root."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "search.html").exists()
+
+    def test_custom_search_path_generates_file_at_configured_location(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """A custom search_path generates the search page at the specified path."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+                search_path="find/search.html",
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "find" / "search.html").exists()
+        assert not (temp_output_dir / "search.html").exists()
+
+    def test_custom_search_path_creates_intermediate_directories(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Intermediate directories are created when search_path uses subdirectories."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+                search_path="a/b/c/search.html",
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "a" / "b" / "c" / "search.html").exists()
+
+    def test_search_url_in_nav_reflects_custom_search_path(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The Search link in the navigation bar uses the configured search_path URL."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+                search_path="find/search.html",
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/find/search.html"' in index_content
+        assert 'href="/search.html"' not in index_content
+
+    def test_search_form_action_reflects_custom_search_path(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The search form action attribute uses the configured search_path URL."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+                search_path="find/search.html",
+            )
+        )
+        generator.generate()
+
+        search_content = (temp_output_dir / "find" / "search.html").read_text()
+        assert 'action="/find/search.html"' in search_content
+
+    def test_search_path_index_html_with_clean_urls_strips_filename(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """When search_path ends in index.html and clean_urls is True, the URL is cleaned."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+                search_path="search/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        # File is still written to the full path
+        assert (temp_output_dir / "search" / "index.html").exists()
+
+        # Navigation link uses the clean URL
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/search/"' in index_content
+        assert 'href="/search/index.html"' not in index_content
+
+    def test_search_path_index_html_clean_urls_form_action_is_clean(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls is True and search_path ends in index.html, form action is clean."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+                search_path="search/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        search_content = (temp_output_dir / "search" / "index.html").read_text()
+        assert 'action="/search/"' in search_content
+        assert 'action="/search/index.html"' not in search_content
+
+    def test_search_path_clean_urls_disabled_keeps_index_html_in_url(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls is False, search URL with index.html suffix is unchanged."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+                search_path="search/index.html",
+                clean_urls=False,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/search/index.html"' in index_content
+
+    def test_search_path_default_value(self) -> None:
+        """The search_path setting defaults to search.html."""
+        from blogmore.site_config import DEFAULT_SEARCH_PATH
+
+        config = SiteConfig(output_dir=Path("output"))
+        assert config.search_path == DEFAULT_SEARCH_PATH
+        assert config.search_path == "search.html"
+
+    def test_stale_search_page_removed_at_custom_path_when_search_disabled(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Stale search page at the configured path is removed when search is disabled."""
+        # Build with custom search_path
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+                search_path="find/search.html",
+            )
+        )
+        generator.generate()
+        assert (temp_output_dir / "find" / "search.html").exists()
+
+        # Rebuild with search disabled (same search_path)
+        generator2 = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=False,
+                search_path="find/search.html",
+            )
+        )
+        generator2.generate()
+        assert not (temp_output_dir / "find" / "search.html").exists()
+
+    def test_search_index_json_stays_in_root(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The search index JSON is always written to the output root, regardless of search_path."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+                search_path="find/search.html",
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "search_index.json").exists()
+        assert not (temp_output_dir / "find" / "search_index.json").exists()
+
+    def test_search_path_with_leading_slash_is_treated_as_relative(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """A search_path with a leading slash is treated as relative to the output dir."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+                search_path="/search/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        # File is written under the output dir, not at the filesystem root.
+        assert (temp_output_dir / "search" / "index.html").exists()
+
+        # Navigation link uses the clean URL.
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/search/"' in index_content
