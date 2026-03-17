@@ -17,6 +17,10 @@
   ([#307](https://github.com/davep/blogmore/pull/307))
 - Added configurable archive page path via the `archive_path` configuration
   option. ([#308](https://github.com/davep/blogmore/pull/308))
+- Added configurable tags overview page path via the `tags_path` configuration
+  option. ([#310](https://github.com/davep/blogmore/pull/310))
+- Added configurable categories overview page path via the `categories_path`
+  configuration option. ([#310](https://github.com/davep/blogmore/pull/310))
 
 ## v1.16.0
 

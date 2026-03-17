@@ -4821,3 +4821,313 @@ class TestPaginationPathConfiguration:
         index_content = (temp_output_dir / "index.html").read_text()
         assert "/tag/python/" in index_content
         assert "/tag/python/index.html" not in index_content
+
+
+class TestTagsPathConfiguration:
+    """Tests for the configurable tags_path feature."""
+
+    def test_default_tags_path_generates_tags_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The default tags_path generates tags.html at the output root."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "tags.html").exists()
+
+    def test_custom_tags_path_generates_file_at_configured_location(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """A custom tags_path generates the tags page at the specified path."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                tags_path="blog/tags.html",
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "blog" / "tags.html").exists()
+        assert not (temp_output_dir / "tags.html").exists()
+
+    def test_custom_tags_path_creates_intermediate_directories(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Intermediate directories are created when tags_path uses subdirectories."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                tags_path="a/b/c/tags.html",
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "a" / "b" / "c" / "tags.html").exists()
+
+    def test_tags_url_in_nav_reflects_custom_tags_path(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The Tags link in the navigation bar uses the configured tags_path URL."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                tags_path="blog/tags.html",
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/blog/tags.html"' in index_content
+        assert 'href="/tags.html"' not in index_content
+
+    def test_tags_path_index_html_with_clean_urls_strips_filename(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """When tags_path ends in index.html and clean_urls is True, the URL is cleaned."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                tags_path="tags/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        # File is still written to the full path.
+        assert (temp_output_dir / "tags" / "index.html").exists()
+
+        # Navigation link uses the clean URL.
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/tags/"' in index_content
+        assert 'href="/tags/index.html"' not in index_content
+
+    def test_tags_path_clean_urls_disabled_keeps_index_html_in_url(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls is False, tags URL with index.html suffix is unchanged."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                tags_path="tags/index.html",
+                clean_urls=False,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/tags/index.html"' in index_content
+
+    def test_tags_path_default_value(self) -> None:
+        """The tags_path setting defaults to tags.html."""
+        from blogmore.site_config import DEFAULT_TAGS_PATH
+
+        config = SiteConfig(output_dir=Path("output"))
+        assert config.tags_path == DEFAULT_TAGS_PATH
+        assert config.tags_path == "tags.html"
+
+    def test_tags_path_with_leading_slash_is_treated_as_relative(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """A tags_path with a leading slash is treated as relative to the output dir."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                tags_path="/tags/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "tags" / "index.html").exists()
+
+        # Navigation link uses the clean URL.
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/tags/"' in index_content
+
+    def test_tags_path_canonical_url_with_site_url_and_clean_urls(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Canonical URL on the tags page uses site_url + clean URL when clean_urls is on."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                tags_path="tags/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        tags_content = (temp_output_dir / "tags" / "index.html").read_text()
+        assert (
+            '<link rel="canonical" href="https://example.com/tags/">'
+            in tags_content
+        )
+
+
+class TestCategoriesPathConfiguration:
+    """Tests for the configurable categories_path feature."""
+
+    def test_default_categories_path_generates_categories_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The default categories_path generates categories.html at the output root."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "categories.html").exists()
+
+    def test_custom_categories_path_generates_file_at_configured_location(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """A custom categories_path generates the categories page at the specified path."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                categories_path="blog/categories.html",
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "blog" / "categories.html").exists()
+        assert not (temp_output_dir / "categories.html").exists()
+
+    def test_custom_categories_path_creates_intermediate_directories(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Intermediate directories are created when categories_path uses subdirectories."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                categories_path="a/b/c/categories.html",
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "a" / "b" / "c" / "categories.html").exists()
+
+    def test_categories_url_in_nav_reflects_custom_categories_path(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The Categories link in the navigation bar uses the configured categories_path URL."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                categories_path="blog/categories.html",
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/blog/categories.html"' in index_content
+        assert 'href="/categories.html"' not in index_content
+
+    def test_categories_path_index_html_with_clean_urls_strips_filename(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """When categories_path ends in index.html and clean_urls is True, the URL is cleaned."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                categories_path="categories/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        # File is still written to the full path.
+        assert (temp_output_dir / "categories" / "index.html").exists()
+
+        # Navigation link uses the clean URL.
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/categories/"' in index_content
+        assert 'href="/categories/index.html"' not in index_content
+
+    def test_categories_path_clean_urls_disabled_keeps_index_html_in_url(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls is False, categories URL with index.html suffix is unchanged."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                categories_path="categories/index.html",
+                clean_urls=False,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/categories/index.html"' in index_content
+
+    def test_categories_path_default_value(self) -> None:
+        """The categories_path setting defaults to categories.html."""
+        from blogmore.site_config import DEFAULT_CATEGORIES_PATH
+
+        config = SiteConfig(output_dir=Path("output"))
+        assert config.categories_path == DEFAULT_CATEGORIES_PATH
+        assert config.categories_path == "categories.html"
+
+    def test_categories_path_with_leading_slash_is_treated_as_relative(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """A categories_path with a leading slash is treated as relative to the output dir."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                categories_path="/categories/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "categories" / "index.html").exists()
+
+        # Navigation link uses the clean URL.
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/categories/"' in index_content
+
+    def test_categories_path_canonical_url_with_site_url_and_clean_urls(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Canonical URL on the categories page uses site_url + clean URL when clean_urls is on."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                categories_path="categories/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        categories_content = (
+            temp_output_dir / "categories" / "index.html"
+        ).read_text()
+        assert (
+            '<link rel="canonical" href="https://example.com/categories/">'
+            in categories_content
+        )

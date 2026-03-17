@@ -25,6 +25,8 @@ below lists all variables that are available in every template.
 | `with_search` | `bool` | `True` when search is enabled. |
 | `search_url` | `str` | URL to the search page (respects `search_path` and `clean_urls`). |
 | `archive_url` | `str` | URL to the archive page (respects `archive_path` and `clean_urls`). |
+| `tags_url` | `str` | URL to the tags overview page (respects `tags_path` and `clean_urls`). |
+| `categories_url` | `str` | URL to the categories overview page (respects `categories_path` and `clean_urls`). |
 | `with_read_time` | `bool` | `True` when reading time display is enabled. |
 | `with_advert` | `bool` | `True` when the "Generated with BlogMore" footer is shown. |
 | `default_author` | `str \| None` | Default author name from configuration. |

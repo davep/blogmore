@@ -549,6 +549,90 @@ clean_urls: true
 
 This makes the archive page accessible at `/archive/` rather than `/archive/index.html`.
 
+#### `tags_path`
+
+Path (relative to the output directory) where the tags overview page is generated.  This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** String  
+**Default:** `tags.html`
+
+```yaml
+tags_path: "tags.html"
+```
+
+##### How it works
+
+The path is joined onto the `output` directory.  Any intermediate subdirectories are created automatically, so you can place the tags page anywhere under your site root without having to create those directories yourself.
+
+The path is always treated as relative to the output directory root — a leading `/` is stripped automatically.  So both `tags/index.html` and `/tags/index.html` produce the same output location.
+
+When `clean_urls` is enabled and the path ends in `index.html`, the `index.html` portion is omitted in any URL reference to the tags page (navigation links, canonical URL, etc.), so the page is accessible at the clean trailing-slash URL.
+
+##### Examples
+
+Default — tags page at the site root:
+
+```yaml
+tags_path: "tags.html"
+```
+
+Tags page in its own subdirectory:
+
+```yaml
+tags_path: "blog/tags.html"
+```
+
+Tags page in its own directory with clean URLs:
+
+```yaml
+tags_path: "tags/index.html"
+clean_urls: true
+```
+
+This makes the tags page accessible at `/tags/` rather than `/tags/index.html`.
+
+#### `categories_path`
+
+Path (relative to the output directory) where the categories overview page is generated.  This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** String  
+**Default:** `categories.html`
+
+```yaml
+categories_path: "categories.html"
+```
+
+##### How it works
+
+The path is joined onto the `output` directory.  Any intermediate subdirectories are created automatically, so you can place the categories page anywhere under your site root without having to create those directories yourself.
+
+The path is always treated as relative to the output directory root — a leading `/` is stripped automatically.  So both `categories/index.html` and `/categories/index.html` produce the same output location.
+
+When `clean_urls` is enabled and the path ends in `index.html`, the `index.html` portion is omitted in any URL reference to the categories page (navigation links, canonical URL, etc.), so the page is accessible at the clean trailing-slash URL.
+
+##### Examples
+
+Default — categories page at the site root:
+
+```yaml
+categories_path: "categories.html"
+```
+
+Categories page in its own subdirectory:
+
+```yaml
+categories_path: "blog/categories.html"
+```
+
+Categories page in its own directory with clean URLs:
+
+```yaml
+categories_path: "categories/index.html"
+clean_urls: true
+```
+
+This makes the categories page accessible at `/categories/` rather than `/categories/index.html`.
+
 #### `page_1_path`
 
 Output path template for the **first page** of any paginated listing (main index, year/month/day archives, tag pages, and category pages).  This is a **configuration file only** option — it cannot be set on the command line.
@@ -625,11 +709,11 @@ With `clean_urls: true` every mention of that URL — in the generated HTML, RSS
 https://example.com/posts/my-first-post/
 ```
 
-The same applies to pages: if `page_path` is set to `pages/{slug}/index.html`, the page URL becomes `pages/about/` instead of `pages/about/index.html`.  The same transformation is applied to the search page if `search_path` ends in `index.html`, to the archive page if `archive_path` ends in `index.html`, and to paginated listing pages if `page_1_path` ends in `index.html`.
+The same applies to pages: if `page_path` is set to `pages/{slug}/index.html`, the page URL becomes `pages/about/` instead of `pages/about/index.html`.  The same transformation is applied to the search page if `search_path` ends in `index.html`, to the archive page if `archive_path` ends in `index.html`, to the tags page if `tags_path` ends in `index.html`, to the categories page if `categories_path` ends in `index.html`, and to paginated listing pages if `page_1_path` ends in `index.html`.
 
 The output *file* is still written to its configured path on disk; only the URLs embedded in the generated site change.
 
-This setting has no effect when neither `post_path`, `page_path`, `search_path`, `archive_path`, nor `page_1_path` / `page_n_path` produces paths that end in `index.html`.
+This setting has no effect when neither `post_path`, `page_path`, `search_path`, `archive_path`, `tags_path`, `categories_path`, nor `page_1_path` / `page_n_path` produces paths that end in `index.html`.
 
 This is a **configuration file only** option — it cannot be set on the command line.  Off by default.
 
