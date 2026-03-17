@@ -23,7 +23,7 @@
 {% block content %}
 <div class="category-page">
     <h1>Posts in category "{{ category }}"</h1>
-    {{ pagination(page, total_pages, '/' ~ category_dir ~ '/' ~ safe_category ~ '.html', '/' ~ category_dir ~ '/' ~ safe_category ~ '/', '.html') }}
+    {{ pagination(page, total_pages, pagination_page_urls) }}
 
     {% if posts %}
     {% for post in posts %}
@@ -33,6 +33,6 @@
     <p>No posts in this category.</p>
     {% endif %}
 
-    {{ pagination(page, total_pages, '/' ~ category_dir ~ '/' ~ safe_category ~ '.html', '/' ~ category_dir ~ '/' ~ safe_category ~ '/', '.html') }}
+    {{ pagination(page, total_pages, pagination_page_urls) }}
 </div>
 {% endblock %}

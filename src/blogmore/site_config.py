@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from blogmore.page_path import DEFAULT_PAGE_PATH
+from blogmore.pagination_path import DEFAULT_PAGE_1_PATH, DEFAULT_PAGE_N_PATH
 from blogmore.post_path import DEFAULT_POST_PATH
 from blogmore.utils import normalize_site_url
 
@@ -126,6 +127,36 @@ class SiteConfig:
 
     This is a **configuration file only** option — it cannot be set on the
     command line.  Defaults to ``search.html``.
+    """
+
+    page_1_path: str = DEFAULT_PAGE_1_PATH
+    """Output path template for the first page of any paginated listing.
+
+    Controls the filename generated for page 1 of the main index, date
+    archives, tag pages, and category pages.  The path is always appended
+    to the end of the section base path being generated — so ``/some/path``
+    and ``some/path`` are treated identically.
+
+    The only available placeholder is ``{page}`` (the 1-based page number),
+    though it is not required for this template since the first page is
+    typically given a fixed name such as ``index.html``.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``index.html``.
+    """
+
+    page_n_path: str = DEFAULT_PAGE_N_PATH
+    """Output path template for pages 2 and above of any paginated listing.
+
+    Controls the filename generated for pages 2, 3, … of the main index,
+    date archives, tag pages, and category pages.  The path is always
+    appended to the end of the section base path being generated.
+
+    The ``{page}`` placeholder is **required** and is replaced with the
+    1-based page number.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``page/{page}.html``.
     """
 
     clean_urls: bool = False

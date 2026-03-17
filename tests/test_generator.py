@@ -339,7 +339,7 @@ class TestSiteGenerator:
         assert tag_dir.exists()
 
         # Check for specific tag pages (python tag exists in fixtures)
-        assert (tag_dir / "python.html").exists()
+        assert (tag_dir / "python" / "index.html").exists()
 
     def test_generate_creates_category_pages(
         self, posts_dir: Path, temp_output_dir: Path
@@ -356,7 +356,7 @@ class TestSiteGenerator:
         assert category_dir.exists()
 
         # Check for specific category pages (python category exists in fixtures)
-        assert (category_dir / "python.html").exists()
+        assert (category_dir / "python" / "index.html").exists()
 
     def test_generate_creates_feeds(
         self, posts_dir: Path, temp_output_dir: Path
@@ -1464,7 +1464,7 @@ class TestSiteGenerator:
 
         generator.generate()
 
-        tag_content = (temp_output_dir / "tag" / "python.html").read_text()
+        tag_content = (temp_output_dir / "tag" / "python" / "index.html").read_text()
         assert '<meta name="keywords" content="blog, posts">' in tag_content
 
     def test_site_keywords_not_shown_when_not_configured(
@@ -2432,11 +2432,11 @@ class TestPaginationHeadLinkTags:
         )
         generator.generate()
 
-        tag_page2_file = temp_output_dir / "tag" / "python" / "2.html"
+        tag_page2_file = temp_output_dir / "tag" / "python" / "page" / "2.html"
         assert tag_page2_file.exists()
         content = tag_page2_file.read_text()
 
-        assert '<link rel="prev" href="/tag/python.html">' in content
+        assert '<link rel="prev" href="/tag/python/index.html">' in content
         assert 'rel="next"' not in content
 
     def test_tag_page_1_has_next_link_tag(
@@ -2456,12 +2456,12 @@ class TestPaginationHeadLinkTags:
         )
         generator.generate()
 
-        tag_page1_file = temp_output_dir / "tag" / "python.html"
+        tag_page1_file = temp_output_dir / "tag" / "python" / "index.html"
         assert tag_page1_file.exists()
         content = tag_page1_file.read_text()
 
         assert 'rel="prev"' not in content
-        assert '<link rel="next" href="/tag/python/2.html">' in content
+        assert '<link rel="next" href="/tag/python/page/2.html">' in content
 
     def test_category_page_2_has_prev_link_tag(
         self, tmp_path: Path, temp_output_dir: Path
@@ -2480,11 +2480,11 @@ class TestPaginationHeadLinkTags:
         )
         generator.generate()
 
-        cat_page2_file = temp_output_dir / "category" / "tech" / "2.html"
+        cat_page2_file = temp_output_dir / "category" / "tech" / "page" / "2.html"
         assert cat_page2_file.exists()
         content = cat_page2_file.read_text()
 
-        assert '<link rel="prev" href="/category/tech.html">' in content
+        assert '<link rel="prev" href="/category/tech/index.html">' in content
         assert 'rel="next"' not in content
 
     def test_category_page_1_has_next_link_tag(
@@ -2504,12 +2504,12 @@ class TestPaginationHeadLinkTags:
         )
         generator.generate()
 
-        cat_page1_file = temp_output_dir / "category" / "tech.html"
+        cat_page1_file = temp_output_dir / "category" / "tech" / "index.html"
         assert cat_page1_file.exists()
         content = cat_page1_file.read_text()
 
         assert 'rel="prev"' not in content
-        assert '<link rel="next" href="/category/tech/2.html">' in content
+        assert '<link rel="next" href="/category/tech/page/2.html">' in content
 
     def test_year_archive_page_2_has_prev_link_tag(
         self, tmp_path: Path, temp_output_dir: Path
@@ -2553,8 +2553,8 @@ class TestPaginationHeadLinkTags:
         generator.generate()
 
         index_file = temp_output_dir / "index.html"
-        tag_page = temp_output_dir / "tag" / "python.html"
-        cat_page = temp_output_dir / "category" / "tech.html"
+        tag_page = temp_output_dir / "tag" / "python" / "index.html"
+        cat_page = temp_output_dir / "category" / "tech" / "index.html"
 
         for page_file in (index_file, tag_page, cat_page):
             assert page_file.exists()
@@ -2721,12 +2721,12 @@ class TestCanonicalLinkTags:
         )
         generator.generate()
 
-        tag_file = temp_output_dir / "tag" / "python.html"
+        tag_file = temp_output_dir / "tag" / "python" / "index.html"
         assert tag_file.exists()
         content = tag_file.read_text()
 
         assert (
-            '<link rel="canonical" href="https://example.com/tag/python.html">'
+            '<link rel="canonical" href="https://example.com/tag/python/index.html">'
             in content
         )
 
@@ -2779,12 +2779,12 @@ class TestCanonicalLinkTags:
         )
         generator.generate()
 
-        category_file = temp_output_dir / "category" / "python.html"
+        category_file = temp_output_dir / "category" / "python" / "index.html"
         assert category_file.exists()
         content = category_file.read_text()
 
         assert (
-            '<link rel="canonical" href="https://example.com/category/python.html">'
+            '<link rel="canonical" href="https://example.com/category/python/index.html">'
             in content
         )
 
@@ -2988,7 +2988,7 @@ class TestWithReadTime:
         )
         generator.generate()
 
-        category_file = temp_output_dir / "category" / "tech.html"
+        category_file = temp_output_dir / "category" / "tech" / "index.html"
         assert category_file.exists()
         content = category_file.read_text()
         assert "min read" not in content
@@ -3010,7 +3010,7 @@ class TestWithReadTime:
         )
         generator.generate()
 
-        category_file = temp_output_dir / "category" / "tech.html"
+        category_file = temp_output_dir / "category" / "tech" / "index.html"
         assert category_file.exists()
         content = category_file.read_text()
         assert "min read" in content
@@ -3030,7 +3030,7 @@ class TestWithReadTime:
         )
         generator.generate()
 
-        tag_file = temp_output_dir / "tag" / "python.html"
+        tag_file = temp_output_dir / "tag" / "python" / "index.html"
         assert tag_file.exists()
         content = tag_file.read_text()
         assert "min read" not in content
@@ -3052,7 +3052,7 @@ class TestWithReadTime:
         )
         generator.generate()
 
-        tag_file = temp_output_dir / "tag" / "python.html"
+        tag_file = temp_output_dir / "tag" / "python" / "index.html"
         assert tag_file.exists()
         content = tag_file.read_text()
         assert "min read" in content

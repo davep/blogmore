@@ -4,20 +4,20 @@
     Parameters:
         page (int): The current page number (1-based).
         total_pages (int): The total number of pages.
-        page1_url (str): The URL for page 1 (often different from the numbered pattern).
-        page_n_url_prefix (str): The URL prefix for pages 2 and above (page number is appended).
-        page_n_url_suffix (str): The URL suffix for pages 2 and above (defaults to ".html").
+        page_urls (list[str]): Pre-computed list of page URLs, one per page
+            (index 0 = page 1).  Produced by the generator and available as
+            the ``pagination_page_urls`` context variable.
 
     Example usage (from a template):
         {% from '_pagination.html' import pagination %}
-        {{ pagination(page, total_pages, '/index.html', '/page/', '.html') }}
+        {{ pagination(page, total_pages, pagination_page_urls) }}
 #}
-{% macro pagination(page, total_pages, page1_url, page_n_url_prefix, page_n_url_suffix=".html") %}
+{% macro pagination(page, total_pages, page_urls) %}
 {% if total_pages > 1 %}
 <nav class="pagination" aria-label="Page navigation">
     {# Previous page link #}
     {% if page > 1 %}
-    <a href="{% if page == 2 %}{{ page1_url }}{% else %}{{ page_n_url_prefix }}{{ page - 1 }}{{ page_n_url_suffix }}{% endif %}" class="pagination-link pagination-prev">← Previous</a>
+    <a href="{{ page_urls[page - 2] }}" class="pagination-link pagination-prev">← Previous</a>
     {% endif %}
 
     {# Numbered page links with ellipsis for large ranges #}
@@ -30,7 +30,7 @@
             {% if i == page %}
     <span class="pagination-link pagination-number pagination-current" aria-current="page">{{ i }}</span>
             {% else %}
-    <a href="{% if i == 1 %}{{ page1_url }}{% else %}{{ page_n_url_prefix }}{{ i }}{{ page_n_url_suffix }}{% endif %}" class="pagination-link pagination-number">{{ i }}</a>
+    <a href="{{ page_urls[i - 1] }}" class="pagination-link pagination-number">{{ i }}</a>
             {% endif %}
             {% set ns.last_shown = i %}
         {% endif %}
@@ -38,7 +38,7 @@
 
     {# Next page link #}
     {% if page < total_pages %}
-    <a href="{{ page_n_url_prefix }}{{ page + 1 }}{{ page_n_url_suffix }}" class="pagination-link pagination-next">Next →</a>
+    <a href="{{ page_urls[page] }}" class="pagination-link pagination-next">Next →</a>
     {% endif %}
 </nav>
 {% endif %}

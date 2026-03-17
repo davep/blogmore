@@ -64,11 +64,11 @@ class TestEndToEndWorkflow:
         assert (temp_output_dir / "about.html").exists()
 
         # Verify tag pages exist
-        assert (temp_output_dir / "tag" / "python.html").exists()
-        assert (temp_output_dir / "tag" / "blog.html").exists()
+        assert (temp_output_dir / "tag" / "python" / "index.html").exists()
+        assert (temp_output_dir / "tag" / "blog" / "index.html").exists()
 
         # Verify category pages exist
-        assert (temp_output_dir / "category" / "python.html").exists()
+        assert (temp_output_dir / "category" / "python" / "index.html").exists()
 
         # Verify content
         index_content = (temp_output_dir / "index.html").read_text()
@@ -437,10 +437,10 @@ int main() {
         assert "&amp;" in post_html or "&" in post_html  # Should be properly escaped
 
         # Check category with special chars
-        assert (temp_output_dir / "category" / "web-dev-more.html").exists()
+        assert (temp_output_dir / "category" / "web-dev-more" / "index.html").exists()
 
         # Check tags with special chars
-        assert (temp_output_dir / "tag" / "c.html").exists()
+        assert (temp_output_dir / "tag" / "c" / "index.html").exists()
 
     def test_footer_advert_shown_by_default(
         self, posts_dir: Path, temp_output_dir: Path
