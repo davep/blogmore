@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.0.0
 
-**Released: WiP**
+**Released: 2026-03-17**
 
 - Added configurable search page path option via the `search_path`
   configuration option. ([#304](https://github.com/davep/blogmore/pull/304))
