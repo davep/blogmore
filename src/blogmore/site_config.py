@@ -13,6 +13,10 @@ from blogmore.post_path import DEFAULT_POST_PATH
 from blogmore.utils import normalize_site_url
 
 ##############################################################################
+# Default archive page path (relative to the output directory).
+DEFAULT_ARCHIVE_PATH = "archive.html"
+
+##############################################################################
 # Default search page path (relative to the output directory).
 DEFAULT_SEARCH_PATH = "search.html"
 
@@ -127,6 +131,25 @@ class SiteConfig:
 
     This is a **configuration file only** option — it cannot be set on the
     command line.  Defaults to ``search.html``.
+    """
+
+    archive_path: str = DEFAULT_ARCHIVE_PATH
+    """Path (relative to the output directory) where the archive page is written.
+
+    The path is joined onto the ``output`` directory, so ``archive.html``
+    produces ``<output>/archive.html``, and ``blog/archive/index.html``
+    produces ``<output>/blog/archive/index.html``.
+
+    Parent directories are created automatically.  When ``clean_urls`` is
+    enabled and the path ends in ``index.html``, the ``index.html`` portion
+    is omitted in any URL reference to the page.
+
+    The path is always treated as relative to the output directory root, so
+    both ``/archive/index.html`` and ``archive/index.html`` produce the same
+    output location.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``archive.html``.
     """
 
     page_1_path: str = DEFAULT_PAGE_1_PATH

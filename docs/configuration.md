@@ -507,6 +507,48 @@ clean_urls: true
 
 This makes the search page accessible at `/search/` rather than `/search/index.html`.
 
+#### `archive_path`
+
+Path (relative to the output directory) where the archive page is generated.  This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** String  
+**Default:** `archive.html`
+
+```yaml
+archive_path: "archive.html"
+```
+
+##### How it works
+
+The path is joined onto the `output` directory.  Any intermediate subdirectories are created automatically, so you can place the archive page anywhere under your site root without having to create those directories yourself.
+
+The path is always treated as relative to the output directory root — a leading `/` is stripped automatically.  So both `archive/index.html` and `/archive/index.html` produce the same output location.
+
+When `clean_urls` is enabled and the path ends in `index.html`, the `index.html` portion is omitted in any URL reference to the archive page (navigation links, canonical URL, etc.), so the page is accessible at the clean trailing-slash URL.
+
+##### Examples
+
+Default — archive page at the site root:
+
+```yaml
+archive_path: "archive.html"
+```
+
+Archive page in its own subdirectory:
+
+```yaml
+archive_path: "blog/archive.html"
+```
+
+Archive page in its own directory with clean URLs:
+
+```yaml
+archive_path: "archive/index.html"
+clean_urls: true
+```
+
+This makes the archive page accessible at `/archive/` rather than `/archive/index.html`.
+
 #### `page_1_path`
 
 Output path template for the **first page** of any paginated listing (main index, year/month/day archives, tag pages, and category pages).  This is a **configuration file only** option — it cannot be set on the command line.
@@ -583,11 +625,11 @@ With `clean_urls: true` every mention of that URL — in the generated HTML, RSS
 https://example.com/posts/my-first-post/
 ```
 
-The same applies to pages: if `page_path` is set to `pages/{slug}/index.html`, the page URL becomes `pages/about/` instead of `pages/about/index.html`.  The same transformation is applied to the search page if `search_path` ends in `index.html`, and to paginated listing pages if `page_1_path` ends in `index.html`.
+The same applies to pages: if `page_path` is set to `pages/{slug}/index.html`, the page URL becomes `pages/about/` instead of `pages/about/index.html`.  The same transformation is applied to the search page if `search_path` ends in `index.html`, to the archive page if `archive_path` ends in `index.html`, and to paginated listing pages if `page_1_path` ends in `index.html`.
 
 The output *file* is still written to its configured path on disk; only the URLs embedded in the generated site change.
 
-This setting has no effect when neither `post_path`, `page_path`, `search_path`, nor `page_1_path` / `page_n_path` produces paths that end in `index.html`.
+This setting has no effect when neither `post_path`, `page_path`, `search_path`, `archive_path`, nor `page_1_path` / `page_n_path` produces paths that end in `index.html`.
 
 This is a **configuration file only** option — it cannot be set on the command line.  Off by default.
 

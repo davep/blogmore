@@ -4359,6 +4359,160 @@ class TestSearchPathConfiguration:
         assert 'href="/search/"' in index_content
 
 
+class TestArchivePathConfiguration:
+    """Tests for the configurable archive_path feature."""
+
+    def test_default_archive_path_generates_archive_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The default archive_path generates archive.html at the output root."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "archive.html").exists()
+
+    def test_custom_archive_path_generates_file_at_configured_location(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """A custom archive_path generates the archive page at the specified path."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                archive_path="blog/archive.html",
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "blog" / "archive.html").exists()
+        assert not (temp_output_dir / "archive.html").exists()
+
+    def test_custom_archive_path_creates_intermediate_directories(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Intermediate directories are created when archive_path uses subdirectories."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                archive_path="a/b/c/archive.html",
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "a" / "b" / "c" / "archive.html").exists()
+
+    def test_archive_url_in_nav_reflects_custom_archive_path(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The Archive link in the navigation bar uses the configured archive_path URL."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                archive_path="blog/archive.html",
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/blog/archive.html"' in index_content
+        assert 'href="/archive.html"' not in index_content
+
+    def test_archive_path_index_html_with_clean_urls_strips_filename(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """When archive_path ends in index.html and clean_urls is True, the URL is cleaned."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                archive_path="archive/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        # File is still written to the full path.
+        assert (temp_output_dir / "archive" / "index.html").exists()
+
+        # Navigation link uses the clean URL.
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/archive/"' in index_content
+        assert 'href="/archive/index.html"' not in index_content
+
+    def test_archive_path_clean_urls_disabled_keeps_index_html_in_url(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls is False, archive URL with index.html suffix is unchanged."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                archive_path="archive/index.html",
+                clean_urls=False,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/archive/index.html"' in index_content
+
+    def test_archive_path_default_value(self) -> None:
+        """The archive_path setting defaults to archive.html."""
+        from blogmore.site_config import DEFAULT_ARCHIVE_PATH
+
+        config = SiteConfig(output_dir=Path("output"))
+        assert config.archive_path == DEFAULT_ARCHIVE_PATH
+        assert config.archive_path == "archive.html"
+
+    def test_archive_path_with_leading_slash_is_treated_as_relative(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """A archive_path with a leading slash is treated as relative to the output dir."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                archive_path="/archive/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "archive" / "index.html").exists()
+
+        # Navigation link uses the clean URL.
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/archive/"' in index_content
+
+    def test_archive_path_canonical_url_with_site_url_and_clean_urls(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Canonical URL on the archive page uses site_url + clean URL when clean_urls is on."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                archive_path="archive/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        archive_content = (temp_output_dir / "archive" / "index.html").read_text()
+        assert (
+            '<link rel="canonical" href="https://example.com/archive/">'
+            in archive_content
+        )
+
+
 class TestPaginationPathConfiguration:
     """Tests for the configurable page_1_path and page_n_path features."""
 

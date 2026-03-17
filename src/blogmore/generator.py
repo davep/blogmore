@@ -241,6 +241,21 @@ class SiteGenerator:
             url = make_url_clean(url)
         return url
 
+    def _get_archive_url(self) -> str:
+        """Return the URL path for the configured archive page.
+
+        Derives the URL from the ``archive_path`` configuration option.  When
+        ``clean_urls`` is enabled and the path ends in ``index.html``, the
+        index filename is stripped so the URL ends with a trailing slash.
+
+        Returns:
+            The URL path for the archive page, always starting with ``/``.
+        """
+        url = "/" + self.site_config.archive_path.lstrip("/")
+        if self.site_config.clean_urls:
+            url = make_url_clean(url)
+        return url
+
     def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
         styles_css_url = self._with_cache_bust(
@@ -274,6 +289,7 @@ class SiteGenerator:
             "blogmore_version": __version__,
             "with_search": self.site_config.with_search,
             "search_url": self._get_search_url(),
+            "archive_url": self._get_archive_url(),
             "with_read_time": self.site_config.with_read_time,
             "with_advert": self.site_config.with_advert,
             "default_author": self.site_config.default_author,
@@ -981,8 +997,19 @@ class SiteGenerator:
         """Generate the archive page."""
         context = self._get_global_context()
         context["pages"] = pages
-        output_path = self.site_config.output_dir / "archive.html"
-        context["canonical_url"] = self._canonical_url_for_path(output_path)
+        output_path = (
+            self.site_config.output_dir / self.site_config.archive_path.lstrip("/")
+        ).resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        archive_url = self._get_archive_url()
+        if self.site_config.clean_urls:
+            context["canonical_url"] = (
+                f"{self.site_config.site_url}{archive_url}"
+                if self.site_config.site_url
+                else archive_url
+            )
+        else:
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
         html = self.renderer.render_archive(
             posts, page=1, total_pages=1, base_path="/archive", **context
         )

@@ -15,6 +15,8 @@
   categories and tags. When `clean_urls` is enabled, the same trailing-slash
   transformation is applied to pagination URLs as to post and page URLs.
   ([#307](https://github.com/davep/blogmore/pull/307))
+- Added configurable archive page path via the `archive_path` configuration
+  option. ([#308](https://github.com/davep/blogmore/pull/308))
 
 ## v1.16.0
 

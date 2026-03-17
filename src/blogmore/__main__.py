@@ -24,7 +24,7 @@ from blogmore.pagination_path import (
 from blogmore.post_path import DEFAULT_POST_PATH, validate_post_path_template
 from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
-from blogmore.site_config import DEFAULT_SEARCH_PATH, SiteConfig
+from blogmore.site_config import DEFAULT_ARCHIVE_PATH, DEFAULT_SEARCH_PATH, SiteConfig
 
 
 def main() -> int:
@@ -157,6 +157,35 @@ def main() -> int:
         )
         return 1
 
+    # Load archive_path from config file only (not available as a CLI argument).
+    raw_archive_path = config.get("archive_path", DEFAULT_ARCHIVE_PATH)
+    if not isinstance(raw_archive_path, str):
+        print(
+            "Error: archive_path in the configuration file must be a string",
+            file=sys.stderr,
+        )
+        return 1
+    if not raw_archive_path:
+        print(
+            "Error: archive_path in the configuration file must not be empty",
+            file=sys.stderr,
+        )
+        return 1
+    if not raw_archive_path.endswith(".html"):
+        print(
+            "Error: archive_path in the configuration file must end with '.html'",
+            file=sys.stderr,
+        )
+        return 1
+    # Verify that the resolved path does not escape the output directory.
+    _archive_resolved = (_output_resolved / raw_archive_path.lstrip("/")).resolve()
+    if not _archive_resolved.is_relative_to(_output_resolved):
+        print(
+            "Error: archive_path in the configuration file must not escape the output directory",
+            file=sys.stderr,
+        )
+        return 1
+
     # Load with_advert from config file only (not available as a CLI argument).
     raw_with_advert = config.get("with_advert", True)
     if not isinstance(raw_with_advert, bool):
@@ -254,6 +283,7 @@ def main() -> int:
         page_1_path=raw_page_1_path,
         page_n_path=raw_page_n_path,
         search_path=raw_search_path,
+        archive_path=raw_archive_path,
         with_advert=raw_with_advert,
         clean_urls=raw_clean_urls,
         sidebar_pages=sidebar_pages,
