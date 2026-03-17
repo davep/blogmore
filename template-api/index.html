@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.26">
+      <meta name="generator" content="zensical-0.0.27">
     
     
       
@@ -692,6 +692,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#global-context-pagination-helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global context — pagination helpers
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -743,6 +754,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Template inheritance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_paginationhtml-macro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        _pagination.html macro
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1017,6 +1045,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#global-context-pagination-helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global context — pagination helpers
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1068,6 +1107,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Template inheritance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_paginationhtml-macro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        _pagination.html macro
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1216,6 +1272,26 @@ below lists all variables that are available in every template.</p>
 <td><code>True</code> when search is enabled.</td>
 </tr>
 <tr>
+<td><code>search_url</code></td>
+<td><code>str</code></td>
+<td>URL to the search page (respects <code>search_path</code> and <code>clean_urls</code>).</td>
+</tr>
+<tr>
+<td><code>archive_url</code></td>
+<td><code>str</code></td>
+<td>URL to the archive page (respects <code>archive_path</code> and <code>clean_urls</code>).</td>
+</tr>
+<tr>
+<td><code>tags_url</code></td>
+<td><code>str</code></td>
+<td>URL to the tags overview page (respects <code>tags_path</code> and <code>clean_urls</code>).</td>
+</tr>
+<tr>
+<td><code>categories_url</code></td>
+<td><code>str</code></td>
+<td>URL to the categories overview page (respects <code>categories_path</code> and <code>clean_urls</code>).</td>
+</tr>
+<tr>
 <td><code>with_read_time</code></td>
 <td><code>bool</code></td>
 <td><code>True</code> when reading time display is enabled.</td>
@@ -1343,8 +1419,40 @@ set in <code>blogmore.yaml</code>:</p>
 <td><code>str \| None</code></td>
 <td>Canonical URL for this page.</td>
 </tr>
+<tr>
+<td><code>pagination_page_urls</code></td>
+<td><code>list[str]</code></td>
+<td>Ordered list of all page URLs for this paginated section (index 0 = page 1). Used by the <code>_pagination.html</code> macro.</td>
+</tr>
 </tbody>
 </table>
+<p><code>pagination_page_urls</code> is the primary way templates link between pages.  It is
+pre-computed by the generator from the <code>page_1_path</code> and <code>page_n_path</code>
+configuration options and respects the <code>clean_urls</code> setting.</p>
+<h4 id="global-context-pagination-helpers">Global context — pagination helpers</h4>
+<p>Available in every template (including post pages, static pages, etc.):</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pagination_page1_suffix</code></td>
+<td><code>str</code></td>
+<td>Resolved suffix for a paginated section's first page (e.g. <code>index.html</code>, or <code>""</code> with <code>clean_urls</code>). Used in templates to build links to tag and category first pages.</td>
+</tr>
+</tbody>
+</table>
+<p>This variable lets templates construct tag and category listing URLs without
+hard-coding the pagination scheme.  For example:</p>
+<div class="highlight"><pre><span></span><code>&lt;a href=&quot;/{{ tag_dir }}/{{ safe_tag }}/{{ pagination_page1_suffix }}&quot;&gt;{{ tag }}&lt;/a&gt;
+</code></pre></div>
+<p>With the default <code>page_1_path: index.html</code> this produces <code>/tag/python/index.html</code>,
+or <code>/tag/python/</code> when <code>clean_urls</code> is enabled.</p>
 <h3 id="template-specific-context">Template-specific context</h3>
 <table>
 <thead>
@@ -1356,7 +1464,7 @@ set in <code>blogmore.yaml</code>:</p>
 <tbody>
 <tr>
 <td><code>index.html</code></td>
-<td><code>all_posts</code> (full post list), <code>pages</code> (static pages list), <code>prev_page_url</code>, <code>next_page_url</code>, <code>canonical_url</code></td>
+<td><code>all_posts</code> (full post list), <code>pages</code> (static pages list), <code>prev_page_url</code>, <code>next_page_url</code>, <code>canonical_url</code>, <code>pagination_page_urls</code></td>
 </tr>
 <tr>
 <td><code>post.html</code></td>
@@ -1368,11 +1476,11 @@ set in <code>blogmore.yaml</code>:</p>
 </tr>
 <tr>
 <td><code>archive.html</code></td>
-<td><code>all_posts</code>, <code>pages</code>, <code>canonical_url</code></td>
+<td><code>all_posts</code>, <code>pages</code>, <code>canonical_url</code>, <code>pagination_page_urls</code></td>
 </tr>
 <tr>
 <td><code>tag.html</code></td>
-<td><code>tag</code> (display name), <code>safe_tag</code> (URL slug), <code>all_posts</code>, <code>pages</code>, <code>prev_page_url</code>, <code>next_page_url</code>, <code>canonical_url</code></td>
+<td><code>tag</code> (display name), <code>safe_tag</code> (URL slug), <code>all_posts</code>, <code>pages</code>, <code>prev_page_url</code>, <code>next_page_url</code>, <code>canonical_url</code>, <code>pagination_page_urls</code></td>
 </tr>
 <tr>
 <td><code>tags.html</code></td>
@@ -1380,7 +1488,7 @@ set in <code>blogmore.yaml</code>:</p>
 </tr>
 <tr>
 <td><code>category.html</code></td>
-<td><code>category</code>, <code>safe_category</code>, <code>all_posts</code>, <code>pages</code>, <code>prev_page_url</code>, <code>next_page_url</code>, <code>canonical_url</code></td>
+<td><code>category</code>, <code>safe_category</code>, <code>all_posts</code>, <code>pages</code>, <code>prev_page_url</code>, <code>next_page_url</code>, <code>canonical_url</code>, <code>pagination_page_urls</code></td>
 </tr>
 <tr>
 <td><code>categories.html</code></td>
@@ -1588,6 +1696,38 @@ and <code>next_post</code>.</p>
 <td><code>meta_tags.html</code></td>
 <td><code>post.html</code>, <code>page.html</code></td>
 <td>Renders Open Graph and SEO <code>&lt;meta&gt;</code> tags.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_paginationhtml-macro"><code>_pagination.html</code> macro</h3>
+<p>The <code>pagination</code> macro in <code>_pagination.html</code> renders the numbered page navigation
+widget.  It is called like this:</p>
+<div class="highlight"><pre><span></span><code>{% from &#39;_pagination.html&#39; import pagination %}
+{{ pagination(page, total_pages, pagination_page_urls) }}
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>page</code></td>
+<td><code>int</code></td>
+<td>Current 1-based page number.</td>
+</tr>
+<tr>
+<td><code>total_pages</code></td>
+<td><code>int</code></td>
+<td>Total number of pages.</td>
+</tr>
+<tr>
+<td><code>page_urls</code></td>
+<td><code>list[str]</code></td>
+<td>Pre-computed list of page URLs (index 0 = page 1). Pass the <code>pagination_page_urls</code> context variable here.</td>
 </tr>
 </tbody>
 </table>

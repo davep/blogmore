@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.26">
+      <meta name="generator" content="zensical-0.0.27">
     
     
       
@@ -733,6 +733,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v200" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v2.0.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v1160" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1147,6 +1158,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v200" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v2.0.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v1160" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1517,6 +1539,27 @@
 
 
 <h1 id="blogmore-changelog">BlogMore ChangeLog</h1>
+<h2 id="v200">v2.0.0</h2>
+<p><strong>Released: 2026-03-17</strong></p>
+<ul>
+<li>Added configurable search page path option via the <code>search_path</code>
+  configuration option. (<a href="https://github.com/davep/blogmore/pull/304">#304</a>)</li>
+<li>BREAKING CHANGE: Added configurable pagination path options <code>page_1_path</code>
+  and <code>page_n_path</code>. These configuration file settings control the output
+  path template for the first page and for pages 2+ of any paginated listing
+  (main index, year/month/day archives, tag pages, and category pages). The
+  defaults (<code>index.html</code> and <code>page/{page}.html</code>) keep the existing URL
+  structure in some cases, but break the pre-existing default structure for
+  categories and tags. When <code>clean_urls</code> is enabled, the same trailing-slash
+  transformation is applied to pagination URLs as to post and page URLs.
+  (<a href="https://github.com/davep/blogmore/pull/307">#307</a>)</li>
+<li>Added configurable archive page path via the <code>archive_path</code> configuration
+  option. (<a href="https://github.com/davep/blogmore/pull/308">#308</a>)</li>
+<li>Added configurable tags overview page path via the <code>tags_path</code> configuration
+  option. (<a href="https://github.com/davep/blogmore/pull/310">#310</a>)</li>
+<li>Added configurable categories overview page path via the <code>categories_path</code>
+  configuration option. (<a href="https://github.com/davep/blogmore/pull/310">#310</a>)</li>
+</ul>
 <h2 id="v1160">v1.16.0</h2>
 <p><strong>Released: 2026-03-16</strong></p>
 <ul>
