@@ -1,5 +1,12 @@
 # BlogMore ChangeLog
 
+## v2.0.1
+
+**Released: 2026-03-17**
+
+- Fixed `categories_path` and `tags_path` not loading correctly from the
+  configuration file.
+
 ## v2.0.0
 
 **Released: 2026-03-17**
