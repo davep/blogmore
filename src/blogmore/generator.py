@@ -928,7 +928,15 @@ class SiteGenerator:
         self._write_html(output_path, html)
 
     def _generate_index_page(self, posts: list[Post], pages: list[Page]) -> None:
-        """Generate the main index page with pagination."""
+        """Generate the main index page with pagination.
+
+        Page 1 of the main index is always written to ``index.html`` at the
+        output root, regardless of the ``page_1_path`` configuration.  This
+        guarantees that the site always has a root ``index.html``.  The
+        ``page_1_path`` setting still applies to all other paginated sections
+        (archives, tags, categories).  Pages 2 and above of the main index
+        use ``page_n_path`` as configured.
+        """
         context = self._get_global_context()
         context["pages"] = pages
 
@@ -938,13 +946,26 @@ class SiteGenerator:
             paginated_posts = [[]]  # Empty page if no posts
 
         total_pages = len(paginated_posts)
-        page_urls = self._build_pagination_page_urls("", total_pages)
+
+        # Page 1 of the main index is always /index.html (with clean_urls: /)
+        # regardless of page_1_path, so that the site root is never displaced.
+        page1_url: str = "/index.html"
+        if self.site_config.clean_urls:
+            page1_url = make_url_clean(page1_url)
+        page_urls = [page1_url] + [
+            self._get_pagination_url("", page_num)
+            for page_num in range(2, total_pages + 1)
+        ]
 
         # Generate each page
         for page_num, page_posts in enumerate(paginated_posts, start=1):
-            output_path = self._get_pagination_output_path(
-                self.site_config.output_dir, page_num
-            )
+            if page_num == 1:
+                output_path = self.site_config.output_dir / "index.html"
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+            else:
+                output_path = self._get_pagination_output_path(
+                    self.site_config.output_dir, page_num
+                )
             context["canonical_url"] = self._canonical_url_for_path(output_path)
             prev_url, next_url = self._pagination_prev_next(page_num, page_urls)
             context["prev_page_url"] = prev_url

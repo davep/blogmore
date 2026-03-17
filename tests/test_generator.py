@@ -4396,7 +4396,7 @@ class TestPaginationPathConfiguration:
     def test_custom_page_1_path_changes_main_index_output(
         self, tmp_path: Path, temp_output_dir: Path
     ) -> None:
-        """A custom page_1_path changes where page 1 of the main index is written."""
+        """page_1_path does NOT change the main index; it always stays at index.html."""
         content_dir = tmp_path / "content"
         content_dir.mkdir()
         (content_dir / "2024-01-01-post.md").write_text(
@@ -4410,8 +4410,9 @@ class TestPaginationPathConfiguration:
             )
         )
         generator.generate()
-        assert (temp_output_dir / "start.html").exists()
-        assert not (temp_output_dir / "index.html").exists()
+        # Main index is always index.html regardless of page_1_path.
+        assert (temp_output_dir / "index.html").exists()
+        assert not (temp_output_dir / "start.html").exists()
 
     def test_custom_page_n_path_changes_subsequent_page_output(
         self, tmp_path: Path, temp_output_dir: Path
@@ -4437,12 +4438,13 @@ class TestPaginationPathConfiguration:
     def test_custom_page_1_path_subdirectory(
         self, tmp_path: Path, temp_output_dir: Path
     ) -> None:
-        """A page_1_path with a subdirectory is created automatically."""
+        """A page_1_path with a subdirectory is applied to archive pages (not main index)."""
         content_dir = tmp_path / "content"
         content_dir.mkdir()
-        (content_dir / "2024-01-01-post.md").write_text(
-            "---\ntitle: Post\ndate: 2024-01-01\n---\n\nContent."
-        )
+        for i in range(1, 5):
+            (content_dir / f"2024-01-{i:02d}-post.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent."
+            )
         generator = SiteGenerator(
             site_config=SiteConfig(
                 content_dir=content_dir,
@@ -4451,17 +4453,21 @@ class TestPaginationPathConfiguration:
             )
         )
         generator.generate()
-        assert (temp_output_dir / "posts" / "index.html").exists()
+        # Main index is always index.html.
+        assert (temp_output_dir / "index.html").exists()
+        # Year archive page 1 uses page_1_path.
+        assert (temp_output_dir / "2024" / "posts" / "index.html").exists()
 
     def test_page_1_path_with_page_placeholder(
         self, tmp_path: Path, temp_output_dir: Path
     ) -> None:
-        """The {page} placeholder works in page_1_path."""
+        """The {page} placeholder works in page_1_path for archive/tag pages (not main index)."""
         content_dir = tmp_path / "content"
         content_dir.mkdir()
-        (content_dir / "2024-01-01-post.md").write_text(
-            "---\ntitle: Post\ndate: 2024-01-01\n---\n\nContent."
-        )
+        for i in range(1, 5):
+            (content_dir / f"2024-01-{i:02d}-post.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent."
+            )
         generator = SiteGenerator(
             site_config=SiteConfig(
                 content_dir=content_dir,
@@ -4470,7 +4476,11 @@ class TestPaginationPathConfiguration:
             )
         )
         generator.generate()
-        assert (temp_output_dir / "page-1.html").exists()
+        # Main index is always index.html regardless of page_1_path.
+        assert (temp_output_dir / "index.html").exists()
+        assert not (temp_output_dir / "page-1.html").exists()
+        # Year archive page 1 uses page_1_path → page-1.html.
+        assert (temp_output_dir / "2024" / "page-1.html").exists()
 
     def test_custom_paths_apply_to_year_archive(
         self, tmp_path: Path, temp_output_dir: Path
@@ -4544,7 +4554,7 @@ class TestPaginationPathConfiguration:
     def test_pagination_page_urls_in_context_match_page_1_path(
         self, tmp_path: Path, temp_output_dir: Path
     ) -> None:
-        """Pagination links in the rendered HTML reflect the configured page_1_path."""
+        """Main index page 1 is always /index.html; page 2's prev link points to /index.html."""
         content_dir = tmp_path / "content"
         content_dir.mkdir()
         for i in range(1, 12):
@@ -4561,9 +4571,11 @@ class TestPaginationPathConfiguration:
         )
         generator.generate()
 
-        # Page 2 of the main index should link back to start.html as prev
+        # Main index page 1 is always index.html regardless of page_1_path.
+        assert (temp_output_dir / "index.html").exists()
+        # Page 2 of the main index should link back to /index.html (not /start.html).
         page2_content = (temp_output_dir / "p2.html").read_text()
-        assert 'href="/start.html"' in page2_content
+        assert 'href="/index.html"' in page2_content
 
     def test_pagination_page_urls_in_context_match_page_n_path(
         self, tmp_path: Path, temp_output_dir: Path

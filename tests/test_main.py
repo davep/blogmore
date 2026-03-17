@@ -1449,12 +1449,16 @@ class TestPaginationPathConfigValidation:
         tmp_path: Path,
         temp_output_dir: Path,
     ) -> None:
-        """A valid page_1_path in the config file is used when generating the site."""
+        """page_1_path is applied to archive/tag/category pages but NOT the main index.
+
+        The main index page 1 is always at /index.html regardless of page_1_path,
+        so that the site root is never displaced.
+        """
         content_dir = tmp_path / "content"
         content_dir.mkdir()
         for i in range(1, 12):
             (content_dir / f"2024-01-{i:02d}-post.md").write_text(
-                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\n---\n\nContent."
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\ntags: [python]\n---\n\nContent."
             )
         config_file = tmp_path / "blogmore.yaml"
         config_file.write_text(
@@ -1471,9 +1475,14 @@ class TestPaginationPathConfigValidation:
             result = main()
 
         assert result == 0
-        # With page_1_path set to page/{page}/index.html, page 1 should be at page/1/index.html
-        assert (temp_output_dir / "page" / "1" / "index.html").exists()
-        assert not (temp_output_dir / "index.html").exists()
+        # Main index page 1 is ALWAYS /index.html regardless of page_1_path.
+        assert (temp_output_dir / "index.html").exists()
+        # Main index page 2 uses page_n_path → page/2/index.html.
+        assert (temp_output_dir / "page" / "2" / "index.html").exists()
+        # Archive (year) page 1 uses page_1_path → 2024/page/1/index.html.
+        assert (temp_output_dir / "2024" / "page" / "1" / "index.html").exists()
+        # Tag page 1 uses page_1_path → tag/python/page/1/index.html.
+        assert (temp_output_dir / "tag" / "python" / "page" / "1" / "index.html").exists()
 
     def test_page_n_path_from_config_is_applied(
         self,
