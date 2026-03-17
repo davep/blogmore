@@ -76,6 +76,18 @@ posts_per_feed: 20
 # The only available placeholder is {slug}, which is required.
 # page_path: "{slug}.html"
 
+# Optional: Output path template for the first page of any paginated listing
+# (main index, year/month/day archives, tag pages, category pages).
+# The path is always appended to the end of the section base path being
+# generated. The {page} placeholder is available but not required.
+# Configuration file only.
+# page_1_path: "index.html"
+
+# Optional: Output path template for pages 2 and above of any paginated
+# listing. The {page} placeholder is required and is substituted with the
+# 1-based page number. Configuration file only.
+# page_n_path: "page/{page}.html"
+
 # Optional: Output path for the search page (default: "search.html")
 # Controls where the search page is generated, relative to the output
 # directory. The full directory path is created automatically.
@@ -87,7 +99,9 @@ posts_per_feed: 20
 # Optional: Generate clean URLs for posts and pages (default: false)
 # When enabled, posts and pages whose URL ends with /index.html will use the
 # shorter trailing-slash form instead (e.g. /pages/about/ instead of
-# /pages/about/index.html). Configuration file only.
+# /pages/about/index.html). This also applies to paginated listing pages when
+# page_1_path or page_n_path produces a path ending in index.html.
+# Configuration file only.
 # clean_urls: false
 
 # Optional: Extra tags to inject into <head> on every generated page.

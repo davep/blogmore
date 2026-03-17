@@ -507,6 +507,68 @@ clean_urls: true
 
 This makes the search page accessible at `/search/` rather than `/search/index.html`.
 
+#### `page_1_path`
+
+Output path template for the **first page** of any paginated listing (main index, year/month/day archives, tag pages, and category pages).  This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** String  
+**Default:** `index.html`
+
+The path is always appended to the end of the section base path being generated.  So for the main index the default produces `output/index.html`, for a year archive it produces `output/2024/index.html`, and for a tag page it produces `output/tag/python/index.html`.
+
+The only available placeholder is `{page}` (the 1-based page number).  It is **not** required for `page_1_path` — the default `index.html` does not use it.
+
+When `clean_urls` is enabled and the resolved path ends in `index.html`, the `index.html` suffix is stripped so the URL uses a trailing slash.
+
+```yaml
+page_1_path: "index.html"
+```
+
+##### Examples
+
+Default — page 1 is `index.html` within each section directory:
+
+```yaml
+page_1_path: "index.html"
+```
+
+Include the page number in the first-page filename:
+
+```yaml
+page_1_path: "page-{page}.html"
+```
+
+#### `page_n_path`
+
+Output path template for **pages 2 and above** of any paginated listing (main index, year/month/day archives, tag pages, and category pages).  This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** String  
+**Default:** `page/{page}.html`
+
+The path is always appended to the end of the section base path being generated.  So for the main index the default produces `output/page/2.html`, `output/page/3.html`, and so on.
+
+The `{page}` placeholder is **required** and is substituted with the 1-based page number.
+
+When `clean_urls` is enabled and the resolved path ends in `index.html`, the `index.html` suffix is stripped so the URL uses a trailing slash.
+
+```yaml
+page_n_path: "page/{page}.html"
+```
+
+##### Examples
+
+Default — subsequent pages in a `page/` subdirectory:
+
+```yaml
+page_n_path: "page/{page}.html"
+```
+
+Flat filenames at the section root:
+
+```yaml
+page_n_path: "p{page}.html"
+```
+
 #### `clean_urls`
 
 When `true`, any post or page whose resolved URL ends with `/index.html` has the `index.html` portion removed so that the URL ends with a trailing slash instead.  For example, if `post_path` is set to `posts/{slug}/index.html`, a post with slug `my-first-post` would normally be referenced as:
@@ -521,11 +583,11 @@ With `clean_urls: true` every mention of that URL — in the generated HTML, RSS
 https://example.com/posts/my-first-post/
 ```
 
-The same applies to pages: if `page_path` is set to `pages/{slug}/index.html`, the page URL becomes `pages/about/` instead of `pages/about/index.html`.  The same transformation is applied to the search page if `search_path` ends in `index.html`.
+The same applies to pages: if `page_path` is set to `pages/{slug}/index.html`, the page URL becomes `pages/about/` instead of `pages/about/index.html`.  The same transformation is applied to the search page if `search_path` ends in `index.html`, and to paginated listing pages if `page_1_path` ends in `index.html`.
 
 The output *file* is still written to its configured path on disk; only the URLs embedded in the generated site change.
 
-This setting has no effect when neither `post_path`, `page_path`, nor `search_path` produces paths that end in `index.html`.
+This setting has no effect when neither `post_path`, `page_path`, `search_path`, nor `page_1_path` / `page_n_path` produces paths that end in `index.html`.
 
 This is a **configuration file only** option — it cannot be set on the command line.  Off by default.
 
