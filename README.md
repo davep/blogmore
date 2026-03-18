@@ -22,6 +22,10 @@ BlogMore is a blog-oriented static site generation engine built in Python. It
 transforms your Markdown files into a complete, modern blog website with a
 clean, responsive design—no database, no server-side runtime required.
 
+See [my own blog](https://blog.davep.org/) for an example of a site created
+with BlogMore (the site is hosted on GitHub pages, with the repository [over
+here](https://github.com/davep/davep.github.com)).
+
 ## Key Features
 
 - **Static site generator** — produces plain HTML/CSS/JS that can be hosted
