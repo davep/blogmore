@@ -3,8 +3,8 @@
 from pathlib import Path
 from xml.etree.ElementTree import Element, SubElement, indent, tostring
 
+from blogmore.clean_url import make_url_clean
 from blogmore.parser import CUSTOM_404_HTML
-from blogmore.post_path import make_url_clean
 from blogmore.utils import normalize_site_url
 
 SITEMAP_XMLNS = "http://www.sitemaps.org/schemas/sitemap/0.9"

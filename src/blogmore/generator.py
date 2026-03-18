@@ -14,6 +14,7 @@ import rcssmin  # type: ignore[import-untyped]
 import rjsmin  # type: ignore[import-untyped]
 
 from blogmore import __version__
+from blogmore.clean_url import make_url_clean
 from blogmore.feeds import BlogFeedGenerator
 from blogmore.fontawesome import (
     FONTAWESOME_CDN_BRANDS_WOFF2_URL,
@@ -33,7 +34,7 @@ from blogmore.parser import (
     post_sort_key,
     sanitize_for_url,
 )
-from blogmore.post_path import compute_output_path, make_url_clean
+from blogmore.post_path import compute_output_path
 from blogmore.renderer import TemplateRenderer
 from blogmore.search import write_search_index
 from blogmore.site_config import SiteConfig

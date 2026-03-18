@@ -1,5 +1,12 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed false-positive stripping of `index.html` from URLs such as
+  `/my-index.html`. ([#315](https://github.com/davep/blogmore/pull/315))
+
 ## v2.0.1
 
 **Released: 2026-03-17**
