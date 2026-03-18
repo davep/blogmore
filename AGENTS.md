@@ -20,6 +20,10 @@ All source lives in `src/blogmore/`. Key modules and their responsibilities:
 | `icons.py` | Favicons and touch icons from a single source image |
 | `fontawesome.py` | FontAwesome CSS tree-shaking/optimisation |
 | `post_path.py` | Configurable output path resolution for posts |
+| `pagination_path.py` | Pagination path resolution for configurable index page output paths |
+| `content_path.py` | Shared path-resolution utilities for content output paths (used by page_path and post_path) |
+| `clean_url.py` | Clean URL transformation utilities (removes index.html from URLs when enabled) |
+| `page_path.py` | Page path resolution for configurable output file paths |
 | `admonitions.py` | Markdown extension: GitHub-style `> [!TYPE]` admonitions |
 | `external_links.py` | Markdown extension: opens external links in a new tab |
 | `heading_anchors.py` | Markdown extension: hover anchor links on headings |
