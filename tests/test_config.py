@@ -478,7 +478,6 @@ class TestPathExpansion:
         assert args.default_author == "CLI Author"
 
 
-
 class TestGetSidebarConfig:
     """Test the get_sidebar_config function."""
 
@@ -920,3 +919,382 @@ class TestSiteKeywordsConfig:
         merge_config_with_args(config, args)
 
         assert args.minify_html is True
+
+
+class TestParseSiteConfigFromDict:
+    """Tests for the parse_site_config_from_dict function."""
+
+    def test_empty_config_returns_defaults_for_explicit_fields(
+        self, tmp_path: Path
+    ) -> None:
+        """An empty config dict returns path-template and html-path defaults."""
+        from blogmore.config import parse_site_config_from_dict
+        from blogmore.page_path import DEFAULT_PAGE_PATH
+        from blogmore.pagination_path import DEFAULT_PAGE_1_PATH, DEFAULT_PAGE_N_PATH
+        from blogmore.post_path import DEFAULT_POST_PATH
+        from blogmore.site_config import (
+            DEFAULT_ARCHIVE_PATH,
+            DEFAULT_CATEGORIES_PATH,
+            DEFAULT_SEARCH_PATH,
+            DEFAULT_TAGS_PATH,
+        )
+
+        kwargs, errors = parse_site_config_from_dict({}, tmp_path)
+
+        assert errors == []
+        assert kwargs["post_path"] == DEFAULT_POST_PATH
+        assert kwargs["page_path"] == DEFAULT_PAGE_PATH
+        assert kwargs["page_1_path"] == DEFAULT_PAGE_1_PATH
+        assert kwargs["page_n_path"] == DEFAULT_PAGE_N_PATH
+        assert kwargs["search_path"] == DEFAULT_SEARCH_PATH
+        assert kwargs["archive_path"] == DEFAULT_ARCHIVE_PATH
+        assert kwargs["tags_path"] == DEFAULT_TAGS_PATH
+        assert kwargs["categories_path"] == DEFAULT_CATEGORIES_PATH
+        assert kwargs["sidebar_pages"] is None
+        assert kwargs["head"] == []
+        assert kwargs["extra_stylesheets"] is None
+
+    def test_simple_scalar_fields_copied_when_present(self, tmp_path: Path) -> None:
+        """Simple scalar fields present in the config are included in kwargs."""
+        from blogmore.config import parse_site_config_from_dict
+
+        config = {
+            "site_title": "Test Blog",
+            "site_subtitle": "A subtitle",
+            "posts_per_feed": 10,
+            "with_search": True,
+            "minify_css": True,
+            "with_advert": False,
+            "clean_urls": True,
+        }
+        kwargs, errors = parse_site_config_from_dict(config, tmp_path)
+
+        assert errors == []
+        assert kwargs["site_title"] == "Test Blog"
+        assert kwargs["site_subtitle"] == "A subtitle"
+        assert kwargs["posts_per_feed"] == 10
+        assert kwargs["with_search"] is True
+        assert kwargs["minify_css"] is True
+        assert kwargs["with_advert"] is False
+        assert kwargs["clean_urls"] is True
+
+    def test_simple_scalar_absent_not_in_kwargs(self, tmp_path: Path) -> None:
+        """Simple scalar fields absent from config are not included in kwargs."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({}, tmp_path)
+
+        assert errors == []
+        assert "site_title" not in kwargs
+        assert "site_subtitle" not in kwargs
+        assert "with_search" not in kwargs
+
+    def test_simple_scalar_wrong_type_produces_error(self, tmp_path: Path) -> None:
+        """A simple scalar field with the wrong type produces an error."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"site_title": 42, "posts_per_feed": "not-a-number"}, tmp_path
+        )
+
+        assert len(errors) == 2
+        assert "site_title" not in kwargs
+        assert "posts_per_feed" not in kwargs
+
+    def test_bool_field_rejects_int(self, tmp_path: Path) -> None:
+        """A bool field with an int value produces an error."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({"with_search": 1}, tmp_path)
+
+        assert len(errors) == 1
+        assert "with_search" not in kwargs
+
+    def test_optional_str_field_accepts_none(self, tmp_path: Path) -> None:
+        """An Optional[str] field accepts None."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({"default_author": None}, tmp_path)
+
+        assert errors == []
+        assert kwargs["default_author"] is None
+
+    def test_optional_str_field_accepts_string(self, tmp_path: Path) -> None:
+        """An Optional[str] field accepts a string value."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"default_author": "Alice"}, tmp_path
+        )
+
+        assert errors == []
+        assert kwargs["default_author"] == "Alice"
+
+    def test_site_keywords_normalised_from_string(self, tmp_path: Path) -> None:
+        """site_keywords as a comma-separated string is normalised to a list."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"site_keywords": "python, blog, tech"}, tmp_path
+        )
+
+        assert errors == []
+        assert kwargs["site_keywords"] == ["python", "blog", "tech"]
+
+    def test_site_keywords_normalised_from_list(self, tmp_path: Path) -> None:
+        """site_keywords as a list is passed through."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"site_keywords": ["python", "blog"]}, tmp_path
+        )
+
+        assert errors == []
+        assert kwargs["site_keywords"] == ["python", "blog"]
+
+    def test_site_keywords_absent_not_in_kwargs(self, tmp_path: Path) -> None:
+        """site_keywords absent from config is not included in kwargs."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({}, tmp_path)
+
+        assert errors == []
+        assert "site_keywords" not in kwargs
+
+    def test_extra_stylesheets_string_normalised_to_list(self, tmp_path: Path) -> None:
+        """extra_stylesheets as a string is wrapped in a list."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"extra_stylesheets": "custom.css"}, tmp_path
+        )
+
+        assert errors == []
+        assert kwargs["extra_stylesheets"] == ["custom.css"]
+
+    def test_extra_stylesheets_list_passed_through(self, tmp_path: Path) -> None:
+        """extra_stylesheets as a list is passed through unchanged."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"extra_stylesheets": ["a.css", "b.css"]}, tmp_path
+        )
+
+        assert errors == []
+        assert kwargs["extra_stylesheets"] == ["a.css", "b.css"]
+
+    def test_extra_stylesheets_absent_uses_cli_override(self, tmp_path: Path) -> None:
+        """When extra_stylesheets is absent from config, cli_overrides is used."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {}, tmp_path, cli_overrides={"extra_stylesheets": ["cli.css"]}
+        )
+
+        assert errors == []
+        assert kwargs["extra_stylesheets"] == ["cli.css"]
+
+    def test_extra_stylesheets_absent_no_override_returns_none(
+        self, tmp_path: Path
+    ) -> None:
+        """When extra_stylesheets is absent and no cli_overrides, returns None."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({}, tmp_path)
+
+        assert errors == []
+        assert kwargs["extra_stylesheets"] is None
+
+    def test_valid_post_path(self, tmp_path: Path) -> None:
+        """A valid post_path template is accepted."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"post_path": "{year}/{month}/{slug}.html"}, tmp_path
+        )
+
+        assert errors == []
+        assert kwargs["post_path"] == "{year}/{month}/{slug}.html"
+
+    def test_invalid_post_path_produces_error(self, tmp_path: Path) -> None:
+        """An invalid post_path (missing {slug}) produces an error."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"post_path": "{year}/{month}/noslug.html"}, tmp_path
+        )
+
+        assert len(errors) == 1
+        assert "post_path" not in kwargs
+
+    def test_non_string_post_path_produces_error(self, tmp_path: Path) -> None:
+        """A non-string post_path produces an error."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({"post_path": 42}, tmp_path)
+
+        assert len(errors) == 1
+        assert "post_path" not in kwargs
+
+    def test_valid_search_path(self, tmp_path: Path) -> None:
+        """A valid search_path ending in .html is accepted."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"search_path": "find/index.html"}, tmp_path
+        )
+
+        assert errors == []
+        assert kwargs["search_path"] == "find/index.html"
+
+    def test_search_path_must_end_with_html(self, tmp_path: Path) -> None:
+        """A search_path not ending in .html produces an error."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"search_path": "search.htm"}, tmp_path
+        )
+
+        assert len(errors) == 1
+        assert "search_path" not in kwargs
+
+    def test_search_path_must_not_be_empty(self, tmp_path: Path) -> None:
+        """An empty search_path produces an error."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({"search_path": ""}, tmp_path)
+
+        assert len(errors) == 1
+        assert "search_path" not in kwargs
+
+    def test_html_path_must_not_escape_output_dir(self, tmp_path: Path) -> None:
+        """A search_path that escapes the output directory produces an error."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"search_path": "../outside.html"}, tmp_path
+        )
+
+        assert len(errors) == 1
+        assert "search_path" not in kwargs
+
+    def test_all_html_path_fields_validated(self, tmp_path: Path) -> None:
+        """All four html path fields (search, archive, tags, categories) are validated."""
+        from blogmore.config import parse_site_config_from_dict
+
+        config = {
+            "search_path": "bad",
+            "archive_path": "also-bad",
+            "tags_path": "no-html",
+            "categories_path": "",
+        }
+        kwargs, errors = parse_site_config_from_dict(config, tmp_path)
+
+        assert len(errors) == 4
+        assert "search_path" not in kwargs
+        assert "archive_path" not in kwargs
+        assert "tags_path" not in kwargs
+        assert "categories_path" not in kwargs
+
+    def test_sidebar_pages_via_pages_key(self, tmp_path: Path) -> None:
+        """sidebar_pages is read from the YAML 'pages' key."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"pages": ["about", "contact"]}, tmp_path
+        )
+
+        assert errors == []
+        assert kwargs["sidebar_pages"] == ["about", "contact"]
+
+    def test_sidebar_pages_absent_resets_to_none(self, tmp_path: Path) -> None:
+        """When 'pages' is absent, sidebar_pages is reset to None (show all)."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({}, tmp_path)
+
+        assert errors == []
+        assert kwargs["sidebar_pages"] is None
+
+    def test_sidebar_pages_empty_list_becomes_none(self, tmp_path: Path) -> None:
+        """An empty 'pages' list is normalised to None."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({"pages": []}, tmp_path)
+
+        assert errors == []
+        assert kwargs["sidebar_pages"] is None
+
+    def test_sidebar_pages_invalid_produces_error(self, tmp_path: Path) -> None:
+        """A non-list 'pages' value produces an error."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({"pages": "about"}, tmp_path)
+
+        assert len(errors) == 1
+        assert "sidebar_pages" not in kwargs
+
+    def test_head_valid_tags(self, tmp_path: Path) -> None:
+        """A valid head list is accepted."""
+        from blogmore.config import parse_site_config_from_dict
+
+        head = [{"link": {"rel": "author", "href": "/humans.txt"}}]
+        kwargs, errors = parse_site_config_from_dict({"head": head}, tmp_path)
+
+        assert errors == []
+        assert kwargs["head"] == head
+
+    def test_head_absent_resets_to_empty_list(self, tmp_path: Path) -> None:
+        """When 'head' is absent, head is reset to an empty list."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({}, tmp_path)
+
+        assert errors == []
+        assert kwargs["head"] == []
+
+    def test_head_invalid_structure_produces_error(self, tmp_path: Path) -> None:
+        """A malformed head list produces an error."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"head": [{"a": 1, "b": 2}]}, tmp_path
+        )
+
+        assert len(errors) == 1
+        assert "head" not in kwargs
+
+    def test_multiple_errors_collected(self, tmp_path: Path) -> None:
+        """Multiple invalid fields produce multiple errors; valid fields still returned."""
+        from blogmore.config import parse_site_config_from_dict
+
+        config = {
+            "post_path": "no-slug.html",
+            "search_path": "bad-extension.htm",
+            "site_title": "Good Title",
+        }
+        kwargs, errors = parse_site_config_from_dict(config, tmp_path)
+
+        assert len(errors) == 2
+        assert "post_path" not in kwargs
+        assert "search_path" not in kwargs
+        assert kwargs["site_title"] == "Good Title"
+
+    def test_no_structural_fields_returned(self, tmp_path: Path) -> None:
+        """Structural fields (output_dir, content_dir, etc.) are never in kwargs."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, _ = parse_site_config_from_dict(
+            {
+                "output_dir": "/some/path",
+                "content_dir": "/content",
+                "templates_dir": "/tmpl",
+                "sidebar_config": {"key": "value"},
+            },
+            tmp_path,
+        )
+
+        assert "output_dir" not in kwargs
+        assert "content_dir" not in kwargs
+        assert "templates_dir" not in kwargs
+        assert "sidebar_config" not in kwargs

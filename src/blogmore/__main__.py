@@ -12,25 +12,12 @@ from blogmore.config import (
     load_config,
     merge_config_with_args,
     normalize_site_keywords,
+    parse_site_config_from_dict,
 )
 from blogmore.generator import SiteGenerator
-from blogmore.page_path import DEFAULT_PAGE_PATH, validate_page_path_template
-from blogmore.pagination_path import (
-    DEFAULT_PAGE_1_PATH,
-    DEFAULT_PAGE_N_PATH,
-    validate_page_1_path_template,
-    validate_page_n_path_template,
-)
-from blogmore.post_path import DEFAULT_POST_PATH, validate_post_path_template
 from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
-from blogmore.site_config import (
-    DEFAULT_ARCHIVE_PATH,
-    DEFAULT_CATEGORIES_PATH,
-    DEFAULT_SEARCH_PATH,
-    DEFAULT_TAGS_PATH,
-    SiteConfig,
-)
+from blogmore.site_config import SiteConfig
 
 
 def main() -> int:
@@ -77,249 +64,21 @@ def main() -> int:
     # Normalize site_keywords: CLI provides a string, config provides a list or string
     site_keywords = normalize_site_keywords(getattr(args, "site_keywords", None))
 
-    # Load post_path from config file only (not available as a CLI argument).
-    raw_post_path = config.get("post_path", DEFAULT_POST_PATH)
-    if not isinstance(raw_post_path, str):
-        print(
-            "Error: post_path in the configuration file must be a string",
-            file=sys.stderr,
-        )
+    # Parse all config-file-controlled SiteConfig fields from the loaded config
+    # dictionary. The call produces validated, normalised field values ready for
+    # SiteConfig. Fields that are also available as CLI args are filtered out
+    # below since merge_config_with_args already merged those into args with the
+    # correct CLI-wins precedence.
+    config_kwargs, config_errors = parse_site_config_from_dict(config, args.output)
+    for error in config_errors:
+        print(f"Error: {error}", file=sys.stderr)
+    if config_errors:
         return 1
-    try:
-        validate_post_path_template(raw_post_path)
-    except ValueError as e:
-        print(f"Error: Invalid post_path in configuration file: {e}", file=sys.stderr)
-        return 1
-
-    # Load page_path from config file only (not available as a CLI argument).
-    raw_page_path = config.get("page_path", DEFAULT_PAGE_PATH)
-    if not isinstance(raw_page_path, str):
-        print(
-            "Error: page_path in the configuration file must be a string",
-            file=sys.stderr,
-        )
-        return 1
-    try:
-        validate_page_path_template(raw_page_path)
-    except ValueError as e:
-        print(f"Error: Invalid page_path in configuration file: {e}", file=sys.stderr)
-        return 1
-
-    # Load page_1_path from config file only (not available as a CLI argument).
-    raw_page_1_path = config.get("page_1_path", DEFAULT_PAGE_1_PATH)
-    if not isinstance(raw_page_1_path, str):
-        print(
-            "Error: page_1_path in the configuration file must be a string",
-            file=sys.stderr,
-        )
-        return 1
-    try:
-        validate_page_1_path_template(raw_page_1_path)
-    except ValueError as e:
-        print(f"Error: Invalid page_1_path in configuration file: {e}", file=sys.stderr)
-        return 1
-
-    # Load page_n_path from config file only (not available as a CLI argument).
-    raw_page_n_path = config.get("page_n_path", DEFAULT_PAGE_N_PATH)
-    if not isinstance(raw_page_n_path, str):
-        print(
-            "Error: page_n_path in the configuration file must be a string",
-            file=sys.stderr,
-        )
-        return 1
-    try:
-        validate_page_n_path_template(raw_page_n_path)
-    except ValueError as e:
-        print(f"Error: Invalid page_n_path in configuration file: {e}", file=sys.stderr)
-        return 1
-
-    # Load search_path from config file only (not available as a CLI argument).
-    raw_search_path = config.get("search_path", DEFAULT_SEARCH_PATH)
-    if not isinstance(raw_search_path, str):
-        print(
-            "Error: search_path in the configuration file must be a string",
-            file=sys.stderr,
-        )
-        return 1
-    if not raw_search_path:
-        print(
-            "Error: search_path in the configuration file must not be empty",
-            file=sys.stderr,
-        )
-        return 1
-    if not raw_search_path.endswith(".html"):
-        print(
-            "Error: search_path in the configuration file must end with '.html'",
-            file=sys.stderr,
-        )
-        return 1
-    # Verify that the resolved path does not escape the output directory.
-    _output_resolved = args.output.resolve()
-    _search_resolved = (_output_resolved / raw_search_path.lstrip("/")).resolve()
-    if not _search_resolved.is_relative_to(_output_resolved):
-        print(
-            "Error: search_path in the configuration file must not escape the output directory",
-            file=sys.stderr,
-        )
-        return 1
-
-    # Load archive_path from config file only (not available as a CLI argument).
-    raw_archive_path = config.get("archive_path", DEFAULT_ARCHIVE_PATH)
-    if not isinstance(raw_archive_path, str):
-        print(
-            "Error: archive_path in the configuration file must be a string",
-            file=sys.stderr,
-        )
-        return 1
-    if not raw_archive_path:
-        print(
-            "Error: archive_path in the configuration file must not be empty",
-            file=sys.stderr,
-        )
-        return 1
-    if not raw_archive_path.endswith(".html"):
-        print(
-            "Error: archive_path in the configuration file must end with '.html'",
-            file=sys.stderr,
-        )
-        return 1
-    # Verify that the resolved path does not escape the output directory.
-    _archive_resolved = (_output_resolved / raw_archive_path.lstrip("/")).resolve()
-    if not _archive_resolved.is_relative_to(_output_resolved):
-        print(
-            "Error: archive_path in the configuration file must not escape the output directory",
-            file=sys.stderr,
-        )
-        return 1
-
-    # Load tags_path from config file only (not available as a CLI argument).
-    raw_tags_path = config.get("tags_path", DEFAULT_TAGS_PATH)
-    if not isinstance(raw_tags_path, str):
-        print(
-            "Error: tags_path in the configuration file must be a string",
-            file=sys.stderr,
-        )
-        return 1
-    if not raw_tags_path:
-        print(
-            "Error: tags_path in the configuration file must not be empty",
-            file=sys.stderr,
-        )
-        return 1
-    if not raw_tags_path.endswith(".html"):
-        print(
-            "Error: tags_path in the configuration file must end with '.html'",
-            file=sys.stderr,
-        )
-        return 1
-    # Verify that the resolved path does not escape the output directory.
-    _tags_resolved = (_output_resolved / raw_tags_path.lstrip("/")).resolve()
-    if not _tags_resolved.is_relative_to(_output_resolved):
-        print(
-            "Error: tags_path in the configuration file must not escape the output directory",
-            file=sys.stderr,
-        )
-        return 1
-
-    # Load categories_path from config file only (not available as a CLI argument).
-    raw_categories_path = config.get("categories_path", DEFAULT_CATEGORIES_PATH)
-    if not isinstance(raw_categories_path, str):
-        print(
-            "Error: categories_path in the configuration file must be a string",
-            file=sys.stderr,
-        )
-        return 1
-    if not raw_categories_path:
-        print(
-            "Error: categories_path in the configuration file must not be empty",
-            file=sys.stderr,
-        )
-        return 1
-    if not raw_categories_path.endswith(".html"):
-        print(
-            "Error: categories_path in the configuration file must end with '.html'",
-            file=sys.stderr,
-        )
-        return 1
-    # Verify that the resolved path does not escape the output directory.
-    _categories_resolved = (
-        _output_resolved / raw_categories_path.lstrip("/")
-    ).resolve()
-    if not _categories_resolved.is_relative_to(_output_resolved):
-        print(
-            "Error: categories_path in the configuration file must not escape the output directory",
-            file=sys.stderr,
-        )
-        return 1
-
-    # Load with_advert from config file only (not available as a CLI argument).
-    raw_with_advert = config.get("with_advert", True)
-    if not isinstance(raw_with_advert, bool):
-        print(
-            "Error: with_advert in the configuration file must be a boolean",
-            file=sys.stderr,
-        )
-        return 1
-
-    # Load clean_urls from config file only (not available as a CLI argument).
-    raw_clean_urls = config.get("clean_urls", False)
-    if not isinstance(raw_clean_urls, bool):
-        print(
-            "Error: clean_urls in the configuration file must be a boolean",
-            file=sys.stderr,
-        )
-        return 1
-
-    # Load pages from config file only (not available as a CLI argument).
-    raw_sidebar_pages = config.get("pages", None)
-    if raw_sidebar_pages is not None:
-        if not isinstance(raw_sidebar_pages, list):
-            print(
-                "Error: pages in the configuration file must be a list of page slugs",
-                file=sys.stderr,
-            )
-            return 1
-        for item in raw_sidebar_pages:
-            if not isinstance(item, str):
-                print(
-                    "Error: each entry in pages must be a string (page slug)",
-                    file=sys.stderr,
-                )
-                return 1
-        sidebar_pages: list[str] | None = (
-            raw_sidebar_pages if raw_sidebar_pages else None
-        )
-    else:
-        sidebar_pages = None
-
-    # Load head from config file only (not available as a CLI argument).
-    raw_head = config.get("head", [])
-    if not isinstance(raw_head, list):
-        print(
-            "Error: head in the configuration file must be a list",
-            file=sys.stderr,
-        )
-        return 1
-    for item in raw_head:
-        if not isinstance(item, dict) or len(item) != 1:
-            print(
-                "Error: each entry in head must be a single-key mapping from a tag name to its attributes",
-                file=sys.stderr,
-            )
-            return 1
-        tag_name, attributes = next(iter(item.items()))
-        if not isinstance(tag_name, str):
-            print(
-                "Error: head tag names must be strings",
-                file=sys.stderr,
-            )
-            return 1
-        if not isinstance(attributes, dict):
-            print(
-                "Error: head tag attributes must be a mapping of attribute names to values",
-                file=sys.stderr,
-            )
-            return 1
+    # Exclude any field that is also accessible via args (handled above by
+    # merge_config_with_args and args.*) so that CLI args always take precedence.
+    config_only_kwargs = {
+        k: v for k, v in config_kwargs.items() if not hasattr(args, k)
+    }
 
     # Build the shared site configuration object
     site_config = SiteConfig(
@@ -344,18 +103,7 @@ def main() -> int:
         minify_html=args.minify_html,
         with_read_time=args.with_read_time,
         include_drafts=args.include_drafts,
-        post_path=raw_post_path,
-        page_path=raw_page_path,
-        page_1_path=raw_page_1_path,
-        page_n_path=raw_page_n_path,
-        search_path=raw_search_path,
-        archive_path=raw_archive_path,
-        tags_path=raw_tags_path,
-        categories_path=raw_categories_path,
-        with_advert=raw_with_advert,
-        clean_urls=raw_clean_urls,
-        sidebar_pages=sidebar_pages,
-        head=raw_head,
+        **config_only_kwargs,
     )
 
     # Handle serve command

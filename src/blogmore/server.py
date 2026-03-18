@@ -12,24 +12,14 @@ from typing import Any
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
-from blogmore.config import get_sidebar_config, load_config, normalize_site_keywords
+from blogmore.config import (
+    get_sidebar_config,
+    load_config,
+    parse_site_config_from_dict,
+)
 from blogmore.generator import SiteGenerator
-from blogmore.page_path import DEFAULT_PAGE_PATH, validate_page_path_template
-from blogmore.pagination_path import (
-    DEFAULT_PAGE_1_PATH,
-    DEFAULT_PAGE_N_PATH,
-    validate_page_1_path_template,
-    validate_page_n_path_template,
-)
 from blogmore.parser import CUSTOM_404_HTML
-from blogmore.post_path import DEFAULT_POST_PATH, validate_post_path_template
-from blogmore.site_config import (
-    DEFAULT_ARCHIVE_PATH,
-    DEFAULT_CATEGORIES_PATH,
-    DEFAULT_SEARCH_PATH,
-    DEFAULT_TAGS_PATH,
-    SiteConfig,
-)
+from blogmore.site_config import SiteConfig
 
 
 class ReusingTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -277,242 +267,17 @@ class ConfigChangeHandler(FileSystemEventHandler):
             config: The loaded configuration dictionary
             sidebar_config: The sidebar configuration
         """
-        update_kwargs: dict[str, Any] = {"sidebar_config": sidebar_config}
-
-        for key in (
-            "site_title",
-            "site_subtitle",
-            "site_description",
-            "site_url",
-            "posts_per_feed",
-            "default_author",
-            "icon_source",
-            "with_search",
-            "with_sitemap",
-            "minify_css",
-            "minify_js",
-            "minify_html",
-            "with_read_time",
-            "with_advert",
-            "clean_urls",
-            "clean_first",
-            "include_drafts",
-        ):
-            if key in config:
-                update_kwargs[key] = config[key]
-
-        if "site_keywords" in config:
-            update_kwargs["site_keywords"] = normalize_site_keywords(
-                config["site_keywords"]
-            )
-
-        if "extra_stylesheets" in config:
-            stylesheets = config["extra_stylesheets"]
-            if isinstance(stylesheets, str):
-                update_kwargs["extra_stylesheets"] = [stylesheets]
-            elif isinstance(stylesheets, list):
-                update_kwargs["extra_stylesheets"] = stylesheets
-        else:
-            # extra_stylesheets was removed from the config file; fall back to
-            # any value supplied via the CLI, or clear the list entirely so the
-            # next generate() does not include the old stylesheet references.
-            update_kwargs["extra_stylesheets"] = self.cli_overrides.get(
-                "extra_stylesheets"
-            )
-
-        raw_post_path = config.get("post_path", DEFAULT_POST_PATH)
-        if isinstance(raw_post_path, str):
-            try:
-                validate_post_path_template(raw_post_path)
-                update_kwargs["post_path"] = raw_post_path
-            except ValueError as error:
-                print(
-                    f"Warning: Invalid post_path in configuration file: {error}",
-                    file=sys.stderr,
-                )
-        else:
-            print(
-                "Warning: post_path in the configuration file must be a string; "
-                "using the default.",
-                file=sys.stderr,
-            )
-
-        raw_page_path = config.get("page_path", DEFAULT_PAGE_PATH)
-        if isinstance(raw_page_path, str):
-            try:
-                validate_page_path_template(raw_page_path)
-                update_kwargs["page_path"] = raw_page_path
-            except ValueError as error:
-                print(
-                    f"Warning: Invalid page_path in configuration file: {error}",
-                    file=sys.stderr,
-                )
-        else:
-            print(
-                "Warning: page_path in the configuration file must be a string; "
-                "using the default.",
-                file=sys.stderr,
-            )
-
-        raw_page_1_path = config.get("page_1_path", DEFAULT_PAGE_1_PATH)
-        if isinstance(raw_page_1_path, str):
-            try:
-                validate_page_1_path_template(raw_page_1_path)
-                update_kwargs["page_1_path"] = raw_page_1_path
-            except ValueError as error:
-                print(
-                    f"Warning: Invalid page_1_path in configuration file: {error}",
-                    file=sys.stderr,
-                )
-        else:
-            print(
-                "Warning: page_1_path in the configuration file must be a string; "
-                "using the default.",
-                file=sys.stderr,
-            )
-
-        raw_page_n_path = config.get("page_n_path", DEFAULT_PAGE_N_PATH)
-        if isinstance(raw_page_n_path, str):
-            try:
-                validate_page_n_path_template(raw_page_n_path)
-                update_kwargs["page_n_path"] = raw_page_n_path
-            except ValueError as error:
-                print(
-                    f"Warning: Invalid page_n_path in configuration file: {error}",
-                    file=sys.stderr,
-                )
-        else:
-            print(
-                "Warning: page_n_path in the configuration file must be a string; "
-                "using the default.",
-                file=sys.stderr,
-            )
-
-        raw_search_path = config.get("search_path", DEFAULT_SEARCH_PATH)
-        if isinstance(raw_search_path, str):
-            if not raw_search_path:
-                print(
-                    "Warning: search_path in the configuration file must not be empty; "
-                    "using the default.",
-                    file=sys.stderr,
-                )
-            elif not raw_search_path.endswith(".html"):
-                print(
-                    "Warning: search_path in the configuration file must end with '.html'; "
-                    "using the default.",
-                    file=sys.stderr,
-                )
-            else:
-                update_kwargs["search_path"] = raw_search_path
-        else:
-            print(
-                "Warning: search_path in the configuration file must be a string; "
-                "using the default.",
-                file=sys.stderr,
-            )
-
-        raw_archive_path = config.get("archive_path", DEFAULT_ARCHIVE_PATH)
-        if isinstance(raw_archive_path, str):
-            if not raw_archive_path:
-                print(
-                    "Warning: archive_path in the configuration file must not be empty; "
-                    "using the default.",
-                    file=sys.stderr,
-                )
-            elif not raw_archive_path.endswith(".html"):
-                print(
-                    "Warning: archive_path in the configuration file must end with '.html'; "
-                    "using the default.",
-                    file=sys.stderr,
-                )
-            else:
-                update_kwargs["archive_path"] = raw_archive_path
-        else:
-            print(
-                "Warning: archive_path in the configuration file must be a string; "
-                "using the default.",
-                file=sys.stderr,
-            )
-
-        raw_tags_path = config.get("tags_path", DEFAULT_TAGS_PATH)
-        if isinstance(raw_tags_path, str):
-            if not raw_tags_path:
-                print(
-                    "Warning: tags_path in the configuration file must not be empty; "
-                    "using the default.",
-                    file=sys.stderr,
-                )
-            elif not raw_tags_path.endswith(".html"):
-                print(
-                    "Warning: tags_path in the configuration file must end with '.html'; "
-                    "using the default.",
-                    file=sys.stderr,
-                )
-            else:
-                update_kwargs["tags_path"] = raw_tags_path
-        else:
-            print(
-                "Warning: tags_path in the configuration file must be a string; "
-                "using the default.",
-                file=sys.stderr,
-            )
-
-        raw_categories_path = config.get("categories_path", DEFAULT_CATEGORIES_PATH)
-        if isinstance(raw_categories_path, str):
-            if not raw_categories_path:
-                print(
-                    "Warning: categories_path in the configuration file must not be empty; "
-                    "using the default.",
-                    file=sys.stderr,
-                )
-            elif not raw_categories_path.endswith(".html"):
-                print(
-                    "Warning: categories_path in the configuration file must end with '.html'; "
-                    "using the default.",
-                    file=sys.stderr,
-                )
-            else:
-                update_kwargs["categories_path"] = raw_categories_path
-        else:
-            print(
-                "Warning: categories_path in the configuration file must be a string; "
-                "using the default.",
-                file=sys.stderr,
-            )
-
-        raw_sidebar_pages = config.get("pages")
-        if raw_sidebar_pages is None:
-            # Option not present — show all pages (default behaviour)
-            update_kwargs["sidebar_pages"] = None
-        elif not isinstance(raw_sidebar_pages, list) or not all(
-            isinstance(item, str) for item in raw_sidebar_pages
-        ):
-            print(
-                "Warning: pages in the configuration file must be a list of page "
-                "slugs; ignoring the value.",
-                file=sys.stderr,
-            )
-        else:
-            update_kwargs["sidebar_pages"] = (
-                raw_sidebar_pages if raw_sidebar_pages else None
-            )
-
-        raw_head = config.get("head")
-        if raw_head is None:
-            # Key not present in config — clear any previously set head tags.
-            update_kwargs["head"] = []
-        elif isinstance(raw_head, list) and all(
-            isinstance(item, dict) and len(item) == 1 for item in raw_head
-        ):
-            update_kwargs["head"] = raw_head
-        else:
-            print(
-                "Warning: head in the configuration file is invalid; ignoring the value.",
-                file=sys.stderr,
-            )
-
+        kwargs, warnings = parse_site_config_from_dict(
+            config,
+            self.generator.site_config.output_dir,
+            self.cli_overrides,
+        )
+        for warning in warnings:
+            print(f"Warning: {warning}", file=sys.stderr)
         self.generator.site_config = dataclasses.replace(
-            self.generator.site_config, **update_kwargs
+            self.generator.site_config,
+            sidebar_config=sidebar_config,
+            **kwargs,
         )
 
 

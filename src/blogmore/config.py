@@ -1,11 +1,62 @@
 """Configuration file loading and merging for blogmore."""
 
+import dataclasses
+import typing
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
 import yaml
 
-from blogmore.site_config import site_config_defaults
+from blogmore.page_path import DEFAULT_PAGE_PATH, validate_page_path_template
+from blogmore.pagination_path import (
+    DEFAULT_PAGE_1_PATH,
+    DEFAULT_PAGE_N_PATH,
+    validate_page_1_path_template,
+    validate_page_n_path_template,
+)
+from blogmore.post_path import DEFAULT_POST_PATH, validate_post_path_template
+from blogmore.site_config import (
+    DEFAULT_ARCHIVE_PATH,
+    DEFAULT_CATEGORIES_PATH,
+    DEFAULT_SEARCH_PATH,
+    DEFAULT_TAGS_PATH,
+    SiteConfig,
+    site_config_defaults,
+)
+
+##############################################################################
+# Fields set from program structure or CLI arguments, not from the YAML file.
+# These are excluded from config-dict parsing entirely.
+_STRUCTURAL_FIELDS: frozenset[str] = frozenset(
+    {
+        "output_dir",
+        "content_dir",
+        "templates_dir",
+        "sidebar_config",
+    }
+)
+
+##############################################################################
+# Fields that require explicit parsing (validation, normalisation, or YAML key
+# aliasing). These are excluded from the automatic simple-scalar handler and
+# processed individually in parse_site_config_from_dict.
+_EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
+    {
+        "site_keywords",
+        "extra_stylesheets",
+        "post_path",
+        "page_path",
+        "page_1_path",
+        "page_n_path",
+        "search_path",
+        "archive_path",
+        "tags_path",
+        "categories_path",
+        "sidebar_pages",
+        "head",
+    }
+)
 
 DEFAULT_CONFIG_FILES = ["blogmore.yaml", "blogmore.yml"]
 
@@ -172,3 +223,228 @@ def get_sidebar_config(config: dict[str, Any]) -> dict[str, Any]:
         )
 
     return sidebar_config
+
+
+def _is_simple_scalar_hint(hint: Any) -> bool:
+    """Return True if the type hint is a simple scalar we can safely copy from config.
+
+    Recognises str, int, bool, and their Optional (``X | None``) variants.
+
+    Args:
+        hint: A resolved type hint (as returned by typing.get_type_hints).
+
+    Returns:
+        True if the hint is a simple scalar, False otherwise.
+    """
+    if hint in (str, int, bool):
+        return True
+    # Handles both ``str | None`` (types.UnionType) and ``Optional[str]``
+    # (typing.Union), since typing.get_args works for both.
+    args = typing.get_args(hint)
+    if args:
+        non_none = [a for a in args if a is not type(None)]
+        return len(non_none) == 1 and non_none[0] in (str, int, bool)
+    return False
+
+
+def _check_simple_scalar_value(value: Any, hint: Any) -> bool:
+    """Return True if value is a valid instance of the given simple scalar hint.
+
+    Ensures bool values are not accepted for int fields and vice versa, to
+    guard against accidental YAML type coercions.
+
+    Args:
+        value: The value to check.
+        hint: A resolved simple-scalar type hint.
+
+    Returns:
+        True if the value is type-compatible with the hint.
+    """
+    if hint is bool:
+        return isinstance(value, bool)
+    if hint is int:
+        return isinstance(value, int) and not isinstance(value, bool)
+    if hint is str:
+        return isinstance(value, str)
+    # Optional (X | None)
+    args = typing.get_args(hint)
+    if args:
+        non_none = [a for a in args if a is not type(None)]
+        if len(non_none) == 1:
+            if value is None:
+                return True
+            base = non_none[0]
+            if base is bool:
+                return isinstance(value, bool)
+            if base is int:
+                return isinstance(value, int) and not isinstance(value, bool)
+            if base is str:
+                return isinstance(value, str)
+    return False
+
+
+def parse_site_config_from_dict(
+    config: dict[str, Any],
+    output_dir: Path,
+    cli_overrides: dict[str, Any] | None = None,
+) -> tuple[dict[str, Any], list[str]]:
+    """Parse all config-file-controlled SiteConfig fields from a raw dict.
+
+    Validates and normalises every field that can appear in the YAML
+    configuration file.  Simple scalar fields (str, int, bool, and their
+    Optional variants) are discovered automatically from SiteConfig using
+    dataclasses introspection so that newly-added simple scalar fields are
+    handled without any code changes here.  Fields that require validation or
+    normalisation are handled explicitly.
+
+    Fields that fail validation are omitted from the returned kwargs dict so
+    that a caller using ``dataclasses.replace()`` will preserve the existing
+    SiteConfig value for those fields.
+
+    Args:
+        config: Raw configuration dictionary loaded from the YAML file.
+        output_dir: The site output directory, used to verify that path fields
+            do not escape it.
+        cli_overrides: Optional dict of values explicitly set via the CLI.
+            Currently used to restore the CLI-provided ``extra_stylesheets``
+            when that key is absent from the config file.
+
+    Returns:
+        A tuple ``(kwargs, errors)`` where ``kwargs`` is a dict suitable for
+        passing to ``SiteConfig()`` or ``dataclasses.replace()``, and
+        ``errors`` is a list of human-readable validation messages (empty when
+        all fields are valid).
+    """
+    overrides: dict[str, Any] = cli_overrides or {}
+    kwargs: dict[str, Any] = {}
+    errors: list[str] = []
+    resolved_output = output_dir.resolve()
+
+    # --- Auto-discover simple scalar fields via SiteConfig introspection -----
+    hints: dict[str, Any] = typing.get_type_hints(SiteConfig)
+    for field in dataclasses.fields(SiteConfig):
+        name = field.name
+        if name in _STRUCTURAL_FIELDS or name in _EXPLICIT_HANDLED_FIELDS:
+            continue
+        hint = hints.get(name)
+        if hint is None or not _is_simple_scalar_hint(hint):
+            continue
+        if name not in config:
+            continue
+        value = config[name]
+        if _check_simple_scalar_value(value, hint):
+            kwargs[name] = value
+        else:
+            errors.append(
+                f"{name} in the configuration file has an unexpected type; "
+                "ignoring value"
+            )
+
+    # --- site_keywords -------------------------------------------------------
+    if "site_keywords" in config:
+        kwargs["site_keywords"] = normalize_site_keywords(config["site_keywords"])
+
+    # --- extra_stylesheets ---------------------------------------------------
+    if "extra_stylesheets" in config:
+        raw_stylesheets = config["extra_stylesheets"]
+        if isinstance(raw_stylesheets, str):
+            kwargs["extra_stylesheets"] = [raw_stylesheets]
+        elif isinstance(raw_stylesheets, list):
+            kwargs["extra_stylesheets"] = raw_stylesheets
+        else:
+            errors.append(
+                "extra_stylesheets in the configuration file must be a string "
+                "or a list; ignoring value"
+            )
+    else:
+        kwargs["extra_stylesheets"] = overrides.get("extra_stylesheets")
+
+    # --- Path template fields ------------------------------------------------
+    _path_template_validators: list[tuple[str, str, Callable[[str], None]]] = [
+        ("post_path", DEFAULT_POST_PATH, validate_post_path_template),
+        ("page_path", DEFAULT_PAGE_PATH, validate_page_path_template),
+        ("page_1_path", DEFAULT_PAGE_1_PATH, validate_page_1_path_template),
+        ("page_n_path", DEFAULT_PAGE_N_PATH, validate_page_n_path_template),
+    ]
+    for field_name, default, validator in _path_template_validators:
+        raw = config.get(field_name, default)
+        if not isinstance(raw, str):
+            errors.append(
+                f"{field_name} in the configuration file must be a string; "
+                "using the default"
+            )
+        else:
+            try:
+                validator(raw)
+                kwargs[field_name] = raw
+            except ValueError as exc:
+                errors.append(
+                    f"Invalid {field_name} in the configuration file: {exc}; "
+                    "using the default"
+                )
+
+    # --- HTML path fields ----------------------------------------------------
+    _html_path_defaults: list[tuple[str, str]] = [
+        ("search_path", DEFAULT_SEARCH_PATH),
+        ("archive_path", DEFAULT_ARCHIVE_PATH),
+        ("tags_path", DEFAULT_TAGS_PATH),
+        ("categories_path", DEFAULT_CATEGORIES_PATH),
+    ]
+    for field_name, default in _html_path_defaults:
+        raw = config.get(field_name, default)
+        if not isinstance(raw, str):
+            errors.append(
+                f"{field_name} in the configuration file must be a string; "
+                "using the default"
+            )
+            continue
+        if not raw:
+            errors.append(
+                f"{field_name} in the configuration file must not be empty; "
+                "using the default"
+            )
+            continue
+        if not raw.endswith(".html"):
+            errors.append(
+                f"{field_name} in the configuration file must end with '.html'; "
+                "using the default"
+            )
+            continue
+        resolved_path = (resolved_output / raw.lstrip("/")).resolve()
+        if not resolved_path.is_relative_to(resolved_output):
+            errors.append(
+                f"{field_name} in the configuration file must not escape the "
+                "output directory; using the default"
+            )
+            continue
+        kwargs[field_name] = raw
+
+    # --- sidebar_pages (YAML key: "pages") -----------------------------------
+    raw_sidebar_pages = config.get("pages")
+    if raw_sidebar_pages is None:
+        kwargs["sidebar_pages"] = None
+    elif isinstance(raw_sidebar_pages, list) and all(
+        isinstance(item, str) for item in raw_sidebar_pages
+    ):
+        kwargs["sidebar_pages"] = raw_sidebar_pages if raw_sidebar_pages else None
+    else:
+        errors.append(
+            "pages in the configuration file must be a list of page slugs; "
+            "ignoring value"
+        )
+
+    # --- head ----------------------------------------------------------------
+    raw_head = config.get("head")
+    if raw_head is None:
+        kwargs["head"] = []
+    elif isinstance(raw_head, list) and all(
+        isinstance(item, dict) and len(item) == 1 for item in raw_head
+    ):
+        kwargs["head"] = raw_head
+    else:
+        errors.append(
+            "head in the configuration file must be a list of single-key tag "
+            "mappings; ignoring value"
+        )
+
+    return kwargs, errors
