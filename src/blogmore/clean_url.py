@@ -34,7 +34,7 @@ def make_url_clean(url: str) -> str:
     """
     name = PurePosixPath(url).name
     if name in CLEAN_URL_INDEX_FILES:
-        return url[: -len(name)]
+        return url.removesuffix(name)
     return url
 
 
