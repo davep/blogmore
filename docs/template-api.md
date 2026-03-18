@@ -1,7 +1,7 @@
 # Template API reference
 
 This page documents the **stable contract** for custom templates in BlogMore.
-All items listed here will remain compatible across all v1.x releases unless
+All items listed here will remain compatible across all v2.x releases unless
 explicitly noted otherwise.
 
 For a broader introduction to theming — including CSS variable overrides and
@@ -228,7 +228,7 @@ The following CSS classes are part of the stable template/CSS contract:
 
 ## Stability policy
 
-### What will not change in v1.x
+### What will not change in v2.x
 
 - All context variable names listed in this document.
 - All `Post` and `Page` attribute names listed in this document.
@@ -256,7 +256,7 @@ changes will:
 
 1. Be labelled `BREAKING CHANGE` in [ChangeLog.md](changelog.md).
 2. Include step-by-step migration instructions.
-3. Only be introduced in a new **major** version (i.e. v1.x → v2.0), never
+3. Only be introduced in a new **major** version (i.e. v2.x → v3.0), never
    in a minor or patch release.
 
 Additive changes (new context variables, new CSS custom properties, new

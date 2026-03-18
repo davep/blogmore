@@ -32,8 +32,8 @@ same visual or functional result.  Examples include:
 
 Breaking changes, when approved, must:
 
-- Be introduced only in a new **major** version bump (e.g. v1.x → v2.0).
-  A minor version bump (v1.x → v1.(x+1)) is **never** sufficient for a
+- Be introduced only in a new **major** version bump (e.g. v2.x → v3.0).
+  A minor version bump (v2.x → v2.(x+1)) is **never** sufficient for a
   breaking change, regardless of how small the change appears.
 - Be labelled `BREAKING CHANGE` in `ChangeLog.md` with full migration
   instructions.
@@ -100,7 +100,7 @@ When adding new CSS, place it in the most appropriate section.
 ### Stable CSS custom properties
 
 The following properties are part of the public API and **must not be
-renamed** in a v1.x release:
+renamed** in a v2.x release:
 
 **Light/active values:**
 `--bg-color`, `--text-color`, `--text-secondary`, `--border-color`,
@@ -130,7 +130,7 @@ renamed** in a v1.x release:
 ### Stable context variables
 
 All variables documented in [Template API](template-api.md) are stable for
-v1.x.  Key ones that appear in nearly every template:
+v2.x.  Key ones that appear in nearly every template:
 
 - `site_title`, `site_subtitle`, `site_url`
 - `all_posts` — full sorted list of `Post` objects
