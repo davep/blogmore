@@ -58,6 +58,23 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
     }
 )
 
+##############################################################################
+# Simple scalar fields that exist only in the config file and have no CLI
+# equivalent.  When one of these is absent from the config dict during a
+# serve-mode reload, parse_site_config_from_dict must include it in the
+# returned kwargs using the SiteConfig class default so that removing the key
+# resets the value rather than preserving the previous (stale) one.
+#
+# Overlapping CLI+config scalar fields (site_title, with_search, etc.) are
+# intentionally NOT listed here: those must preserve the existing value when
+# absent so that an explicit CLI override is not silently dropped on reload.
+_CONFIG_ONLY_SCALAR_FIELDS: frozenset[str] = frozenset(
+    {
+        "with_advert",
+        "clean_urls",
+    }
+)
+
 DEFAULT_CONFIG_FILES = ["blogmore.yaml", "blogmore.yml"]
 
 
@@ -301,6 +318,18 @@ def parse_site_config_from_dict(
     that a caller using ``dataclasses.replace()`` will preserve the existing
     SiteConfig value for those fields.
 
+    Absent-field semantics differ by field category:
+
+    * **Config-file-only scalars** (``_CONFIG_ONLY_SCALAR_FIELDS``): when the
+      key is absent the SiteConfig class default is included in kwargs so that
+      removing the key resets the value rather than preserving a stale one.
+    * **Overlapping CLI+config scalars** (e.g. ``site_title``): when the key
+      is absent the field is omitted from kwargs so that an explicit CLI
+      override supplied at startup is not silently dropped on reload.
+    * **Explicit fields** (path templates, html paths, ``sidebar_pages``,
+      ``head``): always included in kwargs, using their SiteConfig defaults
+      when absent.
+
     Args:
         config: Raw configuration dictionary loaded from the YAML file.
         output_dir: The site output directory, used to verify that path fields
@@ -329,16 +358,21 @@ def parse_site_config_from_dict(
         hint = hints.get(name)
         if hint is None or not _is_simple_scalar_hint(hint):
             continue
-        if name not in config:
-            continue
-        value = config[name]
-        if _check_simple_scalar_value(value, hint):
-            kwargs[name] = value
-        else:
-            errors.append(
-                f"{name} in the configuration file has an unexpected type; "
-                "ignoring value"
-            )
+        if name in config:
+            value = config[name]
+            if _check_simple_scalar_value(value, hint):
+                kwargs[name] = value
+            else:
+                errors.append(
+                    f"{name} in the configuration file has an unexpected type; "
+                    "ignoring value"
+                )
+        elif name in _CONFIG_ONLY_SCALAR_FIELDS:
+            # Config-file-only fields have no CLI equivalent to fall back on,
+            # so removing the key from the config file must reset the value to
+            # the SiteConfig class default rather than preserving the stale one.
+            if field.default is not dataclasses.MISSING:
+                kwargs[name] = field.default
 
     # --- site_keywords -------------------------------------------------------
     if "site_keywords" in config:

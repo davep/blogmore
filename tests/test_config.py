@@ -1298,3 +1298,45 @@ class TestParseSiteConfigFromDict:
         assert "content_dir" not in kwargs
         assert "templates_dir" not in kwargs
         assert "sidebar_config" not in kwargs
+
+    def test_config_only_scalar_absent_resets_to_default(self, tmp_path: Path) -> None:
+        """Config-file-only scalars reset to the SiteConfig default when absent.
+
+        Removing clean_urls or with_advert from the config file during a serve
+        reload must reset those fields to their SiteConfig defaults rather than
+        preserving the stale previous value via dataclasses.replace.
+        """
+        from blogmore.config import parse_site_config_from_dict
+
+        # Neither field present → defaults returned
+        kwargs, errors = parse_site_config_from_dict({}, tmp_path)
+
+        assert errors == []
+        # SiteConfig defaults
+        assert kwargs["clean_urls"] is False
+        assert kwargs["with_advert"] is True
+
+    def test_config_only_scalar_value_overrides_default(self, tmp_path: Path) -> None:
+        """Config-file-only scalars use the config value when present."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"clean_urls": True, "with_advert": False}, tmp_path
+        )
+
+        assert errors == []
+        assert kwargs["clean_urls"] is True
+        assert kwargs["with_advert"] is False
+
+    def test_overlapping_scalar_absent_not_in_kwargs(self, tmp_path: Path) -> None:
+        """Overlapping CLI+config scalars are omitted when absent (preserve CLI override)."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({}, tmp_path)
+
+        assert errors == []
+        # site_title, with_search etc. are overlapping fields — not in kwargs
+        # when absent so that an explicit CLI override is not silently dropped.
+        assert "site_title" not in kwargs
+        assert "with_search" not in kwargs
+        assert "include_drafts" not in kwargs
