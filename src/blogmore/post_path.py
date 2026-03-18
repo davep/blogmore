@@ -2,12 +2,11 @@
 
 ##############################################################################
 # Python imports.
-import re
 from pathlib import Path
-from string import Formatter
 
 ##############################################################################
 # Application imports.
+from blogmore.content_path import resolve_path, safe_output_path, validate_path_template
 from blogmore.parser import Post, remove_date_prefix, sanitize_for_url
 
 ##############################################################################
@@ -44,34 +43,7 @@ def validate_post_path_template(template: str) -> None:
         ValueError: If the template is empty, contains no ``{slug}``
             placeholder, or references an unknown variable name.
     """
-    if not template:
-        raise ValueError("post_path must not be empty")
-
-    # Extract field names using the standard Formatter parser.
-    try:
-        field_names = [
-            field_name
-            for _, field_name, _, _ in Formatter().parse(template)
-            if field_name is not None
-        ]
-    except (ValueError, KeyError) as error:
-        raise ValueError(
-            f"post_path '{template}' contains an invalid placeholder: {error}"
-        ) from error
-
-    unknown = set(field_names) - ALLOWED_PATH_VARIABLES
-    if unknown:
-        raise ValueError(
-            f"post_path '{template}' contains unknown variable(s): "
-            + ", ".join(sorted(unknown))
-            + f". Allowed variables are: {', '.join(sorted(ALLOWED_PATH_VARIABLES))}"
-        )
-
-    if "slug" not in field_names:
-        raise ValueError(
-            f"post_path '{template}' must contain the {{slug}} variable so that "
-            "each post can be uniquely identified"
-        )
+    validate_path_template(template, "post_path", ALLOWED_PATH_VARIABLES, "post")
 
 
 def resolve_post_path(post: Post, template: str) -> str:
@@ -131,20 +103,7 @@ def resolve_post_path(post: Post, template: str) -> str:
         "slug": slug,
     }
 
-    try:
-        result = template.format_map(variables)
-    except (KeyError, ValueError) as error:
-        raise ValueError(
-            f"Failed to resolve post_path template '{template}': {error}"
-        ) from error
-
-    # Collapse multiple consecutive forward slashes that may result from
-    # empty variable substitutions (e.g. an undated post using {year}/{month}).
-    result = re.sub(r"/+", "/", result)
-
-    # Remove any leading slash so the result can be safely joined onto a
-    # Path with the / operator.
-    return result.lstrip("/")
+    return resolve_path(variables, template, "post_path")
 
 
 def compute_output_path(output_dir: Path, post: Post, template: str) -> Path:
@@ -165,17 +124,7 @@ def compute_output_path(output_dir: Path, post: Post, template: str) -> Path:
     Raises:
         ValueError: If the resolved path escapes the output directory.
     """
-    relative = resolve_post_path(post, template)
-    candidate = (output_dir / relative).resolve()
-    output_resolved = output_dir.resolve()
-
-    if not candidate.is_relative_to(output_resolved):
-        raise ValueError(
-            f"The resolved post path '{relative}' escapes the output directory. "
-            "Ensure the post_path template does not contain '..' segments."
-        )
-
-    return candidate
+    return safe_output_path(output_dir, resolve_post_path(post, template), "post_path")
 
 
 ### post_path.py ends here
