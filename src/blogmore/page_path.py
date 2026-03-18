@@ -2,12 +2,11 @@
 
 ##############################################################################
 # Standard-library imports.
-import re
 from pathlib import Path
-from string import Formatter
 
 ##############################################################################
 # Application imports.
+from blogmore.content_path import resolve_path, safe_output_path, validate_path_template
 from blogmore.parser import Page
 
 ##############################################################################
@@ -34,34 +33,7 @@ def validate_page_path_template(template: str) -> None:
         ValueError: If the template is empty, contains no ``{slug}``
             placeholder, or references an unknown variable name.
     """
-    if not template:
-        raise ValueError("page_path must not be empty")
-
-    # Extract field names using the standard Formatter parser.
-    try:
-        field_names = [
-            field_name
-            for _, field_name, _, _ in Formatter().parse(template)
-            if field_name is not None
-        ]
-    except (ValueError, KeyError) as error:
-        raise ValueError(
-            f"page_path '{template}' contains an invalid placeholder: {error}"
-        ) from error
-
-    unknown = set(field_names) - ALLOWED_PAGE_PATH_VARIABLES
-    if unknown:
-        raise ValueError(
-            f"page_path '{template}' contains unknown variable(s): "
-            + ", ".join(sorted(unknown))
-            + f". Allowed variables are: {', '.join(sorted(ALLOWED_PAGE_PATH_VARIABLES))}"
-        )
-
-    if "slug" not in field_names:
-        raise ValueError(
-            f"page_path '{template}' must contain the {{slug}} variable so that "
-            "each page can be uniquely identified"
-        )
+    validate_path_template(template, "page_path", ALLOWED_PAGE_PATH_VARIABLES, "page")
 
 
 def resolve_page_path(page: Page, template: str) -> str:
@@ -84,21 +56,7 @@ def resolve_page_path(page: Page, template: str) -> str:
         ValueError: If the template references an unknown variable or is
             otherwise malformed.
     """
-    variables = {"slug": page.slug}
-
-    try:
-        result = template.format_map(variables)
-    except (KeyError, ValueError) as error:
-        raise ValueError(
-            f"Failed to resolve page_path template '{template}': {error}"
-        ) from error
-
-    # Collapse multiple consecutive forward slashes.
-    result = re.sub(r"/+", "/", result)
-
-    # Remove any leading slash so the result can be safely joined onto a
-    # Path with the / operator.
-    return result.lstrip("/")
+    return resolve_path({"slug": page.slug}, template, "page_path")
 
 
 def compute_page_output_path(output_dir: Path, page: Page, template: str) -> Path:
@@ -119,17 +77,7 @@ def compute_page_output_path(output_dir: Path, page: Page, template: str) -> Pat
     Raises:
         ValueError: If the resolved path escapes the output directory.
     """
-    relative = resolve_page_path(page, template)
-    candidate = (output_dir / relative).resolve()
-    output_resolved = output_dir.resolve()
-
-    if not candidate.is_relative_to(output_resolved):
-        raise ValueError(
-            f"The resolved page path '{relative}' escapes the output directory. "
-            "Ensure the page_path template does not contain '..' segments."
-        )
-
-    return candidate
+    return safe_output_path(output_dir, resolve_page_path(page, template), "page_path")
 
 
 ### page_path.py ends here
