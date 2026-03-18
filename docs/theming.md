@@ -258,13 +258,13 @@ blog.
 ## Stability guarantees
 
 All CSS custom properties documented in this guide are part of BlogMore's
-**stable public API** for v1.x releases.  Specifically:
+**stable public API** for v2.x releases.  Specifically:
 
 - CSS variable names will not be renamed without a major version bump.
 - New variables may be added at any time; existing ones will not be removed.
 - The `data-theme` attribute values (`"dark"` and `"light"`) will not change.
 - Template context variables documented in [Template API](template-api.md)
-  will remain stable for all v1.x releases.
+  will remain stable for all v2.x releases.
 
 Any breaking change will be clearly labelled `BREAKING CHANGE` in
 [ChangeLog.md](changelog.md) and will include migration instructions.
