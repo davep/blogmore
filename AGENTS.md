@@ -7,7 +7,7 @@ All source lives in `src/blogmore/`. Key modules and their responsibilities:
 | Module | Responsibility |
 |---|---|
 | `__main__.py` / `cli.py` | Entry point; CLI argument parsing |
-| `config.py` | Loads and merges `blogmore.yaml` into a runtime config object |
+| `config.py` | Loads and merges `blogmore.yaml` into a runtime config object; `parse_site_config_from_dict` is the single source of truth for YAML→`SiteConfig` field mapping |
 | `site_config.py` | `SiteConfig` dataclass — the validated, typed site configuration |
 | `generator.py` | Core static site generator; orchestrates all page/feed/asset output |
 | `parser.py` | Markdown + frontmatter parser; produces `Post` and `Page` objects |
@@ -164,6 +164,28 @@ Rules:
 - When adding a new configuration property to the configuration file,
   *ensure* that if the user were to change it while in `serve` mode, that
   the new value, no matter what it is, will be reflected in the
-  freshly-generated site.
+  freshly-generated site.  The mechanics depend on the field's category:
+
+  * **Simple scalar** (`str`, `int`, `bool`, `X | None`): the field is
+    auto-discovered via dataclass introspection in
+    `parse_site_config_from_dict` (`config.py`).  You only need to add it
+    to `SiteConfig` with a default value — no changes to `config.py` are
+    required for the *present* case.  For the *absent* case (user removes
+    the key during `serve`), you **must** decide which category applies:
+
+    - **Config-file-only** (no CLI argument equivalent, e.g. `clean_urls`,
+      `with_advert`): add the field name to `_CONFIG_ONLY_SCALAR_FIELDS`
+      in `config.py`.  This ensures the SiteConfig default is restored
+      when the key is removed from the YAML.
+    - **Overlapping CLI+config** (a matching CLI flag exists, e.g.
+      `site_title`, `with_search`): do *not* add to
+      `_CONFIG_ONLY_SCALAR_FIELDS`.  The existing value (which may carry
+      a CLI override) is preserved when the key is absent, which is the
+      correct behaviour.
+
+  * **Complex field** (list, nested object, path template, etc.): add
+    explicit handling inside `parse_site_config_from_dict` in `config.py`,
+    following the patterns used for `sidebar_pages`, `head`,
+    `extra_stylesheets`, and the path template fields.
 
 [//]: # (AGENTS.md ends here)
