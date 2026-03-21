@@ -43,6 +43,10 @@
     --admonition-important-title-color: #8250df;
     --admonition-warning-title-color: #9a6700;
     --admonition-caution-title-color: #d1242f;
+    --code-block-header-border: #e0e0e0;
+    --code-lang-color: #888;
+    --code-copy-color: #555;
+    --code-copy-success-color: #1a7f37;
 
     /* ---- Dark mode palette (shared by both dark mode selectors below) ---- */
     --dark-bg-color: #1a1a1a;
@@ -70,6 +74,10 @@
     --dark-admonition-important-title-color: #a371f7;
     --dark-admonition-warning-title-color: #d29922;
     --dark-admonition-caution-title-color: #f85149;
+    --dark-code-block-header-border: #393932;
+    --dark-code-lang-color: #999;
+    --dark-code-copy-color: #bbb;
+    --dark-code-copy-success-color: #3fb950;
 }
 
 /* Dark mode — applied by system preference (JavaScript disabled fallback).
@@ -104,6 +112,10 @@
         --admonition-important-title-color: var(--dark-admonition-important-title-color);
         --admonition-warning-title-color: var(--dark-admonition-warning-title-color);
         --admonition-caution-title-color: var(--dark-admonition-caution-title-color);
+        --code-block-header-border: var(--dark-code-block-header-border);
+        --code-lang-color: var(--dark-code-lang-color);
+        --code-copy-color: var(--dark-code-copy-color);
+        --code-copy-success-color: var(--dark-code-copy-success-color);
     }
 }
 
@@ -138,6 +150,10 @@
     --admonition-important-title-color: var(--dark-admonition-important-title-color);
     --admonition-warning-title-color: var(--dark-admonition-warning-title-color);
     --admonition-caution-title-color: var(--dark-admonition-caution-title-color);
+    --code-block-header-border: var(--dark-code-block-header-border);
+    --code-lang-color: var(--dark-code-lang-color);
+    --code-copy-color: var(--dark-code-copy-color);
+    --code-copy-success-color: var(--dark-code-copy-success-color);
 }
 
 /* =============================================================================
@@ -1111,16 +1127,56 @@ footer a:hover {
    ========================================================================== */
 
 /* Light theme syntax highlighting (default style) */
-.highlight { 
-    background: var(--code-bg); 
+.highlight {
+    background: var(--code-bg);
     border-radius: 5px;
-    padding: 15px;
+    overflow-x: auto;
+    position: relative;
+}
+
+.highlight pre {
+    margin: 0;
+    padding: 10px 15px;
+    line-height: 125%;
     overflow-x: auto;
 }
 
-.highlight pre { 
-    margin: 0;
-    line-height: 125%; 
+/* Code block header bar: language label (left) + copy button (right). */
+.code-block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px 4px 12px;
+    border-bottom: 1px solid var(--code-block-header-border);
+}
+
+.code-block-lang {
+    font-size: 0.72em;
+    color: var(--code-lang-color);
+    font-family: monospace;
+    user-select: none;
+}
+
+.code-block-copy {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--code-copy-color);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 0.85em;
+    line-height: 1;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+}
+
+.code-block-copy:hover {
+    opacity: 1;
+}
+
+.code-block-copy.copied {
+    color: var(--code-copy-success-color);
+    opacity: 1;
 }
 
 .highlight .hll { background-color: #ffffcc }

@@ -2,6 +2,7 @@
 
 import datetime as dt
 import re
+from collections.abc import Generator
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -9,6 +10,7 @@ from typing import Any
 import frontmatter  # type: ignore[import-untyped]
 import markdown
 import yaml
+from pygments.formatters import HtmlFormatter
 
 from blogmore.admonitions import AdmonitionsExtension
 from blogmore.external_links import ExternalLinksExtension
@@ -26,6 +28,63 @@ _DATE_FORMATS = [
 
 CUSTOM_404_MARKDOWN = "404.md"
 CUSTOM_404_HTML = "404.html"
+
+_LANG_PREFIX = "language-"
+
+
+class _LangAwareHtmlFormatter(HtmlFormatter[str]):
+    """Pygments HTML formatter that exposes the detected language via a data attribute.
+
+    The codehilite Markdown extension passes the fenced code block language as
+    ``lang_str`` (e.g. ``language-python``) when constructing the formatter.
+    This subclass captures that value and writes it as a ``data-lang`` attribute
+    on the wrapper ``<div>``, making it available to JavaScript without any
+    additional post-processing.
+    """
+
+    def __init__(self, lang_str: str = "", **kwargs: Any) -> None:
+        """Initialise the formatter.
+
+        Args:
+            lang_str: The language string passed by codehilite, typically in the
+                form ``language-<name>`` (e.g. ``language-python``).  An empty
+                string means no language was specified.
+            **kwargs: Remaining keyword arguments forwarded to
+                :class:`pygments.formatters.HtmlFormatter`.
+        """
+        super().__init__(**kwargs)
+        self._lang_name = lang_str.removeprefix(_LANG_PREFIX) if lang_str else ""
+
+    def _wrap_div(
+        self, inner: Generator[tuple[int, str], None, None]
+    ) -> Generator[tuple[int, str], None, None]:
+        """Wrap the highlighted code in a ``<div>`` element.
+
+        Extends the parent implementation by adding a ``data-lang`` attribute
+        when a language name is available.
+
+        Args:
+            inner: Generator of ``(token_type, value)`` tuples from the parent.
+
+        Yields:
+            ``(token_type, value)`` tuples forming the wrapped HTML.
+        """
+        style_parts: list[str] = []
+        if (
+            self.noclasses
+            and not self.nobackground
+            and self.style.background_color is not None
+        ):
+            style_parts.append(f"background: {self.style.background_color}")
+        if self.cssstyles:
+            style_parts.append(self.cssstyles)
+        style_attr = f' style="{"; ".join(style_parts)}"' if style_parts else ""
+        class_attr = f' class="{self.cssclass}"' if self.cssclass else ""
+        lang_attr = f' data-lang="{self._lang_name}"' if self._lang_name else ""
+
+        yield 0, f"<div{class_attr}{lang_attr}{style_attr}>"
+        yield from inner
+        yield 0, "</div>\n"
 
 
 def sanitize_for_url(value: str) -> str:
@@ -338,6 +397,7 @@ class PostParser:
                     "css_class": "highlight",
                     "guess_lang": False,
                     "use_pygments": True,
+                    "pygments_formatter": _LangAwareHtmlFormatter,
                 },
                 "footnotes": {
                     "UNIQUE_IDS": True,
