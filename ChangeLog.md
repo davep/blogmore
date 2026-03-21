@@ -4,13 +4,11 @@
 
 **Released: WiP**
 
-- Tidied up code block styling: reduced the visual weight of the
-  `.highlight` wrapper, added a language label in the top-left corner of
-  fenced code blocks that specify a language, and added a copy-to-clipboard
-  button in the top-right corner of every code block.
-  ([#318](https://github.com/davep/blogmore/pull/318))
 - Fixed false-positive stripping of `index.html` from URLs such as
   `/my-index.html`. ([#315](https://github.com/davep/blogmore/pull/315))
+- Overhauled the styling of code blocks, adding a language label in the
+  top-left corner and a copy-to-clipboard button in the top-right corner.
+  ([#323](https://github.com/davep/blogmore/pull/323))
 
 ## v2.0.1
 
