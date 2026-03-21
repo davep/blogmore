@@ -6,6 +6,9 @@
 
 - Fixed false-positive stripping of `index.html` from URLs such as
   `/my-index.html`. ([#315](https://github.com/davep/blogmore/pull/315))
+- Overhauled the styling of code blocks, adding a language label in the
+  top-left corner and a copy-to-clipboard button in the top-right corner.
+  ([#323](https://github.com/davep/blogmore/pull/323))
 
 ## v2.0.1
 

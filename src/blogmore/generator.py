@@ -46,6 +46,8 @@ THEME_JS_FILENAME = "theme.js"
 THEME_JS_MINIFIED_FILENAME = "theme.min.js"
 SEARCH_JS_FILENAME = "search.js"
 SEARCH_JS_MINIFIED_FILENAME = "search.min.js"
+CODEBLOCKS_JS_FILENAME = "codeblocks.js"
+CODEBLOCKS_JS_MINIFIED_FILENAME = "codeblocks.min.js"
 
 
 def paginate_posts(posts: list[Post], posts_per_page: int) -> list[list[Post]]:
@@ -304,6 +306,11 @@ class SiteGenerator:
             if self.site_config.minify_js
             else f"/static/{SEARCH_JS_FILENAME}"
         )
+        codeblocks_js_url = (
+            f"/static/{CODEBLOCKS_JS_MINIFIED_FILENAME}"
+            if self.site_config.minify_js
+            else f"/static/{CODEBLOCKS_JS_FILENAME}"
+        )
         page1_suffix = resolve_pagination_page_path(self.site_config.page_1_path, 1)
         if self.site_config.clean_urls:
             page1_suffix = make_url_clean(page1_suffix)
@@ -332,6 +339,7 @@ class SiteGenerator:
             "styles_css_url": styles_css_url,
             "theme_js_url": theme_js_url,
             "search_js_url": search_js_url,
+            "codeblocks_js_url": codeblocks_js_url,
             "pagination_page1_suffix": page1_suffix,
         }
         # Merge sidebar config into context
@@ -1610,6 +1618,11 @@ class SiteGenerator:
                             and self.site_config.minify_js
                         ):
                             continue
+                        if (
+                            item.name == CODEBLOCKS_JS_FILENAME
+                            and self.site_config.minify_js
+                        ):
+                            continue
                         # Read content and write to output
                         content = item.read_bytes()
                         output_file = output_static / item.name
@@ -1642,6 +1655,11 @@ class SiteGenerator:
                             and self.site_config.minify_js
                         ):
                             continue
+                        if (
+                            relative_path.name == CODEBLOCKS_JS_FILENAME
+                            and self.site_config.minify_js
+                        ):
+                            continue
                         output_file = output_static / relative_path
                         output_file.parent.mkdir(parents=True, exist_ok=True)
                         shutil.copy2(item, output_file)
@@ -1655,6 +1673,9 @@ class SiteGenerator:
         if self.site_config.minify_js:
             self._write_minified_js(
                 output_static, THEME_JS_FILENAME, THEME_JS_MINIFIED_FILENAME
+            )
+            self._write_minified_js(
+                output_static, CODEBLOCKS_JS_FILENAME, CODEBLOCKS_JS_MINIFIED_FILENAME
             )
             if self.site_config.with_search:
                 self._write_minified_js(
