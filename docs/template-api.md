@@ -220,6 +220,8 @@ The following CSS classes are part of the stable template/CSS contract:
 | `.post-summary` | `article` | A single post card on a listing page. |
 | `.post-navigation` | `nav` | Previous/next post links. |
 | `.pagination` | `nav` | Page navigation on listing pages. |
+| `.archive-post-count` | `span` | Parenthetical post count in archive headings (h1/h2/h3). |
+| `.archive-toc-count` | `span` | Parenthetical numeric count in the archive TOC sidebar. |
 | `.tag-cloud` | `div` | Tag cloud on the tags index page. |
 | `.tags` | `div` | Inline tag badges on a post. |
 | `.category-link` | `a` | Category badge link. |

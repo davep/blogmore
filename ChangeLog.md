@@ -1,5 +1,18 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added post counts to the archive page. The main Archive heading now shows
+  the total count of posts, each year heading shows that year's count, and each
+  month heading shows that month's count. Counts are parenthetical and
+  respect singular/plural (`1 post`, `23 posts`). The right-hand TOC sidebar
+  also shows numeric counts in parentheses (without the word "post/posts").
+  Two new stable CSS classes, `.archive-post-count` and `.archive-toc-count`,
+  are available for theme authors to customise the count styling.
+  ([#TODO](https://github.com/davep/blogmore/pull/TODO))
+
 ## v2.1.0
 
 **Released: 2026-03-22**

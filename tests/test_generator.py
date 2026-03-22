@@ -3221,6 +3221,160 @@ class TestWithReadTime:
 
         assert december_pos < june_pos < january_pos
 
+    def test_archive_page_heading_shows_total_post_count(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the Archive h1 heading shows the total count of all posts."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post-a.md").write_text(
+            "---\ntitle: January Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+        (content_dir / "2024-03-10-post-b.md").write_text(
+            "---\ntitle: March Post\ndate: 2024-03-10\n---\n\nContent."
+        )
+        (content_dir / "2023-11-05-post-c.md").write_text(
+            "---\ntitle: November Post\ndate: 2023-11-05\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
+        )
+        generator.generate()
+
+        content = (temp_output_dir / "archive.html").read_text()
+
+        assert '<h1>Archive <span class="archive-post-count">(3 posts)</span></h1>' in content
+
+    def test_archive_page_heading_singular_post_count(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the Archive h1 heading uses singular 'post' for a single post."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-only-post.md").write_text(
+            "---\ntitle: Only Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
+        )
+        generator.generate()
+
+        content = (temp_output_dir / "archive.html").read_text()
+
+        assert '<h1>Archive <span class="archive-post-count">(1 post)</span></h1>' in content
+
+    def test_archive_page_year_headings_show_post_counts(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that each year heading in the archive shows the post count for that year."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post-a.md").write_text(
+            "---\ntitle: January Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+        (content_dir / "2024-03-10-post-b.md").write_text(
+            "---\ntitle: March Post\ndate: 2024-03-10\n---\n\nContent."
+        )
+        (content_dir / "2023-11-05-post-c.md").write_text(
+            "---\ntitle: November Post\ndate: 2023-11-05\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
+        )
+        generator.generate()
+
+        content = (temp_output_dir / "archive.html").read_text()
+
+        assert 'class="archive-post-count">(2 posts)</span>' in content
+        assert 'class="archive-post-count">(1 post)</span>' in content
+
+    def test_archive_page_month_headings_show_post_counts(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that each month heading in the archive shows the post count for that month."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post-a.md").write_text(
+            "---\ntitle: January Post A\ndate: 2024-01-15\n---\n\nContent."
+        )
+        (content_dir / "2024-01-20-post-b.md").write_text(
+            "---\ntitle: January Post B\ndate: 2024-01-20\n---\n\nContent."
+        )
+        (content_dir / "2024-03-10-post-c.md").write_text(
+            "---\ntitle: March Post\ndate: 2024-03-10\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
+        )
+        generator.generate()
+
+        content = (temp_output_dir / "archive.html").read_text()
+
+        assert 'class="archive-post-count">(2 posts)</span>' in content
+        assert 'class="archive-post-count">(1 post)</span>' in content
+
+    def test_archive_toc_shows_year_counts(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the archive TOC shows numeric post counts for each year."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post-a.md").write_text(
+            "---\ntitle: Post A\ndate: 2024-01-15\n---\n\nContent."
+        )
+        (content_dir / "2024-03-10-post-b.md").write_text(
+            "---\ntitle: Post B\ndate: 2024-03-10\n---\n\nContent."
+        )
+        (content_dir / "2023-06-20-post-c.md").write_text(
+            "---\ntitle: Post C\ndate: 2023-06-20\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
+        )
+        generator.generate()
+
+        content = (temp_output_dir / "archive.html").read_text()
+
+        assert 'class="archive-toc-count">(2)</span>' in content
+        assert 'class="archive-toc-count">(1)</span>' in content
+
+    def test_archive_toc_shows_month_counts(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the archive TOC shows numeric post counts for each month."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post-a.md").write_text(
+            "---\ntitle: Post A\ndate: 2024-01-15\n---\n\nContent."
+        )
+        (content_dir / "2024-01-20-post-b.md").write_text(
+            "---\ntitle: Post B\ndate: 2024-01-20\n---\n\nContent."
+        )
+        (content_dir / "2024-03-10-post-c.md").write_text(
+            "---\ntitle: Post C\ndate: 2024-03-10\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
+        )
+        generator.generate()
+
+        content = (temp_output_dir / "archive.html").read_text()
+
+        assert 'January <span class="archive-toc-count">(2)</span>' in content
+        assert 'March <span class="archive-toc-count">(1)</span>' in content
+
 
 class TestPostPathConfiguration:
     """Tests for the configurable post_path feature."""
