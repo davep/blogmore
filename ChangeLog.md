@@ -1,5 +1,12 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added post counts to the archive page.
+  ([#326](https://github.com/davep/blogmore/pull/326))
+
 ## v2.1.0
 
 **Released: 2026-03-22**

@@ -31,18 +31,31 @@
     {% endif %}
 {% endfor %}
 
+{# Pre-compute year post counts for use in both the main content and the TOC #}
+{% set year_counts = {} %}
+{% for year in ns.years %}
+    {% set year_count_ns = namespace(count=0) %}
+    {% for month_key in ns.years[year] %}
+        {% set year_count_ns.count = year_count_ns.count + ns.years[year][month_key]['posts']|length %}
+    {% endfor %}
+    {% set _ = year_counts.update({year: year_count_ns.count}) %}
+{% endfor %}
+
+{% set total_post_count = posts|length %}
+
 <div class="archive-with-toc">
     <div class="archive">
-        <h1>Archive</h1>
+        <h1>Archive <span class="archive-post-count">({{ total_post_count }} {{ 'post' if total_post_count == 1 else 'posts' }})</span></h1>
         {{ pagination(page, total_pages, pagination_page_urls) }}
 
         {% for year in ns.years.keys()|sort(reverse=True) %}
         <section class="archive-year" id="archive-{{ year }}">
-            <h2><a href="/{{ year }}/{{ pagination_page1_suffix }}">{{ year }}</a></h2>
+            <h2><a href="/{{ year }}/{{ pagination_page1_suffix }}">{{ year }}</a> <span class="archive-post-count">({{ year_counts[year] }} {{ 'post' if year_counts[year] == 1 else 'posts' }})</span></h2>
 
             {% for month_key in ns.years[year].keys()|sort(reverse=True) %}
+            {% set month_count = ns.years[year][month_key]['posts']|length %}
             <section class="archive-month" id="archive-{{ year }}-{{ month_key }}">
-                <h3><a href="/{{ year }}/{{ month_key }}/{{ pagination_page1_suffix }}">{{ ns.years[year][month_key]['name'] }}</a></h3>
+                <h3><a href="/{{ year }}/{{ month_key }}/{{ pagination_page1_suffix }}">{{ ns.years[year][month_key]['name'] }}</a> <span class="archive-post-count">({{ month_count }} {{ 'post' if month_count == 1 else 'posts' }})</span></h3>
 
                 <ul class="archive-post-list">
                 {% for post in ns.years[year][month_key]['posts'] %}
@@ -75,10 +88,10 @@
         <ul class="archive-toc-years">
             {% for year in ns.years.keys()|sort(reverse=True) %}
             <li class="archive-toc-year">
-                <a href="#archive-{{ year }}">{{ year }}</a>
+                <a href="#archive-{{ year }}">{{ year }} <span class="archive-toc-count">({{ year_counts[year] }})</span></a>
                 <ul class="archive-toc-months">
                     {% for month_key in ns.years[year].keys()|sort(reverse=True) %}
-                    <li><a href="#archive-{{ year }}-{{ month_key }}">{{ ns.years[year][month_key]['name'] }}</a></li>
+                    <li><a href="#archive-{{ year }}-{{ month_key }}">{{ ns.years[year][month_key]['name'] }} <span class="archive-toc-count">({{ ns.years[year][month_key]['posts']|length }})</span></a></li>
                     {% endfor %}
                 </ul>
             </li>
