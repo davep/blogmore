@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed sidebar page links on individual post pages not respecting the
+  configured `page_path` and `clean_urls` settings.
+  ([#327](https://github.com/davep/blogmore/pull/327))
+
 ## v2.2.0
 
 **Released: 2026-03-23**

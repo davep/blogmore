@@ -3245,7 +3245,10 @@ class TestWithReadTime:
 
         content = (temp_output_dir / "archive.html").read_text()
 
-        assert '<h1>Archive <span class="archive-post-count">(3 posts)</span></h1>' in content
+        assert (
+            '<h1>Archive <span class="archive-post-count">(3 posts)</span></h1>'
+            in content
+        )
 
     def test_archive_page_heading_singular_post_count(
         self, tmp_path: Path, temp_output_dir: Path
@@ -3265,7 +3268,10 @@ class TestWithReadTime:
 
         content = (temp_output_dir / "archive.html").read_text()
 
-        assert '<h1>Archive <span class="archive-post-count">(1 post)</span></h1>' in content
+        assert (
+            '<h1>Archive <span class="archive-post-count">(1 post)</span></h1>'
+            in content
+        )
 
     def test_archive_page_year_headings_show_post_counts(
         self, tmp_path: Path, temp_output_dir: Path
@@ -3966,6 +3972,48 @@ class TestPagePathConfiguration:
         config = SiteConfig(output_dir=Path("output"))
         assert config.page_path == DEFAULT_PAGE_PATH
         assert config.page_path == "{slug}.html"
+
+    def test_post_page_sidebar_uses_correct_page_url_with_clean_urls(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Sidebar page links on individual post pages use the configured page URL.
+
+        Regression test: when page_path and clean_urls are configured, the page
+        URLs shown in the sidebar of an individual post page must reflect those
+        settings, not fall back to the default /{slug}.html scheme.
+        """
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        pages_subdir = content_dir / "pages"
+        pages_subdir.mkdir()
+        (pages_subdir / "dotfiles.md").write_text(
+            "---\ntitle: Dotfiles\n---\n\nDotfiles content."
+        )
+        (content_dir / "2024-01-01-post.md").write_text(
+            "---\ntitle: A Post\ndate: 2024-01-01\n---\n\nPost content."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                page_path="{slug}/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        # Find the generated post page and check its sidebar link for the page.
+        post_file = temp_output_dir / "2024" / "01" / "01" / "post.html"
+        assert post_file.exists(), f"Expected post file at {post_file}"
+        post_content = post_file.read_text()
+        # The sidebar link must use the clean URL scheme, not the default /{slug}.html.
+        assert "/dotfiles/" in post_content, (
+            "Expected clean URL /dotfiles/ in sidebar of post page"
+        )
+        assert "/dotfiles.html" not in post_content, (
+            "Unexpected default URL /dotfiles.html found in sidebar of post page"
+        )
 
 
 class TestCacheBusting:
@@ -5125,10 +5173,7 @@ class TestTagsPathConfiguration:
         generator.generate()
 
         tags_content = (temp_output_dir / "tags" / "index.html").read_text()
-        assert (
-            '<link rel="canonical" href="https://example.com/tags/">'
-            in tags_content
-        )
+        assert '<link rel="canonical" href="https://example.com/tags/">' in tags_content
 
 
 class TestCategoriesPathConfiguration:
@@ -5278,9 +5323,7 @@ class TestCategoriesPathConfiguration:
         )
         generator.generate()
 
-        categories_content = (
-            temp_output_dir / "categories" / "index.html"
-        ).read_text()
+        categories_content = (temp_output_dir / "categories" / "index.html").read_text()
         assert (
             '<link rel="canonical" href="https://example.com/categories/">'
             in categories_content
