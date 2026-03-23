@@ -1126,9 +1126,8 @@ footer a:hover {
    Syntax Highlighting
    ========================================================================== */
 
-/* Light theme syntax highlighting (default style) */
+/* Structural layout for .highlight wrapper; colour rules are in code.css. */
 .highlight {
-    background: var(--code-bg);
     border-radius: 5px;
     overflow-x: auto;
     position: relative;
@@ -1141,8 +1140,13 @@ footer a:hover {
     overflow-x: auto;
 }
 
-/* Code block header bar: language label (left) + copy button (right). */
+/* Code block header bar: language label (left) + copy button (right).
+   The background is always taken from the site's --code-bg CSS variable so
+   the header follows the site's light/dark theme regardless of the Pygments
+   code style in use.  The code content area inherits its background from the
+   Pygments rules in code.css. */
 .code-block-header {
+    background: var(--code-bg);
     display: flex;
     align-items: center;
     justify-content: space-between;

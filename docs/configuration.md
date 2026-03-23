@@ -776,7 +776,7 @@ minify_html: true
 The [Pygments](https://pygments.org/styles/) style name to use for syntax highlighting in light mode. This controls the colour scheme applied to fenced code blocks when the visitor is using a light theme (or has not changed the default theme). BlogMore generates a `code.css` file (or `code.min.css` when `minify_css` is enabled) containing only the CSS rules for the configured styles.
 
 **Type:** String (any valid Pygments style name)  
-**Default:** `"default"`  
+**Default:** `"xcode"`  
 **Configuration file only** — cannot be set on the command line.
 
 ```yaml
@@ -790,11 +790,11 @@ See the [Pygments style gallery](https://pygments.org/styles/) for all available
 The [Pygments](https://pygments.org/styles/) style name to use for syntax highlighting in dark mode. This controls the colour scheme applied to fenced code blocks when the visitor is using a dark theme or has toggled the theme to dark. BlogMore generates a `code.css` file (or `code.min.css` when `minify_css` is enabled) containing only the CSS rules for the configured styles.
 
 **Type:** String (any valid Pygments style name)  
-**Default:** `"monokai"`  
+**Default:** `"github-dark"`  
 **Configuration file only** — cannot be set on the command line.
 
 ```yaml
-dark_mode_code_style: github-dark
+dark_mode_code_style: monokai
 ```
 
 See the [Pygments style gallery](https://pygments.org/styles/) for all available style names.

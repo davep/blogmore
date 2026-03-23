@@ -159,13 +159,13 @@ posts_per_feed: 20
 
 # Optional: Pygments style for syntax highlighting in light mode.
 # See https://pygments.org/styles/ for all available styles.
-# Configuration file only. Default: "default".
-# light_mode_code_style: default
+# Configuration file only. Default: "xcode".
+# light_mode_code_style: xcode
 
 # Optional: Pygments style for syntax highlighting in dark mode.
 # See https://pygments.org/styles/ for all available styles.
-# Configuration file only. Default: "monokai".
-# dark_mode_code_style: monokai
+# Configuration file only. Default: "github-dark".
+# dark_mode_code_style: github-dark
 
 # Optional: Additional stylesheets to include (can be URLs or relative paths)
 # extra_stylesheets:

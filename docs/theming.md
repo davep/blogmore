@@ -25,8 +25,8 @@ The code-highlighting colour scheme is generated at build time from [Pygments](h
 Configure the styles in `blogmore.yaml`:
 
 ```yaml
-light_mode_code_style: friendly    # light mode; default is "default"
-dark_mode_code_style: github-dark  # dark mode; default is "monokai"
+light_mode_code_style: friendly    # light mode; default is "xcode"
+dark_mode_code_style: monokai      # dark mode; default is "github-dark"
 ```
 
 Any style name shown at [https://pygments.org/styles/](https://pygments.org/styles/) is accepted.  BlogMore validates the name at build time and falls back to the default if an unrecognised name is given.

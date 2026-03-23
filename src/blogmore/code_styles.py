@@ -11,8 +11,8 @@ from pygments.styles import get_all_styles
 
 ##############################################################################
 # Default Pygments styles used for code syntax highlighting.
-DEFAULT_LIGHT_STYLE = "default"
-DEFAULT_DARK_STYLE = "monokai"
+DEFAULT_LIGHT_STYLE = "xcode"
+DEFAULT_DARK_STYLE = "github-dark"
 
 
 def is_valid_style(style_name: str) -> bool:

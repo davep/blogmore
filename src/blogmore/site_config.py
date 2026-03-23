@@ -282,7 +282,7 @@ class SiteConfig:
     that is served alongside the main stylesheet.
 
     This is a **configuration file only** option — it cannot be set on the
-    command line.  Defaults to ``"default"``.
+    command line.  Defaults to ``"xcode"``.
     """
 
     dark_mode_code_style: str = DEFAULT_DARK_STYLE
@@ -294,7 +294,7 @@ class SiteConfig:
     that is served alongside the main stylesheet.
 
     This is a **configuration file only** option — it cannot be set on the
-    command line.  Defaults to ``"monokai"``.
+    command line.  Defaults to ``"github-dark"``.
     """
 
     def __post_init__(self) -> None:
