@@ -4,19 +4,13 @@
 
 **Released: WiP**
 
-- Added `light_mode_code_style` and `dark_mode_code_style` configuration
-  options that allow the Pygments syntax-highlighting colour scheme to be
-  configured independently for light and dark mode.  The chosen styles are
-  generated into a dedicated `code.css` file (or `code.min.css` when
-  `minify_css` is enabled) so that only the required rules are served to
-  visitors.  Defaults are `xcode` (light) and `github-dark` (dark).  The
-  code block header (language label and copy button) always follows the
-  site's light/dark theme, while the code content area uses the chosen
-  Pygments style background and colours.
-  ([#332](https://github.com/davep/blogmore/pull/332))
 - Fixed sitemap generation not excluding the search page if a custom
   `search_path` was in use.
   ([#331](https://github.com/davep/blogmore/pull/331))
+- Added `light_mode_code_style` and `dark_mode_code_style` configuration
+  options that allow the Pygments syntax-highlighting colour scheme to be
+  configured independently for light and dark mode.
+  ([#334](https://github.com/davep/blogmore/pull/334))
 
 ## v2.2.1
 
