@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed sitemap generation not excluding the search page if a custom
+  `search_path` was in use.
+  ([#331](https://github.com/davep/blogmore/pull/331))
+
 ## v2.2.1
 
 **Released: 2026-03-23**

@@ -5,24 +5,39 @@ from xml.etree.ElementTree import Element, SubElement, indent, tostring
 
 from blogmore.clean_url import make_url_clean
 from blogmore.parser import CUSTOM_404_HTML
+from blogmore.site_config import DEFAULT_SEARCH_PATH
 from blogmore.utils import normalize_site_url
 
 SITEMAP_XMLNS = "http://www.sitemaps.org/schemas/sitemap/0.9"
 SITEMAP_FILENAME = "sitemap.xml"
 
-# Pages to exclude from the sitemap
-EXCLUDED_PAGES = frozenset({"search.html", CUSTOM_404_HTML})
+
+def _build_excluded_paths(search_path: str) -> frozenset[str]:
+    """Build the set of relative paths to exclude from the sitemap.
+
+    Args:
+        search_path: The configured search page path relative to the output
+            directory (e.g. ``"search.html"`` or ``"find/index.html"``).
+
+    Returns:
+        A frozenset of relative path strings (using forward slashes) that
+        should be excluded from the sitemap.
+    """
+    return frozenset({search_path.lstrip("/"), CUSTOM_404_HTML})
 
 
 def collect_sitemap_urls(
-    output_dir: Path, site_url: str, clean_urls: bool = False
+    output_dir: Path,
+    site_url: str,
+    clean_urls: bool = False,
+    search_path: str = DEFAULT_SEARCH_PATH,
 ) -> list[str]:
     """Collect all page URLs for the sitemap.
 
     Walks the output directory collecting every ``.html`` file, excluding
-    ``search.html``.  Each file path is converted to an absolute URL using
-    ``site_url`` as the base.  If ``site_url`` is empty, the fallback
-    ``https://example.com`` is used.
+    the search page and the custom 404 page.  Each file path is converted
+    to an absolute URL using ``site_url`` as the base.  If ``site_url`` is
+    empty, the fallback ``https://example.com`` is used.
 
     When *clean_urls* is ``True``, any URL that ends with ``/index.html``
     has the ``index.html`` portion removed so the URL ends with a trailing
@@ -33,25 +48,31 @@ def collect_sitemap_urls(
         site_url: Base URL of the site (e.g. ``https://example.com``).
         clean_urls: When ``True``, strip ``index.html`` from URLs that end
             with it.
+        search_path: Path of the search page relative to the output
+            directory.  Defaults to ``DEFAULT_SEARCH_PATH``.  This is used
+            to exclude the search page regardless of its filename or
+            location.
 
     Returns:
         Sorted list of absolute URL strings, one per generated page.
     """
     normalized = normalize_site_url(site_url)
     base_url = normalized if normalized else "https://example.com"
+    excluded_paths = _build_excluded_paths(search_path)
 
     urls = []
     for html_file in sorted(output_dir.rglob("*.html")):
         relative_path = html_file.relative_to(output_dir)
 
-        # Exclude certain pages (e.g. search.html)
-        if relative_path.name in EXCLUDED_PAGES:
+        # Exclude certain pages (e.g. the search page and 404 page).
+        # Compare the full relative path so that pages in subdirectories
+        # and pages with custom names are handled correctly.
+        relative_str = str(relative_path).replace("\\", "/")
+        if relative_str in excluded_paths:
             continue
 
-        # Convert any OS-specific path separators to forward slashes
-        url_path = "/" + str(relative_path).replace("\\", "/")
-
         # Apply clean URL transformation when enabled
+        url_path = "/" + relative_str
         if clean_urls:
             url_path = make_url_clean(url_path)
 
@@ -86,20 +107,31 @@ def generate_sitemap_xml(urls: list[str]) -> str:
     return f'<?xml version="1.0" encoding="UTF-8"?>\n{xml_str}\n'
 
 
-def write_sitemap(output_dir: Path, site_url: str, clean_urls: bool = False) -> None:
+def write_sitemap(
+    output_dir: Path,
+    site_url: str,
+    clean_urls: bool = False,
+    search_path: str = DEFAULT_SEARCH_PATH,
+) -> None:
     """Generate and write the XML sitemap file.
 
-    Collects all HTML pages in the output directory (excluding
-    ``search.html``) and writes ``sitemap.xml`` to the root of the output
-    directory.
+    Collects all HTML pages in the output directory (excluding the search
+    page and the custom 404 page) and writes ``sitemap.xml`` to the root
+    of the output directory.
 
     Args:
         output_dir: The output directory containing the generated site.
         site_url: Base URL of the site (e.g. ``https://example.com``).
         clean_urls: When ``True``, strip ``index.html`` from URLs that end
             with it.
+        search_path: Path of the search page relative to the output
+            directory.  Defaults to ``DEFAULT_SEARCH_PATH``.  This is used
+            to exclude the search page regardless of its filename or
+            location.
     """
-    urls = collect_sitemap_urls(output_dir, site_url, clean_urls=clean_urls)
+    urls = collect_sitemap_urls(
+        output_dir, site_url, clean_urls=clean_urls, search_path=search_path
+    )
     xml_content = generate_sitemap_xml(urls)
     sitemap_path = output_dir / SITEMAP_FILENAME
     sitemap_path.write_text(xml_content, encoding="utf-8")
