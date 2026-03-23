@@ -528,6 +528,11 @@ class SiteGenerator:
         # so it is not overwritten by that step.
         fontawesome_css_content = self._prepare_fontawesome_css()
 
+        # Resolve page output paths before generating any HTML so that
+        # page.url_path is set correctly for all pages (including when they
+        # appear in the sidebar of individual post pages).
+        page_output_paths = self._resolve_page_output_paths(pages)
+
         # Generate individual post pages
         print("Generating post pages...")
         post_output_paths = self._resolve_post_output_paths(posts)
@@ -544,7 +549,6 @@ class SiteGenerator:
         # Generate static pages
         if pages:
             print("Generating static pages...")
-            page_output_paths = self._resolve_page_output_paths(pages)
             for page in pages:
                 self._generate_page(page, sidebar_pages, page_output_paths[id(page)])
 
