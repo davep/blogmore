@@ -15,6 +15,7 @@ import rjsmin  # type: ignore[import-untyped]
 
 from blogmore import __version__
 from blogmore.clean_url import make_url_clean
+from blogmore.code_styles import build_code_css
 from blogmore.feeds import BlogFeedGenerator
 from blogmore.fontawesome import (
     FONTAWESOME_CDN_BRANDS_WOFF2_URL,
@@ -42,6 +43,8 @@ from blogmore.sitemap import write_sitemap
 
 CSS_FILENAME = "style.css"
 CSS_MINIFIED_FILENAME = "styles.min.css"
+CODE_CSS_FILENAME = "code.css"
+CODE_CSS_MINIFIED_FILENAME = "code.min.css"
 THEME_JS_FILENAME = "theme.js"
 THEME_JS_MINIFIED_FILENAME = "theme.min.js"
 SEARCH_JS_FILENAME = "search.js"
@@ -296,6 +299,11 @@ class SiteGenerator:
             if self.site_config.minify_css
             else f"/static/{CSS_FILENAME}"
         )
+        code_css_url = self._with_cache_bust(
+            f"/static/{CODE_CSS_MINIFIED_FILENAME}"
+            if self.site_config.minify_css
+            else f"/static/{CODE_CSS_FILENAME}"
+        )
         theme_js_url = (
             f"/static/{THEME_JS_MINIFIED_FILENAME}"
             if self.site_config.minify_js
@@ -337,6 +345,7 @@ class SiteGenerator:
             "fontawesome_css_url": self._with_cache_bust(self._fontawesome_css_url),
             "fontawesome_woff2_url": FONTAWESOME_CDN_BRANDS_WOFF2_URL,
             "styles_css_url": styles_css_url,
+            "code_css_url": code_css_url,
             "theme_js_url": theme_js_url,
             "search_js_url": search_js_url,
             "codeblocks_js_url": codeblocks_js_url,
@@ -732,6 +741,33 @@ class SiteGenerator:
         output_path = output_static / CSS_MINIFIED_FILENAME
         output_path.write_text(minified, encoding="utf-8")
         print(f"Generated minified CSS as {CSS_MINIFIED_FILENAME}")
+
+    def _write_code_css(self, output_static: Path) -> None:
+        """Generate and write the code syntax highlighting CSS file.
+
+        Builds a ``code.css`` (or ``code.min.css`` when ``minify_css`` is
+        enabled) from the Pygments styles configured in ``light_mode_code_style``
+        and ``dark_mode_code_style``.  The file is always regenerated from the
+        configured styles, even when the default styles are in use, so that the
+        output is self-contained and does not depend on any hardcoded CSS rules
+        in the main stylesheet.
+
+        Args:
+            output_static: Path to the output static directory.
+        """
+        css_content = build_code_css(
+            self.site_config.light_mode_code_style,
+            self.site_config.dark_mode_code_style,
+        )
+        if self.site_config.minify_css:
+            minified = rcssmin.cssmin(css_content)
+            output_path = output_static / CODE_CSS_MINIFIED_FILENAME
+            output_path.write_text(minified, encoding="utf-8")
+            print(f"Generated minified code CSS as {CODE_CSS_MINIFIED_FILENAME}")
+        else:
+            output_path = output_static / CODE_CSS_FILENAME
+            output_path.write_text(css_content, encoding="utf-8")
+            print(f"Generated code CSS as {CODE_CSS_FILENAME}")
 
     def _write_minified_js(
         self, output_static: Path, js_filename: str, js_minified_filename: str
@@ -1673,6 +1709,9 @@ class SiteGenerator:
         # Minify CSS if requested
         if self.site_config.minify_css:
             self._write_minified_css(output_static)
+
+        # Always generate code.css (or code.min.css) from configured Pygments styles.
+        self._write_code_css(output_static)
 
         # Minify JS if requested
         if self.site_config.minify_js:

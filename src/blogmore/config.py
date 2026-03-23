@@ -8,6 +8,11 @@ from typing import Any
 
 import yaml
 
+from blogmore.code_styles import (
+    DEFAULT_DARK_STYLE,
+    DEFAULT_LIGHT_STYLE,
+    is_valid_style,
+)
 from blogmore.page_path import DEFAULT_PAGE_PATH, validate_page_path_template
 from blogmore.pagination_path import (
     DEFAULT_PAGE_1_PATH,
@@ -55,6 +60,8 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
         "categories_path",
         "sidebar_pages",
         "head",
+        "light_mode_code_style",
+        "dark_mode_code_style",
     }
 )
 
@@ -480,5 +487,39 @@ def parse_site_config_from_dict(
             "head in the configuration file must be a list of single-key tag "
             "mappings; ignoring value"
         )
+
+    # --- light_mode_code_style -----------------------------------------------
+    raw_light_style = config.get("light_mode_code_style", DEFAULT_LIGHT_STYLE)
+    if not isinstance(raw_light_style, str):
+        errors.append(
+            "light_mode_code_style in the configuration file must be a string; "
+            "using the default"
+        )
+        kwargs["light_mode_code_style"] = DEFAULT_LIGHT_STYLE
+    elif not is_valid_style(raw_light_style):
+        errors.append(
+            f"light_mode_code_style {raw_light_style!r} is not a recognised "
+            "Pygments style name; using the default"
+        )
+        kwargs["light_mode_code_style"] = DEFAULT_LIGHT_STYLE
+    else:
+        kwargs["light_mode_code_style"] = raw_light_style
+
+    # --- dark_mode_code_style ------------------------------------------------
+    raw_dark_style = config.get("dark_mode_code_style", DEFAULT_DARK_STYLE)
+    if not isinstance(raw_dark_style, str):
+        errors.append(
+            "dark_mode_code_style in the configuration file must be a string; "
+            "using the default"
+        )
+        kwargs["dark_mode_code_style"] = DEFAULT_DARK_STYLE
+    elif not is_valid_style(raw_dark_style):
+        errors.append(
+            f"dark_mode_code_style {raw_dark_style!r} is not a recognised "
+            "Pygments style name; using the default"
+        )
+        kwargs["dark_mode_code_style"] = DEFAULT_DARK_STYLE
+    else:
+        kwargs["dark_mode_code_style"] = raw_dark_style
 
     return kwargs, errors

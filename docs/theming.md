@@ -11,12 +11,25 @@ to a completely different layout — without touching the BlogMore source code.
 
 ## How the styling works
 
-BlogMore embeds a single stylesheet (`static/style.css`) in every generated
-site.  The stylesheet is built around **CSS custom properties** (variables) so
-that colour schemes can be swapped by changing only those properties.  A small
-JavaScript file (`static/theme.js`) reads the user's OS preference and any
-saved cookie preference, then sets `data-theme="dark"` or
-`data-theme="light"` on the `<html>` element accordingly.
+BlogMore embeds two stylesheets in every generated site:
+
+- **`static/style.css`** — the main stylesheet, built around **CSS custom properties** (variables) so that colour schemes can be swapped by changing only those properties.
+- **`static/code.css`** — a generated stylesheet containing only the Pygments syntax-highlighting rules for the configured light and dark mode code styles.
+
+A small JavaScript file (`static/theme.js`) reads the user's OS preference and any saved cookie preference, then sets `data-theme="dark"` or `data-theme="light"` on the `<html>` element accordingly.
+
+### Syntax highlighting styles
+
+The code-highlighting colour scheme is generated at build time from [Pygments](https://pygments.org/styles/) and written to `code.css` (or `code.min.css` when `minify_css` is enabled).  Only the two configured styles are included — no other Pygments styles add unnecessary size to the file.
+
+Configure the styles in `blogmore.yaml`:
+
+```yaml
+light_mode_code_style: friendly    # light mode; default is "default"
+dark_mode_code_style: github-dark  # dark mode; default is "monokai"
+```
+
+Any style name shown at [https://pygments.org/styles/](https://pygments.org/styles/) is accepted.  BlogMore validates the name at build time and falls back to the default if an unrecognised name is given.
 
 ### Dark mode colour variables
 
