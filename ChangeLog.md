@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.2.1
 
-**Released: WiP**
+**Released: 2026-03-23**
 
 - Fixed sidebar page links on individual post pages not respecting the
   configured `page_path` and `clean_urls` settings.
