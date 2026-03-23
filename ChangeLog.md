@@ -6,7 +6,7 @@
 
 - Fixed sidebar page links on individual post pages not respecting the
   configured `page_path` and `clean_urls` settings.
-  ([#327](https://github.com/davep/blogmore/pull/327))
+  ([#329](https://github.com/davep/blogmore/pull/329))
 
 ## v2.2.0
 
