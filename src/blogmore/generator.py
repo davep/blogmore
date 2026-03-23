@@ -1569,13 +1569,14 @@ class SiteGenerator:
         """Generate the XML sitemap file.
 
         Writes ``sitemap.xml`` to the root of the output directory,
-        containing an entry for every generated HTML page except
-        ``search.html``.
+        containing an entry for every generated HTML page except the
+        configured search page.
         """
         write_sitemap(
             self.site_config.output_dir,
             self.site_config.site_url,
             clean_urls=self.site_config.clean_urls,
+            search_path=self.site_config.search_path,
         )
 
     def _copy_static_assets(self) -> None:

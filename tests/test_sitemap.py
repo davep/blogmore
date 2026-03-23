@@ -5,7 +5,6 @@ from pathlib import Path
 from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN
 from blogmore.site_config import SiteConfig
 from blogmore.sitemap import (
-    EXCLUDED_PAGES,
     SITEMAP_FILENAME,
     SITEMAP_XMLNS,
     collect_sitemap_urls,
@@ -141,9 +140,35 @@ class TestCollectSitemapUrls:
 
         assert "https://example.com/archive.html" in urls
         assert "https://example.com/2024/01/15/my-post.html" in urls
-        """Test that the EXCLUDED_PAGES constant contains expected entries."""
-        assert "search.html" in EXCLUDED_PAGES
-        assert CUSTOM_404_HTML in EXCLUDED_PAGES
+
+    def test_excludes_custom_search_path(self, tmp_path: Path) -> None:
+        """Test that a custom search_path is excluded from the sitemap."""
+        (tmp_path / "index.html").write_text("<html/>")
+        custom_dir = tmp_path / "find"
+        custom_dir.mkdir()
+        (custom_dir / "index.html").write_text("<html/>")
+
+        urls = collect_sitemap_urls(
+            tmp_path, "https://example.com", search_path="find/index.html"
+        )
+
+        assert "https://example.com/index.html" in urls
+        assert "https://example.com/find/index.html" not in urls
+
+    def test_excludes_search_in_subdirectory(self, tmp_path: Path) -> None:
+        """Test that a search page in a subdirectory is excluded."""
+        (tmp_path / "index.html").write_text("<html/>")
+        search_dir = tmp_path / "search"
+        search_dir.mkdir()
+        (search_dir / "index.html").write_text("<html/>")
+
+        urls = collect_sitemap_urls(
+            tmp_path, "https://example.com", search_path="search/index.html"
+        )
+
+        assert "https://example.com/index.html" in urls
+        assert "https://example.com/search/index.html" not in urls
+        assert "https://example.com/search/" not in urls
 
     def test_excludes_404_html(self, tmp_path: Path) -> None:
         """Test that 404.html is excluded from the sitemap."""
@@ -394,3 +419,25 @@ class TestSitemapIntegrationWithGenerator:
         assert (temp_output_dir / CUSTOM_404_HTML).exists()
         content = (temp_output_dir / "sitemap.xml").read_text()
         assert CUSTOM_404_HTML not in content
+
+    def test_sitemap_excludes_custom_search_path(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a custom search_path is excluded from the sitemap."""
+        from blogmore.generator import SiteGenerator
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+                with_search=True,
+                search_path="find/index.html",
+            )
+        )
+        generator.generate()
+
+        content = (temp_output_dir / "sitemap.xml").read_text()
+        assert "find/index.html" not in content
+        assert "find/" not in content
