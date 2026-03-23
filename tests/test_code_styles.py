@@ -2,11 +2,10 @@
 
 from pathlib import Path
 
-import pytest
-
 from blogmore.code_styles import (
     DEFAULT_DARK_STYLE,
     DEFAULT_LIGHT_STYLE,
+    _colour_scheme_for_style,
     build_code_css,
     is_valid_style,
 )
@@ -44,7 +43,77 @@ class TestIsValidStyle:
         assert is_valid_style(DEFAULT_DARK_STYLE) is True
 
 
-class TestBuildCodeCss:
+class TestColourSchemeForStyle:
+    """Tests for the _colour_scheme_for_style function."""
+
+    def test_xcode_is_light(self) -> None:
+        """The 'xcode' style has a light background and reports 'light'."""
+        assert _colour_scheme_for_style("xcode") == "light"
+
+    def test_github_dark_is_dark(self) -> None:
+        """The 'github-dark' style has a dark background and reports 'dark'."""
+        assert _colour_scheme_for_style("github-dark") == "dark"
+
+    def test_monokai_is_dark(self) -> None:
+        """The 'monokai' style has a dark background and reports 'dark'."""
+        assert _colour_scheme_for_style("monokai") == "dark"
+
+    def test_default_is_light(self) -> None:
+        """The 'default' Pygments style has a light background and reports 'light'."""
+        assert _colour_scheme_for_style("default") == "light"
+
+    def test_default_light_style_constant_matches(self) -> None:
+        """DEFAULT_LIGHT_STYLE reports 'light'."""
+        assert _colour_scheme_for_style(DEFAULT_LIGHT_STYLE) == "light"
+
+    def test_default_dark_style_constant_matches(self) -> None:
+        """DEFAULT_DARK_STYLE reports 'dark'."""
+        assert _colour_scheme_for_style(DEFAULT_DARK_STYLE) == "dark"
+
+
+class TestBuildCodeCssColourScheme:
+    """Tests that build_code_css injects color-scheme rules correctly."""
+
+    def test_light_section_contains_color_scheme(self) -> None:
+        """Light section contains a color-scheme rule on .highlight."""
+        css = build_code_css("default", "monokai")
+        light_section = css.split("/* Dark mode syntax highlighting")[0]
+        assert "color-scheme" in light_section
+
+    def test_light_section_color_scheme_matches_light_style(self) -> None:
+        """Light section color-scheme value matches the luminance of the light style."""
+        css = build_code_css("xcode", "monokai")  # xcode is light
+        light_section = css.split("/* Dark mode syntax highlighting")[0]
+        assert ".highlight { color-scheme: light; }" in light_section
+
+    def test_light_section_color_scheme_dark_when_dark_style_used(self) -> None:
+        """Light section uses color-scheme: dark when the light style has a dark background."""
+        css = build_code_css("github-dark", "xcode")  # github-dark is dark
+        light_section = css.split("/* Dark mode syntax highlighting")[0]
+        assert ".highlight { color-scheme: dark; }" in light_section
+
+    def test_auto_dark_section_contains_color_scheme(self) -> None:
+        """Auto-dark media query section contains a color-scheme rule."""
+        css = build_code_css("default", "monokai")
+        assert ":root:not([data-theme]) .highlight { color-scheme:" in css
+
+    def test_auto_dark_color_scheme_matches_dark_style(self) -> None:
+        """Auto-dark section color-scheme matches the luminance of the dark style."""
+        css = build_code_css("default", "xcode")  # xcode is light
+        assert ":root:not([data-theme]) .highlight { color-scheme: light; }" in css
+
+    def test_explicit_dark_section_contains_color_scheme(self) -> None:
+        """Explicit dark toggle section contains a color-scheme rule on .highlight."""
+        css = build_code_css("default", "monokai")
+        assert ':root[data-theme="dark"] .highlight { color-scheme:' in css
+
+    def test_explicit_dark_color_scheme_matches_dark_style(self) -> None:
+        """Explicit dark section color-scheme matches the luminance of the dark style."""
+        css = build_code_css("default", "xcode")  # xcode is light
+        assert ':root[data-theme="dark"] .highlight { color-scheme: light; }' in css
+
+
+
     """Tests for the build_code_css function."""
 
     def test_returns_string(self) -> None:
