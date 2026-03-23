@@ -47,6 +47,7 @@ class TestEndToEndWorkflow:
         assert (temp_output_dir / "categories.html").exists()
         assert (temp_output_dir / "feed.xml").exists()
         assert (temp_output_dir / "static" / "style.css").exists()
+        assert (temp_output_dir / "static" / "code.css").exists()
 
         # Verify search files exist (with_search=True)
         assert (temp_output_dir / "search.html").exists()
@@ -288,6 +289,7 @@ class TestEndToEndWorkflow:
         # Should have basic structure
         assert (temp_output_dir / "index.html").exists()
         assert (temp_output_dir / "static" / "style.css").exists()
+        assert (temp_output_dir / "static" / "code.css").exists()
 
     def test_markdown_features_workflow(
         self, posts_dir: Path, temp_output_dir: Path
