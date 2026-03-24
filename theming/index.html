@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.28">
+      <meta name="generator" content="zensical-0.0.29">
     
     
       
@@ -631,6 +631,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#syntax-highlighting-styles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Syntax highlighting styles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#dark-mode-colour-variables" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1001,6 +1012,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#syntax-highlighting-styles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Syntax highlighting styles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#dark-mode-colour-variables" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1206,12 +1228,19 @@ to a completely different layout — without touching the BlogMore source code.<
 schemes, typography, and how the two approaches work together.</p>
 </div>
 <h2 id="how-the-styling-works">How the styling works</h2>
-<p>BlogMore embeds a single stylesheet (<code>static/style.css</code>) in every generated
-site.  The stylesheet is built around <strong>CSS custom properties</strong> (variables) so
-that colour schemes can be swapped by changing only those properties.  A small
-JavaScript file (<code>static/theme.js</code>) reads the user's OS preference and any
-saved cookie preference, then sets <code>data-theme="dark"</code> or
-<code>data-theme="light"</code> on the <code>&lt;html&gt;</code> element accordingly.</p>
+<p>BlogMore embeds two stylesheets in every generated site:</p>
+<ul>
+<li><strong><code>static/style.css</code></strong> — the main stylesheet, built around <strong>CSS custom properties</strong> (variables) so that colour schemes can be swapped by changing only those properties.</li>
+<li><strong><code>static/code.css</code></strong> — a generated stylesheet containing only the Pygments syntax-highlighting rules for the configured light and dark mode code styles.</li>
+</ul>
+<p>A small JavaScript file (<code>static/theme.js</code>) reads the user's OS preference and any saved cookie preference, then sets <code>data-theme="dark"</code> or <code>data-theme="light"</code> on the <code>&lt;html&gt;</code> element accordingly.</p>
+<h3 id="syntax-highlighting-styles">Syntax highlighting styles</h3>
+<p>The code-highlighting colour scheme is generated at build time from <a href="https://pygments.org/styles/">Pygments</a> and written to <code>code.css</code> (or <code>code.min.css</code> when <code>minify_css</code> is enabled).  Only the two configured styles are included — no other Pygments styles add unnecessary size to the file.</p>
+<p>Configure the styles in <code>blogmore.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">light_mode_code_style</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">friendly</span><span class="w">    </span><span class="c1"># light mode; default is &quot;xcode&quot;</span>
+<span class="nt">dark_mode_code_style</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">monokai</span><span class="w">      </span><span class="c1"># dark mode; default is &quot;github-dark&quot;</span>
+</code></pre></div>
+<p>Any style name shown at <a href="https://pygments.org/styles/">https://pygments.org/styles/</a> is accepted.  BlogMore validates the name at build time and falls back to the default if an unrecognised name is given.</p>
 <h3 id="dark-mode-colour-variables">Dark mode colour variables</h3>
 <p>Dark mode colours are declared <strong>once</strong> in <code>:root</code> as <code>--dark-*</code> variables.
 Both the JavaScript-driven <code>[data-theme="dark"]</code> selector and the CSS media
