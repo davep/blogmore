@@ -1526,3 +1526,217 @@ footer a:hover {
     color: var(--text-secondary);
     font-style: italic;
 }
+
+/* =============================================================================
+   STATS PAGE
+   ============================================================================= */
+
+.stats-page h1 {
+    margin-bottom: 0.25em;
+}
+
+.stats-summary {
+    color: var(--text-secondary);
+    margin-bottom: 2em;
+}
+
+.stats-section {
+    margin-bottom: 2.5em;
+}
+
+.stats-section h2 {
+    margin-bottom: 0.75em;
+    font-size: 1.2em;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.3em;
+}
+
+/* ---  Histogram  ---------------------------------------------------------- */
+
+.stats-chart {
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+}
+
+.stats-bars {
+    display: flex;
+    align-items: stretch; /* all bar groups same total height */
+    gap: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.stats-bar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 0;
+    min-width: 18px;
+}
+
+/* Fixed-height area above the bar — holds the count label */
+.stats-bar-value-area {
+    height: 1.6em;
+    display: flex;
+    align-items: flex-end; /* value sits right at the bottom of this area, flush against bar */
+    justify-content: center;
+    width: 100%;
+    flex-shrink: 0;
+    padding-bottom: 4px; /* breathing room between value and the top of the bar */
+    box-sizing: border-box;
+}
+
+.stats-bar-value {
+    font-size: 0.7em;
+    font-weight: 600;
+    color: var(--text-secondary);
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+/* Fixed-height area where the bar lives */
+.stats-bar-wrap {
+    height: 120px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end; /* bars grow from the bottom */
+    width: 100%;
+}
+
+.stats-bar {
+    width: 100%;
+    background: var(--link-color);
+    border-radius: 3px 3px 0 0;
+    min-height: 2px;
+    transition: background 0.15s;
+}
+
+.stats-bar:hover {
+    background: var(--link-hover-color);
+}
+
+/* Fixed-height area below the bar — holds the axis label */
+.stats-bar-label {
+    height: 1.5em;
+    flex-shrink: 0;
+    margin-top: 4px;
+    font-size: 0.68em;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    line-height: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+}
+
+.stats-bar-label-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ---  Detail list  -------------------------------------------------------- */
+
+.stats-details {
+    margin: 0;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0;
+}
+
+.stats-detail-row {
+    display: contents;
+}
+
+.stats-detail-row dt,
+.stats-detail-row dd {
+    padding: 0.45em 0.6em;
+    border-bottom: 1px solid var(--border-color-light);
+    margin: 0;
+}
+
+.stats-detail-row:last-child dt,
+.stats-detail-row:last-child dd {
+    border-bottom: none;
+}
+
+.stats-detail-row dt {
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    padding-right: 1.5em;
+}
+
+.stats-detail-row dd {
+    color: var(--text-color);
+}
+
+/* ---  Domains table  ------------------------------------------------------- */
+
+.stats-table-wrap {
+    overflow-x: auto;
+}
+
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92em;
+}
+
+.stats-table th,
+.stats-table td {
+    padding: 0.45em 0.75em;
+    border: 1px solid var(--table-border);
+    text-align: left;
+}
+
+.stats-table thead th {
+    background: var(--table-header-bg);
+    font-weight: 600;
+}
+
+.stats-table tbody tr:nth-child(odd) {
+    background: var(--table-stripe-bg);
+}
+
+.stats-table-rank {
+    width: 2.5em;
+    text-align: right;
+    color: var(--text-secondary);
+}
+
+.stats-table-count {
+    width: 4em;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.stats-table-domain a {
+    word-break: break-all;
+}
+
+/* --- Responsive adjustments ----------------------------------------------- */
+
+@media (max-width: 600px) {
+    .stats-bar-wrap {
+        height: 90px;
+    }
+
+    .stats-bar-value-area {
+        height: 1.3em;
+    }
+
+    .stats-bar-group {
+        min-width: 12px;
+    }
+
+    .stats-bar-value {
+        font-size: 0.6em;
+    }
+
+    .stats-bar-label {
+        font-size: 0.55em;
+    }
+}

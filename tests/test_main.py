@@ -1045,6 +1045,35 @@ class TestConfigFileIntegration:
                 content = f.read()
                 assert "davep.org" in content
 
+    def test_with_stats_from_config_file_generates_stats_page(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """with_stats: true in the config file generates stats.html on build."""
+        config_file = tmp_path / "config.yaml"
+        config = {
+            "output": str(temp_output_dir),
+            "with_stats": True,
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "blogmore",
+                "build",
+                str(posts_dir),
+                "--config",
+                str(config_file),
+            ],
+        ):
+            result = main()
+            assert result == 0
+            assert (temp_output_dir / "stats.html").exists(), (
+                "stats.html should be generated when with_stats: true is set in the config file"
+            )
+
     def test_main_build_without_content_dir_fails(
         self, temp_output_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:

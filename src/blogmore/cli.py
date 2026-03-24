@@ -127,6 +127,13 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     )
 
     parser.add_argument(
+        "--with-stats",
+        action="store_true",
+        default=_SITE_CONFIG_DEFAULTS["with_stats"],
+        help="Generate a blog statistics page (default: disabled)",
+    )
+
+    parser.add_argument(
         "--minify-css",
         action="store_true",
         default=_SITE_CONFIG_DEFAULTS["minify_css"],

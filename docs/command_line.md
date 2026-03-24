@@ -195,6 +195,16 @@ blogmore build posts/ --with-sitemap
 
 A `--site-url` should be provided so that sitemap entries contain absolute URLs. If omitted, entries will fall back to `https://example.com`.
 
+#### `--with-stats`
+
+Generate a blog statistics page. When set, BlogMore generates a `/stats.html` page (path configurable via the `stats_path` configuration option) containing posting-pattern histograms, word count and reading-time summaries, blog lifespan, tag and category counts, unique external link count, and a table of the top 20 most-linked external domains. A **Stats** link is added to the navigation bar automatically.
+
+Stats generation is **disabled by default**. Pass this flag to opt in.
+
+```bash
+blogmore build posts/ --with-stats
+```
+
 #### `--with-read-time`
 
 Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on 200 words per minute) and displays it next to the post date on all post listings and individual post pages.
@@ -335,6 +345,7 @@ The serve command also accepts all the build command options:
 - `--icon-source`
 - `--with-search`
 - `--with-sitemap`
+- `--with-stats`
 - `--minify-css`
 - `--minify-js`
 - `--minify-html`
@@ -428,6 +439,7 @@ The publish command also accepts all the build command options:
 - `--icon-source`
 - `--with-search`
 - `--with-sitemap`
+- `--with-stats`
 - `--minify-css`
 - `--minify-js`
 - `--minify-html`

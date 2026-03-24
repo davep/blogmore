@@ -59,6 +59,12 @@ posts_per_feed: 20
 # Requires site_url to be set for absolute URLs in the sitemap.
 # with_sitemap: false
 
+# Optional: Generate a blog statistics page (default: false)
+# Generates a /stats.html page with posting patterns, word counts,
+# reading times, link counts and more. A Stats link is added to the
+# navigation bar automatically.
+# with_stats: false
+
 # Optional: Show estimated reading time on posts (default: false)
 # Displays the approximate time to read each post based on 200 words per minute.
 # with_read_time: false
@@ -119,6 +125,14 @@ posts_per_feed: 20
 # stripped so both categories.html and /categories.html produce the same result.
 # Configuration file only.
 # categories_path: "categories.html"
+
+# Optional: Path for the statistics page relative to the output directory
+# (default: stats.html). The full directory path is created automatically.
+# When clean_urls is enabled and the path ends in index.html, the
+# index.html portion is omitted in links to the page. Leading slashes are
+# stripped so both stats.html and /stats.html produce the same result.
+# Only used when with_stats is true. Configuration file only.
+# stats_path: "stats.html"
 
 # Optional: Generate clean URLs for posts and pages (default: false)
 # When enabled, posts and pages whose URL ends with /index.html will use the

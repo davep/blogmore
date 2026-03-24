@@ -40,6 +40,7 @@ from blogmore.renderer import TemplateRenderer
 from blogmore.search import write_search_index
 from blogmore.site_config import SiteConfig
 from blogmore.sitemap import write_sitemap
+from blogmore.stats import BlogStats, compute_blog_stats
 
 CSS_FILENAME = "style.css"
 CSS_MINIFIED_FILENAME = "styles.min.css"
@@ -292,6 +293,21 @@ class SiteGenerator:
             url = make_url_clean(url)
         return url
 
+    def _get_stats_url(self) -> str:
+        """Return the URL path for the configured statistics page.
+
+        Derives the URL from the ``stats_path`` configuration option.  When
+        ``clean_urls`` is enabled and the path ends in ``index.html``, the
+        index filename is stripped so the URL ends with a trailing slash.
+
+        Returns:
+            The URL path for the statistics page, always starting with ``/``.
+        """
+        url = "/" + self.site_config.stats_path.lstrip("/")
+        if self.site_config.clean_urls:
+            url = make_url_clean(url)
+        return url
+
     def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
         styles_css_url = self._with_cache_bust(
@@ -338,6 +354,8 @@ class SiteGenerator:
             "archive_url": self._get_archive_url(),
             "tags_url": self._get_tags_url(),
             "categories_url": self._get_categories_url(),
+            "with_stats": self.site_config.with_stats,
+            "stats_url": self._get_stats_url(),
             "with_read_time": self.site_config.with_read_time,
             "with_advert": self.site_config.with_advert,
             "default_author": self.site_config.default_author,
@@ -607,6 +625,11 @@ class SiteGenerator:
             # Remove any stale search files left over from a previous build
             # that had search enabled.
             self._remove_stale_search_files()
+
+        # Generate statistics page (only when enabled)
+        if self.site_config.with_stats:
+            print("Generating blog statistics page...")
+            self._generate_stats_page(posts, sidebar_pages)
 
         # Copy static assets if they exist
         self._copy_static_assets()
@@ -1572,6 +1595,32 @@ class SiteGenerator:
         else:
             context["canonical_url"] = self._canonical_url_for_path(output_path)
         html = self.renderer.render_search_page(**context)
+        self._write_html(output_path, html)
+
+    def _generate_stats_page(self, posts: list[Post], pages: list[Page]) -> None:
+        """Generate the blog statistics page.
+
+        Args:
+            posts: All published posts; used to compute statistics.
+            pages: List of static pages (for the sidebar navigation).
+        """
+        context = self._get_global_context()
+        context["pages"] = pages
+        output_path = (
+            self.site_config.output_dir / self.site_config.stats_path.lstrip("/")
+        ).resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        stats_url = self._get_stats_url()
+        if self.site_config.clean_urls:
+            context["canonical_url"] = (
+                f"{self.site_config.site_url}{stats_url}"
+                if self.site_config.site_url
+                else stats_url
+            )
+        else:
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
+        blog_stats: BlogStats = compute_blog_stats(posts, self.site_config.site_url)
+        html = self.renderer.render_stats_page(stats=blog_stats, **context)
         self._write_html(output_path, html)
 
     def _remove_stale_search_files(self) -> None:

@@ -25,6 +25,7 @@ from blogmore.site_config import (
     DEFAULT_ARCHIVE_PATH,
     DEFAULT_CATEGORIES_PATH,
     DEFAULT_SEARCH_PATH,
+    DEFAULT_STATS_PATH,
     DEFAULT_TAGS_PATH,
     SiteConfig,
     site_config_defaults,
@@ -58,6 +59,7 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
         "archive_path",
         "tags_path",
         "categories_path",
+        "stats_path",
         "sidebar_pages",
         "head",
         "light_mode_code_style",
@@ -433,6 +435,7 @@ def parse_site_config_from_dict(
         ("archive_path", DEFAULT_ARCHIVE_PATH),
         ("tags_path", DEFAULT_TAGS_PATH),
         ("categories_path", DEFAULT_CATEGORIES_PATH),
+        ("stats_path", DEFAULT_STATS_PATH),
     ]
     for field_name, default in _html_path_defaults:
         raw = config.get(field_name, default)

@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Blog Statistics - {{ site_title }}{% endblock %}
+
+{% block meta_tags %}
+{# Exclude the stats page from search engine indexing — it is internal site
+   metadata rather than user-facing content. #}
+<meta name="robots" content="noindex">
+<meta property="og:title" content="Blog Statistics - {{ site_title }}">
+{% endblock %}
+
+{% block content %}
+<div class="stats-page">
+    <h1>Blog Statistics</h1>
+
+    {% set total_posts = stats.posts_per_hour | sum %}
+    <p class="stats-summary">Statistics for {{ total_posts }} post{{ '' if total_posts == 1 else 's' }}.</p>
+
+    {# ------------------------------------------------------------------ #}
+    {# Helper macro: render a histogram as a CSS bar chart               #}
+    {# ------------------------------------------------------------------ #}
+    {% macro histogram(title, labels, counts, label_step=1) %}
+    {% set max_count = counts | max if counts | max > 0 else 1 %}
+    <section class="stats-section stats-histogram">
+        <h2>{{ title }}</h2>
+        <figure class="stats-chart" aria-label="{{ title }}">
+            <div class="stats-bars">
+                {% for i in range(labels | length) %}
+                {% set pct = (counts[i] / max_count * 100) | round(1) %}
+                <div class="stats-bar-group">
+                    <div class="stats-bar-value-area">
+                        <span class="stats-bar-value">{{ counts[i] }}</span>
+                    </div>
+                    <div class="stats-bar-wrap">
+                        <div class="stats-bar" style="height: {{ pct }}%" title="{{ labels[i] }}: {{ counts[i] }} post{{ '' if counts[i] == 1 else 's' }}"></div>
+                    </div>
+                    {% if loop.index0 % label_step == 0 or loop.last %}
+                    <div class="stats-bar-label">{{ labels[i] }}</div>
+                    {% else %}
+                    <div class="stats-bar-label stats-bar-label-hidden" aria-hidden="true">{{ labels[i] }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </figure>
+    </section>
+    {% endmacro %}
+
+    {# Posts per hour of day #}
+    {% set hour_labels = [] %}
+    {% for h in range(24) %}{% set _ = hour_labels.append("%02d" % h) %}{% endfor %}
+    {{ histogram("Posts by Hour of Day", hour_labels, stats.posts_per_hour, label_step=2) }}
+
+    {# Posts per day of week #}
+    {{ histogram("Posts by Day of Week", ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], stats.posts_per_weekday) }}
+
+    {# Posts per month of year #}
+    {{ histogram("Posts by Month of Year", ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], stats.posts_per_month) }}
+
+    {# ------------------------------------------------------------------ #}
+    {# Word count                                                         #}
+    {# ------------------------------------------------------------------ #}
+    <section class="stats-section">
+        <h2>Word Count</h2>
+        <dl class="stats-details">
+            <div class="stats-detail-row">
+                <dt>Average</dt>
+                <dd>{{ "%.0f" % stats.avg_word_count }} words</dd>
+            </div>
+            <div class="stats-detail-row">
+                <dt>Shortest</dt>
+                <dd>
+                    {% if stats.min_word_count_post %}
+                    <a href="{{ stats.min_word_count_post.url }}">{{ stats.min_word_count_post.title }}</a>
+                    — {{ stats.min_word_count }} words
+                    {% else %}
+                    {{ stats.min_word_count }} words
+                    {% endif %}
+                </dd>
+            </div>
+            <div class="stats-detail-row">
+                <dt>Longest</dt>
+                <dd>
+                    {% if stats.max_word_count_post %}
+                    <a href="{{ stats.max_word_count_post.url }}">{{ stats.max_word_count_post.title }}</a>
+                    — {{ stats.max_word_count }} words
+                    {% else %}
+                    {{ stats.max_word_count }} words
+                    {% endif %}
+                </dd>
+            </div>
+        </dl>
+    </section>
+
+    {# ------------------------------------------------------------------ #}
+    {# Reading time                                                        #}
+    {# ------------------------------------------------------------------ #}
+    <section class="stats-section">
+        <h2>Reading Time</h2>
+        <dl class="stats-details">
+            <div class="stats-detail-row">
+                <dt>Average</dt>
+                <dd>{{ "%.1f" % stats.avg_reading_time }} min</dd>
+            </div>
+            <div class="stats-detail-row">
+                <dt>Quickest</dt>
+                <dd>
+                    {% if stats.min_reading_time_post %}
+                    <a href="{{ stats.min_reading_time_post.url }}">{{ stats.min_reading_time_post.title }}</a>
+                    — {{ stats.min_reading_time }} min
+                    {% else %}
+                    {{ stats.min_reading_time }} min
+                    {% endif %}
+                </dd>
+            </div>
+            <div class="stats-detail-row">
+                <dt>Longest</dt>
+                <dd>
+                    {% if stats.max_reading_time_post %}
+                    <a href="{{ stats.max_reading_time_post.url }}">{{ stats.max_reading_time_post.title }}</a>
+                    — {{ stats.max_reading_time }} min
+                    {% else %}
+                    {{ stats.max_reading_time }} min
+                    {% endif %}
+                </dd>
+            </div>
+        </dl>
+    </section>
+
+    {# ------------------------------------------------------------------ #}
+    {# Blog time span                                                      #}
+    {# ------------------------------------------------------------------ #}
+    {% if stats.earliest_post_date and stats.latest_post_date %}
+    <section class="stats-section">
+        <h2>Blog Lifespan</h2>
+        <dl class="stats-details">
+            <div class="stats-detail-row">
+                <dt>First post</dt>
+                <dd>
+                    {% if stats.earliest_post %}
+                    <a href="{{ stats.earliest_post.url }}">{{ stats.earliest_post_date.strftime("%Y-%m-%d") }}</a>
+                    {% else %}
+                    {{ stats.earliest_post_date.strftime("%Y-%m-%d") }}
+                    {% endif %}
+                </dd>
+            </div>
+            <div class="stats-detail-row">
+                <dt>Latest post</dt>
+                <dd>
+                    {% if stats.latest_post %}
+                    <a href="{{ stats.latest_post.url }}">{{ stats.latest_post_date.strftime("%Y-%m-%d") }}</a>
+                    {% else %}
+                    {{ stats.latest_post_date.strftime("%Y-%m-%d") }}
+                    {% endif %}
+                </dd>
+            </div>
+            <div class="stats-detail-row">
+                <dt>Span</dt>
+                <dd>
+                    {% set span = stats.blog_span_days %}
+                    {% if span is none %}
+                    —
+                    {% elif span >= 365 %}
+                    {{ "%.1f" % (span / 365.25) }} year{{ '' if (span / 365.25) | round(1) == 1.0 else 's' }}
+                    {% else %}
+                    {{ span }} day{{ '' if span == 1 else 's' }}
+                    {% endif %}
+                </dd>
+            </div>
+        </dl>
+    </section>
+    {% endif %}
+
+    {# ------------------------------------------------------------------ #}
+    {# Tags, categories and links overview                                 #}
+    {# ------------------------------------------------------------------ #}
+    <section class="stats-section">
+        <h2>Content Overview</h2>
+        <dl class="stats-details">
+            <div class="stats-detail-row">
+                <dt>Tags</dt>
+                <dd><a href="{{ tags_url }}">{{ stats.tag_count }}</a></dd>
+            </div>
+            <div class="stats-detail-row">
+                <dt>Categories</dt>
+                <dd><a href="{{ categories_url }}">{{ stats.category_count }}</a></dd>
+            </div>
+            <div class="stats-detail-row">
+                <dt>Unique external links</dt>
+                <dd>{{ stats.unique_external_link_count }}</dd>
+            </div>
+        </dl>
+    </section>
+
+    {# ------------------------------------------------------------------ #}
+    {# Top 20 linked domains                                               #}
+    {# ------------------------------------------------------------------ #}
+    {% if stats.top_domains %}
+    <section class="stats-section">
+        <h2>Top Linked Domains</h2>
+        <div class="stats-table-wrap">
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Domain</th>
+                        <th>Links</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for domain, count in stats.top_domains %}
+                    <tr>
+                        <td class="stats-table-rank">{{ loop.index }}</td>
+                        <td class="stats-table-domain">
+                            <a href="https://{{ domain }}" target="_blank" rel="noopener noreferrer">{{ domain }}</a>
+                        </td>
+                        <td class="stats-table-count">{{ count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
+
+</div>
+{% endblock %}

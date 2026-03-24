@@ -52,6 +52,8 @@ here](https://github.com/davep/davep.github.com)).
   caution) rendered from standard `> [!TYPE]` blockquote syntax
 - **RSS and Atom feeds** — built-in feed generation for syndication
 - **XML sitemap** — optional `sitemap.xml` for search engine indexing
+- **Blog statistics page** — optional stats page with histograms, word counts,
+  reading times, lifespan, top linked domains, and more
 - **SEO optimisation** — meta tags, Open Graph tags, and Twitter Card support
 - **Automatic organisation** — tag pages, category pages, and chronological
   archives generated automatically
