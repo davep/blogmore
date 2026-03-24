@@ -29,6 +29,7 @@ BlogMore focuses on simplicity and efficiency in creating blog-focused websites.
 - **Client-side search** - Optional full-text search across post titles and content, running entirely in the browser with no external services (enable with `--with-search`)
 - **XML sitemap** - Optional `sitemap.xml` generation for search engine indexing (enable with `--with-sitemap`)
 - **Flexible URL scheme for posts** - Fully configurable post output paths and URLs via the `post_path` option; choose date-based paths, per-post directories, category-based layouts, and more
+- **Blog statistics page** — Optional stats page with histograms, word counts, reading times, lifespan, top linked domains, and more
 
 ## Installation
 
