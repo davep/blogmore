@@ -15,6 +15,10 @@ from pygments.styles import get_all_styles, get_style_by_name
 DEFAULT_LIGHT_STYLE = "xcode"
 DEFAULT_DARK_STYLE = "github-dark"
 
+##############################################################################
+# Internal regex for parsing a single Pygments .highlight CSS rule.
+_RULE_PATTERN = re.compile(r"^(\.highlight(?:\s+\.[a-z0-9]+)?)\s*\{([^}]*)\}")
+
 
 def is_valid_style(style_name: str) -> bool:
     """Return whether *style_name* is a valid Pygments style name.
@@ -80,49 +84,69 @@ def _highlight_rules(style_name: str) -> list[str]:
     return [line for line in css.splitlines() if line.startswith(".highlight")]
 
 
-def _prefix_highlight_rules(rules: list[str], prefix: str) -> list[str]:
-    """Re-write a list of ``.highlight`` CSS rules, inserting a selector prefix.
-
-    Each ``.highlight`` occurrence at the start of a selector is replaced by
-    ``<prefix> .highlight``.  This transforms a plain light-mode rule such as::
-
-        .highlight .k { color: #008000; font-weight: bold } /* Keyword */
-
-    into::
-
-        :root[data-theme="dark"] .highlight .k { color: #008000; font-weight: bold } /* Keyword */
+def _parse_token_rules(rules: list[str]) -> dict[str, dict[str, str]]:
+    """Parse a list of raw ``.highlight`` CSS rules into a structured mapping.
 
     Args:
-        rules: A list of CSS rule strings as returned by :func:`_highlight_rules`.
-        prefix: The selector prefix to insert before ``.highlight``.
+        rules: CSS rule strings as returned by :func:`_highlight_rules`.
 
     Returns:
-        A new list of CSS rule strings with the prefix applied.
+        A dictionary mapping each CSS selector (e.g. ``".highlight .k"``) to a
+        dictionary of CSS property names to their raw values.
     """
-    return [re.sub(r"^\.highlight", f"{prefix} .highlight", rule) for rule in rules]
+    parsed: dict[str, dict[str, str]] = {}
+    for rule in rules:
+        match = _RULE_PATTERN.match(rule)
+        if not match:
+            continue
+        selector = match.group(1).strip()
+        props: dict[str, str] = {}
+        for declaration in match.group(2).split(";"):
+            declaration = declaration.strip()
+            if ":" in declaration:
+                prop, _, value = declaration.partition(":")
+                props[prop.strip()] = value.strip()
+        if props:
+            parsed[selector] = props
+    return parsed
+
+
+def _css_var_name(selector: str, prop: str) -> str:
+    """Generate a CSS custom property name for a ``.highlight`` selector and property.
+
+    Args:
+        selector: A CSS selector such as ``".highlight .k"`` or ``".highlight"``.
+        prop: A CSS property name such as ``"color"`` or ``"font-weight"``.
+
+    Returns:
+        A CSS custom property name such as ``"--hl-k-color"`` or
+        ``"--hl-background"``.
+    """
+    parts = selector.strip().split()
+    if len(parts) > 1:
+        token = parts[-1].lstrip(".")
+        return f"--hl-{token}-{prop}"
+    return f"--hl-{prop}"
 
 
 def build_code_css(light_style: str, dark_style: str) -> str:
     """Build a complete ``code.css`` stylesheet for the given Pygments styles.
 
-    Generates CSS that:
+    Uses CSS custom properties so that each ``.highlight`` selector rule is
+    declared only once.  Theme switching is achieved by overriding the custom
+    properties in two dark-mode contexts:
 
-    * Applies the *light_style* colour scheme unconditionally (base rules that
-      remain in effect in light mode).
-    * Overrides the colour scheme with *dark_style* when the operating system
-      reports a preference for dark mode (``@media (prefers-color-scheme:
-      dark)``) and the user has not explicitly chosen a theme via the
-      theme-toggle button (``[data-theme]`` is absent from ``<html>``).
-    * Overrides the colour scheme with *dark_style* when the theme-toggle
-      button has explicitly selected dark mode
-      (``[data-theme="dark"]`` on ``<html>``).
+    * ``@media (prefers-color-scheme: dark)`` with ``:root:not([data-theme])``
+      — active when the operating system reports a dark preference and the
+      user has not activated the theme-toggle button.
+    * ``:root[data-theme="dark"]`` — active when the theme-toggle button has
+      explicitly selected dark mode.
 
-    Each section also sets the CSS ``color-scheme`` property directly on the
-    ``.highlight`` element, derived from the background luminance of the
-    chosen Pygments style.  This ensures that the browser's ``::selection``
-    highlight colours and any inherited text colour are appropriate for the
-    Pygments style's actual background — regardless of the site-wide
-    light/dark mode setting.
+    The ``color-scheme`` property on ``.highlight`` is also driven by a custom
+    property (``--hl-color-scheme``), derived from the perceived background
+    luminance of the chosen Pygments style.  This ensures that the browser's
+    ``::selection`` colours and any inherited text colour remain appropriate
+    regardless of the site-wide light/dark mode setting.
 
     Args:
         light_style: Name of the Pygments style to use in light mode.
@@ -135,46 +159,95 @@ def build_code_css(light_style: str, dark_style: str) -> str:
         ClassNotFound: If either *light_style* or *dark_style* is not a
             recognised Pygments style name.
     """
-    light_rules = _highlight_rules(light_style)
-    dark_rules = _highlight_rules(dark_style)
+    light_parsed = _parse_token_rules(_highlight_rules(light_style))
+    dark_parsed = _parse_token_rules(_highlight_rules(dark_style))
 
     light_colour_scheme = _colour_scheme_for_style(light_style)
     dark_colour_scheme = _colour_scheme_for_style(dark_style)
 
-    # Light mode — apply rules unconditionally.  Also set color-scheme so
-    # that browser ::selection colours match the Pygments style background.
-    light_section = (
-        f".highlight {{ color-scheme: {light_colour_scheme}; }}\n"
-        + "\n".join(light_rules)
-    )
+    # Collect all unique selectors, preserving order (light first, then any
+    # dark-only selectors appended at the end).
+    all_selectors: list[str] = []
+    seen_selectors: set[str] = set()
+    for selector in list(light_parsed.keys()) + list(dark_parsed.keys()):
+        if selector not in seen_selectors:
+            all_selectors.append(selector)
+            seen_selectors.add(selector)
 
-    # Dark mode (system preference, no explicit theme toggle).
-    auto_dark_rules = _prefix_highlight_rules(dark_rules, ":root:not([data-theme])")
-    auto_dark_section = (
-        "@media (prefers-color-scheme: dark) {\n"
-        f"    :root:not([data-theme]) .highlight {{ color-scheme: {dark_colour_scheme}; }}\n"
-        + "\n".join(f"    {rule}" for rule in auto_dark_rules)
-        + "\n}"
-    )
+    # For each selector, collect all unique CSS properties across both styles,
+    # preserving order (light properties first, then any dark-only ones).
+    all_props_by_selector: dict[str, list[str]] = {}
+    for selector in all_selectors:
+        seen_props: set[str] = set()
+        all_props: list[str] = []
+        for prop in list(light_parsed.get(selector, {}).keys()) + list(
+            dark_parsed.get(selector, {}).keys()
+        ):
+            if prop not in seen_props:
+                all_props.append(prop)
+                seen_props.add(prop)
+        all_props_by_selector[selector] = all_props
 
-    # Dark mode (explicitly selected via the theme-toggle button).
-    explicit_dark_rules = _prefix_highlight_rules(
-        dark_rules, ':root[data-theme="dark"]'
-    )
-    explicit_dark_section = (
-        f':root[data-theme="dark"] .highlight {{ color-scheme: {dark_colour_scheme}; }}\n'
-        + "\n".join(explicit_dark_rules)
-    )
+    def _var_declarations(
+        parsed: dict[str, dict[str, str]], colour_scheme: str
+    ) -> list[str]:
+        """Return a flat list of CSS custom property declarations for one mode."""
+        lines: list[str] = [f"--hl-color-scheme: {colour_scheme};"]
+        for selector in all_selectors:
+            props = parsed.get(selector, {})
+            for prop in all_props_by_selector[selector]:
+                # Use "unset" for any property absent in this style so that
+                # the property resets cleanly (inherited props → inherit,
+                # non-inherited props → initial/transparent).
+                value = props.get(prop, "unset")
+                lines.append(f"{_css_var_name(selector, prop)}: {value};")
+        return lines
+
+    light_vars = _var_declarations(light_parsed, light_colour_scheme)
+    dark_vars = _var_declarations(dark_parsed, dark_colour_scheme)
+
+    # Build the actual .highlight selector rules — declared only once, each
+    # property value resolved through a CSS custom property.
+    rule_lines: list[str] = []
+    base_handled = False
+    for selector in all_selectors:
+        all_props = all_props_by_selector[selector]
+        if not all_props:
+            continue
+        prop_decls = "; ".join(
+            f"{prop}: var({_css_var_name(selector, prop)})" for prop in all_props
+        )
+        if selector == ".highlight":
+            rule_lines.append(
+                f"{selector} {{ color-scheme: var(--hl-color-scheme); {prop_decls} }}"
+            )
+            base_handled = True
+        else:
+            rule_lines.append(f"{selector} {{ {prop_decls} }}")
+
+    if not base_handled:
+        rule_lines.insert(0, ".highlight { color-scheme: var(--hl-color-scheme); }")
 
     parts = [
         "/* Light mode syntax highlighting */",
-        light_section,
+        ":root {",
+        *[f"    {line}" for line in light_vars],
+        "}",
         "",
         "/* Dark mode syntax highlighting (system preference) */",
-        auto_dark_section,
+        "@media (prefers-color-scheme: dark) {",
+        "    :root:not([data-theme]) {",
+        *[f"        {line}" for line in dark_vars],
+        "    }",
+        "}",
         "",
         "/* Dark mode syntax highlighting (explicit theme toggle) */",
-        explicit_dark_section,
+        ':root[data-theme="dark"] {',
+        *[f"    {line}" for line in dark_vars],
+        "}",
+        "",
+        "/* Syntax highlighting rules */",
+        *rule_lines,
     ]
     return "\n".join(parts) + "\n"
 
