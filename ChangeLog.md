@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.3.0
 
-**Released: WiP**
+**Released: 2026-03-24**
 
 - Fixed sitemap generation not excluding the search page if a custom
   `search_path` was in use.
