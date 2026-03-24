@@ -29,6 +29,10 @@ DEFAULT_TAGS_PATH = "tags.html"
 # Default categories page path (relative to the output directory).
 DEFAULT_CATEGORIES_PATH = "categories.html"
 
+##############################################################################
+# Default stats page path (relative to the output directory).
+DEFAULT_STATS_PATH = "stats.html"
+
 
 @dataclass
 class SiteConfig:
@@ -91,6 +95,9 @@ class SiteConfig:
 
     with_sitemap: bool = False
     """Whether to generate an XML sitemap."""
+
+    with_stats: bool = False
+    """Whether to generate a blog statistics page."""
 
     minify_css: bool = False
     """Whether to minify the CSS, writing it as ``styles.min.css``."""
@@ -197,6 +204,26 @@ class SiteConfig:
 
     This is a **configuration file only** option — it cannot be set on the
     command line.  Defaults to ``categories.html``.
+    """
+
+    stats_path: str = DEFAULT_STATS_PATH
+    """Path (relative to the output directory) where the statistics page is written.
+
+    The path is joined onto the ``output`` directory, so ``stats.html``
+    produces ``<output>/stats.html``, and ``blog/stats/index.html``
+    produces ``<output>/blog/stats/index.html``.
+
+    Parent directories are created automatically.  When ``clean_urls`` is
+    enabled and the path ends in ``index.html``, the ``index.html`` portion
+    is omitted in any URL reference to the page.
+
+    The path is always treated as relative to the output directory root, so
+    both ``/stats/index.html`` and ``stats/index.html`` produce the same
+    output location.
+
+    Only used when ``with_stats`` is ``True``.  This is a **configuration
+    file only** option — it cannot be set on the command line.  Defaults to
+    ``stats.html``.
     """
 
     page_1_path: str = DEFAULT_PAGE_1_PATH

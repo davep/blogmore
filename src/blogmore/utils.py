@@ -3,6 +3,44 @@
 import re
 
 
+def count_words(content: str) -> int:
+    """Count the number of words in the given content.
+
+    Strips common Markdown and HTML formatting before counting so that only
+    prose words are included.  The same normalisation rules as
+    :func:`calculate_reading_time` are applied.
+
+    Args:
+        content: The text content to analyse (may include Markdown/HTML).
+
+    Returns:
+        The number of words in the content.
+
+    Examples:
+        >>> count_words("Hello world")
+        2
+        >>> count_words("word " * 10)
+        10
+    """
+    # Remove code blocks
+    content = re.sub(r"```[\s\S]*?```", "", content)
+    content = re.sub(r"`[^`]+`", "", content)
+
+    # Remove markdown links but keep the text: [text](url) -> text
+    content = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", content)
+
+    # Remove markdown images: ![alt](url) -> ""
+    content = re.sub(r"!\[([^\]]*)\]\([^\)]+\)", "", content)
+
+    # Remove HTML tags
+    content = re.sub(r"<[^>]+>", "", content)
+
+    # Remove markdown formatting characters
+    content = re.sub(r"[*_~`#-]", " ", content)
+
+    return len([word for word in content.split() if word])
+
+
 def calculate_reading_time(content: str, words_per_minute: int = 200) -> int:
     """Calculate the estimated reading time for content in whole minutes.
 

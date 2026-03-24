@@ -4,6 +4,16 @@
 
 **Released: WiP**
 
+- Added an optional blog statistics page (`--with-stats` / `with_stats: true`).
+  When enabled, a `/stats.html` page is generated showing posting patterns by
+  hour, day of week and month (displayed as histograms), average/min/max word
+  counts and reading times (linking to the relevant posts), blog lifespan, tag
+  and category counts, unique external link count, and a table of the top 20
+  most-linked external domains.  A **Stats** nav link is added automatically
+  between **Search** and **RSS**.  The output path is configurable via the
+  `stats_path` configuration file option, which honours `clean_urls` in the
+  same way as the other path options.
+  ([#339](https://github.com/davep/blogmore/pull/339))
 - Fixed sitemap generation not excluding the search page if a custom
   `search_path` was in use.
   ([#331](https://github.com/davep/blogmore/pull/331))

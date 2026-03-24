@@ -5328,3 +5328,260 @@ class TestCategoriesPathConfiguration:
             '<link rel="canonical" href="https://example.com/categories/">'
             in categories_content
         )
+
+
+class TestStatsPageGeneration:
+    """Tests for the stats page (with_stats) feature."""
+
+    def test_stats_disabled_by_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """stats.html is NOT generated when with_stats is False (the default)."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator.generate()
+
+        assert not (temp_output_dir / "stats.html").exists()
+
+    def test_stats_enabled_generates_stats_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """stats.html is generated when with_stats=True."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "stats.html").exists()
+
+    def test_stats_nav_link_absent_by_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The Stats nav link does not appear when with_stats is False."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/stats.html" not in index_content
+
+    def test_stats_nav_link_present_when_enabled(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The Stats nav link appears in the navigation when with_stats=True."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/stats.html"' in index_content
+
+    def test_stats_nav_link_appears_after_search_before_rss(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The Stats link comes after Search and before the RSS link in the nav."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+                with_stats=True,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        # Isolate just the <nav> element to avoid matching feed links in <head>.
+        nav_start = index_content.find("<nav>")
+        nav_end = index_content.find("</nav>", nav_start) + len("</nav>")
+        nav_content = index_content[nav_start:nav_end]
+
+        search_pos = nav_content.find('href="/search.html"')
+        stats_pos = nav_content.find('href="/stats.html"')
+        rss_pos = nav_content.find('href="/feed.xml"')
+
+        assert search_pos != -1
+        assert stats_pos != -1
+        assert rss_pos != -1
+        assert search_pos < stats_pos < rss_pos
+
+    def test_stats_page_contains_histogram_sections(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The generated stats page contains the expected histogram section headers."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+            )
+        )
+        generator.generate()
+
+        stats_content = (temp_output_dir / "stats.html").read_text()
+        assert "Posts by Hour of Day" in stats_content
+        assert "Posts by Day of Week" in stats_content
+        assert "Posts by Month of Year" in stats_content
+
+    def test_stats_page_contains_word_count_section(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The stats page includes the word count detail section."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+            )
+        )
+        generator.generate()
+
+        stats_content = (temp_output_dir / "stats.html").read_text()
+        assert "Word Count" in stats_content
+
+    def test_stats_page_contains_reading_time_section(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The stats page includes the reading time detail section."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+            )
+        )
+        generator.generate()
+
+        stats_content = (temp_output_dir / "stats.html").read_text()
+        assert "Reading Time" in stats_content
+
+    def test_stats_page_contains_content_overview_section(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The stats page includes the content overview section."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+            )
+        )
+        generator.generate()
+
+        stats_content = (temp_output_dir / "stats.html").read_text()
+        assert "Content Overview" in stats_content
+
+    def test_custom_stats_path(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """A custom stats_path generates the stats page at the specified location."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+                stats_path="data/blog-stats.html",
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "data" / "blog-stats.html").exists()
+        assert not (temp_output_dir / "stats.html").exists()
+
+    def test_custom_stats_path_nav_link_uses_configured_url(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The Stats nav link uses the custom stats_path URL."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+                stats_path="data/blog-stats.html",
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/data/blog-stats.html"' in index_content
+        assert 'href="/stats.html"' not in index_content
+
+    def test_stats_path_clean_urls_strips_index_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """With clean_urls enabled and stats_path ending in index.html, the nav link is clean."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+                stats_path="stats/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "stats" / "index.html").exists()
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/stats/"' in index_content
+
+    def test_stats_path_default_value(self) -> None:
+        """The stats_path setting defaults to stats.html."""
+        from blogmore.site_config import DEFAULT_STATS_PATH
+
+        config = SiteConfig(output_dir=Path("output"))
+        assert config.stats_path == DEFAULT_STATS_PATH
+        assert config.stats_path == "stats.html"
+
+    def test_stats_canonical_url_with_site_url(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The stats page canonical URL includes the site_url."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+                site_url="https://example.com",
+            )
+        )
+        generator.generate()
+
+        stats_content = (temp_output_dir / "stats.html").read_text()
+        assert '<link rel="canonical" href="https://example.com/stats.html">' in stats_content
+
+    def test_stats_canonical_url_clean_url_with_site_url(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Canonical URL on stats page uses site_url + clean URL when clean_urls is on."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+                site_url="https://example.com",
+                stats_path="stats/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        stats_content = (temp_output_dir / "stats" / "index.html").read_text()
+        assert '<link rel="canonical" href="https://example.com/stats/">' in stats_content

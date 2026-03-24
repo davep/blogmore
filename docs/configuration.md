@@ -307,6 +307,17 @@ with_sitemap: true
 
 A `site_url` should be set when using this option so that sitemap entries contain absolute URLs (e.g. `https://example.com/2024/01/15/my-post.html`). If `site_url` is not provided, URLs will fall back to `https://example.com`.
 
+#### `with_stats`
+
+Generate a blog statistics page. When `true`, BlogMore generates a `/stats.html` page (path configurable via [`stats_path`](#stats_path)) containing posting-pattern histograms, word count and reading-time summaries, blog lifespan, tag and category counts, unique external link count, and a table of the top 20 most-linked external domains. A **Stats** link is automatically added to the navigation bar between **Search** and **RSS**.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+with_stats: true
+```
+
 #### `with_read_time`
 
 Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on 200 words per minute) and displays it next to the post date on all post listings and individual post pages.
@@ -632,6 +643,42 @@ clean_urls: true
 ```
 
 This makes the categories page accessible at `/categories/` rather than `/categories/index.html`.
+
+#### `stats_path`
+
+Path (relative to the output directory) where the blog statistics page is generated.  This is a **configuration file only** option — it cannot be set on the command line.  Only used when [`with_stats`](#with_stats) is `true`.
+
+**Type:** String  
+**Default:** `stats.html`
+
+```yaml
+stats_path: "stats.html"
+```
+
+##### How it works
+
+The path is joined onto the `output` directory.  Any intermediate subdirectories are created automatically.
+
+The path is always treated as relative to the output directory root — a leading `/` is stripped automatically.  So both `stats/index.html` and `/stats/index.html` produce the same output location.
+
+When `clean_urls` is enabled and the path ends in `index.html`, the `index.html` portion is omitted in any URL reference to the stats page (navigation links, canonical URL, etc.), so the page is accessible at the clean trailing-slash URL.
+
+##### Examples
+
+Default — stats page at the site root:
+
+```yaml
+stats_path: "stats.html"
+```
+
+Stats page in its own subdirectory with clean URLs:
+
+```yaml
+stats_path: "stats/index.html"
+clean_urls: true
+```
+
+This makes the stats page accessible at `/stats/` rather than `/stats/index.html`.
 
 #### `page_1_path`
 

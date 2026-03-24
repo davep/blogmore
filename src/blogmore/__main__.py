@@ -255,6 +255,7 @@ def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
         "icon_source": None,
         "with_search": False,
         "with_sitemap": False,
+        "with_stats": False,
         "minify_css": False,
         "minify_js": False,
         "minify_html": False,
