@@ -3,6 +3,8 @@
 {% block title %}Blog Statistics - {{ site_title }}{% endblock %}
 
 {% block meta_tags %}
+{# Exclude the stats page from search engine indexing — it is internal site
+   metadata rather than user-facing content. #}
 <meta name="robots" content="noindex">
 <meta property="og:title" content="Blog Statistics - {{ site_title }}">
 {% endblock %}

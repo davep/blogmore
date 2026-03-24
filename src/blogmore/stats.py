@@ -191,8 +191,6 @@ def compute_blog_stats(posts: list[Post], site_url: str = "") -> BlogStats:
 
     # --- Blog time span -------------------------------------------------------
     if dated_posts:
-        dates = [post.date for post in dated_posts]
-
         # Normalise to naive datetimes for comparison across tz-aware / naive.
         def _to_naive(date: dt.datetime) -> dt.datetime:
             if date.tzinfo is not None:
@@ -213,7 +211,6 @@ def compute_blog_stats(posts: list[Post], site_url: str = "") -> BlogStats:
             and stats.latest_post_date.tzinfo is not None
         ):
             stats.latest_post_date = _to_naive(stats.latest_post_date)
-        _ = dates  # referenced above via dated_posts
 
     # --- Word count and reading time -----------------------------------------
     word_counts = [(post, count_words(post.content)) for post in posts]
