@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from blogmore.code_styles import DEFAULT_DARK_STYLE, DEFAULT_LIGHT_STYLE
 from blogmore.page_path import DEFAULT_PAGE_PATH
 from blogmore.pagination_path import DEFAULT_PAGE_1_PATH, DEFAULT_PAGE_N_PATH
 from blogmore.post_path import DEFAULT_POST_PATH
@@ -270,6 +271,30 @@ class SiteConfig:
 
     This is a **configuration file only** option — it cannot be set on the
     command line.  Empty by default.
+    """
+
+    light_mode_code_style: str = DEFAULT_LIGHT_STYLE
+    """Pygments style name used for syntax highlighting in light mode.
+
+    Accepts any style name from the Pygments style gallery
+    (https://pygments.org/styles/).  The chosen style is used to generate a
+    ``code.css`` file (or ``code.min.css`` when ``minify_css`` is enabled)
+    that is served alongside the main stylesheet.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``"xcode"``.
+    """
+
+    dark_mode_code_style: str = DEFAULT_DARK_STYLE
+    """Pygments style name used for syntax highlighting in dark mode.
+
+    Accepts any style name from the Pygments style gallery
+    (https://pygments.org/styles/).  The chosen style is used to generate a
+    ``code.css`` file (or ``code.min.css`` when ``minify_css`` is enabled)
+    that is served alongside the main stylesheet.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``"github-dark"``.
     """
 
     def __post_init__(self) -> None:

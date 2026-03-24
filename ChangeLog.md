@@ -7,6 +7,10 @@
 - Fixed sitemap generation not excluding the search page if a custom
   `search_path` was in use.
   ([#331](https://github.com/davep/blogmore/pull/331))
+- Added `light_mode_code_style` and `dark_mode_code_style` configuration
+  options that allow the Pygments syntax-highlighting colour scheme to be
+  configured independently for light and dark mode.
+  ([#334](https://github.com/davep/blogmore/pull/334))
 
 ## v2.2.1
 
