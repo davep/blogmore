@@ -1561,11 +1561,8 @@ footer a:hover {
 
 .stats-bars {
     display: flex;
-    align-items: flex-end;
+    align-items: stretch; /* all bar groups same total height */
     gap: 4px;
-    height: 140px;
-    padding-bottom: 28px; /* room for labels */
-    min-width: 0;
     width: 100%;
     box-sizing: border-box;
 }
@@ -1576,14 +1573,33 @@ footer a:hover {
     align-items: center;
     flex: 1 1 0;
     min-width: 18px;
-    height: 100%;
-    position: relative;
 }
 
-.stats-bar-wrap {
-    flex: 1 1 auto;
+/* Fixed-height area above the bar — holds the count label */
+.stats-bar-value-area {
+    height: 1.6em;
     display: flex;
-    align-items: flex-end;
+    align-items: flex-end; /* value sits right at the bottom of this area, flush against bar */
+    justify-content: center;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.stats-bar-value {
+    font-size: 0.7em;
+    font-weight: 600;
+    color: var(--text-secondary);
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+/* Fixed-height area where the bar lives */
+.stats-bar-wrap {
+    height: 120px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end; /* bars grow from the bottom */
     width: 100%;
 }
 
@@ -1592,44 +1608,26 @@ footer a:hover {
     background: var(--link-color);
     border-radius: 3px 3px 0 0;
     min-height: 2px;
-    position: relative;
     transition: background 0.15s;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
 }
 
 .stats-bar:hover {
     background: var(--link-hover-color);
 }
 
-.stats-bar-value {
-    font-size: 0.65em;
-    color: #fff;
-    padding-top: 3px;
-    line-height: 1;
-    white-space: nowrap;
-    pointer-events: none;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-}
-
-/* Hide value text on very narrow bars */
-.stats-bar[style*="height: 0"] .stats-bar-value,
-.stats-bar[style*="height: 1"] .stats-bar-value,
-.stats-bar[style*="height: 2"] .stats-bar-value,
-.stats-bar[style*="height: 3"] .stats-bar-value {
-    display: none;
-}
-
+/* Fixed-height area below the bar — holds the axis label */
 .stats-bar-label {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    height: 1.5em;
+    flex-shrink: 0;
+    margin-top: 4px;
     font-size: 0.68em;
     color: var(--text-secondary);
     white-space: nowrap;
     line-height: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
 }
 
 .stats-bar-label-hidden {
@@ -1720,9 +1718,12 @@ footer a:hover {
 /* --- Responsive adjustments ----------------------------------------------- */
 
 @media (max-width: 600px) {
-    .stats-bars {
-        height: 120px;
-        gap: 2px;
+    .stats-bar-wrap {
+        height: 90px;
+    }
+
+    .stats-bar-value-area {
+        height: 1.3em;
     }
 
     .stats-bar-group {
@@ -1730,10 +1731,10 @@ footer a:hover {
     }
 
     .stats-bar-value {
-        font-size: 0;
+        font-size: 0.6em;
     }
 
     .stats-bar-label {
-        font-size: 0.58em;
+        font-size: 0.55em;
     }
 }

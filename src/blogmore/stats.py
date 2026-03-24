@@ -102,6 +102,12 @@ class BlogStats:
     latest_post_date: dt.datetime | None = None
     """Date of the most recently published post."""
 
+    earliest_post: Post | None = None
+    """The oldest published post."""
+
+    latest_post: Post | None = None
+    """The most recently published post."""
+
     tag_count: int = 0
     """Number of distinct tags used across all posts."""
 
@@ -198,8 +204,12 @@ def compute_blog_stats(posts: list[Post], site_url: str = "") -> BlogStats:
             return date
 
         naive_dated = [(post, _to_naive(post.date)) for post in dated_posts]  # type: ignore[arg-type]
-        stats.earliest_post_date = min(naive_dated, key=lambda pair: pair[1])[0].date
-        stats.latest_post_date = max(naive_dated, key=lambda pair: pair[1])[0].date
+        earliest_pair = min(naive_dated, key=lambda pair: pair[1])
+        latest_pair = max(naive_dated, key=lambda pair: pair[1])
+        stats.earliest_post = earliest_pair[0]
+        stats.latest_post = latest_pair[0]
+        stats.earliest_post_date = earliest_pair[0].date
+        stats.latest_post_date = latest_pair[0].date
         # Ensure they're stored as naive datetimes for consistent rendering.
         if (
             stats.earliest_post_date is not None

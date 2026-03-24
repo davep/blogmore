@@ -28,12 +28,13 @@
                 {% for i in range(labels | length) %}
                 {% set pct = (counts[i] / max_count * 100) | round(1) %}
                 <div class="stats-bar-group">
+                    <div class="stats-bar-value-area">
+                        {% if counts[i] > 0 %}
+                        <span class="stats-bar-value">{{ counts[i] }}</span>
+                        {% endif %}
+                    </div>
                     <div class="stats-bar-wrap">
-                        <div class="stats-bar" style="height: {{ pct }}%" title="{{ labels[i] }}: {{ counts[i] }} post{{ '' if counts[i] == 1 else 's' }}">
-                            {% if counts[i] > 0 %}
-                            <span class="stats-bar-value">{{ counts[i] }}</span>
-                            {% endif %}
-                        </div>
+                        <div class="stats-bar" style="height: {{ pct }}%" title="{{ labels[i] }}: {{ counts[i] }} post{{ '' if counts[i] == 1 else 's' }}"></div>
                     </div>
                     {% if loop.index0 % label_step == 0 or loop.last %}
                     <div class="stats-bar-label">{{ labels[i] }}</div>
@@ -137,11 +138,23 @@
         <dl class="stats-details">
             <div class="stats-detail-row">
                 <dt>First post</dt>
-                <dd>{{ stats.earliest_post_date.strftime("%Y-%m-%d") }}</dd>
+                <dd>
+                    {% if stats.earliest_post %}
+                    <a href="{{ stats.earliest_post.url }}">{{ stats.earliest_post_date.strftime("%Y-%m-%d") }}</a>
+                    {% else %}
+                    {{ stats.earliest_post_date.strftime("%Y-%m-%d") }}
+                    {% endif %}
+                </dd>
             </div>
             <div class="stats-detail-row">
                 <dt>Latest post</dt>
-                <dd>{{ stats.latest_post_date.strftime("%Y-%m-%d") }}</dd>
+                <dd>
+                    {% if stats.latest_post %}
+                    <a href="{{ stats.latest_post.url }}">{{ stats.latest_post_date.strftime("%Y-%m-%d") }}</a>
+                    {% else %}
+                    {{ stats.latest_post_date.strftime("%Y-%m-%d") }}
+                    {% endif %}
+                </dd>
             </div>
             <div class="stats-detail-row">
                 <dt>Span</dt>
