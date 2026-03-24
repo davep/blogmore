@@ -65,23 +65,6 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
     }
 )
 
-##############################################################################
-# Simple scalar fields that exist only in the config file and have no CLI
-# equivalent.  When one of these is absent from the config dict during a
-# serve-mode reload, parse_site_config_from_dict must include it in the
-# returned kwargs using the SiteConfig class default so that removing the key
-# resets the value rather than preserving the previous (stale) one.
-#
-# Overlapping CLI+config scalar fields (site_title, with_search, etc.) are
-# intentionally NOT listed here: those must preserve the existing value when
-# absent so that an explicit CLI override is not silently dropped on reload.
-_CONFIG_ONLY_SCALAR_FIELDS: frozenset[str] = frozenset(
-    {
-        "with_advert",
-        "clean_urls",
-    }
-)
-
 DEFAULT_CONFIG_FILES = ["blogmore.yaml", "blogmore.yml"]
 
 
@@ -325,25 +308,31 @@ def parse_site_config_from_dict(
     that a caller using ``dataclasses.replace()`` will preserve the existing
     SiteConfig value for those fields.
 
-    Absent-field semantics differ by field category:
+    Absent-field semantics for simple scalars (auto-discovered and explicit):
 
-    * **Config-file-only scalars** (``_CONFIG_ONLY_SCALAR_FIELDS``): when the
-      key is absent the SiteConfig class default is included in kwargs so that
-      removing the key resets the value rather than preserving a stale one.
-    * **Overlapping CLI+config scalars** (e.g. ``site_title``): when the key
-      is absent the field is omitted from kwargs so that an explicit CLI
-      override supplied at startup is not silently dropped on reload.
-    * **Explicit fields** (path templates, html paths, ``sidebar_pages``,
-      ``head``): always included in kwargs, using their SiteConfig defaults
-      when absent.
+    * When the key is **present** in ``config``: the config-file value is used,
+      unless a matching CLI override is in ``cli_overrides``, in which case the
+      CLI value always wins.
+    * When the key is **absent** from ``config`` and a CLI override was
+      supplied: the CLI override value is used (preserving an explicit
+      command-line choice across reloads).
+    * When the key is **absent** from ``config`` and no CLI override was
+      supplied: the SiteConfig class default is included in kwargs so that
+      removing the key from the YAML during a serve-mode reload resets the
+      value to its default rather than preserving a stale one.
+
+    This policy applies uniformly to all simple scalar fields regardless of
+    whether they are config-file-only or also accessible via the CLI, making
+    the function fully future-proof: adding a new simple scalar to SiteConfig
+    with a default value is all that is required.
 
     Args:
         config: Raw configuration dictionary loaded from the YAML file.
         output_dir: The site output directory, used to verify that path fields
             do not escape it.
         cli_overrides: Optional dict of values explicitly set via the CLI.
-            Currently used to restore the CLI-provided ``extra_stylesheets``
-            when that key is absent from the config file.
+            When a key is absent from ``config``, the corresponding override
+            (if any) is used instead of the SiteConfig default.
 
     Returns:
         A tuple ``(kwargs, errors)`` where ``kwargs`` is a dict suitable for
@@ -366,7 +355,8 @@ def parse_site_config_from_dict(
         if hint is None or not _is_simple_scalar_hint(hint):
             continue
         if name in config:
-            value = config[name]
+            # CLI override always takes precedence over a config-file value.
+            value = overrides[name] if name in overrides else config[name]
             if _check_simple_scalar_value(value, hint):
                 kwargs[name] = value
             else:
@@ -374,19 +364,31 @@ def parse_site_config_from_dict(
                     f"{name} in the configuration file has an unexpected type; "
                     "ignoring value"
                 )
-        elif name in _CONFIG_ONLY_SCALAR_FIELDS:
-            # Config-file-only fields have no CLI equivalent to fall back on,
-            # so removing the key from the config file must reset the value to
-            # the SiteConfig class default rather than preserving the stale one.
-            if field.default is not dataclasses.MISSING:
-                kwargs[name] = field.default
+        elif name in overrides:
+            # Key absent from config: restore the CLI-provided value so that an
+            # explicit command-line choice is preserved across reloads.
+            kwargs[name] = overrides[name]
+        elif field.default is not dataclasses.MISSING:
+            # Key absent from config with no CLI override: reset to the SiteConfig
+            # class default so that removing the key from the YAML resets the value
+            # rather than preserving a stale one.
+            kwargs[name] = field.default
 
     # --- site_keywords -------------------------------------------------------
-    if "site_keywords" in config:
+    if "site_keywords" in overrides:
+        # CLI override always wins, whether or not the key is in the config file.
+        kwargs["site_keywords"] = normalize_site_keywords(overrides["site_keywords"])
+    elif "site_keywords" in config:
         kwargs["site_keywords"] = normalize_site_keywords(config["site_keywords"])
+    else:
+        # Absent from config with no CLI override: reset to None (SiteConfig default).
+        kwargs["site_keywords"] = None
 
     # --- extra_stylesheets ---------------------------------------------------
-    if "extra_stylesheets" in config:
+    if "extra_stylesheets" in overrides:
+        # CLI override always wins, whether or not the key is in the config file.
+        kwargs["extra_stylesheets"] = overrides["extra_stylesheets"]
+    elif "extra_stylesheets" in config:
         raw_stylesheets = config["extra_stylesheets"]
         if isinstance(raw_stylesheets, str):
             kwargs["extra_stylesheets"] = [raw_stylesheets]
@@ -398,7 +400,8 @@ def parse_site_config_from_dict(
                 "or a list; ignoring value"
             )
     else:
-        kwargs["extra_stylesheets"] = overrides.get("extra_stylesheets")
+        # Absent from config with no CLI override: reset to None (SiteConfig default).
+        kwargs["extra_stylesheets"] = None
 
     # --- Path template fields ------------------------------------------------
     _path_template_validators: list[tuple[str, str, Callable[[str], None]]] = [
