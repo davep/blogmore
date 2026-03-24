@@ -978,16 +978,16 @@ class TestParseSiteConfigFromDict:
         assert kwargs["with_advert"] is False
         assert kwargs["clean_urls"] is True
 
-    def test_simple_scalar_absent_not_in_kwargs(self, tmp_path: Path) -> None:
-        """Simple scalar fields absent from config are not included in kwargs."""
+    def test_simple_scalar_absent_resets_to_default(self, tmp_path: Path) -> None:
+        """Simple scalar fields absent from config are reset to their SiteConfig defaults."""
         from blogmore.config import parse_site_config_from_dict
 
         kwargs, errors = parse_site_config_from_dict({}, tmp_path)
 
         assert errors == []
-        assert "site_title" not in kwargs
-        assert "site_subtitle" not in kwargs
-        assert "with_search" not in kwargs
+        assert kwargs["site_title"] == "My Blog"
+        assert kwargs["site_subtitle"] == ""
+        assert kwargs["with_search"] is False
 
     def test_simple_scalar_wrong_type_produces_error(self, tmp_path: Path) -> None:
         """A simple scalar field with the wrong type produces an error."""
@@ -1052,14 +1052,14 @@ class TestParseSiteConfigFromDict:
         assert errors == []
         assert kwargs["site_keywords"] == ["python", "blog"]
 
-    def test_site_keywords_absent_not_in_kwargs(self, tmp_path: Path) -> None:
-        """site_keywords absent from config is not included in kwargs."""
+    def test_site_keywords_absent_resets_to_none(self, tmp_path: Path) -> None:
+        """site_keywords absent from config resets to None (the SiteConfig default)."""
         from blogmore.config import parse_site_config_from_dict
 
         kwargs, errors = parse_site_config_from_dict({}, tmp_path)
 
         assert errors == []
-        assert "site_keywords" not in kwargs
+        assert kwargs["site_keywords"] is None
 
     def test_extra_stylesheets_string_normalised_to_list(self, tmp_path: Path) -> None:
         """extra_stylesheets as a string is wrapped in a list."""
@@ -1328,15 +1328,94 @@ class TestParseSiteConfigFromDict:
         assert kwargs["clean_urls"] is True
         assert kwargs["with_advert"] is False
 
-    def test_overlapping_scalar_absent_not_in_kwargs(self, tmp_path: Path) -> None:
-        """Overlapping CLI+config scalars are omitted when absent (preserve CLI override)."""
+    def test_overlapping_scalar_absent_resets_to_default(self, tmp_path: Path) -> None:
+        """Overlapping CLI+config scalars absent from config reset to SiteConfig defaults.
+
+        When a key is removed from the config file during a serve-mode reload
+        and no CLI override was supplied, the field must revert to its SiteConfig
+        class default rather than preserving a stale previous value.
+        """
         from blogmore.config import parse_site_config_from_dict
 
         kwargs, errors = parse_site_config_from_dict({}, tmp_path)
 
         assert errors == []
-        # site_title, with_search etc. are overlapping fields — not in kwargs
-        # when absent so that an explicit CLI override is not silently dropped.
-        assert "site_title" not in kwargs
-        assert "with_search" not in kwargs
-        assert "include_drafts" not in kwargs
+        # All overlapping fields absent from config with no CLI override reset to defaults.
+        assert kwargs["site_title"] == "My Blog"
+        assert kwargs["with_search"] is False
+        assert kwargs["include_drafts"] is False
+
+    def test_overlapping_scalar_absent_uses_cli_override(self, tmp_path: Path) -> None:
+        """When a key is absent from config but a CLI override was set, the override is used.
+
+        This simulates a serve-mode reload where the user removes a key from the
+        config file, but the value had originally been provided via a CLI flag.
+        The CLI value must always win.
+        """
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {},
+            tmp_path,
+            cli_overrides={"site_title": "CLI Title", "with_search": True},
+        )
+
+        assert errors == []
+        assert kwargs["site_title"] == "CLI Title"
+        assert kwargs["with_search"] is True
+
+    def test_cli_override_wins_over_config_value(self, tmp_path: Path) -> None:
+        """A CLI override takes precedence over the corresponding config-file value."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"site_title": "Config Title", "posts_per_feed": 5},
+            tmp_path,
+            cli_overrides={"site_title": "CLI Title"},
+        )
+
+        assert errors == []
+        assert kwargs["site_title"] == "CLI Title"
+        # Fields without a CLI override still use the config-file value.
+        assert kwargs["posts_per_feed"] == 5
+
+    def test_site_keywords_absent_uses_cli_override(self, tmp_path: Path) -> None:
+        """When site_keywords is absent from config, the CLI override is used."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {},
+            tmp_path,
+            cli_overrides={"site_keywords": "python, blog"},
+        )
+
+        assert errors == []
+        assert kwargs["site_keywords"] == ["python", "blog"]
+
+    def test_site_keywords_cli_override_wins_over_config(self, tmp_path: Path) -> None:
+        """A site_keywords CLI override wins even when the config file also has the key."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"site_keywords": ["config", "keywords"]},
+            tmp_path,
+            cli_overrides={"site_keywords": "cli, keywords"},
+        )
+
+        assert errors == []
+        assert kwargs["site_keywords"] == ["cli", "keywords"]
+
+    def test_extra_stylesheets_cli_override_wins_over_config(
+        self, tmp_path: Path
+    ) -> None:
+        """A CLI extra_stylesheets override wins even when the config file also has the key."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"extra_stylesheets": "config.css"},
+            tmp_path,
+            cli_overrides={"extra_stylesheets": ["cli.css"]},
+        )
+
+        assert errors == []
+        assert kwargs["extra_stylesheets"] == ["cli.css"]
