@@ -29,9 +29,7 @@
                 {% set pct = (counts[i] / max_count * 100) | round(1) %}
                 <div class="stats-bar-group">
                     <div class="stats-bar-value-area">
-                        {% if counts[i] > 0 %}
                         <span class="stats-bar-value">{{ counts[i] }}</span>
-                        {% endif %}
                     </div>
                     <div class="stats-bar-wrap">
                         <div class="stats-bar" style="height: {{ pct }}%" title="{{ labels[i] }}: {{ counts[i] }} post{{ '' if counts[i] == 1 else 's' }}"></div>

@@ -1583,6 +1583,8 @@ footer a:hover {
     justify-content: center;
     width: 100%;
     flex-shrink: 0;
+    padding-bottom: 4px; /* breathing room between value and the top of the bar */
+    box-sizing: border-box;
 }
 
 .stats-bar-value {
