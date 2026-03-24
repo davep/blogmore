@@ -98,6 +98,7 @@ def main() -> int:
         icon_source=args.icon_source,
         with_search=args.with_search,
         with_sitemap=args.with_sitemap,
+        with_stats=args.with_stats,
         minify_css=args.minify_css,
         minify_js=args.minify_js,
         minify_html=args.minify_html,
