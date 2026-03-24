@@ -12,9 +12,7 @@
   configured independently for light and dark mode.
   ([#334](https://github.com/davep/blogmore/pull/334))
 - Fixed `serve` mode not restoring configuration defaults when a setting is
-  removed from the YAML file: all simple scalar fields now reset to their
-  `SiteConfig` default on reload (unless a matching CLI flag was supplied at
-  startup, in which case the CLI value always wins).
+  removed from the YAML file.
   ([#337](https://github.com/davep/blogmore/pull/337))
 
 ## v2.2.1
