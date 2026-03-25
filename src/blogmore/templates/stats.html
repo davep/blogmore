@@ -69,16 +69,16 @@
         <dl class="stats-details">
             <div class="stats-detail-row">
                 <dt>Average</dt>
-                <dd>{{ "%.0f" % stats.avg_word_count }} words</dd>
+                <dd>{{ "%.0f" % stats.avg_word_count }} word{{ '' if ("%.0f" % stats.avg_word_count) | int == 1 else 's' }}</dd>
             </div>
             <div class="stats-detail-row">
                 <dt>Shortest</dt>
                 <dd>
                     {% if stats.min_word_count_post %}
                     <a href="{{ stats.min_word_count_post.url }}">{{ stats.min_word_count_post.title }}</a>
-                    — {{ stats.min_word_count }} words
+                    — {{ stats.min_word_count }} word{{ '' if stats.min_word_count == 1 else 's' }}
                     {% else %}
-                    {{ stats.min_word_count }} words
+                    {{ stats.min_word_count }} word{{ '' if stats.min_word_count == 1 else 's' }}
                     {% endif %}
                 </dd>
             </div>
@@ -87,9 +87,9 @@
                 <dd>
                     {% if stats.max_word_count_post %}
                     <a href="{{ stats.max_word_count_post.url }}">{{ stats.max_word_count_post.title }}</a>
-                    — {{ stats.max_word_count }} words
+                    — {{ stats.max_word_count }} word{{ '' if stats.max_word_count == 1 else 's' }}
                     {% else %}
-                    {{ stats.max_word_count }} words
+                    {{ stats.max_word_count }} word{{ '' if stats.max_word_count == 1 else 's' }}
                     {% endif %}
                 </dd>
             </div>

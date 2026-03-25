@@ -8,6 +8,9 @@
   stylesheets (`search.css`, `stats.css`, `archive.css`, `tag-cloud.css`).
   Each stylesheet is loaded only on the pages that need it.
   ([#341](https://github.com/davep/blogmore/pull/341))
+- Fixed singular/plural in the "Word Count" section of the stats page so
+  that a count of 1 now correctly shows "1 word" rather than "1 words".
+  ([#343](https://github.com/davep/blogmore/pull/343))
 
 ## v2.3.0
 
