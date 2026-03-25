@@ -6,9 +6,7 @@
 
 - Broke out page-specific styles from the main `style.css` into separate
   stylesheets (`search.css`, `stats.css`, `archive.css`, `tag-cloud.css`).
-  Each stylesheet is loaded only on the pages that need it. All new
-  stylesheets participate in the same cache-busting and minification
-  (`minify_css`) pipeline as the main stylesheet.
+  Each stylesheet is loaded only on the pages that need it.
   ([#341](https://github.com/davep/blogmore/pull/341))
 
 ## v2.3.0
