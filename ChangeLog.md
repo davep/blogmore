@@ -4,6 +4,9 @@
 
 **Released: WiP**
 
+- Fixed singular/plural in the Word Count section of the stats page so that
+  a count of 1 now correctly shows "1 word" rather than "1 words".
+  ([#343](https://github.com/davep/blogmore/pull/343))
 - Broke out page-specific styles from the main `style.css` into separate
   stylesheets (`search.css`, `stats.css`, `archive.css`, `tag-cloud.css`).
   Each stylesheet is loaded only on the pages that need it.
