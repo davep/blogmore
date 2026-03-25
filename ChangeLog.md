@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.4.0
 
-**Released: WiP**
+**Released: 2026-03-25**
 
 - Broke out page-specific styles from the main `style.css` into separate
   stylesheets (`search.css`, `stats.css`, `archive.css`, `tag-cloud.css`).
