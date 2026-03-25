@@ -1,0 +1,37 @@
+/* =============================================================================
+   TAG CLOUD (tags and categories overview pages)
+   ============================================================================= */
+
+/* Tags page styles */
+.tags-page h1,
+.categories-page h1 {
+    margin-bottom: 20px;
+}
+
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: baseline;
+    justify-content: flex-start;
+    line-height: 1.4;
+    margin: 20px 0;
+}
+
+.tag-cloud-item {
+    display: inline-block;
+    text-decoration: none;
+    color: var(--link-color);
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.tag-cloud-item:hover {
+    color: var(--link-hover-color);
+    transform: scale(1.05);
+}
+
+.tag-cloud-item .tag-count {
+    font-size: 0.7em;
+    color: var(--text-secondary);
+    margin-left: 2px;
+}

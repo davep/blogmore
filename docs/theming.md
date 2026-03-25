@@ -11,10 +11,20 @@ to a completely different layout — without touching the BlogMore source code.
 
 ## How the styling works
 
-BlogMore embeds two stylesheets in every generated site:
+BlogMore embeds several stylesheets in every generated site:
 
 - **`static/style.css`** — the main stylesheet, built around **CSS custom properties** (variables) so that colour schemes can be swapped by changing only those properties.
 - **`static/code.css`** — a generated stylesheet containing only the Pygments syntax-highlighting rules for the configured light and dark mode code styles.
+
+The following page-specific stylesheets are included only in the pages that need them:
+
+- **`static/search.css`** — styles for the search page (included only in `search.html`).
+- **`static/stats.css`** — styles for the statistics page (included only in `stats.html`).
+- **`static/archive.css`** — styles for archive pages (included only in `archive.html`).
+- **`static/tag-cloud.css`** — styles for the tag and category cloud pages (included only in `tags.html` and `categories.html`).
+
+When `minify_css` is enabled, all stylesheets are minified and renamed (e.g.
+`style.css` → `styles.min.css`, `search.css` → `search.min.css`, and so on).
 
 A small JavaScript file (`static/theme.js`) reads the user's OS preference and any saved cookie preference, then sets `data-theme="dark"` or `data-theme="light"` on the `<html>` element accordingly.
 

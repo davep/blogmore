@@ -8,6 +8,14 @@ from pathlib import Path
 import pytest
 
 from blogmore.generator import (
+    ARCHIVE_CSS_FILENAME,
+    ARCHIVE_CSS_MINIFIED_FILENAME,
+    SEARCH_CSS_FILENAME,
+    SEARCH_CSS_MINIFIED_FILENAME,
+    STATS_CSS_FILENAME,
+    STATS_CSS_MINIFIED_FILENAME,
+    TAG_CLOUD_CSS_FILENAME,
+    TAG_CLOUD_CSS_MINIFIED_FILENAME,
     SiteGenerator,
     paginate_posts,
     sanitize_for_url,
@@ -1944,6 +1952,220 @@ class TestMinifyCss:
         )
         assert "body" in minified_content
         assert "color" in minified_content
+
+
+class TestPageSpecificCss:
+    """Test that page-specific CSS files are generated and linked correctly."""
+
+    def test_page_specific_css_files_exist(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that all page-specific CSS source files are present in the output."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+                with_stats=True,
+            )
+        )
+
+        generator.generate()
+
+        assert (temp_output_dir / "static" / SEARCH_CSS_FILENAME).exists()
+        assert (temp_output_dir / "static" / STATS_CSS_FILENAME).exists()
+        assert (temp_output_dir / "static" / ARCHIVE_CSS_FILENAME).exists()
+        assert (temp_output_dir / "static" / TAG_CLOUD_CSS_FILENAME).exists()
+
+    def test_page_specific_css_minified_files_exist(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that minified page-specific CSS files exist when minify_css is enabled."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                minify_css=True,
+                with_search=True,
+                with_stats=True,
+            )
+        )
+
+        generator.generate()
+
+        assert (temp_output_dir / "static" / SEARCH_CSS_MINIFIED_FILENAME).exists()
+        assert (temp_output_dir / "static" / STATS_CSS_MINIFIED_FILENAME).exists()
+        assert (temp_output_dir / "static" / ARCHIVE_CSS_MINIFIED_FILENAME).exists()
+        assert (temp_output_dir / "static" / TAG_CLOUD_CSS_MINIFIED_FILENAME).exists()
+
+    def test_page_specific_css_source_not_present_when_minifying(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that source CSS files are absent when minify_css is enabled."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                minify_css=True,
+                with_search=True,
+                with_stats=True,
+            )
+        )
+
+        generator.generate()
+
+        assert not (temp_output_dir / "static" / SEARCH_CSS_FILENAME).exists()
+        assert not (temp_output_dir / "static" / STATS_CSS_FILENAME).exists()
+        assert not (temp_output_dir / "static" / ARCHIVE_CSS_FILENAME).exists()
+        assert not (temp_output_dir / "static" / TAG_CLOUD_CSS_FILENAME).exists()
+
+    def test_search_page_links_search_css(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the search page includes the search-specific CSS file."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+            )
+        )
+
+        generator.generate()
+
+        search_html = (temp_output_dir / "search.html").read_text()
+        assert f"/static/{SEARCH_CSS_FILENAME}" in search_html
+
+    def test_stats_page_links_stats_css(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the stats page includes the stats-specific CSS file."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+            )
+        )
+
+        generator.generate()
+
+        stats_html = (temp_output_dir / "stats.html").read_text()
+        assert f"/static/{STATS_CSS_FILENAME}" in stats_html
+
+    def test_archive_page_links_archive_css(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the archive page includes the archive-specific CSS file."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+
+        generator.generate()
+
+        archive_html = (temp_output_dir / "archive.html").read_text()
+        assert f"/static/{ARCHIVE_CSS_FILENAME}" in archive_html
+
+    def test_tags_page_links_tag_cloud_css(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the tags overview page includes the tag-cloud CSS file."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+
+        generator.generate()
+
+        tags_html = (temp_output_dir / "tags.html").read_text()
+        assert f"/static/{TAG_CLOUD_CSS_FILENAME}" in tags_html
+
+    def test_categories_page_links_tag_cloud_css(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the categories overview page includes the tag-cloud CSS file."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+
+        generator.generate()
+
+        categories_html = (temp_output_dir / "categories.html").read_text()
+        assert f"/static/{TAG_CLOUD_CSS_FILENAME}" in categories_html
+
+    def test_index_page_does_not_link_page_specific_css(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the main index page does not include page-specific CSS files."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+                with_stats=True,
+            )
+        )
+
+        generator.generate()
+
+        index_html = (temp_output_dir / "index.html").read_text()
+        assert SEARCH_CSS_FILENAME not in index_html
+        assert STATS_CSS_FILENAME not in index_html
+        assert ARCHIVE_CSS_FILENAME not in index_html
+        assert TAG_CLOUD_CSS_FILENAME not in index_html
+
+    def test_search_css_has_cache_bust_token(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the search CSS URL contains a cache-busting token."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_search=True,
+            )
+        )
+
+        generator.generate()
+
+        search_html = (temp_output_dir / "search.html").read_text()
+        assert f"/static/{SEARCH_CSS_FILENAME}?v=" in search_html
+
+    def test_minified_page_specific_css_urls_in_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that minified CSS filenames appear in pages when minify_css is enabled."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                minify_css=True,
+                with_search=True,
+                with_stats=True,
+            )
+        )
+
+        generator.generate()
+
+        search_html = (temp_output_dir / "search.html").read_text()
+        assert f"/static/{SEARCH_CSS_MINIFIED_FILENAME}" in search_html
+
+        stats_html = (temp_output_dir / "stats.html").read_text()
+        assert f"/static/{STATS_CSS_MINIFIED_FILENAME}" in stats_html
+
+        archive_html = (temp_output_dir / "archive.html").read_text()
+        assert f"/static/{ARCHIVE_CSS_MINIFIED_FILENAME}" in archive_html
+
+        tags_html = (temp_output_dir / "tags.html").read_text()
+        assert f"/static/{TAG_CLOUD_CSS_MINIFIED_FILENAME}" in tags_html
 
 
 class TestMinifyJs:
