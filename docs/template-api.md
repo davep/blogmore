@@ -32,6 +32,10 @@ below lists all variables that are available in every template.
 | `default_author` | `str \| None` | Default author name from configuration. |
 | `styles_css_url` | `str` | URL to the compiled stylesheet (with cache-bust query string). |
 | `code_css_url` | `str` | URL to the generated code-highlighting stylesheet (with cache-bust query string). |
+| `search_css_url` | `str` | URL to the search-page stylesheet (with cache-bust query string). |
+| `stats_css_url` | `str` | URL to the stats-page stylesheet (with cache-bust query string). |
+| `archive_css_url` | `str` | URL to the archive-page stylesheet (with cache-bust query string). |
+| `tag_cloud_css_url` | `str` | URL to the tag/category-cloud stylesheet (with cache-bust query string). |
 | `theme_js_url` | `str` | URL to `theme.js` (with cache-bust query string). |
 | `search_js_url` | `str` | URL to `search.js` (with cache-bust query string). |
 | `favicon_url` | `str \| None` | URL to the site favicon, if one exists. |

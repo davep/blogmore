@@ -9,6 +9,10 @@
 <meta property="og:title" content="Blog Statistics - {{ site_title }}">
 {% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{{ stats_css_url }}">
+{% endblock %}
+
 {% block content %}
 <div class="stats-page">
     <h1>Blog Statistics</h1>
