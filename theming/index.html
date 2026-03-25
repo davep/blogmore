@@ -1228,11 +1228,20 @@ to a completely different layout — without touching the BlogMore source code.<
 schemes, typography, and how the two approaches work together.</p>
 </div>
 <h2 id="how-the-styling-works">How the styling works</h2>
-<p>BlogMore embeds two stylesheets in every generated site:</p>
+<p>BlogMore embeds several stylesheets in every generated site:</p>
 <ul>
 <li><strong><code>static/style.css</code></strong> — the main stylesheet, built around <strong>CSS custom properties</strong> (variables) so that colour schemes can be swapped by changing only those properties.</li>
 <li><strong><code>static/code.css</code></strong> — a generated stylesheet containing only the Pygments syntax-highlighting rules for the configured light and dark mode code styles.</li>
 </ul>
+<p>The following page-specific stylesheets are included only in the pages that need them:</p>
+<ul>
+<li><strong><code>static/search.css</code></strong> — styles for the search page (included only in <code>search.html</code>).</li>
+<li><strong><code>static/stats.css</code></strong> — styles for the statistics page (included only in <code>stats.html</code>).</li>
+<li><strong><code>static/archive.css</code></strong> — styles for archive pages (included only in <code>archive.html</code>).</li>
+<li><strong><code>static/tag-cloud.css</code></strong> — styles for the tag and category cloud pages (included only in <code>tags.html</code> and <code>categories.html</code>).</li>
+</ul>
+<p>When <code>minify_css</code> is enabled, all stylesheets are minified and renamed (e.g.
+<code>style.css</code> → <code>styles.min.css</code>, <code>search.css</code> → <code>search.min.css</code>, and so on).</p>
 <p>A small JavaScript file (<code>static/theme.js</code>) reads the user's OS preference and any saved cookie preference, then sets <code>data-theme="dark"</code> or <code>data-theme="light"</code> on the <code>&lt;html&gt;</code> element accordingly.</p>
 <h3 id="syntax-highlighting-styles">Syntax highlighting styles</h3>
 <p>The code-highlighting colour scheme is generated at build time from <a href="https://pygments.org/styles/">Pygments</a> and written to <code>code.css</code> (or <code>code.min.css</code> when <code>minify_css</code> is enabled).  Only the two configured styles are included — no other Pygments styles add unnecessary size to the file.</p>
