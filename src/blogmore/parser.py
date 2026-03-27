@@ -147,6 +147,10 @@ def extract_first_paragraph(content: str) -> str:
         if stripped.startswith(("![", "[![", "<img")):
             continue
 
+        # Skip reference link definitions: [label]: URL
+        if re.match(r"^\[[^\]]+\]:\s+\S", stripped):
+            continue
+
         # If we hit a heading, code block, or other special syntax, stop if we have content
         if stripped.startswith(("#", "```", "---")):
             if paragraph_lines:
@@ -165,12 +169,22 @@ def extract_first_paragraph(content: str) -> str:
     # Join the lines and clean up markdown formatting
     paragraph = " ".join(paragraph_lines)
 
-    # Remove common markdown formatting
-    # Remove links but keep text: [text](url) -> text
+    # Remove common markdown formatting (order matters — more specific patterns first)
+    # Remove reference-style links: [text][ref] or [text][] -> text
+    paragraph = re.sub(r"\[([^\]]+)\]\[[^\]]*\]", r"\1", paragraph)
+    # Remove inline links: [text](url) -> text
     paragraph = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", paragraph)
-    # Remove bold/italic: **text** or *text* -> text
-    paragraph = re.sub(r"\*\*([^\*]+)\*\*", r"\1", paragraph)
-    paragraph = re.sub(r"\*([^\*]+)\*", r"\1", paragraph)
+    # Remove remaining bracketed shorthand references: [text] -> text
+    # (negative lookahead avoids matching already-processed [ or ( that follow)
+    paragraph = re.sub(r"\[([^\]]+)\](?!\[|\()", r"\1", paragraph)
+    # Remove strikethrough: ~~text~~ -> text
+    paragraph = re.sub(r"~~(.+?)~~", r"\1", paragraph)
+    # Remove bold/italic (asterisk variants): **text** or *text* -> text
+    paragraph = re.sub(r"\*\*(.+?)\*\*", r"\1", paragraph)
+    paragraph = re.sub(r"\*(.+?)\*", r"\1", paragraph)
+    # Remove bold/italic (underscore variants): __text__ or _text_ -> text
+    paragraph = re.sub(r"__(.+?)__", r"\1", paragraph)
+    paragraph = re.sub(r"_(.+?)_", r"\1", paragraph)
     # Remove inline code: `code` -> code
     paragraph = re.sub(r"`([^`]+)`", r"\1", paragraph)
 
