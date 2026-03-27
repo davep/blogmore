@@ -200,6 +200,16 @@ Standard Markdown formatting all works as expected:
 ![alt text](/path/to/image.png)
 ```
 
+#### Strikethrough
+
+Wrap text in double tildes (`~~`) to render it with a line through it:
+
+```markdown
+This is ~~deleted~~ and this is ~~struck-out text~~ in a sentence.
+```
+
+This produces text where the marked words appear with a horizontal line through them, rendered as an HTML `<del>` element. Use it to indicate content that has been removed or is no longer relevant.
+
 ### Code blocks with syntax highlighting
 
 Use fenced code blocks with a language identifier for syntax highlighting:
