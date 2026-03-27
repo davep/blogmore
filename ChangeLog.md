@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added support for strikethrough text using `~~text~~` syntax, which
+  renders as an HTML `<del>` element.
+  ([#346](https://github.com/davep/blogmore/pull/346))
+
 ## v2.4.0
 
 **Released: 2026-03-25**

@@ -15,6 +15,7 @@ from pygments.formatters import HtmlFormatter
 from blogmore.admonitions import AdmonitionsExtension
 from blogmore.external_links import ExternalLinksExtension
 from blogmore.heading_anchors import HeadingAnchorsExtension
+from blogmore.strikethrough import StrikethroughExtension
 from blogmore.utils import calculate_reading_time
 
 _DATE_FORMATS = [
@@ -378,6 +379,7 @@ class PostParser:
         external_links_ext = ExternalLinksExtension(site_url=site_url or "")
         admonitions_ext = AdmonitionsExtension()
         heading_anchors_ext = HeadingAnchorsExtension()
+        strikethrough_ext = StrikethroughExtension()
 
         self.markdown = markdown.Markdown(
             extensions=[
@@ -391,6 +393,7 @@ class PostParser:
                 admonitions_ext,
                 external_links_ext,
                 heading_anchors_ext,
+                strikethrough_ext,
             ],
             extension_configs={
                 "codehilite": {
