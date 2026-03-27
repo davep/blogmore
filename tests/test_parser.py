@@ -146,6 +146,64 @@ class TestExtractFirstParagraph:
         content = "First paragraph.\n\n```python\ncode here\n```"
         assert extract_first_paragraph(content) == "First paragraph."
 
+    def test_remove_reference_style_link_with_ref(self) -> None:
+        """Test that reference-style links [text][ref] are stripped to text."""
+        content = "When [Dave][davep] Pearson wrote this.\n\n[davep]: https://example.com/"
+        assert extract_first_paragraph(content) == "When Dave Pearson wrote this."
+
+    def test_remove_reference_style_link_empty_ref(self) -> None:
+        """Test that empty-ref reference links [text][] are stripped to text."""
+        content = "He [announced][] a new tool.\n\n[announced]: https://example.com/"
+        assert extract_first_paragraph(content) == "He announced a new tool."
+
+    def test_remove_reference_style_links_mixed(self) -> None:
+        """Test stripping both inline and reference-style links in the same paragraph."""
+        content = (
+            "When [Dave][davep] Pearson quietly [announced][] a Python static site\n"
+            "generator, I felt obliged to check it out.\n\n"
+            "[davep]: https://blog.davep.org/\n"
+            "[announced]: https://blog.davep.org/2026/02/19/a-new-engine.html"
+        )
+        assert extract_first_paragraph(content) == (
+            "When Dave Pearson quietly announced a Python static site "
+            "generator, I felt obliged to check it out."
+        )
+
+    def test_remove_shorthand_reference_link(self) -> None:
+        """Test that standalone shorthand references [text] are stripped to text."""
+        content = "See the [documentation] for details."
+        assert extract_first_paragraph(content) == "See the documentation for details."
+
+    def test_skip_reference_link_definition_lines(self) -> None:
+        """Test that reference link definition lines are skipped entirely."""
+        content = "[ref]: https://example.com/\n\nFirst real paragraph."
+        assert extract_first_paragraph(content) == "First real paragraph."
+
+    def test_remove_strikethrough(self) -> None:
+        """Test that strikethrough markup ~~text~~ is stripped to text."""
+        content = "This is ~~deleted~~ text."
+        assert extract_first_paragraph(content) == "This is deleted text."
+
+    def test_remove_underscore_bold(self) -> None:
+        """Test that __bold__ underscore markup is stripped to text."""
+        content = "This is __bold__ text."
+        assert extract_first_paragraph(content) == "This is bold text."
+
+    def test_remove_underscore_italic(self) -> None:
+        """Test that _italic_ underscore markup is stripped to text."""
+        content = "This is _italic_ text."
+        assert extract_first_paragraph(content) == "This is italic text."
+
+    def test_remove_all_markup_combined(self) -> None:
+        """Test that all markup types are stripped in a single paragraph."""
+        content = (
+            "This is **bold**, _italic_, ~~struck~~, `code`, "
+            "[inline](url), [ref-link][ref], and [empty][]."
+        )
+        assert extract_first_paragraph(content) == (
+            "This is bold, italic, struck, code, inline, ref-link, and empty."
+        )
+
 
 class TestPost:
     """Test the Post dataclass."""

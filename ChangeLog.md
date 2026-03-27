@@ -1,5 +1,16 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed auto-generated post descriptions so that reference-style links are
+  stripped to plain text, matching the existing behaviour for inline links.
+  Strikethrough (`~~text~~`) and underscore bold/italic (`__text__`,
+  `_text_`) are now also stripped. Reference link definition lines (`[ref]:
+  url`) found inside a paragraph block are skipped rather than included in
+  the description. ([#349](https://github.com/davep/blogmore/pull/349))
+
 ## v2.5.0
 
 **Released: 2026-03-27**
