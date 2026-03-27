@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.5.0
 
-**Released: WiP**
+**Released: 2026-03-27**
 
 - Added support for strikethrough text using `~~text~~` syntax, which
   renders as an HTML `<del>` element.
