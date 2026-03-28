@@ -5,16 +5,8 @@
 **Released: WiP**
 
 - Replaced the regex-based `extract_first_paragraph` implementation with a
-  Markdown-library-powered approach.  The content is now converted to HTML
-  using all BlogMore extensions before the first paragraph is located and
-  stripped to plain text.  This means any future Markdown extension is
-  automatically handled without extra work.  Block-level containers such as
-  admonitions and blockquotes are skipped so only genuine top-level
-  paragraphs are returned.  Undefined reference-style link syntax
-  (`[text][ref]`, `[text][]`) is now kept as literal text (including
-  brackets) rather than having the brackets stripped, which matches correct
-  Markdown behaviour.
-  ([#350](https://github.com/davep/blogmore/pull/350))
+  Markdown-library-powered approach.
+  ([#354](https://github.com/davep/blogmore/pull/354))
 
 ## v2.6.0
 
