@@ -24,10 +24,20 @@ All source lives in `src/blogmore/`. Key modules and their responsibilities:
 | `content_path.py` | Shared path-resolution utilities for content output paths (used by page_path and post_path) |
 | `clean_url.py` | Clean URL transformation utilities (removes index.html from URLs when enabled) |
 | `page_path.py` | Page path resolution for configurable output file paths |
-| `admonitions.py` | Markdown extension: GitHub-style `> [!TYPE]` admonitions |
-| `external_links.py` | Markdown extension: opens external links in a new tab |
-| `heading_anchors.py` | Markdown extension: hover anchor links on headings |
 | `utils.py` | Shared utility helpers |
+
+The `markdown/` sub-package (`src/blogmore/markdown/`) groups all custom
+Markdown extensions:
+
+| Module | Responsibility |
+|---|---|
+| `markdown/admonitions.py` | Markdown extension: GitHub-style `> [!TYPE]` admonitions |
+| `markdown/external_links.py` | Markdown extension: opens external links in a new tab |
+| `markdown/heading_anchors.py` | Markdown extension: hover anchor links on headings |
+| `markdown/strikethrough.py` | Markdown extension: `~~strikethrough~~` syntax |
+
+Any new Markdown extensions must be added as a new module inside
+`src/blogmore/markdown/` and registered in `parser.py`.
 
 Templates live in `src/blogmore/templates/`; the stylesheet is
 `src/blogmore/templates/static/style.css`.
