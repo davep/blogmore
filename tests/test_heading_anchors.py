@@ -3,7 +3,7 @@
 import markdown
 from markdown.extensions import Extension
 
-from blogmore.heading_anchors import (
+from blogmore.markdown.heading_anchors import (
     ANCHOR_SYMBOL,
     HEADING_TAGS,
     HeadingAnchorsExtension,
@@ -164,7 +164,7 @@ class TestHeadingAnchorsExtension:
 
     def test_makeextension_factory(self) -> None:
         """Test that the makeExtension factory function works."""
-        from blogmore.heading_anchors import makeExtension
+        from blogmore.markdown.heading_anchors import makeExtension
 
         extension = makeExtension()
         assert isinstance(extension, HeadingAnchorsExtension)

@@ -2,7 +2,7 @@
 
 import markdown
 
-from blogmore.strikethrough import StrikethroughExtension
+from blogmore.markdown.strikethrough import StrikethroughExtension
 
 
 class TestStrikethroughExtension:
@@ -52,7 +52,7 @@ class TestStrikethroughExtension:
 
     def test_makeextension_returns_instance(self) -> None:
         """Test that makeExtension returns a StrikethroughExtension instance."""
-        from blogmore.strikethrough import makeExtension
+        from blogmore.markdown.strikethrough import makeExtension
 
         ext = makeExtension()
         assert isinstance(ext, StrikethroughExtension)

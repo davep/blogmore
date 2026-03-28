@@ -2,7 +2,7 @@
 
 import markdown
 
-from blogmore.admonitions import AdmonitionsExtension
+from blogmore.markdown.admonitions import AdmonitionsExtension
 
 
 class TestAdmonitionsExtension:

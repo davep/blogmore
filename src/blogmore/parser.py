@@ -12,10 +12,10 @@ import markdown
 import yaml
 from pygments.formatters import HtmlFormatter
 
-from blogmore.admonitions import AdmonitionsExtension
-from blogmore.external_links import ExternalLinksExtension
-from blogmore.heading_anchors import HeadingAnchorsExtension
-from blogmore.strikethrough import StrikethroughExtension
+from blogmore.markdown.admonitions import AdmonitionsExtension
+from blogmore.markdown.external_links import ExternalLinksExtension
+from blogmore.markdown.heading_anchors import HeadingAnchorsExtension
+from blogmore.markdown.strikethrough import StrikethroughExtension
 from blogmore.utils import calculate_reading_time
 
 _DATE_FORMATS = [
