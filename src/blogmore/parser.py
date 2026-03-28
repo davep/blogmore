@@ -4,6 +4,7 @@ import datetime as dt
 import re
 from collections.abc import Generator
 from dataclasses import dataclass, field
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
 
@@ -120,75 +121,188 @@ def remove_date_prefix(slug: str) -> str:
     return re.sub(r"^\d{4}-\d{2}-\d{2}-", "", slug)
 
 
-def extract_first_paragraph(content: str) -> str:
-    """Extract the first paragraph from markdown content.
+def _create_custom_extensions(site_url: str = "") -> list[Any]:
+    """Create instances of all custom BlogMore Markdown extensions.
 
-    Skips images and empty lines to find the first text paragraph.
-    Removes markdown formatting for a clean description.
+    This is the single source of truth for BlogMore's custom Markdown extension
+    set.  Both the full-rendering parser and the lightweight extraction instance
+    pull their custom-extension list from here, so any new extension added to
+    this list is automatically included in both contexts.
 
     Args:
-        content: The markdown content to extract from
+        site_url: Base URL of the site; forwarded to
+            :class:`~blogmore.markdown.external_links.ExternalLinksExtension`
+            so it can distinguish internal from external links.
 
     Returns:
-        The first paragraph as plain text, or empty string if none found
+        A list of configured custom Markdown extension instances.
     """
-    lines = content.strip().split("\n")
-    paragraph_lines: list[str] = []
-    in_paragraph = False
+    return [
+        AdmonitionsExtension(),
+        ExternalLinksExtension(site_url=site_url),
+        HeadingAnchorsExtension(),
+        StrikethroughExtension(),
+    ]
 
-    for line in lines:
-        stripped = line.strip()
 
-        # Skip empty lines before we start collecting
-        if not in_paragraph and not stripped:
-            continue
+def _make_extraction_markdown() -> markdown.Markdown:
+    """Create a Markdown instance configured for first-paragraph text extraction.
 
-        # Skip image syntax (markdown images, linked images, and HTML img tags)
-        if stripped.startswith(("![", "[![", "<img")):
-            continue
+    Includes all BlogMore custom extensions and the standard extensions needed
+    to correctly identify paragraph boundaries.  Intentionally omits
+    presentation-only extensions such as ``codehilite`` and ``toc`` that are
+    not required for plain-text extraction.
 
-        # Skip reference link definitions: [label]: URL
-        if re.match(r"^\[[^\]]+\]:\s+\S", stripped):
-            continue
+    Returns:
+        A fresh, configured :class:`markdown.Markdown` instance.
+    """
+    return markdown.Markdown(
+        extensions=[
+            "fenced_code",
+            "tables",
+            "footnotes",
+            *_create_custom_extensions(),
+        ],
+    )
 
-        # If we hit a heading, code block, or other special syntax, stop if we have content
-        if stripped.startswith(("#", "```", "---")):
-            if paragraph_lines:
-                break
-            continue
 
-        # If we have an empty line and we're in a paragraph, we've reached the end
-        if not stripped and in_paragraph:
-            break
+class _FirstParagraphExtractor(HTMLParser):
+    """HTML parser that extracts plain text from the first non-image-only paragraph.
 
-        # If we have content, add it
-        if stripped:
-            in_paragraph = True
-            paragraph_lines.append(stripped)
+    Only top-level ``<p>`` elements are considered; paragraphs nested inside
+    block-level containers such as admonition ``<div>`` elements, blockquotes,
+    or list items are skipped.  A paragraph that consists entirely of images
+    (no text data) is also skipped so that posts that open with a banner image
+    return the following descriptive paragraph instead.
+    """
 
-    # Join the lines and clean up markdown formatting
-    paragraph = " ".join(paragraph_lines)
+    _BLOCK_TAGS: frozenset[str] = frozenset(
+        {
+            "div",
+            "blockquote",
+            "ul",
+            "ol",
+            "table",
+            "thead",
+            "tbody",
+            "tr",
+            "td",
+            "th",
+            "pre",
+            "figure",
+            "section",
+            "article",
+            "aside",
+            "nav",
+            "header",
+            "footer",
+            "main",
+        }
+    )
 
-    # Remove common markdown formatting (order matters — more specific patterns first)
-    # Remove reference-style links: [text][ref] or [text][] -> text
-    paragraph = re.sub(r"\[([^\]]+)\]\[[^\]]*\]", r"\1", paragraph)
-    # Remove inline links: [text](url) -> text
-    paragraph = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", paragraph)
-    # Remove remaining bracketed shorthand references: [text] -> text
-    # (negative lookahead avoids matching already-processed [ or ( that follow)
-    paragraph = re.sub(r"\[([^\]]+)\](?!\[|\()", r"\1", paragraph)
-    # Remove strikethrough: ~~text~~ -> text
-    paragraph = re.sub(r"~~(.+?)~~", r"\1", paragraph)
-    # Remove bold/italic (asterisk variants): **text** or *text* -> text
-    paragraph = re.sub(r"\*\*(.+?)\*\*", r"\1", paragraph)
-    paragraph = re.sub(r"\*(.+?)\*", r"\1", paragraph)
-    # Remove bold/italic (underscore variants): __text__ or _text_ -> text
-    paragraph = re.sub(r"__(.+?)__", r"\1", paragraph)
-    paragraph = re.sub(r"_(.+?)_", r"\1", paragraph)
-    # Remove inline code: `code` -> code
-    paragraph = re.sub(r"`([^`]+)`", r"\1", paragraph)
+    def __init__(self) -> None:
+        """Initialise the extractor.
 
-    return paragraph.strip()
+        Sets up all tracking state used during parsing:
+
+        * ``_block_depth`` — current nesting level inside block-level container
+          elements (``<div>``, ``<blockquote>``, ``<ul>``, etc.).  Any ``<p>``
+          encountered while this is non-zero is nested and therefore skipped.
+        * ``_in_paragraph`` — whether the parser is currently inside a
+          candidate top-level ``<p>`` element.
+        * ``_chunks`` — raw character-data fragments collected from the current
+          paragraph, joined and normalised when the paragraph ends.
+        * ``_has_text`` — set to ``True`` as soon as non-whitespace data is
+          seen inside the current paragraph; keeps image-only paragraphs from
+          being returned.
+        * ``_result`` — the accepted plain-text paragraph (empty until found).
+        * ``_done`` — short-circuit flag; once ``True`` all further events are
+          ignored.
+        """
+        super().__init__(convert_charrefs=True)
+        self._block_depth: int = 0
+        self._in_paragraph: bool = False
+        self._chunks: list[str] = []
+        self._has_text: bool = False
+        self._result: str = ""
+        self._done: bool = False
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        """Process an opening HTML tag.
+
+        Args:
+            tag: The lowercase tag name.
+            attrs: List of ``(attribute-name, value)`` pairs for the tag.
+        """
+        if self._done:
+            return
+        if tag in self._BLOCK_TAGS:
+            self._block_depth += 1
+        elif tag == "p" and self._block_depth == 0 and not self._in_paragraph:
+            self._in_paragraph = True
+            self._chunks = []
+            self._has_text = False
+
+    def handle_endtag(self, tag: str) -> None:
+        """Process a closing HTML tag.
+
+        Args:
+            tag: The lowercase tag name.
+        """
+        if self._done:
+            return
+        if tag in self._BLOCK_TAGS:
+            if self._block_depth > 0:
+                self._block_depth -= 1
+        elif tag == "p" and self._in_paragraph:
+            self._in_paragraph = False
+            text = re.sub(r"\s+", " ", "".join(self._chunks)).strip()
+            if self._has_text and text:
+                self._result = text
+                self._done = True
+
+    def handle_data(self, data: str) -> None:
+        """Process character data between tags.
+
+        Args:
+            data: The text content between tags.
+        """
+        if self._done or not self._in_paragraph:
+            return
+        self._chunks.append(data)
+        if data.strip():
+            self._has_text = True
+
+    @property
+    def result(self) -> str:
+        """Get the extracted paragraph text.
+
+        Returns:
+            The extracted first paragraph text, or an empty string if none was
+            found.
+        """
+        return self._result
+
+
+def extract_first_paragraph(content: str) -> str:
+    """Extract the first paragraph from markdown content as plain text.
+
+    Converts the markdown to HTML using all BlogMore extensions, then finds
+    the first top-level ``<p>`` element that contains actual text.  Paragraphs
+    that consist solely of images are skipped.
+
+    Args:
+        content: The markdown content to extract from.
+
+    Returns:
+        The first paragraph as plain text, or an empty string if none is found.
+    """
+    if not content.strip():
+        return ""
+    html_content = _make_extraction_markdown().convert(content)
+    extractor = _FirstParagraphExtractor()
+    extractor.feed(html_content)
+    return extractor.result
 
 
 @dataclass
@@ -389,12 +503,6 @@ class PostParser:
         Args:
             site_url: Optional base URL of the site for determining internal vs external links
         """
-        # Create custom extension instances
-        external_links_ext = ExternalLinksExtension(site_url=site_url or "")
-        admonitions_ext = AdmonitionsExtension()
-        heading_anchors_ext = HeadingAnchorsExtension()
-        strikethrough_ext = StrikethroughExtension()
-
         self.markdown = markdown.Markdown(
             extensions=[
                 "meta",
@@ -404,10 +512,7 @@ class PostParser:
                 "tables",
                 "toc",
                 "footnotes",
-                admonitions_ext,
-                external_links_ext,
-                heading_anchors_ext,
-                strikethrough_ext,
+                *_create_custom_extensions(site_url=site_url or ""),
             ],
             extension_configs={
                 "codehilite": {
