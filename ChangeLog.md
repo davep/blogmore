@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Replaced the regex-based `extract_first_paragraph` implementation with a
+  Markdown-library-powered approach.
+  ([#354](https://github.com/davep/blogmore/pull/354))
+
 ## v2.6.0
 
 **Released: 2026-03-28**

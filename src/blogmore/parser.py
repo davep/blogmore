@@ -12,10 +12,10 @@ import markdown
 import yaml
 from pygments.formatters import HtmlFormatter
 
-from blogmore.markdown.admonitions import AdmonitionsExtension
-from blogmore.markdown.external_links import ExternalLinksExtension
-from blogmore.markdown.heading_anchors import HeadingAnchorsExtension
-from blogmore.markdown.strikethrough import StrikethroughExtension
+from blogmore.markdown.first_paragraph import (
+    create_custom_extensions,
+    extract_first_paragraph,
+)
 from blogmore.utils import calculate_reading_time
 
 _DATE_FORMATS = [
@@ -118,77 +118,6 @@ def remove_date_prefix(slug: str) -> str:
         The slug without the date prefix
     """
     return re.sub(r"^\d{4}-\d{2}-\d{2}-", "", slug)
-
-
-def extract_first_paragraph(content: str) -> str:
-    """Extract the first paragraph from markdown content.
-
-    Skips images and empty lines to find the first text paragraph.
-    Removes markdown formatting for a clean description.
-
-    Args:
-        content: The markdown content to extract from
-
-    Returns:
-        The first paragraph as plain text, or empty string if none found
-    """
-    lines = content.strip().split("\n")
-    paragraph_lines: list[str] = []
-    in_paragraph = False
-
-    for line in lines:
-        stripped = line.strip()
-
-        # Skip empty lines before we start collecting
-        if not in_paragraph and not stripped:
-            continue
-
-        # Skip image syntax (markdown images, linked images, and HTML img tags)
-        if stripped.startswith(("![", "[![", "<img")):
-            continue
-
-        # Skip reference link definitions: [label]: URL
-        if re.match(r"^\[[^\]]+\]:\s+\S", stripped):
-            continue
-
-        # If we hit a heading, code block, or other special syntax, stop if we have content
-        if stripped.startswith(("#", "```", "---")):
-            if paragraph_lines:
-                break
-            continue
-
-        # If we have an empty line and we're in a paragraph, we've reached the end
-        if not stripped and in_paragraph:
-            break
-
-        # If we have content, add it
-        if stripped:
-            in_paragraph = True
-            paragraph_lines.append(stripped)
-
-    # Join the lines and clean up markdown formatting
-    paragraph = " ".join(paragraph_lines)
-
-    # Remove common markdown formatting (order matters — more specific patterns first)
-    # Remove reference-style links: [text][ref] or [text][] -> text
-    paragraph = re.sub(r"\[([^\]]+)\]\[[^\]]*\]", r"\1", paragraph)
-    # Remove inline links: [text](url) -> text
-    paragraph = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", paragraph)
-    # Remove remaining bracketed shorthand references: [text] -> text
-    # (negative lookahead avoids matching already-processed [ or ( that follow)
-    paragraph = re.sub(r"\[([^\]]+)\](?!\[|\()", r"\1", paragraph)
-    # Remove strikethrough: ~~text~~ -> text
-    paragraph = re.sub(r"~~(.+?)~~", r"\1", paragraph)
-    # Remove bold/italic (asterisk variants): **text** or *text* -> text
-    paragraph = re.sub(r"\*\*(.+?)\*\*", r"\1", paragraph)
-    paragraph = re.sub(r"\*(.+?)\*", r"\1", paragraph)
-    # Remove bold/italic (underscore variants): __text__ or _text_ -> text
-    paragraph = re.sub(r"__(.+?)__", r"\1", paragraph)
-    paragraph = re.sub(r"_(.+?)_", r"\1", paragraph)
-    # Remove inline code: `code` -> code
-    paragraph = re.sub(r"`([^`]+)`", r"\1", paragraph)
-
-    return paragraph.strip()
 
 
 @dataclass
@@ -389,12 +318,6 @@ class PostParser:
         Args:
             site_url: Optional base URL of the site for determining internal vs external links
         """
-        # Create custom extension instances
-        external_links_ext = ExternalLinksExtension(site_url=site_url or "")
-        admonitions_ext = AdmonitionsExtension()
-        heading_anchors_ext = HeadingAnchorsExtension()
-        strikethrough_ext = StrikethroughExtension()
-
         self.markdown = markdown.Markdown(
             extensions=[
                 "meta",
@@ -404,10 +327,7 @@ class PostParser:
                 "tables",
                 "toc",
                 "footnotes",
-                admonitions_ext,
-                external_links_ext,
-                heading_anchors_ext,
-                strikethrough_ext,
+                *create_custom_extensions(site_url=site_url or ""),
             ],
             extension_configs={
                 "codehilite": {

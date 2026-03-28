@@ -170,9 +170,14 @@ class TestExtractFirstParagraph:
         )
 
     def test_remove_shorthand_reference_link(self) -> None:
-        """Test that standalone shorthand references [text] are stripped to text."""
+        """Test that a bare [text] with no definition is preserved as-is.
+
+        The Markdown library renders an undefined reference link as literal text
+        including the surrounding brackets, which is the correct Markdown
+        behaviour.
+        """
         content = "See the [documentation] for details."
-        assert extract_first_paragraph(content) == "See the documentation for details."
+        assert extract_first_paragraph(content) == "See the [documentation] for details."
 
     def test_skip_reference_link_definition_lines(self) -> None:
         """Test that reference link definition lines are skipped entirely."""
@@ -195,14 +200,45 @@ class TestExtractFirstParagraph:
         assert extract_first_paragraph(content) == "This is italic text."
 
     def test_remove_all_markup_combined(self) -> None:
-        """Test that all markup types are stripped in a single paragraph."""
+        """Test that all markup types are stripped in a single paragraph.
+
+        Inline links and defined reference-style links are fully resolved to
+        plain text.  Undefined reference-style links (``[ref-link][ref]``,
+        ``[empty][]``) are kept as literal text including brackets, because
+        that is the correct Markdown library behaviour when no definition is
+        present.
+        """
         content = (
             "This is **bold**, _italic_, ~~struck~~, `code`, "
             "[inline](url), [ref-link][ref], and [empty][]."
         )
         assert extract_first_paragraph(content) == (
-            "This is bold, italic, struck, code, inline, ref-link, and empty."
+            "This is bold, italic, struck, code, inline, [ref-link][ref], and [empty][]."
         )
+
+    def test_skip_admonition_finds_next_paragraph(self) -> None:
+        """Test that an admonition block is skipped and the following paragraph is returned.
+
+        Admonitions are rendered as block-level ``<div>`` elements by the
+        BlogMore AdmonitionsExtension, so they are not treated as a paragraph.
+        """
+        content = (
+            "> [!NOTE]\n"
+            "> This is a note.\n\n"
+            "This is the first real paragraph."
+        )
+        assert extract_first_paragraph(content) == "This is the first real paragraph."
+
+    def test_skip_admonition_only_content(self) -> None:
+        """Test that content consisting only of an admonition returns empty string."""
+        content = "> [!TIP]\n> Only an admonition here."
+        assert extract_first_paragraph(content) == ""
+
+    def test_blockquote_skipped_finds_next_paragraph(self) -> None:
+        """Test that blockquote content is not returned as the first paragraph."""
+        content = "> A blockquote.\n\nFirst real paragraph."
+        assert extract_first_paragraph(content) == "First real paragraph."
+
 
 
 class TestPost:
