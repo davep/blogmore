@@ -12,9 +12,9 @@ import markdown
 import yaml
 from pygments.formatters import HtmlFormatter
 
-from blogmore.markdown.first_paragraph import create_custom_extensions
 from blogmore.markdown.first_paragraph import (
-    extract_first_paragraph as extract_first_paragraph,
+    create_custom_extensions,
+    extract_first_paragraph,
 )
 from blogmore.utils import calculate_reading_time
 
