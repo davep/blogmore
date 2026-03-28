@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.6.0
 
-**Released: WiP**
+**Released: 2026-03-28**
 
 - Fixed auto-generated post descriptions so that reference-style links are
   stripped to plain text, matching the existing behaviour for inline links.
