@@ -7,6 +7,10 @@
 - Replaced the regex-based `extract_first_paragraph` implementation with a
   Markdown-library-powered approach.
   ([#354](https://github.com/davep/blogmore/pull/354))
+- Draft posts now receive a clear visual indicator wherever a post title is
+  rendered: the title is displayed in a contrasting amber colour and a 🚧
+  emoji is appended after the title text.
+  ([#357](https://github.com/davep/blogmore/pull/357))
 
 ## v2.6.0
 

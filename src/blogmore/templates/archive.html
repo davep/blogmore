@@ -64,7 +64,7 @@
                 <ul class="archive-post-list">
                 {% for post in ns.years[year][month_key]['posts'] %}
                     <li>
-                        <a href="{{ post.url }}" class="post-title">{{ post.title }}</a>
+                        <a href="{{ post.url }}" class="post-title{% if post.draft %} draft-title{% endif %}">{{ post.title }}{% if post.draft %} 🚧{% endif %}</a>
                         {% if post.category %}
                         <span class="archive-metadata">
                             <a href="/{{ category_dir }}/{{ post.safe_category }}/{{ pagination_page1_suffix }}" class="category-link">{{ post.category }}</a>

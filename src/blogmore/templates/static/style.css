@@ -47,6 +47,7 @@
     --code-lang-color: #888;
     --code-copy-color: #555;
     --code-copy-success-color: #1a7f37;
+    --draft-title-color: #cc6600;
 
     /* ---- Dark mode palette (shared by both dark mode selectors below) ---- */
     --dark-bg-color: #1a1a1a;
@@ -78,6 +79,7 @@
     --dark-code-lang-color: #999;
     --dark-code-copy-color: #bbb;
     --dark-code-copy-success-color: #3fb950;
+    --dark-draft-title-color: #ffab40;
 }
 
 /* Dark mode — applied by system preference (JavaScript disabled fallback).
@@ -116,6 +118,7 @@
         --code-lang-color: var(--dark-code-lang-color);
         --code-copy-color: var(--dark-code-copy-color);
         --code-copy-success-color: var(--dark-code-copy-success-color);
+        --draft-title-color: var(--dark-draft-title-color);
     }
 }
 
@@ -154,6 +157,7 @@
     --code-lang-color: var(--dark-code-lang-color);
     --code-copy-color: var(--dark-code-copy-color);
     --code-copy-success-color: var(--dark-code-copy-success-color);
+    --draft-title-color: var(--dark-draft-title-color);
 }
 
 /* =============================================================================
@@ -996,6 +1000,11 @@ img[src*="#centre"] {
 
 .post-summary h2 a:hover {
     color: var(--hover-color);
+}
+
+.post-summary.draft-post h2 a,
+.post.draft-post .post-header h1 {
+    color: var(--draft-title-color);
 }
 
 .post-summary time {
