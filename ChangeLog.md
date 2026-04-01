@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.7.0
 
-**Released: WiP**
+**Released: 2026-04-01**
 
 - Replaced the regex-based `extract_first_paragraph` implementation with a
   Markdown-library-powered approach.
