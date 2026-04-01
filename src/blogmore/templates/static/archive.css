@@ -76,6 +76,10 @@
     text-decoration: underline;
 }
 
+.archive-post-list .post-title.draft-title {
+    color: var(--draft-title-color);
+}
+
 .archive-post-list .archive-metadata {
     margin-left: 8px;
 }

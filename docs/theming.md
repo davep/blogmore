@@ -136,6 +136,7 @@ corresponding `--dark-*` values.
 | `--admonition-important-title-color` | `#8250df` | Important admonition title |
 | `--admonition-warning-title-color` | `#9a6700` | Warning admonition title |
 | `--admonition-caution-title-color` | `#d1242f` | Caution admonition title |
+| `--draft-title-color` | `#cc6600` | Draft post title colour |
 
 ### Dark mode palette variables
 
@@ -170,6 +171,7 @@ automatically to both the JavaScript toggle and the CSS media query fallback.
 | `--dark-admonition-important-title-color` | `#a371f7` | Dark important title |
 | `--dark-admonition-warning-title-color` | `#d29922` | Dark warning title |
 | `--dark-admonition-caution-title-color` | `#f85149` | Dark caution title |
+| `--dark-draft-title-color` | `#ffab40` | Dark mode draft post title colour |
 
 ## Example: full colour override
 

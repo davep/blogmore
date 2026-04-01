@@ -135,6 +135,33 @@ Helper methods available on `Post`:
 | `safe_tags()` | `list[str]` | Tags sanitised for URL use. |
 | `sorted_tag_pairs()` | `list[tuple[str, str]]` | `(display, safe)` tag pairs sorted alphabetically. |
 
+### Draft post visual indicator
+
+When `post.draft` is `True`, the built-in templates automatically apply a
+clear visual indicator to the post title wherever it is rendered:
+
+- The post title is displayed in the **draft title colour** (`--draft-title-color`
+  CSS custom property, default amber `#cc6600`).
+- A **🚧 emoji** is appended after the title text.
+- The containing `<article>` element receives the CSS class **`draft-post`**
+  (for summary cards and individual post pages) or the link receives the class
+  **`draft-title`** (in the date archive list).
+
+This applies in every listing context (home page, tag pages, category pages,
+date archive) as well as on the individual post page.  Non-draft posts are
+never affected.
+
+Custom templates that render `post.title` should replicate this pattern.  A
+minimal implementation:
+
+```html+jinja
+<h2><a href="{{ post.url }}">{{ post.title }}{% if post.draft %} 🚧{% endif %}</a></h2>
+```
+
+To override the draft title colour, set `--draft-title-color` (and
+`--dark-draft-title-color` for dark mode) in your custom stylesheet.  See
+[Theming](theming.md) for the full CSS variable reference.
+
 ## Page object
 
 `Page` objects represent static pages from the `pages/` directory.

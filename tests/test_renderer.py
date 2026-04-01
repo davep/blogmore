@@ -1190,3 +1190,111 @@ class TestTemplateRenderer:
 
         assert '<meta name="description"' not in html
         assert '<meta property="og:description"' not in html
+
+    def test_draft_post_page_has_emoji_and_class(
+        self, sample_draft_post: Post
+    ) -> None:
+        """Test that a draft post page shows the 🚧 emoji and draft-post class."""
+        renderer = TemplateRenderer()
+        html = renderer.render_post(sample_draft_post, site_title="Test Blog")
+
+        assert "🚧" in html
+        assert "draft-post" in html
+
+    def test_non_draft_post_page_has_no_emoji_or_class(
+        self, sample_post: Post
+    ) -> None:
+        """Test that a non-draft post page does not show the 🚧 emoji or draft-post class."""
+        renderer = TemplateRenderer()
+        html = renderer.render_post(sample_post, site_title="Test Blog")
+
+        assert "🚧" not in html
+        assert "draft-post" not in html
+
+    def test_draft_post_index_has_emoji_and_class(
+        self, sample_draft_post: Post
+    ) -> None:
+        """Test that a draft post in the index shows the 🚧 emoji and draft-post class."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_draft_post],
+            page=1,
+            total_pages=1,
+            site_title="Test Blog",
+        )
+
+        assert "🚧" in html
+        assert "draft-post" in html
+
+    def test_non_draft_post_index_has_no_emoji_or_class(
+        self, sample_post: Post
+    ) -> None:
+        """Test that a non-draft post in the index does not show the 🚧 emoji or draft-post class."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=1,
+            total_pages=1,
+            site_title="Test Blog",
+        )
+
+        assert "🚧" not in html
+        assert "draft-post" not in html
+
+    def test_draft_post_tag_page_has_emoji_and_class(
+        self, sample_draft_post: Post
+    ) -> None:
+        """Test that a draft post on a tag page shows the 🚧 emoji and draft-post class."""
+        renderer = TemplateRenderer()
+        html = renderer.render_tag_page(
+            tag="draft",
+            posts=[sample_draft_post],
+            site_title="Test Blog",
+        )
+
+        assert "🚧" in html
+        assert "draft-post" in html
+
+    def test_draft_post_category_page_has_emoji_and_class(
+        self, sample_draft_post: Post
+    ) -> None:
+        """Test that a draft post on a category page shows the 🚧 emoji and draft-post class."""
+        renderer = TemplateRenderer()
+        html = renderer.render_category_page(
+            category="webdev",
+            posts=[sample_draft_post],
+            site_title="Test Blog",
+        )
+
+        assert "🚧" in html
+        assert "draft-post" in html
+
+    def test_draft_post_archive_has_emoji_and_class(
+        self, sample_draft_post: Post
+    ) -> None:
+        """Test that a draft post on the archive page shows the 🚧 emoji and draft-title class."""
+        renderer = TemplateRenderer()
+        # Render the main archive page (no archive_title) to exercise the
+        # compact list view that uses the draft-title CSS class.
+        html = renderer.render_archive(
+            posts=[sample_draft_post],
+            site_title="Test Blog",
+        )
+
+        assert "🚧" in html
+        assert "draft-title" in html
+
+    def test_non_draft_post_archive_has_no_emoji_or_class(
+        self, sample_post: Post
+    ) -> None:
+        """Test that a non-draft post on the archive page does not show the 🚧 emoji or draft-title class."""
+        renderer = TemplateRenderer()
+        # Render the main archive page (no archive_title) to exercise the
+        # compact list view that uses the draft-title CSS class.
+        html = renderer.render_archive(
+            posts=[sample_post],
+            site_title="Test Blog",
+        )
+
+        assert "🚧" not in html
+        assert "draft-title" not in html

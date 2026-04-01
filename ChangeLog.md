@@ -4,6 +4,16 @@
 
 **Released: WiP**
 
+- Draft posts now receive a clear visual indicator wherever a post title is
+  rendered: the title is displayed in a contrasting amber colour
+  (`--draft-title-color`) and a 🚧 emoji is appended after the title text.
+  This applies on the individual post page, all listing pages (home, tag,
+  category) and the date archive.  A new `draft-post` CSS class is added to
+  the article element and a `draft-title` class to archive list links.  The
+  `--draft-title-color` and `--dark-draft-title-color` CSS custom properties
+  can be overridden in a custom stylesheet to change the colour.
+  Non-draft posts are unaffected.
+  ([#355](https://github.com/davep/blogmore/pull/355))
 - Replaced the regex-based `extract_first_paragraph` implementation with a
   Markdown-library-powered approach.
   ([#354](https://github.com/davep/blogmore/pull/354))

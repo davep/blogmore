@@ -19,8 +19,8 @@
         tag_dir (str): URL path segment for tag pages.
 #}
 {% macro post_summary(post, include_category=true) %}
-<article class="post-summary">
-    <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+<article class="post-summary{% if post.draft %} draft-post{% endif %}">
+    <h2><a href="{{ post.url }}">{{ post.title }}{% if post.draft %} 🚧{% endif %}</a></h2>
     {% if post.date %}
     <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>
     {% endif %}
