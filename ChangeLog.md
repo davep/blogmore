@@ -1,5 +1,17 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed a bug where post or page content starting with a line of the form
+  `<digit>:<rest>` (e.g. `7:54am …`) was silently dropped from the rendered
+  HTML output. The root cause was the Python-Markdown `meta` extension being
+  enabled alongside `python-frontmatter`: the `meta` extension treated the
+  leading digit as a metadata key and consumed the line. Removing the unused
+  `meta` extension fixes the issue.
+  ([#NNN](https://github.com/davep/blogmore/pull/NNN))
+
 ## v2.7.0
 
 **Released: 2026-04-01**

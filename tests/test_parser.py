@@ -1059,3 +1059,42 @@ This post has [an external link](https://external.com) and
         assert 'href="/posts/my-post"' in post.html_content
         # Only the external link should have target="_blank"
         assert post.html_content.count('target="_blank"') == 1
+
+    def test_post_content_starting_with_numeric_is_fully_rendered(
+        self, tmp_path: Path
+    ) -> None:
+        """Test that post content starting with a numeric character is rendered correctly.
+
+        The Python-Markdown 'meta' extension would incorrectly interpret a line
+        such as "7:54am ..." as metadata (key "7", value "54am ..."), causing the
+        first line to be silently dropped from the HTML output.
+        """
+        parser = PostParser()
+        post_file = tmp_path / "numeric-start.md"
+        post_file.write_text(
+            "---\ntitle: Starts With Numeric\n---\n\n"
+            "7:54am on a quiet Monday morning. Quiet because its New Years Eve. I\n"
+            "have just put £15 into a hire car prior to returning the vehicle.\n\n"
+            "This is paragraph two.\n"
+        )
+        post = parser.parse_file(post_file)
+
+        assert "7:54am" in post.html_content
+        assert "have just put" in post.html_content
+        assert "This is paragraph two." in post.html_content
+
+    def test_page_content_starting_with_numeric_is_fully_rendered(
+        self, tmp_path: Path
+    ) -> None:
+        """Test that page content starting with a numeric character is rendered correctly."""
+        parser = PostParser()
+        page_file = tmp_path / "numeric-start.md"
+        page_file.write_text(
+            "---\ntitle: Starts With Numeric\n---\n\n"
+            "9:00am — the meeting starts.\n\n"
+            "This is paragraph two.\n"
+        )
+        page = parser.parse_page(page_file)
+
+        assert "9:00am" in page.html_content
+        assert "This is paragraph two." in page.html_content
