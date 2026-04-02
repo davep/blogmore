@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.8.0
 
-**Released: WiP**
+**Released: 2026-04-02**
 
 - Fixed a bug where post or page content starting with a line of the form
   `<digit>:<rest>` (e.g. `7:54am …`) was silently dropped from the rendered
