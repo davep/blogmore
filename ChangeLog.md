@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed a bug where post or page content starting with a line of the form
+  `<digit>:<rest>` (e.g. `7:54am …`) was silently dropped from the rendered
+  HTML output. ([#360](https://github.com/davep/blogmore/pull/360))
+
 ## v2.7.0
 
 **Released: 2026-04-01**

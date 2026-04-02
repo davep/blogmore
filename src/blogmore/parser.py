@@ -320,7 +320,6 @@ class PostParser:
         """
         self.markdown = markdown.Markdown(
             extensions=[
-                "meta",
                 "attr_list",
                 "fenced_code",
                 "codehilite",
