@@ -127,6 +127,8 @@
         --kbd-border: var(--dark-kbd-border);
     }
 }
+
+/* Dark mode — applied by theme toggle (JavaScript enabled).
  * theme.js sets data-theme="dark" when the user has selected dark mode or
  * when the system preference is dark.
  */
