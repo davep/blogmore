@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.9.0
 
-**Released: WiP**
+**Released: 2026-04-04**
 
 - Added styling for `<kbd>` elements. Keys are now rendered with a subtle
   raised appearance using a border, background, and monospaced font. Two new
