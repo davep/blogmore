@@ -137,6 +137,8 @@ corresponding `--dark-*` values.
 | `--admonition-warning-title-color` | `#9a6700` | Warning admonition title |
 | `--admonition-caution-title-color` | `#d1242f` | Caution admonition title |
 | `--draft-title-color` | `#cc6600` | Draft post title colour |
+| `--kbd-bg` | `#f0f0f0` | Keyboard key background |
+| `--kbd-border` | `#b4b4b4` | Keyboard key border |
 
 ### Dark mode palette variables
 
@@ -172,6 +174,8 @@ automatically to both the JavaScript toggle and the CSS media query fallback.
 | `--dark-admonition-warning-title-color` | `#d29922` | Dark warning title |
 | `--dark-admonition-caution-title-color` | `#f85149` | Dark caution title |
 | `--dark-draft-title-color` | `#ffab40` | Dark mode draft post title colour |
+| `--dark-kbd-bg` | `#3a3a3a` | Dark mode keyboard key background |
+| `--dark-kbd-border` | `#666` | Dark mode keyboard key border |
 
 ## Example: full colour override
 
@@ -201,6 +205,8 @@ is a good starting point for building your own theme.
     --table-border: #e0d0ce;
     --table-header-bg: #f2ede0;
     --table-stripe-bg: #faf9f5;
+    --kbd-bg: #eee8e0;
+    --kbd-border: #c8b8b0;
 }
 
 /* Dark mode palette — override --dark-* to change dark mode colours */
@@ -225,6 +231,8 @@ is a good starting point for building your own theme.
     --dark-table-border: #3a3028;
     --dark-table-header-bg: #28201c;
     --dark-table-stripe-bg: #201810;
+    --dark-kbd-bg: #3a2e28;
+    --dark-kbd-border: #6a5a50;
 }
 ```
 

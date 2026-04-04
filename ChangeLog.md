@@ -1,5 +1,17 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added keyboard styling for `<kbd>` elements. Keys are now rendered with a
+  subtle raised appearance using a border, background, and monospaced font,
+  without disrupting line spacing. Two new CSS variables — `--kbd-bg` and
+  `--kbd-border` — control the appearance and can be overridden in a custom
+  stylesheet. Both light and dark modes are supported via the corresponding
+  `--dark-kbd-bg` and `--dark-kbd-border` palette variables.
+  ([#TBD](https://github.com/davep/blogmore/pull/TBD))
+
 ## v2.8.0
 
 **Released: 2026-04-02**

@@ -60,6 +60,8 @@
     --dark-admonition-important-title-color: #6c71c4;
     --dark-admonition-warning-title-color: #b58900;
     --dark-admonition-caution-title-color: #dc322f;
+    --dark-kbd-bg: #073642;
+    --dark-kbd-border: #586e75;
 }
 
 /* ---- Light mode palette --------------------------------------------------- */
@@ -95,4 +97,6 @@
     --admonition-important-title-color: #6c71c4;
     --admonition-warning-title-color: #b58900;
     --admonition-caution-title-color: #dc322f;
+    --kbd-bg: #eee8d5;
+    --kbd-border: #93a1a1;
 }
