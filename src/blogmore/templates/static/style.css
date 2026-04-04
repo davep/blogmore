@@ -48,6 +48,8 @@
     --code-copy-color: #555;
     --code-copy-success-color: #1a7f37;
     --draft-title-color: #cc6600;
+    --kbd-bg: #f0f0f0;
+    --kbd-border: #b4b4b4;
 
     /* ---- Dark mode palette (shared by both dark mode selectors below) ---- */
     --dark-bg-color: #1a1a1a;
@@ -80,6 +82,8 @@
     --dark-code-copy-color: #bbb;
     --dark-code-copy-success-color: #3fb950;
     --dark-draft-title-color: #ffab40;
+    --dark-kbd-bg: #3a3a3a;
+    --dark-kbd-border: #666;
 }
 
 /* Dark mode — applied by system preference (JavaScript disabled fallback).
@@ -119,6 +123,8 @@
         --code-copy-color: var(--dark-code-copy-color);
         --code-copy-success-color: var(--dark-code-copy-success-color);
         --draft-title-color: var(--dark-draft-title-color);
+        --kbd-bg: var(--dark-kbd-bg);
+        --kbd-border: var(--dark-kbd-border);
     }
 }
 
@@ -158,6 +164,8 @@
     --code-copy-color: var(--dark-code-copy-color);
     --code-copy-success-color: var(--dark-code-copy-success-color);
     --draft-title-color: var(--dark-draft-title-color);
+    --kbd-bg: var(--dark-kbd-bg);
+    --kbd-border: var(--dark-kbd-border);
 }
 
 /* =============================================================================
@@ -836,6 +844,17 @@ time a:visited {
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 0.9em;
+}
+
+.post-content kbd {
+    background: var(--kbd-bg);
+    border: 1px solid var(--kbd-border);
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 0.85em;
+    padding: 1px 5px;
+    white-space: nowrap;
 }
 
 .post-content pre {

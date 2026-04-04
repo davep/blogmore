@@ -57,6 +57,8 @@
     --admonition-important-title-color: #6a1b9a;
     --admonition-warning-title-color: #e65100;
     --admonition-caution-title-color: #c62828;
+    --kbd-bg: #e8eaf6;
+    --kbd-border: #9fa8da;
 }
 
 /* ---- Dark mode palette ---------------------------------------------------- */
@@ -91,6 +93,8 @@
     --dark-admonition-important-title-color: #ce93d8;
     --dark-admonition-warning-title-color: #ffb74d;
     --dark-admonition-caution-title-color: #ef9a9a;
+    --dark-kbd-bg: #1e1d30;
+    --dark-kbd-border: #3949ab;
 }
 
 /* ---- Compact sidebar --------------------------------------------------------

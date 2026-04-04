@@ -47,6 +47,8 @@
     --admonition-important-title-color: #222222;
     --admonition-warning-title-color: #222222;
     --admonition-caution-title-color: #222222;
+    --kbd-bg: #eeeeee;
+    --kbd-border: #aaaaaa;
 }
 
 /* ---- Dark mode palette ---------------------------------------------------- */
@@ -81,6 +83,8 @@
     --dark-admonition-important-title-color: #dddddd;
     --dark-admonition-warning-title-color: #dddddd;
     --dark-admonition-caution-title-color: #dddddd;
+    --dark-kbd-bg: #222222;
+    --dark-kbd-border: #555555;
 }
 
 /* ---- Link styling --------------------------------------------------------- */
