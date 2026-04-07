@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.10.0
 
-**Released: WiP**
+**Released: 2026-07-07**
 
 - Added a posting-streak chart to the stats page.
   ([#366](https://github.com/davep/blogmore/pull/366))
