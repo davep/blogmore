@@ -4,16 +4,8 @@
 
 **Released: WiP**
 
-- Added a posting-streak chart to the stats page, displayed after the
-  "Posts by Month of Year" histogram. The chart uses a GitHub-style
-  contribution grid with five intensity levels; hovering a cell shows the
-  date and post count; clicking a day with posts navigates to the daily
-  archive. The chart is responsive: it shows 9, 6, or 3 trailing calendar
-  months depending on the available viewport width. Month names are displayed
-  above the grid as column labels. Both light and dark modes are supported
-  via five new CSS variable pairs (`--streak-cell-empty`,
-  `--streak-cell-l1` … `--streak-cell-l4` and their `--dark-*` counterparts).
-  ([#FIXME](https://github.com/davep/blogmore/pull/FIXME))
+- Added a posting-streak chart to the stats page.
+  ([#366](https://github.com/davep/blogmore/pull/366))
 
 ## v2.9.0
 
