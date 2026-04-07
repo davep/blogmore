@@ -72,8 +72,8 @@
             <h2>{{ count }} post{{ '' if count == 1 else 's' }} in the last {{ variant.months }} month{{ '' if variant.months == 1 else 's' }}</h2>
             <figure class="stats-chart stats-streak-chart" aria-label="Posts in the last {{ variant.months }} months">
                 <div class="streak-outer">
-                    {# Row 1, Col 1: spacer (aligns with DOW labels column) #}
-                    <div aria-hidden="true"></div>
+                    {# Row 1, Col 1: spacer (aligns month labels with DOW labels column) #}
+                    <div class="streak-dow-spacer" aria-hidden="true"></div>
                     {# Row 1, Col 2: month labels positioned by column #}
                     <div class="streak-month-labels-grid">
                         {% for label, col_start in variant.month_label_positions %}

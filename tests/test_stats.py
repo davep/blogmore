@@ -443,7 +443,6 @@ class TestStreakChart:
 
     def test_streak_variant_dataclass_fields(self) -> None:
         """StreakChartVariant exposes months, posts_count, month_label_positions, weeks."""
-        today = dt.date.today()
         variant = StreakChartVariant(
             months=3,
             posts_count=5,
@@ -454,7 +453,6 @@ class TestStreakChart:
         assert variant.posts_count == 5
         assert variant.month_label_positions == [("Apr", 1)]
         assert variant.weeks == []
-        _ = today  # silence unused-variable warning
 
     def test_month_label_positions_are_ordered(self) -> None:
         """month_label_positions are in ascending column order."""
