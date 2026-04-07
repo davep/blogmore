@@ -211,3 +211,157 @@
         font-size: 0.55em;
     }
 }
+
+/* ---  Streak chart  ------------------------------------------------------- */
+
+/*
+ * Responsive variant visibility.
+ * Three variants cover 5, 9, and 10 trailing calendar months.
+ * Only the appropriate variant for the current viewport is shown.
+ *
+ *   < 450 px          → 5-month  (always fits)
+ *   450 px – 999 px   → 9-month  (grid ≈ 585 px; fits once sidebar collapses)
+ *   ≥ 1000 px         → 10-month (grid ≈ 650 px; fits with sidebar at 1000 px+)
+ */
+.streak-variant {
+    display: none;
+}
+
+.streak-variant-5mo {
+    display: block;
+}
+
+@media (min-width: 450px) {
+    .streak-variant-5mo {
+        display: none;
+    }
+
+    .streak-variant-9mo {
+        display: block;
+    }
+}
+
+@media (min-width: 1000px) {
+    .streak-variant-9mo {
+        display: none;
+    }
+
+    .streak-variant-10mo {
+        display: block;
+    }
+}
+
+/*
+ * The streak chart figure is a flex container so that .streak-outer (which is
+ * width: fit-content) can be horizontally centred via justify-content.
+ * overflow: visible is required so the hover outline on edge cells is not
+ * clipped by the figure boundary.
+ */
+.stats-streak-chart {
+    display: flex;
+    justify-content: center;
+    overflow: visible;
+}
+
+/*
+ * Outer 2-column CSS grid: col 1 = DOW labels, col 2 = month labels + cells.
+ * Both rows share the same column widths so the labels align with the grid.
+ * Padding provides room for the hover outline on edge cells; the symmetric
+ * negative margin counteracts the padding to prevent it from affecting layout.
+ */
+.streak-outer {
+    display: grid;
+    grid-template-columns: 30px auto;
+    row-gap: 2px;
+    column-gap: 4px;
+    width: fit-content;
+    padding: 4px;
+    margin: -4px;
+}
+
+/* Row 1, Col 1: invisible spacer that aligns the month-label row with the
+   DOW label column below it. */
+.streak-dow-spacer {
+    /* Intentionally empty; width provided by the grid column definition. */
+}
+
+/* Row 1, Col 2: month name labels */
+.streak-month-labels-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 13px;
+    gap: 2px;
+    overflow: visible;
+}
+
+.streak-month-label {
+    grid-row: 1;
+    font-size: 0.6em;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: visible;
+}
+
+/* Row 2, Col 1: day-of-week labels */
+.streak-dow-labels {
+    display: grid;
+    grid-template-rows: repeat(7, 13px);
+    gap: 2px;
+    align-self: start;
+}
+
+.streak-dow-label {
+    font-size: 0.6em;
+    color: var(--text-secondary);
+    line-height: 13px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* Row 2, Col 2: streak cells */
+.streak-grid {
+    display: grid;
+    grid-template-rows: repeat(7, 13px);
+    grid-auto-flow: column;
+    grid-auto-columns: 13px;
+    gap: 2px;
+    overflow: visible;
+}
+
+.streak-cell {
+    width: 13px;
+    height: 13px;
+    border-radius: 2px;
+    display: block;
+    box-sizing: border-box;
+}
+
+.streak-cell-out-of-range {
+    background: transparent;
+}
+
+.streak-cell-level-0 {
+    background: var(--streak-cell-empty);
+}
+
+.streak-cell-level-1 {
+    background: var(--streak-cell-l1);
+}
+
+.streak-cell-level-2 {
+    background: var(--streak-cell-l2);
+}
+
+.streak-cell-level-3 {
+    background: var(--streak-cell-l3);
+}
+
+.streak-cell-level-4 {
+    background: var(--streak-cell-l4);
+}
+
+a.streak-cell:hover {
+    outline: 2px solid var(--link-hover-color);
+    outline-offset: 1px;
+    cursor: pointer;
+}

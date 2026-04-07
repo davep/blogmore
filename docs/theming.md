@@ -139,6 +139,11 @@ corresponding `--dark-*` values.
 | `--draft-title-color` | `#cc6600` | Draft post title colour |
 | `--kbd-bg` | `#f0f0f0` | Keyboard key background |
 | `--kbd-border` | `#b4b4b4` | Keyboard key border |
+| `--streak-cell-empty` | `#ebedf0` | Streak chart empty day cell |
+| `--streak-cell-l1` | `#9ecaf0` | Streak chart level 1 (1 post) |
+| `--streak-cell-l2` | `#5499d5` | Streak chart level 2 (2–3 posts) |
+| `--streak-cell-l3` | `#2270bd` | Streak chart level 3 (4–6 posts) |
+| `--streak-cell-l4` | `#0066cc` | Streak chart level 4 (7+ posts) |
 
 ### Dark mode palette variables
 
@@ -176,6 +181,11 @@ automatically to both the JavaScript toggle and the CSS media query fallback.
 | `--dark-draft-title-color` | `#ffab40` | Dark mode draft post title colour |
 | `--dark-kbd-bg` | `#3a3a3a` | Dark mode keyboard key background |
 | `--dark-kbd-border` | `#666` | Dark mode keyboard key border |
+| `--dark-streak-cell-empty` | `#21262d` | Dark mode streak chart empty cell |
+| `--dark-streak-cell-l1` | `#1a3b5c` | Dark mode streak chart level 1 (1 post) |
+| `--dark-streak-cell-l2` | `#1d5fa0` | Dark mode streak chart level 2 (2–3 posts) |
+| `--dark-streak-cell-l3` | `#3487d8` | Dark mode streak chart level 3 (4–6 posts) |
+| `--dark-streak-cell-l4` | `#6eb3ff` | Dark mode streak chart level 4 (7+ posts) |
 
 ## Example: full colour override
 
@@ -207,6 +217,11 @@ is a good starting point for building your own theme.
     --table-stripe-bg: #faf9f5;
     --kbd-bg: #eee8e0;
     --kbd-border: #c8b8b0;
+    --streak-cell-empty: #e8e0d5;
+    --streak-cell-l1: #c5dce8;
+    --streak-cell-l2: #7ab5d0;
+    --streak-cell-l3: #2aa198;
+    --streak-cell-l4: #268bd2;
 }
 
 /* Dark mode palette — override --dark-* to change dark mode colours */
@@ -233,6 +248,11 @@ is a good starting point for building your own theme.
     --dark-table-stripe-bg: #201810;
     --dark-kbd-bg: #3a2e28;
     --dark-kbd-border: #6a5a50;
+    --dark-streak-cell-empty: #1c1512;
+    --dark-streak-cell-l1: #2a1e18;
+    --dark-streak-cell-l2: #5a3830;
+    --dark-streak-cell-l3: #c0392b;
+    --dark-streak-cell-l4: #ff8c85;
 }
 ```
 

@@ -13,6 +13,77 @@ from urllib.parse import urlparse
 from blogmore.parser import Post
 from blogmore.utils import count_words
 
+
+@dataclass
+class StreakChartCell:
+    """A single cell in the posting-streak chart grid.
+
+    Attributes:
+        date: The calendar date this cell represents.
+        count: Number of posts published on this date.
+        in_window: Whether this date falls within the variant's window.
+            Cells outside the window are rendered as empty/dimmed spacers.
+    """
+
+    date: dt.date
+    """The calendar date this cell represents."""
+
+    count: int
+    """Number of posts published on this date."""
+
+    in_window: bool
+    """Whether this date falls within the variant's window."""
+
+
+@dataclass
+class StreakChartVariant:
+    """Streak chart covering a specific number of trailing calendar months.
+
+    Attributes:
+        months: Number of calendar months covered, inclusive of the current
+            partial month.
+        posts_count: Total posts published within the window.
+        first_date: First date of the window (first day of the oldest month).
+        last_date: Last date of the window (today when the variant was built).
+        month_label_positions: Month labels paired with their 1-based week
+            column index in :attr:`weeks`.  Each entry is ``(label, col)``,
+            e.g. ``("Apr", 1)``.
+        weeks: Week columns, oldest first.  Each column is a list of exactly
+            7 entries ordered Sunday-first.  An entry is ``None`` when the
+            slot falls outside the window.
+    """
+
+    months: int
+    """Number of calendar months covered by this variant."""
+
+    posts_count: int
+    """Total posts published within the variant's window."""
+
+    first_date: dt.date
+    """First date of the window (first day of the oldest month)."""
+
+    last_date: dt.date
+    """Last date of the window (today when the variant was built)."""
+
+    month_label_positions: list[tuple[str, int]]
+    """Month labels and their 1-based column positions in the week grid."""
+
+    weeks: list[list[StreakChartCell | None]]
+    """Week columns (oldest first), each with 7 Sunday-first day slots."""
+
+
+##############################################################################
+# Day-of-week labels (Sunday first, used in the streak chart rows).
+STREAK_DOW_LABELS: list[str] = [
+    "Sun",
+    "Mon",
+    "Tue",
+    "Wed",
+    "Thu",
+    "Fri",
+    "Sat",
+]
+
 ##############################################################################
 # Day-of-week labels (Monday first, matching datetime.weekday() → 0=Mon).
 WEEKDAY_LABELS: list[str] = [
@@ -123,6 +194,17 @@ class BlogStats:
     Sorted by count descending.
     """
 
+    posts_in_last_year: int = 0
+    """Total number of posts published in the last 365 days (inclusive of today)."""
+
+    streak_variants: list[StreakChartVariant] = field(default_factory=list)
+    """Streak chart variants for responsive display.
+
+    Three pre-computed variants covering 3, 6, and 9 trailing calendar
+    months respectively, each with week-column data and month-label positions.
+    Ordered by ascending month count (3 first, 9 last).
+    """
+
     @property
     def blog_span_days(self) -> int | None:
         """Return the total span of the blog in days, or ``None`` if fewer than two dated posts exist.
@@ -171,6 +253,89 @@ def _extract_external_links(html_content: str, site_url: str) -> list[str]:
     return external_urls
 
 
+def _compute_streak_variant(
+    posts_by_date: dict[dt.date, int],
+    today: dt.date,
+    num_months: int,
+) -> StreakChartVariant:
+    """Compute a streak chart variant covering the last *num_months* calendar months.
+
+    The window runs from the first day of the month that is
+    ``num_months - 1`` months before *today* through *today* inclusive.
+    The week grid is padded to full Sunday→Saturday columns at both ends.
+
+    Args:
+        posts_by_date: Mapping of date to post count for all dated posts.
+        today: The current date.
+        num_months: Number of trailing calendar months to include, counting
+            the current (partial) month.
+
+    Returns:
+        A :class:`StreakChartVariant` for the requested window.
+    """
+    # 1st of the month (num_months - 1) months before today.
+    start_month = today.month - (num_months - 1)
+    start_year = today.year
+    while start_month <= 0:
+        start_month += 12
+        start_year -= 1
+    window_start = dt.date(start_year, start_month, 1)
+
+    # Count posts within the window.
+    posts_count = sum(
+        count for date, count in posts_by_date.items() if window_start <= date <= today
+    )
+
+    # Align grid to full Sunday→Saturday weeks.
+    dow_start = window_start.isoweekday() % 7  # Sun=0, Mon=1, …
+    grid_start = window_start - dt.timedelta(days=dow_start)
+    dow_today = today.isoweekday() % 7
+    grid_end = today + dt.timedelta(days=(6 - dow_today) % 7)
+
+    # Build week columns.
+    weeks: list[list[StreakChartCell | None]] = []
+    current_sunday = grid_start
+    while current_sunday <= grid_end:
+        week: list[StreakChartCell | None] = []
+        for offset in range(7):
+            day = current_sunday + dt.timedelta(days=offset)
+            if window_start <= day <= today:
+                week.append(
+                    StreakChartCell(
+                        date=day,
+                        count=posts_by_date.get(day, 0),
+                        in_window=True,
+                    )
+                )
+            else:
+                week.append(None)
+        weeks.append(week)
+        current_sunday += dt.timedelta(days=7)
+
+    # Determine month label positions: 1-based column of the first week
+    # where each calendar month appears.
+    months_seen: set[tuple[int, int]] = set()
+    month_label_positions: list[tuple[str, int]] = []
+    for col_idx, week in enumerate(weeks):
+        for cell in week:
+            if cell is not None:
+                key = (cell.date.year, cell.date.month)
+                if key not in months_seen:
+                    months_seen.add(key)
+                    month_label_positions.append(
+                        (cell.date.strftime("%b"), col_idx + 1)
+                    )
+
+    return StreakChartVariant(
+        months=num_months,
+        posts_count=posts_count,
+        first_date=window_start,
+        last_date=today,
+        month_label_positions=month_label_positions,
+        weeks=weeks,
+    )
+
+
 def compute_blog_stats(posts: list[Post], site_url: str = "") -> BlogStats:
     """Compute aggregated statistics from a collection of blog posts.
 
@@ -183,9 +348,6 @@ def compute_blog_stats(posts: list[Post], site_url: str = "") -> BlogStats:
         A :class:`BlogStats` instance populated from the given posts.
     """
     stats = BlogStats()
-
-    if not posts:
-        return stats
 
     # --- Date-based histograms -----------------------------------------------
     dated_posts = [post for post in posts if post.date is not None]
@@ -269,6 +431,32 @@ def compute_blog_stats(posts: list[Post], site_url: str = "") -> BlogStats:
                 domain_counter[domain] += 1
     stats.unique_external_link_count = len(all_external_urls)
     stats.top_domains = domain_counter.most_common(20)
+
+    # --- Streak chart variants (3, 6, 9 months) ------------------------------
+    today = dt.date.today()
+
+    # Build a date→count mapping for all dated posts (all variants share it).
+    posts_by_date: dict[dt.date, int] = {}
+    for post in dated_posts:
+        assert post.date is not None
+        post_dt = post.date
+        if post_dt.tzinfo is not None:
+            post_dt = post_dt.astimezone(dt.UTC).replace(tzinfo=None)
+        post_date = post_dt.date()
+        posts_by_date[post_date] = posts_by_date.get(post_date, 0) + 1
+
+    # Rolling 365-day post count.
+    window_365_start = today - dt.timedelta(days=364)
+    stats.posts_in_last_year = sum(
+        count
+        for date, count in posts_by_date.items()
+        if window_365_start <= date <= today
+    )
+
+    # Responsive variants: 3, 6, and 9 trailing calendar months.
+    stats.streak_variants = [
+        _compute_streak_variant(posts_by_date, today, n) for n in (5, 9, 10)
+    ]
 
     return stats
 
