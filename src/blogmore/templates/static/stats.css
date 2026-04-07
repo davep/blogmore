@@ -216,37 +216,37 @@
 
 /*
  * Responsive variant visibility.
- * Three variants cover 3, 6, and 9 trailing calendar months.
+ * Three variants cover 4, 9, and 10 trailing calendar months.
  * Only the appropriate variant for the current viewport is shown.
  *
- *   < 450 px          → 3-month  (always fits)
- *   450 px – 999 px   → 6-month  (grid ≈ 390 px; fits once sidebar collapses)
- *   ≥ 1000 px         → 9-month  (grid ≈ 585 px; fits with sidebar at 1000 px+)
+ *   < 450 px          → 4-month  (always fits)
+ *   450 px – 999 px   → 9-month  (grid ≈ 585 px; fits once sidebar collapses)
+ *   ≥ 1000 px         → 10-month (grid ≈ 650 px; fits with sidebar at 1000 px+)
  */
 .streak-variant {
     display: none;
 }
 
-.streak-variant-3mo {
+.streak-variant-4mo {
     display: block;
 }
 
 @media (min-width: 450px) {
-    .streak-variant-3mo {
+    .streak-variant-4mo {
         display: none;
     }
 
-    .streak-variant-6mo {
+    .streak-variant-9mo {
         display: block;
     }
 }
 
 @media (min-width: 1000px) {
-    .streak-variant-6mo {
+    .streak-variant-9mo {
         display: none;
     }
 
-    .streak-variant-9mo {
+    .streak-variant-10mo {
         display: block;
     }
 }
@@ -256,6 +256,7 @@
  * Both rows share the same column widths so the labels align with the grid.
  * Padding provides room for the hover outline on edge cells; the negative
  * margin counteracts the padding to prevent it from affecting the layout.
+ * margin-right: auto centres the chart within the section.
  */
 .streak-outer {
     display: grid;
@@ -264,7 +265,7 @@
     column-gap: 4px;
     width: fit-content;
     padding: 4px;
-    margin: -4px;
+    margin: -4px auto -4px -4px;
 }
 
 /* Row 1, Col 1: invisible spacer that aligns the month-label row with the

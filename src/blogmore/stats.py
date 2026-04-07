@@ -445,7 +445,7 @@ def compute_blog_stats(posts: list[Post], site_url: str = "") -> BlogStats:
 
     # Responsive variants: 3, 6, and 9 trailing calendar months.
     stats.streak_variants = [
-        _compute_streak_variant(posts_by_date, today, n) for n in (3, 6, 9)
+        _compute_streak_variant(posts_by_date, today, n) for n in (4, 9, 10)
     ]
 
     return stats

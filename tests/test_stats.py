@@ -300,18 +300,18 @@ class TestStreakChart:
     def _nine_month_variant(
         self, posts: list[Post] | None = None
     ) -> StreakChartVariant:
-        """Return the 9-month streak variant (index 2 in the list)."""
+        """Return the 9-month streak variant (index 1 in the list)."""
         stats = compute_blog_stats(posts or [])
         assert len(stats.streak_variants) == 3
-        variant = stats.streak_variants[2]
+        variant = stats.streak_variants[1]
         assert variant.months == 9
         return variant
 
     def test_streak_variants_populated(self) -> None:
-        """streak_variants contains exactly three entries (3, 6, 9 months)."""
+        """streak_variants contains exactly three entries (4, 9, 10 months)."""
         stats = compute_blog_stats([])
         assert len(stats.streak_variants) == 3
-        assert [v.months for v in stats.streak_variants] == [3, 6, 9]
+        assert [v.months for v in stats.streak_variants] == [4, 9, 10]
 
     def test_streak_variants_populated_no_posts(self) -> None:
         """streak_variants is built even when there are no posts."""
@@ -400,7 +400,7 @@ class TestStreakChart:
         stats = compute_blog_stats(posts)
         target = post_date.date()
         # Check across the 9-month variant (which always covers 5 days ago).
-        variant = stats.streak_variants[2]
+        variant = stats.streak_variants[1]
         matching = [
             cell
             for week in variant.weeks
@@ -415,7 +415,7 @@ class TestStreakChart:
         stats = compute_blog_stats([])
         today = dt.date.today()
         yesterday = today - dt.timedelta(days=1)
-        variant = stats.streak_variants[2]  # 9-month variant
+        variant = stats.streak_variants[1]  # 9-month variant
         matching = [
             cell
             for week in variant.weeks
