@@ -49,6 +49,11 @@
     --admonition-caution-title-color: #222222;
     --kbd-bg: #eeeeee;
     --kbd-border: #aaaaaa;
+    --streak-cell-empty: #eeeeee;
+    --streak-cell-l1: #bbbbbb;
+    --streak-cell-l2: #888888;
+    --streak-cell-l3: #555555;
+    --streak-cell-l4: #111111;
 }
 
 /* ---- Dark mode palette ---------------------------------------------------- */
@@ -85,6 +90,11 @@
     --dark-admonition-caution-title-color: #dddddd;
     --dark-kbd-bg: #222222;
     --dark-kbd-border: #555555;
+    --dark-streak-cell-empty: #222222;
+    --dark-streak-cell-l1: #444444;
+    --dark-streak-cell-l2: #666666;
+    --dark-streak-cell-l3: #aaaaaa;
+    --dark-streak-cell-l4: #eeeeee;
 }
 
 /* ---- Link styling --------------------------------------------------------- */

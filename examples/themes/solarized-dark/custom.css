@@ -62,6 +62,11 @@
     --dark-admonition-caution-title-color: #dc322f;
     --dark-kbd-bg: #073642;
     --dark-kbd-border: #586e75;
+    --dark-streak-cell-empty: #073642;
+    --dark-streak-cell-l1: #0a4a55;
+    --dark-streak-cell-l2: #1a6a7a;
+    --dark-streak-cell-l3: #2aa198;
+    --dark-streak-cell-l4: #268bd2;
 }
 
 /* ---- Light mode palette --------------------------------------------------- */
@@ -99,4 +104,9 @@
     --admonition-caution-title-color: #dc322f;
     --kbd-bg: #eee8d5;
     --kbd-border: #93a1a1;
+    --streak-cell-empty: #eee8d5;
+    --streak-cell-l1: #c5dce8;
+    --streak-cell-l2: #7ab5d0;
+    --streak-cell-l3: #2aa198;
+    --streak-cell-l4: #268bd2;
 }

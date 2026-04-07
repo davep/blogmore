@@ -59,6 +59,11 @@
     --admonition-caution-title-color: #c62828;
     --kbd-bg: #e8eaf6;
     --kbd-border: #9fa8da;
+    --streak-cell-empty: #eef0fb;
+    --streak-cell-l1: #c5cae9;
+    --streak-cell-l2: #9fa8da;
+    --streak-cell-l3: #5c6bc0;
+    --streak-cell-l4: #3949ab;
 }
 
 /* ---- Dark mode palette ---------------------------------------------------- */
@@ -95,6 +100,11 @@
     --dark-admonition-caution-title-color: #ef9a9a;
     --dark-kbd-bg: #1e1d30;
     --dark-kbd-border: #3949ab;
+    --dark-streak-cell-empty: #1e1d30;
+    --dark-streak-cell-l1: #252438;
+    --dark-streak-cell-l2: #3949ab;
+    --dark-streak-cell-l3: #5c6bc0;
+    --dark-streak-cell-l4: #9fa8da;
 }
 
 /* ---- Compact sidebar --------------------------------------------------------
