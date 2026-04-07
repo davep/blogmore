@@ -62,6 +62,57 @@
     {{ histogram("Posts by Month of Year", ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], stats.posts_per_month) }}
 
     {# ------------------------------------------------------------------ #}
+    {# Streak chart: posts in the last 365 days                           #}
+    {# ------------------------------------------------------------------ #}
+    {% if stats.streak_weeks %}
+    <section class="stats-section">
+        {% set year_count = stats.posts_in_last_year %}
+        <h2>{{ year_count }} post{{ '' if year_count == 1 else 's' }} in the last year</h2>
+        <figure class="stats-chart stats-streak-chart" aria-label="Posts in the last year">
+            <div class="streak-layout">
+                <div class="streak-dow-labels" aria-hidden="true">
+                    <div class="streak-dow-label">Sun</div>
+                    <div class="streak-dow-label">Mon</div>
+                    <div class="streak-dow-label">Tue</div>
+                    <div class="streak-dow-label">Wed</div>
+                    <div class="streak-dow-label">Thu</div>
+                    <div class="streak-dow-label">Fri</div>
+                    <div class="streak-dow-label">Sat</div>
+                </div>
+                <div class="streak-grid">
+                    {% for week in stats.streak_weeks %}
+                    {% for cell in week %}
+                    {% if cell is none %}
+                    <div class="streak-cell streak-cell-out-of-range" aria-hidden="true"></div>
+                    {% else %}
+                    {% if cell.count == 0 %}
+                    {% set level = 0 %}
+                    {% elif cell.count == 1 %}
+                    {% set level = 1 %}
+                    {% elif cell.count <= 3 %}
+                    {% set level = 2 %}
+                    {% elif cell.count <= 6 %}
+                    {% set level = 3 %}
+                    {% else %}
+                    {% set level = 4 %}
+                    {% endif %}
+                    {% set day_label = cell.date.strftime('%Y-%m-%d') ~ ': ' ~ cell.count ~ ' post' ~ ('' if cell.count == 1 else 's') %}
+                    {% if cell.count > 0 %}
+                    {% set day_url = '/' ~ cell.date.year ~ '/' ~ '%02d'|format(cell.date.month) ~ '/' ~ '%02d'|format(cell.date.day) ~ '/' ~ pagination_page1_suffix %}
+                    <a href="{{ day_url }}" class="streak-cell streak-cell-level-{{ level }}" title="{{ day_label }}" aria-label="{{ day_label }}"></a>
+                    {% else %}
+                    <div class="streak-cell streak-cell-level-0" title="{{ day_label }}" aria-label="{{ day_label }}"></div>
+                    {% endif %}
+                    {% endif %}
+                    {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+        </figure>
+    </section>
+    {% endif %}
+
+    {# ------------------------------------------------------------------ #}
     {# Word count                                                         #}
     {# ------------------------------------------------------------------ #}
     <section class="stats-section">

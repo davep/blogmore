@@ -50,6 +50,11 @@
     --draft-title-color: #cc6600;
     --kbd-bg: #f0f0f0;
     --kbd-border: #b4b4b4;
+    --streak-cell-empty: #ebedf0;
+    --streak-cell-l1: #9ecaf0;
+    --streak-cell-l2: #5499d5;
+    --streak-cell-l3: #2270bd;
+    --streak-cell-l4: #0066cc;
 
     /* ---- Dark mode palette (shared by both dark mode selectors below) ---- */
     --dark-bg-color: #1a1a1a;
@@ -84,6 +89,11 @@
     --dark-draft-title-color: #ffab40;
     --dark-kbd-bg: #3a3a3a;
     --dark-kbd-border: #666;
+    --dark-streak-cell-empty: #21262d;
+    --dark-streak-cell-l1: #1a3b5c;
+    --dark-streak-cell-l2: #1d5fa0;
+    --dark-streak-cell-l3: #3487d8;
+    --dark-streak-cell-l4: #6eb3ff;
 }
 
 /* Dark mode — applied by system preference (JavaScript disabled fallback).
@@ -125,6 +135,11 @@
         --draft-title-color: var(--dark-draft-title-color);
         --kbd-bg: var(--dark-kbd-bg);
         --kbd-border: var(--dark-kbd-border);
+        --streak-cell-empty: var(--dark-streak-cell-empty);
+        --streak-cell-l1: var(--dark-streak-cell-l1);
+        --streak-cell-l2: var(--dark-streak-cell-l2);
+        --streak-cell-l3: var(--dark-streak-cell-l3);
+        --streak-cell-l4: var(--dark-streak-cell-l4);
     }
 }
 
@@ -166,6 +181,11 @@
     --draft-title-color: var(--dark-draft-title-color);
     --kbd-bg: var(--dark-kbd-bg);
     --kbd-border: var(--dark-kbd-border);
+    --streak-cell-empty: var(--dark-streak-cell-empty);
+    --streak-cell-l1: var(--dark-streak-cell-l1);
+    --streak-cell-l2: var(--dark-streak-cell-l2);
+    --streak-cell-l3: var(--dark-streak-cell-l3);
+    --streak-cell-l4: var(--dark-streak-cell-l4);
 }
 
 /* =============================================================================

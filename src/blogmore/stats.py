@@ -13,6 +13,40 @@ from urllib.parse import urlparse
 from blogmore.parser import Post
 from blogmore.utils import count_words
 
+
+@dataclass
+class StreakChartCell:
+    """A single cell in the posting-streak chart grid.
+
+    Attributes:
+        date: The calendar date this cell represents.
+        count: Number of posts published on this date.
+        in_window: Whether this date falls within the 365-day window.
+            Cells outside the window are rendered as empty/dimmed spacers.
+    """
+
+    date: dt.date
+    """The calendar date this cell represents."""
+
+    count: int
+    """Number of posts published on this date."""
+
+    in_window: bool
+    """Whether this date falls within the 365-day window."""
+
+
+##############################################################################
+# Day-of-week labels (Sunday first, used in the streak chart rows).
+STREAK_DOW_LABELS: list[str] = [
+    "Sun",
+    "Mon",
+    "Tue",
+    "Wed",
+    "Thu",
+    "Fri",
+    "Sat",
+]
+
 ##############################################################################
 # Day-of-week labels (Monday first, matching datetime.weekday() → 0=Mon).
 WEEKDAY_LABELS: list[str] = [
@@ -123,6 +157,18 @@ class BlogStats:
     Sorted by count descending.
     """
 
+    posts_in_last_year: int = 0
+    """Total number of posts published in the last 365 days (inclusive of today)."""
+
+    streak_weeks: list[list[StreakChartCell | None]] = field(default_factory=list)
+    """Streak chart data for the last 365 days.
+
+    A list of week columns, ordered oldest to newest (left → right).  Each
+    column is a list of exactly 7 entries ordered Sunday-first (index 0 =
+    Sunday, index 6 = Saturday).  An entry is ``None`` when the slot falls
+    outside the 365-day window (i.e. the leading or trailing partial weeks).
+    """
+
     @property
     def blog_span_days(self) -> int | None:
         """Return the total span of the blog in days, or ``None`` if fewer than two dated posts exist.
@@ -183,9 +229,6 @@ def compute_blog_stats(posts: list[Post], site_url: str = "") -> BlogStats:
         A :class:`BlogStats` instance populated from the given posts.
     """
     stats = BlogStats()
-
-    if not posts:
-        return stats
 
     # --- Date-based histograms -----------------------------------------------
     dated_posts = [post for post in posts if post.date is not None]
@@ -269,6 +312,55 @@ def compute_blog_stats(posts: list[Post], site_url: str = "") -> BlogStats:
                 domain_counter[domain] += 1
     stats.unique_external_link_count = len(all_external_urls)
     stats.top_domains = domain_counter.most_common(20)
+
+    # --- Streak chart (last 365 days) ----------------------------------------
+    today = dt.date.today()
+    window_start = today - dt.timedelta(days=364)  # 365 days inclusive of today
+
+    # Tally posts that fall within the window.
+    posts_by_date: dict[dt.date, int] = {}
+    for post in dated_posts:
+        assert post.date is not None
+        # Normalise timezone-aware datetimes to UTC before extracting date.
+        post_dt = post.date
+        if post_dt.tzinfo is not None:
+            post_dt = post_dt.astimezone(dt.UTC).replace(tzinfo=None)
+        post_date = post_dt.date()
+        if window_start <= post_date <= today:
+            posts_by_date[post_date] = posts_by_date.get(post_date, 0) + 1
+
+    stats.posts_in_last_year = sum(posts_by_date.values())
+
+    # Extend the grid to full weeks: start on the Sunday on or before
+    # window_start, end on the Saturday on or after today.
+    # isoweekday(): Mon=1 … Sun=7.  We want Sun=0, Mon=1, …, Sat=6.
+    dow_of_window_start = window_start.isoweekday() % 7  # Sun→0, Mon→1, …
+    grid_start = window_start - dt.timedelta(days=dow_of_window_start)
+
+    dow_of_today = today.isoweekday() % 7
+    days_to_saturday = (6 - dow_of_today) % 7
+    grid_end = today + dt.timedelta(days=days_to_saturday)
+
+    weeks: list[list[StreakChartCell | None]] = []
+    current_sunday = grid_start
+    while current_sunday <= grid_end:
+        week: list[StreakChartCell | None] = []
+        for day_offset in range(7):
+            day = current_sunday + dt.timedelta(days=day_offset)
+            if window_start <= day <= today:
+                week.append(
+                    StreakChartCell(
+                        date=day,
+                        count=posts_by_date.get(day, 0),
+                        in_window=True,
+                    )
+                )
+            else:
+                week.append(None)
+        weeks.append(week)
+        current_sunday += dt.timedelta(days=7)
+
+    stats.streak_weeks = weeks
 
     return stats
 
