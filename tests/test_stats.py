@@ -308,10 +308,10 @@ class TestStreakChart:
         return variant
 
     def test_streak_variants_populated(self) -> None:
-        """streak_variants contains exactly three entries (4, 9, 10 months)."""
+        """streak_variants contains exactly three entries (5, 9, 10 months)."""
         stats = compute_blog_stats([])
         assert len(stats.streak_variants) == 3
-        assert [v.months for v in stats.streak_variants] == [4, 9, 10]
+        assert [v.months for v in stats.streak_variants] == [5, 9, 10]
 
     def test_streak_variants_populated_no_posts(self) -> None:
         """streak_variants is built even when there are no posts."""
