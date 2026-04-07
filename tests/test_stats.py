@@ -9,6 +9,7 @@ from blogmore.parser import Post
 from blogmore.stats import (
     BlogStats,
     StreakChartCell,
+    StreakChartVariant,
     _extract_external_links,
     compute_blog_stats,
 )
@@ -296,47 +297,80 @@ class TestStreakChart:
             date=date,
         )
 
-    def test_streak_weeks_is_populated(self) -> None:
-        """streak_weeks is a non-empty list after compute_blog_stats."""
+    def _nine_month_variant(
+        self, posts: list[Post] | None = None
+    ) -> StreakChartVariant:
+        """Return the 9-month streak variant (index 2 in the list)."""
+        stats = compute_blog_stats(posts or [])
+        assert len(stats.streak_variants) == 3
+        variant = stats.streak_variants[2]
+        assert variant.months == 9
+        return variant
+
+    def test_streak_variants_populated(self) -> None:
+        """streak_variants contains exactly three entries (3, 6, 9 months)."""
         stats = compute_blog_stats([])
-        # Even with no posts the chart grid is built for the last 365 days.
-        assert len(stats.streak_weeks) > 0
+        assert len(stats.streak_variants) == 3
+        assert [v.months for v in stats.streak_variants] == [3, 6, 9]
+
+    def test_streak_variants_populated_no_posts(self) -> None:
+        """streak_variants is built even when there are no posts."""
+        stats = compute_blog_stats([])
+        assert len(stats.streak_variants) > 0
 
     def test_streak_weeks_each_has_seven_entries(self) -> None:
-        """Every week column in streak_weeks contains exactly 7 entries."""
+        """Every week column in every variant contains exactly 7 entries."""
         stats = compute_blog_stats([])
-        for week in stats.streak_weeks:
-            assert len(week) == 7
+        for variant in stats.streak_variants:
+            for week in variant.weeks:
+                assert len(week) == 7
 
-    def test_streak_grid_covers_365_days(self) -> None:
-        """The non-None cells span exactly 365 dates."""
-        stats = compute_blog_stats([])
+    def test_streak_9mo_grid_covers_correct_days(self) -> None:
+        """The 9-month variant covers all days from window_start to today."""
+        today = dt.date.today()
+        # window_start = 1st of month 8 months before today
+        start_month = today.month - 8
+        start_year = today.year
+        while start_month <= 0:
+            start_month += 12
+            start_year -= 1
+        window_start = dt.date(start_year, start_month, 1)
+        expected_days = (today - window_start).days + 1
+
+        variant = self._nine_month_variant()
         in_window = [
-            cell for week in stats.streak_weeks for cell in week if cell is not None
+            cell for week in variant.weeks for cell in week if cell is not None
         ]
-        assert len(in_window) == 365
+        assert len(in_window) == expected_days
 
-    def test_streak_grid_starts_on_sunday(self) -> None:
-        """The first non-None cell of the grid falls on or after the window start."""
+    def test_streak_grid_starts_at_window_start(self) -> None:
+        """The first non-None cell of each variant falls exactly on window_start."""
         stats = compute_blog_stats([])
         today = dt.date.today()
-        window_start = today - dt.timedelta(days=364)
-        first_in_window = next(
-            cell for week in stats.streak_weeks for cell in week if cell is not None
-        )
-        assert first_in_window.date == window_start
+        for variant in stats.streak_variants:
+            start_month = today.month - (variant.months - 1)
+            start_year = today.year
+            while start_month <= 0:
+                start_month += 12
+                start_year -= 1
+            expected_start = dt.date(start_year, start_month, 1)
+            first_in_window = next(
+                cell for week in variant.weeks for cell in week if cell is not None
+            )
+            assert first_in_window.date == expected_start
 
     def test_streak_grid_ends_on_today(self) -> None:
-        """The last non-None cell's date is today."""
+        """The last non-None cell's date is today in all variants."""
         stats = compute_blog_stats([])
         today = dt.date.today()
-        last_in_window = None
-        for week in stats.streak_weeks:
-            for cell in week:
-                if cell is not None:
-                    last_in_window = cell
-        assert last_in_window is not None
-        assert last_in_window.date == today
+        for variant in stats.streak_variants:
+            last_in_window = None
+            for week in variant.weeks:
+                for cell in week:
+                    if cell is not None:
+                        last_in_window = cell
+            assert last_in_window is not None
+            assert last_in_window.date == today
 
     def test_posts_in_last_year_counts_only_within_window(self) -> None:
         """posts_in_last_year counts only posts within the 365-day window."""
@@ -365,9 +399,11 @@ class TestStreakChart:
         ]
         stats = compute_blog_stats(posts)
         target = post_date.date()
+        # Check across the 9-month variant (which always covers 5 days ago).
+        variant = stats.streak_variants[2]
         matching = [
             cell
-            for week in stats.streak_weeks
+            for week in variant.weeks
             for cell in week
             if cell is not None and cell.date == target
         ]
@@ -379,9 +415,10 @@ class TestStreakChart:
         stats = compute_blog_stats([])
         today = dt.date.today()
         yesterday = today - dt.timedelta(days=1)
+        variant = stats.streak_variants[2]  # 9-month variant
         matching = [
             cell
-            for week in stats.streak_weeks
+            for week in variant.weeks
             for cell in week
             if cell is not None and cell.date == yesterday
         ]
@@ -391,10 +428,11 @@ class TestStreakChart:
     def test_streak_cell_in_window_flag(self) -> None:
         """All non-None streak cells have in_window == True."""
         stats = compute_blog_stats([])
-        for week in stats.streak_weeks:
-            for cell in week:
-                if cell is not None:
-                    assert cell.in_window is True
+        for variant in stats.streak_variants:
+            for week in variant.weeks:
+                for cell in week:
+                    if cell is not None:
+                        assert cell.in_window is True
 
     def test_streak_cell_dataclass_fields(self) -> None:
         """StreakChartCell exposes date, count, and in_window attributes."""
@@ -402,6 +440,54 @@ class TestStreakChart:
         assert cell.date == dt.date(2024, 6, 1)
         assert cell.count == 3
         assert cell.in_window is True
+
+    def test_streak_variant_dataclass_fields(self) -> None:
+        """StreakChartVariant exposes months, posts_count, month_label_positions, weeks."""
+        today = dt.date.today()
+        variant = StreakChartVariant(
+            months=3,
+            posts_count=5,
+            month_label_positions=[("Apr", 1)],
+            weeks=[],
+        )
+        assert variant.months == 3
+        assert variant.posts_count == 5
+        assert variant.month_label_positions == [("Apr", 1)]
+        assert variant.weeks == []
+        _ = today  # silence unused-variable warning
+
+    def test_month_label_positions_are_ordered(self) -> None:
+        """month_label_positions are in ascending column order."""
+        stats = compute_blog_stats([])
+        for variant in stats.streak_variants:
+            cols = [col for _, col in variant.month_label_positions]
+            assert cols == sorted(cols)
+
+    def test_month_label_count_matches_months(self) -> None:
+        """Each variant has approximately as many month labels as months covered."""
+        stats = compute_blog_stats([])
+        for variant in stats.streak_variants:
+            # Allow 1 extra label for partial months at the boundary.
+            assert (
+                variant.months
+                <= len(variant.month_label_positions)
+                <= variant.months + 1
+            )
+
+    def test_posts_count_per_variant(self) -> None:
+        """Each variant's posts_count matches posts within its own window."""
+        today = dt.date.today()
+        # Post that is always within all variants (5 days ago).
+        recent_date = dt.datetime.combine(today - dt.timedelta(days=5), dt.time(9, 0))
+        # Post that is far in the past (always outside any variant window).
+        old_date = dt.datetime.combine(today - dt.timedelta(days=400), dt.time(9, 0))
+        posts = [
+            self._make_post(date=recent_date),
+            self._make_post(date=old_date),
+        ]
+        stats = compute_blog_stats(posts)
+        for variant in stats.streak_variants:
+            assert variant.posts_count == 1  # only the recent post
 
     def test_timezone_aware_posts_handled(self) -> None:
         """Timezone-aware post dates are normalised before being counted."""
