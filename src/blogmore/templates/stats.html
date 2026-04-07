@@ -69,8 +69,8 @@
         {% for variant in stats.streak_variants %}
         {% set count = variant.posts_count %}
         <div class="streak-variant streak-variant-{{ variant.months }}mo">
-            <h2>{{ count }} post{{ '' if count == 1 else 's' }} in the last {{ variant.months }} month{{ '' if variant.months == 1 else 's' }}</h2>
-            <figure class="stats-chart stats-streak-chart" aria-label="Posts in the last {{ variant.months }} months">
+            <h2>{{ count }} post{{ '' if count == 1 else 's' }} between {{ variant.first_date }} and {{ variant.last_date }}</h2>
+            <figure class="stats-chart stats-streak-chart" aria-label="Posts between {{ variant.first_date }} and {{ variant.last_date }}">
                 <div class="streak-outer">
                     {# Row 1, Col 1: spacer (aligns month labels with DOW labels column) #}
                     <div class="streak-dow-spacer" aria-hidden="true"></div>

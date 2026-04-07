@@ -43,6 +43,8 @@ class StreakChartVariant:
         months: Number of calendar months covered, inclusive of the current
             partial month.
         posts_count: Total posts published within the window.
+        first_date: First date of the window (first day of the oldest month).
+        last_date: Last date of the window (today when the variant was built).
         month_label_positions: Month labels paired with their 1-based week
             column index in :attr:`weeks`.  Each entry is ``(label, col)``,
             e.g. ``("Apr", 1)``.
@@ -56,6 +58,12 @@ class StreakChartVariant:
 
     posts_count: int
     """Total posts published within the variant's window."""
+
+    first_date: dt.date
+    """First date of the window (first day of the oldest month)."""
+
+    last_date: dt.date
+    """Last date of the window (today when the variant was built)."""
 
     month_label_positions: list[tuple[str, int]]
     """Month labels and their 1-based column positions in the week grid."""
@@ -321,6 +329,8 @@ def _compute_streak_variant(
     return StreakChartVariant(
         months=num_months,
         posts_count=posts_count,
+        first_date=window_start,
+        last_date=today,
         month_label_positions=month_label_positions,
         weeks=weeks,
     )

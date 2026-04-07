@@ -442,15 +442,23 @@ class TestStreakChart:
         assert cell.in_window is True
 
     def test_streak_variant_dataclass_fields(self) -> None:
-        """StreakChartVariant exposes months, posts_count, month_label_positions, weeks."""
+        """StreakChartVariant exposes months, posts_count, first_date, last_date, month_label_positions, weeks."""
+        import datetime as dt
+
+        first = dt.date(2024, 1, 1)
+        last = dt.date(2024, 3, 31)
         variant = StreakChartVariant(
             months=3,
             posts_count=5,
+            first_date=first,
+            last_date=last,
             month_label_positions=[("Apr", 1)],
             weeks=[],
         )
         assert variant.months == 3
         assert variant.posts_count == 5
+        assert variant.first_date == first
+        assert variant.last_date == last
         assert variant.month_label_positions == [("Apr", 1)]
         assert variant.weeks == []
 
