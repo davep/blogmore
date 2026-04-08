@@ -66,8 +66,12 @@ posts_per_feed: 20
 # with_stats: false
 
 # Optional: Show estimated reading time on posts (default: false)
-# Displays the approximate time to read each post based on 200 words per minute.
+# Displays the approximate time to read each post based on the configured WPM.
 # with_read_time: false
+
+# Optional: Words per minute used when calculating estimated reading time (default: 200)
+# Must be a positive integer. Configuration file only.
+# read_time_wpm: 200
 
 # Optional: Show "Generated with BlogMore" footer line (default: true)
 # Set to false to hide the footer attribution line.

@@ -64,6 +64,7 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
         "head",
         "light_mode_code_style",
         "dark_mode_code_style",
+        "read_time_wpm",
     }
 )
 
@@ -527,5 +528,25 @@ def parse_site_config_from_dict(
         kwargs["dark_mode_code_style"] = DEFAULT_DARK_STYLE
     else:
         kwargs["dark_mode_code_style"] = raw_dark_style
+
+    # --- read_time_wpm -------------------------------------------------------
+    if "read_time_wpm" in config:
+        raw_wpm = config["read_time_wpm"]
+        if not isinstance(raw_wpm, int) or isinstance(raw_wpm, bool):
+            errors.append(
+                "read_time_wpm in the configuration file must be an integer; "
+                "using the default"
+            )
+            kwargs["read_time_wpm"] = 200
+        elif raw_wpm <= 0:
+            errors.append(
+                "read_time_wpm in the configuration file must be a positive "
+                "integer; using the default"
+            )
+            kwargs["read_time_wpm"] = 200
+        else:
+            kwargs["read_time_wpm"] = raw_wpm
+    else:
+        kwargs["read_time_wpm"] = 200
 
     return kwargs, errors

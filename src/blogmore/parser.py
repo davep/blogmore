@@ -134,6 +134,7 @@ class Post:
     draft: bool = False
     metadata: dict[str, Any] | None = None
     url_path: str | None = field(default=None, repr=False, compare=False)
+    words_per_minute: int = field(default=200, repr=False, compare=False)
 
     @property
     def slug(self) -> str:
@@ -206,7 +207,7 @@ class Post:
         Returns:
             Estimated reading time in minutes (minimum 1 minute)
         """
-        return calculate_reading_time(self.content)
+        return calculate_reading_time(self.content, self.words_per_minute)
 
     @property
     def modified_date(self) -> dt.datetime | None:
