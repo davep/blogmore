@@ -4,19 +4,15 @@
 
 **Released: WiP**
 
-- Added a calendar view page (`with_calendar` / `--with-calendar`) that shows
-  the full history of the blog as a reverse-chronological year calendar.  Days
-  with posts link to the daily archive, months link to the monthly archive,
-  and years link to the yearly archive.  The page location is controlled by the
-  `calendar_path` configuration option (default `calendar.html`).  The design
-  is fully responsive, keeping whole months intact as the viewport narrows.
-  ([#PR](https://github.com/davep/blogmore/pull/PR))
 - Added a table of longest posting streaks to the stats page, showing the
   top 10 consecutive-day posting streaks of two or more days.
   ([#369](https://github.com/davep/blogmore/pull/369))
 - Added a `read_time_wpm` configuration option that lets users override the
   words-per-minute value used when calculating estimated reading time.
   ([#371](https://github.com/davep/blogmore/pull/371))
+- Added a calendar view page (`with_calendar` / `--with-calendar`) that
+  shows the full history of the blog as a year calendar.
+  ([#373](https://github.com/davep/blogmore/pull/373))
 
 ## v2.10.0
 
