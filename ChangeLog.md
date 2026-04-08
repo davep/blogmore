@@ -4,6 +4,13 @@
 
 **Released: WiP**
 
+- Added a calendar view page (`with_calendar` / `--with-calendar`) that shows
+  the full history of the blog as a reverse-chronological year calendar.  Days
+  with posts link to the daily archive, months link to the monthly archive,
+  and years link to the yearly archive.  The page location is controlled by the
+  `calendar_path` configuration option (default `calendar.html`).  The design
+  is fully responsive, keeping whole months intact as the viewport narrows.
+  ([#PR](https://github.com/davep/blogmore/pull/PR))
 - Added a table of longest posting streaks to the stats page, showing the
   top 10 consecutive-day posting streaks of two or more days.
   ([#369](https://github.com/davep/blogmore/pull/369))

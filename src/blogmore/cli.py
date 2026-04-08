@@ -134,6 +134,13 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     )
 
     parser.add_argument(
+        "--with-calendar",
+        action="store_true",
+        default=_SITE_CONFIG_DEFAULTS["with_calendar"],
+        help="Generate a calendar view of all posts (default: disabled)",
+    )
+
+    parser.add_argument(
         "--minify-css",
         action="store_true",
         default=_SITE_CONFIG_DEFAULTS["minify_css"],

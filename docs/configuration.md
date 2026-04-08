@@ -318,6 +318,17 @@ Generate a blog statistics page. When `true`, BlogMore generates a `/stats.html`
 with_stats: true
 ```
 
+#### `with_calendar`
+
+Generate a calendar view of all posts. When `true`, BlogMore generates a `calendar.html` page (path configurable via [`calendar_path`](#calendar_path)) showing a full year-by-year calendar of the blog's history, from the date of the latest post back to the date of the first post. Days with posts link to the daily archive, months link to the monthly archive, and years link to the yearly archive. A **Calendar** link is automatically added to the navigation bar after **Stats** and before **RSS**.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+with_calendar: true
+```
+
 #### `with_read_time`
 
 Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on the configured words-per-minute rate) and displays it next to the post date on all post listings and individual post pages.
@@ -690,6 +701,42 @@ clean_urls: true
 ```
 
 This makes the stats page accessible at `/stats/` rather than `/stats/index.html`.
+
+#### `calendar_path`
+
+Path (relative to the output directory) where the calendar page is generated.  This is a **configuration file only** option — it cannot be set on the command line.  Only used when [`with_calendar`](#with_calendar) is `true`.
+
+**Type:** String  
+**Default:** `calendar.html`
+
+```yaml
+calendar_path: "calendar.html"
+```
+
+##### How it works
+
+The path is joined onto the `output` directory.  Any intermediate subdirectories are created automatically.
+
+The path is always treated as relative to the output directory root — a leading `/` is stripped automatically.  So both `calendar/index.html` and `/calendar/index.html` produce the same output location.
+
+When `clean_urls` is enabled and the path ends in `index.html`, the `index.html` portion is omitted in any URL reference to the calendar page (navigation links, canonical URL, etc.), so the page is accessible at the clean trailing-slash URL.
+
+##### Examples
+
+Default — calendar page at the site root:
+
+```yaml
+calendar_path: "calendar.html"
+```
+
+Calendar page in its own subdirectory with clean URLs:
+
+```yaml
+calendar_path: "calendar/index.html"
+clean_urls: true
+```
+
+This makes the calendar page accessible at `/calendar/` rather than `/calendar/index.html`.
 
 #### `page_1_path`
 

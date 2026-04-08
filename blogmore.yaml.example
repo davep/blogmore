@@ -65,6 +65,13 @@ posts_per_feed: 20
 # navigation bar automatically.
 # with_stats: false
 
+# Optional: Generate a calendar view of all posts (default: false)
+# Generates a calendar.html page showing the full history of the blog as a
+# reverse-chronological year calendar. Days with posts link to the daily
+# archive, months link to the monthly archive, and years link to the yearly
+# archive. A Calendar link is added to the navigation bar automatically.
+# with_calendar: false
+
 # Optional: Show estimated reading time on posts (default: false)
 # Displays the approximate time to read each post based on the configured WPM.
 # with_read_time: false
@@ -137,6 +144,14 @@ posts_per_feed: 20
 # stripped so both stats.html and /stats.html produce the same result.
 # Only used when with_stats is true. Configuration file only.
 # stats_path: "stats.html"
+
+# Optional: Path for the calendar page relative to the output directory
+# (default: calendar.html). The full directory path is created automatically.
+# When clean_urls is enabled and the path ends in index.html, the
+# index.html portion is omitted in links to the page. Leading slashes are
+# stripped so both calendar.html and /calendar.html produce the same result.
+# Only used when with_calendar is true. Configuration file only.
+# calendar_path: "calendar.html"
 
 # Optional: Generate clean URLs for posts and pages (default: false)
 # When enabled, posts and pages whose URL ends with /index.html will use the

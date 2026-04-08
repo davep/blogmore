@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Calendar - {{ site_title }}{% endblock %}
+
+{% block meta_tags %}
+{% from '_listing_meta_tags.html' import listing_meta_tags with context %}
+{{ listing_meta_tags("Calendar - " ~ site_title) }}
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ calendar_css_url }}">
+{% endblock %}
+
+{% block content %}
+<div class="calendar-page">
+    <h1>Calendar</h1>
+
+    {% if not calendar_years %}
+    <p>No posts yet.</p>
+    {% else %}
+    {% for year_group in calendar_years %}
+    <section class="calendar-year-section">
+        <h2 class="calendar-year-label">
+            {% if year_group.year_url %}
+            <a href="{{ year_group.year_url }}">{{ year_group.year }}</a>
+            {% else %}
+            {{ year_group.year }}
+            {% endif %}
+        </h2>
+
+        <div class="calendar-months-grid">
+            {% for cal_month in year_group.months %}
+            <div class="calendar-month">
+                <h3 class="calendar-month-label">
+                    {% if cal_month.month_url %}
+                    <a href="{{ cal_month.month_url }}">{{ cal_month.month_name }}</a>
+                    {% else %}
+                    {{ cal_month.month_name }}
+                    {% endif %}
+                </h3>
+
+                <div class="calendar-grid">
+                    <div class="calendar-dow" aria-hidden="true">M</div>
+                    <div class="calendar-dow" aria-hidden="true">T</div>
+                    <div class="calendar-dow" aria-hidden="true">W</div>
+                    <div class="calendar-dow" aria-hidden="true">T</div>
+                    <div class="calendar-dow" aria-hidden="true">F</div>
+                    <div class="calendar-dow" aria-hidden="true">S</div>
+                    <div class="calendar-dow" aria-hidden="true">S</div>
+
+                    {% for week in cal_month.weeks %}
+                    {% for day in week %}
+                    {% if day.date is none %}
+                    <div class="calendar-day calendar-day-outside" aria-hidden="true"></div>
+                    {% elif day.post_count > 0 %}
+                    {% set day_title = day.post_count ~ ' post' ~ ('' if day.post_count == 1 else 's') %}
+                    <a href="{{ day.day_url }}" class="calendar-day calendar-day-has-posts" title="{{ day_title }}" aria-label="{{ day.date.day }}: {{ day_title }}">{{ day.date.day }}</a>
+                    {% else %}
+                    <div class="calendar-day">{{ day.date.day }}</div>
+                    {% endif %}
+                    {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

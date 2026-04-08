@@ -33,6 +33,10 @@ DEFAULT_CATEGORIES_PATH = "categories.html"
 # Default stats page path (relative to the output directory).
 DEFAULT_STATS_PATH = "stats.html"
 
+##############################################################################
+# Default calendar page path (relative to the output directory).
+DEFAULT_CALENDAR_PATH = "calendar.html"
+
 
 @dataclass
 class SiteConfig:
@@ -98,6 +102,9 @@ class SiteConfig:
 
     with_stats: bool = False
     """Whether to generate a blog statistics page."""
+
+    with_calendar: bool = False
+    """Whether to generate a calendar view of all posts."""
 
     minify_css: bool = False
     """Whether to minify the CSS, writing it as ``styles.min.css``."""
@@ -235,6 +242,26 @@ class SiteConfig:
     Only used when ``with_stats`` is ``True``.  This is a **configuration
     file only** option — it cannot be set on the command line.  Defaults to
     ``stats.html``.
+    """
+
+    calendar_path: str = DEFAULT_CALENDAR_PATH
+    """Path (relative to the output directory) where the calendar page is written.
+
+    The path is joined onto the ``output`` directory, so ``calendar.html``
+    produces ``<output>/calendar.html``, and ``blog/calendar/index.html``
+    produces ``<output>/blog/calendar/index.html``.
+
+    Parent directories are created automatically.  When ``clean_urls`` is
+    enabled and the path ends in ``index.html``, the ``index.html`` portion
+    is omitted in any URL reference to the page.
+
+    The path is always treated as relative to the output directory root, so
+    both ``/calendar/index.html`` and ``calendar/index.html`` produce the
+    same output location.
+
+    Only used when ``with_calendar`` is ``True``.  This is a **configuration
+    file only** option — it cannot be set on the command line.  Defaults to
+    ``calendar.html``.
     """
 
     page_1_path: str = DEFAULT_PAGE_1_PATH

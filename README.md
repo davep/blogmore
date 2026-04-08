@@ -54,6 +54,9 @@ here](https://github.com/davep/davep.github.com)).
 - **XML sitemap** — optional `sitemap.xml` for search engine indexing
 - **Blog statistics page** — optional stats page with histograms, word counts,
   reading times, lifespan, top linked domains, and more
+- **Calendar view** — optional full-history year calendar showing all posts,
+  with links to day, month, and year archives; responsive design adapts from
+  four months per row down to one
 - **SEO optimisation** — meta tags, Open Graph tags, and Twitter Card support
 - **Automatic organisation** — tag pages, category pages, and chronological
   archives generated automatically

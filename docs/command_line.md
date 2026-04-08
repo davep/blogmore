@@ -205,6 +205,16 @@ Stats generation is **disabled by default**. Pass this flag to opt in.
 blogmore build posts/ --with-stats
 ```
 
+#### `--with-calendar`
+
+Generate a calendar view of all posts. When set, BlogMore generates a `calendar.html` page (path configurable via the `calendar_path` configuration option) displaying the full history of the blog as a reverse-chronological year calendar. Days with posts link to the daily archive, months link to the monthly archive, and years link to the yearly archive. A **Calendar** link is added to the navigation bar automatically.
+
+Calendar generation is **disabled by default**. Pass this flag to opt in.
+
+```bash
+blogmore build posts/ --with-calendar
+```
+
 #### `--with-read-time`
 
 Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on 200 words per minute) and displays it next to the post date on all post listings and individual post pages.
