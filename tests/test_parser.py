@@ -437,6 +437,31 @@ class TestPost:
         # Reading time should be calculated from the actual text content
         assert post.reading_time >= 1
 
+    def test_reading_time_uses_words_per_minute_field(self) -> None:
+        """Test that reading_time uses the words_per_minute field."""
+        # 200 words at 100 WPM = 2 minutes; at 200 WPM (default) = 1 minute
+        content = " ".join(["word"] * 200)
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content=content,
+            html_content=f"<p>{content}</p>",
+            words_per_minute=100,
+        )
+        assert post.reading_time == 2
+
+    def test_reading_time_default_words_per_minute(self) -> None:
+        """Test that reading_time defaults to 200 WPM."""
+        # 200 words at 200 WPM (default) = 1 minute
+        content = " ".join(["word"] * 200)
+        post = Post(
+            path=Path("test.md"),
+            title="Test",
+            content=content,
+            html_content=f"<p>{content}</p>",
+        )
+        assert post.reading_time == 1
+
     def test_modified_date_none_when_no_metadata(self) -> None:
         """Test that modified_date returns None when metadata is None."""
         post = Post(

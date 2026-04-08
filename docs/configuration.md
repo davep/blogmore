@@ -320,13 +320,24 @@ with_stats: true
 
 #### `with_read_time`
 
-Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on 200 words per minute) and displays it next to the post date on all post listings and individual post pages.
+Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on the configured words-per-minute rate) and displays it next to the post date on all post listings and individual post pages.
 
 **Type:** Boolean  
 **Default:** `false`
 
 ```yaml
 with_read_time: true
+```
+
+#### `read_time_wpm`
+
+Words per minute used when calculating estimated reading time.  Adjust this value to match the expected reading speed of your audience.  Must be a positive integer.  This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** Integer  
+**Default:** `200`
+
+```yaml
+read_time_wpm: 250
 ```
 
 #### `post_path`

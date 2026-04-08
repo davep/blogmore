@@ -1419,3 +1419,65 @@ class TestParseSiteConfigFromDict:
 
         assert errors == []
         assert kwargs["extra_stylesheets"] == ["cli.css"]
+
+    def test_read_time_wpm_valid_value(self, tmp_path: Path) -> None:
+        """A valid positive integer read_time_wpm is accepted."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({"read_time_wpm": 250}, tmp_path)
+
+        assert errors == []
+        assert kwargs["read_time_wpm"] == 250
+
+    def test_read_time_wpm_absent_resets_to_default(self, tmp_path: Path) -> None:
+        """When read_time_wpm is absent from config, it resets to the default (200)."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({}, tmp_path)
+
+        assert errors == []
+        assert kwargs["read_time_wpm"] == 200
+
+    def test_read_time_wpm_zero_produces_error(self, tmp_path: Path) -> None:
+        """A read_time_wpm of zero produces an error and uses the default."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({"read_time_wpm": 0}, tmp_path)
+
+        assert len(errors) == 1
+        assert "read_time_wpm" in errors[0]
+        assert kwargs["read_time_wpm"] == 200
+
+    def test_read_time_wpm_negative_produces_error(self, tmp_path: Path) -> None:
+        """A negative read_time_wpm produces an error and uses the default."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({"read_time_wpm": -50}, tmp_path)
+
+        assert len(errors) == 1
+        assert "read_time_wpm" in errors[0]
+        assert kwargs["read_time_wpm"] == 200
+
+    def test_read_time_wpm_non_integer_produces_error(self, tmp_path: Path) -> None:
+        """A non-integer read_time_wpm produces an error and uses the default."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"read_time_wpm": "fast"}, tmp_path
+        )
+
+        assert len(errors) == 1
+        assert "read_time_wpm" in errors[0]
+        assert kwargs["read_time_wpm"] == 200
+
+    def test_read_time_wpm_bool_produces_error(self, tmp_path: Path) -> None:
+        """A boolean read_time_wpm produces an error (booleans are subclasses of int)."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {"read_time_wpm": True}, tmp_path
+        )
+
+        assert len(errors) == 1
+        assert "read_time_wpm" in errors[0]
+        assert kwargs["read_time_wpm"] == 200

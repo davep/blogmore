@@ -569,6 +569,11 @@ class SiteGenerator:
         )
         print(f"Found {len(posts)} posts")
 
+        # Apply configured reading-speed to every post so that reading_time
+        # reflects the user's read_time_wpm setting.
+        for post in posts:
+            post.words_per_minute = self.site_config.read_time_wpm
+
         # Apply default author to posts that don't have one
         if self.site_config.default_author:
             for post in posts:

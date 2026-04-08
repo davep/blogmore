@@ -117,6 +117,17 @@ class SiteConfig:
     with_read_time: bool = False
     """Whether to show estimated reading time on posts."""
 
+    read_time_wpm: int = 200
+    """Words per minute used when calculating estimated reading time.
+
+    Controls the reading speed assumption used by the reading-time estimator.
+    Must be a positive integer.  The default value of 200 WPM reflects a
+    widely-cited average adult reading speed.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``200``.
+    """
+
     include_drafts: bool = False
     """Whether to include draft posts in generation."""
 

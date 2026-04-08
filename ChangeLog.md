@@ -7,6 +7,9 @@
 - Added a table of longest posting streaks to the stats page, showing the
   top 10 consecutive-day posting streaks of two or more days.
   ([#369](https://github.com/davep/blogmore/pull/369))
+- Added a `read_time_wpm` configuration option that lets users override the
+  words-per-minute value used when calculating estimated reading time.
+  ([#371](https://github.com/davep/blogmore/pull/371))
 
 ## v2.10.0
 
