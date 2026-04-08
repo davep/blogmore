@@ -40,6 +40,7 @@ below lists all variables that are available in every template.
 | `with_stats` | `bool` | `True` when the statistics page is enabled. |
 | `stats_url` | `str` | URL to the statistics page (respects `stats_path` and `clean_urls`). |
 | `with_calendar` | `bool` | `True` when the calendar page is enabled. |
+| `forward_calendar` | `bool` | `True` when the calendar is in forward (oldest-to-newest) order. |
 | `calendar_url` | `str` | URL to the calendar page (respects `calendar_path` and `clean_urls`). |
 | `theme_js_url` | `str` | URL to `theme.js` (with cache-bust query string). |
 | `search_js_url` | `str` | URL to `search.js` (with cache-bust query string). |

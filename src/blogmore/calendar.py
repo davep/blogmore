@@ -62,8 +62,10 @@ class CalendarMonth:
     weeks: list[list[CalendarDay]]
     """Calendar grid rows.
 
-    Each row contains exactly seven :class:`CalendarDay` items in
-    Monday-to-Sunday order.
+    Each row contains exactly seven :class:`CalendarDay` items.  In
+    reverse-chronological mode (the default) the order is Sunday-to-Monday so
+    that day numbers count down left-to-right.  In forward mode the order is
+    Monday-to-Sunday, matching the usual calendar convention.
     """
 
 
@@ -84,28 +86,40 @@ class CalendarYear:
     """Whether any posts were published in this year."""
 
     months: list[CalendarMonth]
-    """Months for this year in reverse chronological order (latest first)."""
+    """Months for this year.
+
+    In reverse-chronological mode (the default) the list runs newest-first.
+    In forward mode the list runs oldest-first.
+    """
 
 
 def build_calendar(
     posts: list[Post],
     page1_suffix: str,
+    *,
+    forward: bool = False,
 ) -> list[CalendarYear]:
     """Build the calendar data structure from a list of posts.
 
-    Constructs a reverse-chronological list of :class:`CalendarYear` objects,
-    each containing months in reverse order, spanning from the date of the
-    first post to the date of the latest post.
+    Constructs a list of :class:`CalendarYear` objects spanning from the
+    date of the first post to the date of the latest post.
+
+    By default the list is in reverse chronological order (newest year
+    first, newest month first, day numbers counting down from left to right
+    within each row).  Pass ``forward=True`` to generate a natural
+    chronological calendar instead (oldest year first, Monday-to-Sunday
+    columns, day numbers increasing left to right).
 
     Args:
         posts: All published posts to include in the calendar.
         page1_suffix: The URL suffix for the first pagination page (e.g.
             ``"index.html"`` or ``""`` for clean URLs).
+        forward: When ``True``, generate the calendar in oldest-to-newest
+            order.  Defaults to ``False`` (reverse chronological).
 
     Returns:
-        A list of :class:`CalendarYear` objects in reverse chronological
-        order (most recent year first).  Returns an empty list when *posts*
-        is empty or no posts have a date.
+        A list of :class:`CalendarYear` objects.  Returns an empty list
+        when *posts* is empty or no posts have a date.
     """
     dated_posts = [p for p in posts if p.date is not None]
     if not dated_posts:
@@ -138,7 +152,14 @@ def build_calendar(
 
     years: list[CalendarYear] = []
 
-    for year in range(last_year, first_year - 1, -1):
+    # Choose iteration direction for years and months.
+    year_range = (
+        range(first_year, last_year + 1)
+        if forward
+        else range(last_year, first_year - 1, -1)
+    )
+
+    for year in year_range:
         # Determine the month range to include for this year.
         if year == last_year and year == first_year:
             year_last_month = last_month
@@ -158,24 +179,35 @@ def build_calendar(
 
         months: list[CalendarMonth] = []
 
-        for month in range(year_last_month, year_first_month - 1, -1):
+        month_range = (
+            range(year_first_month, year_last_month + 1)
+            if forward
+            else range(year_last_month, year_first_month - 1, -1)
+        )
+
+        for month in month_range:
             month_has_posts = (year, month) in months_with_posts
             month_name = dt.date(year, month, 1).strftime("%B")
             month_url: str | None = (
                 f"/{year}/{month:02d}/{page1_suffix}" if month_has_posts else None
             )
 
-            # Build the week grid.  ``monthdayscalendar`` returns weeks in
-            # forward order (Mon first); reverse both the week list and each
-            # week's day order so the most recent day appears first (top-left)
-            # throughout — consistent with the overall reverse-chronological
-            # ordering of the calendar.
-            raw_weeks = list(reversed(month_calendar.monthdayscalendar(year, month)))
+            # Build the week grid.  ``monthdayscalendar`` always returns
+            # weeks in forward order (Mon first).  For reverse-chronological
+            # mode, reverse both the week list and each week's day order so
+            # the most recent day appears first (top-left); for forward mode,
+            # keep them as-is so the grid reads like a normal calendar.
+            raw_weeks = month_calendar.monthdayscalendar(year, month)
             weeks: list[list[CalendarDay]] = []
 
-            for raw_week in raw_weeks:
+            ordered_weeks: list[list[int]] = (
+                raw_weeks if forward else list(reversed(raw_weeks))
+            )
+
+            for raw_week in ordered_weeks:
                 week: list[CalendarDay] = []
-                for day_num in reversed(raw_week):
+                day_iter = raw_week if forward else list(reversed(raw_week))
+                for day_num in day_iter:
                     if day_num == 0:
                         week.append(CalendarDay(date=None))
                     else:

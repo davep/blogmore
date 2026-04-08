@@ -72,6 +72,14 @@ posts_per_feed: 20
 # archive. A Calendar link is added to the navigation bar automatically.
 # with_calendar: false
 
+# Optional: Use forward (oldest-to-newest) ordering in the calendar (default: false)
+# When true, the calendar runs in natural chronological order — oldest year at
+# the top, oldest month first within each year, and day numbers increasing left
+# to right (Monday first). When false (the default), everything is reversed so
+# the most recent content appears first. Configuration file only.
+# Only used when with_calendar is true.
+# forward_calendar: false
+
 # Optional: Show estimated reading time on posts (default: false)
 # Displays the approximate time to read each post based on the configured WPM.
 # with_read_time: false

@@ -417,6 +417,7 @@ class SiteGenerator:
             "with_stats": self.site_config.with_stats,
             "stats_url": self._get_stats_url(),
             "with_calendar": self.site_config.with_calendar,
+            "forward_calendar": self.site_config.forward_calendar,
             "calendar_url": self._get_calendar_url(),
             "with_read_time": self.site_config.with_read_time,
             "with_advert": self.site_config.with_advert,
@@ -1747,7 +1748,9 @@ class SiteGenerator:
             context["canonical_url"] = self._canonical_url_for_path(output_path)
         # Determine page1_suffix for archive URL construction.
         page1_suffix = self.site_config.page_1_path.lstrip("/")
-        calendar_years: list[CalendarYear] = build_calendar(posts, page1_suffix)
+        calendar_years: list[CalendarYear] = build_calendar(
+            posts, page1_suffix, forward=self.site_config.forward_calendar
+        )
         html = self.renderer.render_calendar_page(
             calendar_years=calendar_years, **context
         )

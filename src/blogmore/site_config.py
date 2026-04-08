@@ -106,6 +106,21 @@ class SiteConfig:
     with_calendar: bool = False
     """Whether to generate a calendar view of all posts."""
 
+    forward_calendar: bool = False
+    """Whether to display the calendar in forward (oldest-to-newest) order.
+
+    When ``False`` (the default) the calendar is rendered in reverse
+    chronological order — newest year first, newest month first within each
+    year, and day numbers counting down from right to left within each row.
+
+    When ``True`` the calendar is rendered in natural chronological order —
+    oldest year first, oldest month first within each year, and day numbers
+    running left to right in normal calendar order (Monday first).
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Only meaningful when :attr:`with_calendar` is ``True``.
+    """
+
     minify_css: bool = False
     """Whether to minify the CSS, writing it as ``styles.min.css``."""
 

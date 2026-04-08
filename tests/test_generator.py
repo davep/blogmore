@@ -5987,3 +5987,32 @@ class TestCalendarPageGeneration:
             '<link rel="canonical" href="https://example.com/calendar.html">'
             in calendar_content
         )
+
+    def test_forward_calendar_default_is_false(self) -> None:
+        """forward_calendar defaults to False on SiteConfig."""
+        config = SiteConfig(output_dir=Path("output"))
+        assert config.forward_calendar is False
+
+    def test_forward_calendar_generates_monday_first_headers(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """When forward_calendar=True the template renders M T W T F S S headers."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_calendar=True,
+                forward_calendar=True,
+            )
+        )
+        generator.generate()
+
+        calendar_content = (temp_output_dir / "calendar.html").read_text()
+        # The DOW header row for a forward calendar should start with M (Monday).
+        # We look for the sequential M T W T pattern (Monday-Tuesday-Wednesday-Thursday).
+        assert "calendar-dow" in calendar_content
+        # Find the section containing the day-of-week headers; Monday should appear
+        # before Sunday in forward mode.
+        first_m_pos = calendar_content.find(">M<")
+        first_s_pos = calendar_content.find(">S<")
+        assert first_m_pos < first_s_pos

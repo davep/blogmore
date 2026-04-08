@@ -336,3 +336,82 @@ class TestCalendarDataClasses:
         assert year.year_url == "/2024/index.html"
         assert year.has_posts is True
         assert year.months == []
+
+
+class TestBuildCalendarForward:
+    """Tests for build_calendar with forward=True (chronological order)."""
+
+    def test_forward_year_order_is_oldest_first(self) -> None:
+        """Years are listed oldest-first when forward=True."""
+        posts = [_make_post(2022, 6, 1), _make_post(2024, 3, 15)]
+        result = build_calendar(posts, "index.html", forward=True)
+        years = [y.year for y in result]
+        assert years == sorted(years)
+
+    def test_forward_month_order_is_oldest_first(self) -> None:
+        """Months within a year are listed oldest-first when forward=True."""
+        posts = [_make_post(2024, 1, 10), _make_post(2024, 9, 5)]
+        result = build_calendar(posts, "index.html", forward=True)
+        months = [m.month for m in result[0].months]
+        assert months == sorted(months)
+
+    def test_forward_days_increase_left_to_right(self) -> None:
+        """Day numbers increase left-to-right within a row when forward=True.
+
+        January 2024 week containing the 8th: Monday the 8th is at column 0.
+        """
+        post = _make_post(2024, 1, 8)
+        result = build_calendar([post], "index.html", forward=True)
+        month = result[0].months[0]
+        # Find the week containing the 8th.
+        for week in month.weeks:
+            for cell in week:
+                if cell.date is not None and cell.date.day == 8:
+                    # Jan 8 2024 is a Monday — must be at column 0 (first).
+                    assert week.index(cell) == 0
+                    return
+        raise AssertionError("Day 8 not found in calendar")
+
+    def test_forward_monday_at_column_zero(self) -> None:
+        """Monday appears at column 0 when forward=True.
+
+        January 2024: the 1st is a Monday, so the first week row should
+        have January 1 at column index 0.
+        """
+        post = _make_post(2024, 1, 1)
+        result = build_calendar([post], "index.html", forward=True)
+        month = result[0].months[0]
+        first_week = month.weeks[0]
+        assert first_week[0].date is not None
+        assert first_week[0].date.day == 1
+
+    def test_forward_false_is_default(self) -> None:
+        """forward=False (the default) keeps reverse-chronological order."""
+        posts = [_make_post(2022, 6, 1), _make_post(2024, 3, 15)]
+        result_default = build_calendar(posts, "index.html")
+        result_explicit = build_calendar(posts, "index.html", forward=False)
+        assert [y.year for y in result_default] == [y.year for y in result_explicit]
+
+    def test_forward_preserves_post_count(self) -> None:
+        """Post counts are correct when forward=True."""
+        post = _make_post(2024, 6, 15)
+        result = build_calendar([post], "index.html", forward=True)
+        month = result[0].months[0]
+        for week in month.weeks:
+            for cell in week:
+                if cell.date is not None and cell.date.day == 15:
+                    assert cell.post_count == 1
+                    return
+        raise AssertionError("Day 15 not found in calendar")
+
+    def test_forward_year_url_present(self) -> None:
+        """Year URL is set when forward=True and the year has posts."""
+        post = _make_post(2024, 3, 10)
+        result = build_calendar([post], "index.html", forward=True)
+        assert result[0].year_url == "/2024/index.html"
+
+    def test_forward_month_url_present(self) -> None:
+        """Month URL is set when forward=True and the month has posts."""
+        post = _make_post(2024, 3, 10)
+        result = build_calendar([post], "index.html", forward=True)
+        assert result[0].months[0].month_url == "/2024/03/index.html"
