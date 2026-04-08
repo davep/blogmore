@@ -1,5 +1,17 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added a table of longest posting streaks to the stats page, showing the top
+  10 consecutive-day posting streaks of two or more days. Each row shows the
+  streak rank, length in days, start and end dates (linked to their respective
+  day archives), and post count. Streaks are ranked by length, then by post
+  count, then by recency of start date. The section is omitted when no
+  qualifying streaks exist.
+  ([#371](https://github.com/davep/blogmore/pull/371))
+
 ## v2.10.0
 
 **Released: 2026-07-07**

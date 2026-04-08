@@ -8,8 +8,10 @@ import pytest
 from blogmore.parser import Post
 from blogmore.stats import (
     BlogStats,
+    PostingStreak,
     StreakChartCell,
     StreakChartVariant,
+    _compute_longest_streaks,
     _extract_external_links,
     compute_blog_stats,
 )
@@ -505,3 +507,159 @@ class TestStreakChart:
         )
         stats = compute_blog_stats([self._make_post(date=aware_dt)])
         assert stats.posts_in_last_year == 1
+
+
+class TestComputeLongestStreaks:
+    """Tests for the _compute_longest_streaks helper."""
+
+    def test_empty_returns_empty(self) -> None:
+        """An empty mapping returns an empty list."""
+        assert _compute_longest_streaks({}) == []
+
+    def test_single_day_not_included(self) -> None:
+        """A streak of exactly one day is excluded (below min_days=2)."""
+        dates = {dt.date(2024, 1, 1): 3}
+        assert _compute_longest_streaks(dates) == []
+
+    def test_two_consecutive_days_included(self) -> None:
+        """A streak of exactly two consecutive days is included."""
+        dates = {
+            dt.date(2024, 1, 1): 1,
+            dt.date(2024, 1, 2): 1,
+        }
+        streaks = _compute_longest_streaks(dates)
+        assert len(streaks) == 1
+        assert streaks[0].days == 2
+        assert streaks[0].start_date == dt.date(2024, 1, 1)
+        assert streaks[0].end_date == dt.date(2024, 1, 2)
+        assert streaks[0].post_count == 2
+
+    def test_streak_post_count_sums_all_days(self) -> None:
+        """post_count sums the posts across every day in the streak."""
+        dates = {
+            dt.date(2024, 3, 1): 2,
+            dt.date(2024, 3, 2): 3,
+            dt.date(2024, 3, 3): 1,
+        }
+        streaks = _compute_longest_streaks(dates)
+        assert len(streaks) == 1
+        assert streaks[0].post_count == 6
+
+    def test_gap_splits_streaks(self) -> None:
+        """A day gap between two runs produces two separate streaks."""
+        dates = {
+            dt.date(2024, 1, 1): 1,
+            dt.date(2024, 1, 2): 1,
+            # gap: 2024-01-03
+            dt.date(2024, 1, 4): 1,
+            dt.date(2024, 1, 5): 1,
+        }
+        streaks = _compute_longest_streaks(dates)
+        assert len(streaks) == 2
+        assert all(s.days == 2 for s in streaks)
+
+    def test_sorted_by_days_descending(self) -> None:
+        """Longer streaks appear before shorter ones."""
+        dates = {
+            dt.date(2024, 1, 1): 1,
+            dt.date(2024, 1, 2): 1,
+            # gap
+            dt.date(2024, 2, 1): 1,
+            dt.date(2024, 2, 2): 1,
+            dt.date(2024, 2, 3): 1,
+        }
+        streaks = _compute_longest_streaks(dates)
+        assert streaks[0].days == 3
+        assert streaks[1].days == 2
+
+    def test_tie_broken_by_post_count(self) -> None:
+        """Equal-length streaks are ordered by descending post count."""
+        dates = {
+            dt.date(2024, 1, 1): 1,
+            dt.date(2024, 1, 2): 1,  # streak A: 2 days, 2 posts
+            # gap
+            dt.date(2024, 2, 1): 3,
+            dt.date(2024, 2, 2): 3,  # streak B: 2 days, 6 posts
+        }
+        streaks = _compute_longest_streaks(dates)
+        assert streaks[0].post_count == 6  # streak B ranked higher
+        assert streaks[1].post_count == 2
+
+    def test_tie_broken_by_most_recent_start(self) -> None:
+        """Equal-length, equal-post-count streaks order most recent start first."""
+        dates = {
+            dt.date(2024, 1, 1): 2,
+            dt.date(2024, 1, 2): 2,  # streak A: 2 days, 4 posts, older
+            # gap
+            dt.date(2024, 3, 1): 2,
+            dt.date(2024, 3, 2): 2,  # streak B: 2 days, 4 posts, newer
+        }
+        streaks = _compute_longest_streaks(dates)
+        assert streaks[0].start_date == dt.date(2024, 3, 1)  # newer first
+        assert streaks[1].start_date == dt.date(2024, 1, 1)
+
+    def test_capped_at_max_streaks(self) -> None:
+        """At most max_streaks entries are returned."""
+        # Create 15 distinct 2-day streaks spread out
+        dates: dict[dt.date, int] = {}
+        for i in range(15):
+            base = dt.date(2024, 1, 1) + dt.timedelta(days=i * 4)
+            dates[base] = 1
+            dates[base + dt.timedelta(days=1)] = 1
+        streaks = _compute_longest_streaks(dates, max_streaks=10)
+        assert len(streaks) == 10
+
+    def test_longest_streaks_on_blog_stats(self) -> None:
+        """compute_blog_stats populates longest_streaks correctly."""
+        today = dt.date.today()
+        posts = [
+            Post(
+                path=Path("p.md"),
+                title="P",
+                content="x",
+                html_content="<p>x</p>",
+                date=dt.datetime.combine(
+                    today - dt.timedelta(days=offset), dt.time(10, 0)
+                ),
+            )
+            for offset in (5, 4, 3, 1)  # 3-day streak then a single day then a gap
+        ]
+        stats = compute_blog_stats(posts)
+        # Must have at least the 3-day streak
+        assert any(s.days >= 3 for s in stats.longest_streaks)
+        # Single-day gap result should not contain a single-day streak
+        assert all(s.days >= 2 for s in stats.longest_streaks)
+
+    def test_no_streaks_gives_empty_longest_streaks(self) -> None:
+        """When all posts are on isolated days, longest_streaks is empty."""
+        posts = [
+            Post(
+                path=Path("p.md"),
+                title="P",
+                content="x",
+                html_content="<p>x</p>",
+                date=dt.datetime(2024, 1, 1),
+            ),
+            Post(
+                path=Path("q.md"),
+                title="Q",
+                content="x",
+                html_content="<p>x</p>",
+                date=dt.datetime(2024, 1, 3),
+            ),
+        ]
+        stats = compute_blog_stats(posts)
+        assert stats.longest_streaks == []
+
+    def test_posting_streak_dataclass_fields(self) -> None:
+        """PostingStreak exposes start_date, end_date, days, and post_count."""
+        streak = PostingStreak(
+            start_date=dt.date(2024, 4, 1),
+            end_date=dt.date(2024, 4, 5),
+            days=5,
+            post_count=7,
+        )
+        assert streak.start_date == dt.date(2024, 4, 1)
+        assert streak.end_date == dt.date(2024, 4, 5)
+        assert streak.days == 5
+        assert streak.post_count == 7
