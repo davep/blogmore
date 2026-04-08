@@ -166,15 +166,16 @@ def build_calendar(
             )
 
             # Build the week grid.  ``monthdayscalendar`` returns weeks in
-            # forward order; reverse them so the most recent week appears at
-            # the top of the month block (consistent with the overall
-            # reverse-chronological ordering of the calendar).
+            # forward order (Mon first); reverse both the week list and each
+            # week's day order so the most recent day appears first (top-left)
+            # throughout — consistent with the overall reverse-chronological
+            # ordering of the calendar.
             raw_weeks = list(reversed(month_calendar.monthdayscalendar(year, month)))
             weeks: list[list[CalendarDay]] = []
 
             for raw_week in raw_weeks:
                 week: list[CalendarDay] = []
-                for day_num in raw_week:
+                for day_num in reversed(raw_week):
                     if day_num == 0:
                         week.append(CalendarDay(date=None))
                     else:

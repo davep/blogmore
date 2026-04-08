@@ -31,10 +31,13 @@
 /* Responsive months grid: auto-fill with a fixed column width so months
  * never grow wider than their natural compact size.  As the viewport narrows,
  * fewer whole months appear per row, reaching 1 at the narrowest.
+ * justify-content: center removes the empty gap on the right when the row
+ * is not completely filled.
  */
 .calendar-months-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, 13em);
+    justify-content: center;
     gap: 1.5rem 2rem;
 }
 
