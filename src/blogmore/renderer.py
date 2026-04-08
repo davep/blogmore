@@ -369,6 +369,20 @@ class TemplateRenderer:
         template = self.env.get_template("stats.html")
         return template.render(extra_stylesheets=self.extra_stylesheets, **context)
 
+    def render_calendar_page(self, **context: Any) -> str:
+        """Render the calendar view page.
+
+        Args:
+            **context: Context variables to pass to the template.  Should
+                include a ``calendar_years`` key containing a list of
+                :class:`~blogmore.calendar.CalendarYear` instances.
+
+        Returns:
+            Rendered HTML string.
+        """
+        template = self.env.get_template("calendar.html")
+        return template.render(extra_stylesheets=self.extra_stylesheets, **context)
+
     def render_template(self, template_name: str, **context: Any) -> str:
         """Render an arbitrary template.
 

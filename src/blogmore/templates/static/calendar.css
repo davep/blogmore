@@ -1,0 +1,117 @@
+/* =============================================================================
+   CALENDAR PAGE
+   ============================================================================= */
+
+.calendar-page > h1 {
+    margin-bottom: 2rem;
+}
+
+/* Year section */
+.calendar-year-section {
+    margin-bottom: 3rem;
+}
+
+.calendar-year-label {
+    font-size: 1.8em;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.calendar-year-label a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.calendar-year-label a:hover {
+    color: var(--hover-color);
+}
+
+/* Responsive months grid: auto-fill with a fixed column width so months
+ * never grow wider than their natural compact size.  As the viewport narrows,
+ * fewer whole months appear per row, reaching 1 at the narrowest.
+ * justify-content: center removes the empty gap on the right when the row
+ * is not completely filled.
+ */
+.calendar-months-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 13em);
+    justify-content: center;
+    gap: 1.5rem 2rem;
+}
+
+/* Individual month block */
+.calendar-month {
+}
+
+/* Month heading */
+.calendar-month-label {
+    font-size: 1em;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 0.4rem;
+    color: var(--text-secondary);
+}
+
+.calendar-month-label a {
+    color: var(--hover-color);
+    text-decoration: none;
+}
+
+.calendar-month-label a:hover {
+    text-decoration: underline;
+}
+
+/* 7-column grid for the calendar days */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+}
+
+/* Day-of-week headers */
+.calendar-dow {
+    text-align: center;
+    font-size: 0.7em;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding-bottom: 0.3em;
+}
+
+/* Day cells: square, centered text */
+.calendar-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    font-size: 0.75em;
+    border-radius: 50%;
+    color: var(--text-color);
+    text-decoration: none;
+    line-height: 1;
+}
+
+/* Padding days (before first and after last of the month) */
+.calendar-day-outside {
+    color: var(--text-secondary);
+    opacity: 0.3;
+}
+
+/* Days that have posts: shown as a filled circle link */
+a.calendar-day-has-posts {
+    background-color: var(--hover-color);
+    color: var(--bg-color);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+a.calendar-day-has-posts:hover {
+    background-color: var(--hover-color-dark);
+    text-decoration: none;
+    color: var(--bg-color);
+}
+
+a.calendar-day-has-posts:visited {
+    color: var(--bg-color);
+}

@@ -35,7 +35,13 @@ below lists all variables that are available in every template.
 | `search_css_url` | `str` | URL to the search-page stylesheet (with cache-bust query string). |
 | `stats_css_url` | `str` | URL to the stats-page stylesheet (with cache-bust query string). |
 | `archive_css_url` | `str` | URL to the archive-page stylesheet (with cache-bust query string). |
+| `calendar_css_url` | `str` | URL to the calendar-page stylesheet (with cache-bust query string). |
 | `tag_cloud_css_url` | `str` | URL to the tag/category-cloud stylesheet (with cache-bust query string). |
+| `with_stats` | `bool` | `True` when the statistics page is enabled. |
+| `stats_url` | `str` | URL to the statistics page (respects `stats_path` and `clean_urls`). |
+| `with_calendar` | `bool` | `True` when the calendar page is enabled. |
+| `forward_calendar` | `bool` | `True` when the calendar is in forward (oldest-to-newest) order. |
+| `calendar_url` | `str` | URL to the calendar page (respects `calendar_path` and `clean_urls`). |
 | `theme_js_url` | `str` | URL to `theme.js` (with cache-bust query string). |
 | `search_js_url` | `str` | URL to `search.js` (with cache-bust query string). |
 | `favicon_url` | `str \| None` | URL to the site favicon, if one exists. |
@@ -105,6 +111,8 @@ or `/tag/python/` when `clean_urls` is enabled.
 | `category.html` | `category`, `safe_category`, `all_posts`, `pages`, `prev_page_url`, `next_page_url`, `canonical_url`, `pagination_page_urls` |
 | `categories.html` | `categories` (dict of display name → post list), `pages`, `canonical_url` |
 | `search.html` | `pages`, `canonical_url` |
+| `stats.html` | `stats` (`BlogStats`), `pages`, `canonical_url` |
+| `calendar.html` | `calendar_years` (list of `CalendarYear`), `pages`, `canonical_url` |
 
 ## Post object
 
@@ -176,6 +184,39 @@ To override the draft title colour, set `--draft-title-color` (and
 | `url` | `str` (property) | URL path (e.g. `/about.html`). |
 | `description` | `str` (property) | Page description (from metadata or first paragraph). |
 
+## Calendar objects
+
+The `calendar.html` template receives a `calendar_years` variable containing a
+list of `CalendarYear` objects in reverse chronological order.
+
+### CalendarYear
+
+| Attribute | Type | Description |
+|---|---|---|
+| `year` | `int` | The calendar year. |
+| `year_url` | `str \| None` | URL to the yearly archive, or `None` when the year has no posts. |
+| `has_posts` | `bool` | `True` when at least one post was published in this year. |
+| `months` | `list[CalendarMonth]` | Months for this year in reverse chronological order (latest first). |
+
+### CalendarMonth
+
+| Attribute | Type | Description |
+|---|---|---|
+| `year` | `int` | The year this month belongs to. |
+| `month` | `int` | The month number (1–12). |
+| `month_name` | `str` | Full English month name (e.g. `"January"`). |
+| `month_url` | `str \| None` | URL to the monthly archive, or `None` when the month has no posts. |
+| `has_posts` | `bool` | `True` when at least one post was published in this month. |
+| `weeks` | `list[list[CalendarDay]]` | Calendar grid rows, each containing exactly 7 `CalendarDay` entries in Monday-to-Sunday order. |
+
+### CalendarDay
+
+| Attribute | Type | Description |
+|---|---|---|
+| `date` | `datetime.date \| None` | The calendar date for this cell. `None` for padding slots that do not belong to the current month. |
+| `post_count` | `int` | Number of posts published on this day (0 for non-post days and padding). |
+| `day_url` | `str \| None` | URL to the daily archive. Set only when `post_count > 0`; `None` otherwise. |
+
 ## Template inheritance
 
 All page templates extend `base.html`.  The inheritance chain is:
@@ -190,7 +231,9 @@ base.html
 ├── tags.html
 ├── category.html
 ├── categories.html
-└── search.html
+├── search.html
+├── stats.html
+└── calendar.html
 ```
 
 Partial templates included by the above:

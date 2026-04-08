@@ -10,6 +10,13 @@
 - Added a `read_time_wpm` configuration option that lets users override the
   words-per-minute value used when calculating estimated reading time.
   ([#371](https://github.com/davep/blogmore/pull/371))
+- Added a calendar view page (`with_calendar` / `--with-calendar`) that
+  shows the full history of the blog as a year calendar.
+  ([#373](https://github.com/davep/blogmore/pull/373))
+- Added a `forward_calendar` configuration option that renders the calendar
+  in natural chronological order (oldest to newest) instead of the default
+  reverse-chronological order.
+  ([#373](https://github.com/davep/blogmore/pull/373))
 
 ## v2.10.0
 

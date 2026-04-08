@@ -23,6 +23,7 @@ from blogmore.pagination_path import (
 from blogmore.post_path import DEFAULT_POST_PATH, validate_post_path_template
 from blogmore.site_config import (
     DEFAULT_ARCHIVE_PATH,
+    DEFAULT_CALENDAR_PATH,
     DEFAULT_CATEGORIES_PATH,
     DEFAULT_SEARCH_PATH,
     DEFAULT_STATS_PATH,
@@ -60,6 +61,7 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
         "tags_path",
         "categories_path",
         "stats_path",
+        "calendar_path",
         "sidebar_pages",
         "head",
         "light_mode_code_style",
@@ -437,6 +439,7 @@ def parse_site_config_from_dict(
         ("tags_path", DEFAULT_TAGS_PATH),
         ("categories_path", DEFAULT_CATEGORIES_PATH),
         ("stats_path", DEFAULT_STATS_PATH),
+        ("calendar_path", DEFAULT_CALENDAR_PATH),
     ]
     for field_name, default in _html_path_defaults:
         raw = config.get(field_name, default)

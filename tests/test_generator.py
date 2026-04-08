@@ -5807,3 +5807,212 @@ class TestStatsPageGeneration:
 
         stats_content = (temp_output_dir / "stats" / "index.html").read_text()
         assert '<link rel="canonical" href="https://example.com/stats/">' in stats_content
+
+
+class TestCalendarPageGeneration:
+    """Tests for the calendar page (with_calendar) feature."""
+
+    def test_calendar_disabled_by_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """calendar.html is NOT generated when with_calendar is False (the default)."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator.generate()
+
+        assert not (temp_output_dir / "calendar.html").exists()
+
+    def test_calendar_enabled_generates_calendar_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """calendar.html is generated when with_calendar=True."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_calendar=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "calendar.html").exists()
+
+    def test_calendar_nav_link_absent_by_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The Calendar nav link does not appear when with_calendar is False."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/calendar.html" not in index_content
+
+    def test_calendar_nav_link_present_when_enabled(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The Calendar nav link appears in the navigation when with_calendar=True."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_calendar=True,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/calendar.html"' in index_content
+
+    def test_calendar_page_links_calendar_css(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The calendar page includes the calendar-specific CSS file."""
+        from blogmore.generator import CALENDAR_CSS_FILENAME
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_calendar=True,
+            )
+        )
+        generator.generate()
+
+        calendar_content = (temp_output_dir / "calendar.html").read_text()
+        assert f"/static/{CALENDAR_CSS_FILENAME}" in calendar_content
+
+    def test_calendar_page_contains_year_labels(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The calendar page contains year section labels from the posts."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_calendar=True,
+            )
+        )
+        generator.generate()
+
+        calendar_content = (temp_output_dir / "calendar.html").read_text()
+        assert "calendar-year-label" in calendar_content
+
+    def test_custom_calendar_path(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """A custom calendar_path generates the calendar page at the specified location."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_calendar=True,
+                calendar_path="blog/history.html",
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "blog" / "history.html").exists()
+        assert not (temp_output_dir / "calendar.html").exists()
+
+    def test_custom_calendar_path_nav_link_uses_configured_url(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The Calendar nav link uses the custom calendar_path URL."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_calendar=True,
+                calendar_path="blog/history.html",
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/blog/history.html"' in index_content
+        assert 'href="/calendar.html"' not in index_content
+
+    def test_calendar_path_clean_urls_strips_index_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """With clean_urls enabled and calendar_path ending in index.html, the nav link is clean."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_calendar=True,
+                calendar_path="calendar/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "calendar" / "index.html").exists()
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/calendar/"' in index_content
+
+    def test_calendar_path_default_value(self) -> None:
+        """The calendar_path setting defaults to calendar.html."""
+        from blogmore.site_config import DEFAULT_CALENDAR_PATH
+
+        config = SiteConfig(output_dir=Path("output"))
+        assert config.calendar_path == DEFAULT_CALENDAR_PATH
+        assert config.calendar_path == "calendar.html"
+
+    def test_calendar_canonical_url_with_site_url(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The calendar page canonical URL includes the site_url."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_calendar=True,
+                site_url="https://example.com",
+            )
+        )
+        generator.generate()
+
+        calendar_content = (temp_output_dir / "calendar.html").read_text()
+        assert (
+            '<link rel="canonical" href="https://example.com/calendar.html">'
+            in calendar_content
+        )
+
+    def test_forward_calendar_default_is_false(self) -> None:
+        """forward_calendar defaults to False on SiteConfig."""
+        config = SiteConfig(output_dir=Path("output"))
+        assert config.forward_calendar is False
+
+    def test_forward_calendar_generates_monday_first_headers(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """When forward_calendar=True the template renders M T W T F S S headers."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_calendar=True,
+                forward_calendar=True,
+            )
+        )
+        generator.generate()
+
+        calendar_content = (temp_output_dir / "calendar.html").read_text()
+        # The DOW header row for a forward calendar should start with M (Monday).
+        # We look for the sequential M T W T pattern (Monday-Tuesday-Wednesday-Thursday).
+        assert "calendar-dow" in calendar_content
+        # Find the section containing the day-of-week headers; Monday should appear
+        # before Sunday in forward mode.
+        first_m_pos = calendar_content.find(">M<")
+        first_s_pos = calendar_content.find(">S<")
+        assert first_m_pos < first_s_pos
