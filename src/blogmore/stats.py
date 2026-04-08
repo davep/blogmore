@@ -115,6 +115,30 @@ MONTH_LABELS: list[str] = [
 
 
 @dataclass
+class PostingStreak:
+    """A consecutive streak of posting days.
+
+    Attributes:
+        start_date: The first day of the streak.
+        end_date: The last day of the streak.
+        days: Number of consecutive days in the streak.
+        post_count: Total number of posts published during the streak.
+    """
+
+    start_date: dt.date
+    """The first day of the streak."""
+
+    end_date: dt.date
+    """The last day of the streak."""
+
+    days: int
+    """Number of consecutive days in the streak."""
+
+    post_count: int
+    """Total number of posts published during the streak."""
+
+
+@dataclass
 class BlogStats:
     """Aggregated statistics for a collection of blog posts.
 
@@ -200,9 +224,17 @@ class BlogStats:
     streak_variants: list[StreakChartVariant] = field(default_factory=list)
     """Streak chart variants for responsive display.
 
-    Three pre-computed variants covering 3, 6, and 9 trailing calendar
+    Three pre-computed variants covering 5, 9, and 10 trailing calendar
     months respectively, each with week-column data and month-label positions.
-    Ordered by ascending month count (3 first, 9 last).
+    Ordered by ascending month count (5 first, 10 last).
+    """
+
+    longest_streaks: list[PostingStreak] = field(default_factory=list)
+    """Top posting streaks of two or more consecutive days.
+
+    At most 10 entries, sorted by descending streak length, then descending
+    post count, then descending start date (most recent first).
+    Only streaks of two or more days are included.
     """
 
     @property
@@ -336,6 +368,78 @@ def _compute_streak_variant(
     )
 
 
+def _compute_longest_streaks(
+    posts_by_date: dict[dt.date, int],
+    max_streaks: int = 10,
+    min_days: int = 2,
+) -> list[PostingStreak]:
+    """Compute the longest posting streaks from a date→count mapping.
+
+    A streak is a consecutive run of calendar days on which at least one post
+    was published.  Only streaks of at least *min_days* days are included.
+    Where two streaks share the same length, the one with more posts ranks
+    higher; if still tied, the more recently-started streak ranks higher.
+
+    Args:
+        posts_by_date: Mapping of date to post count for all dated posts.
+        max_streaks: Maximum number of streaks to return.
+        min_days: Minimum streak length (in days) to include.
+
+    Returns:
+        A list of up to *max_streaks* :class:`PostingStreak` objects sorted
+        by descending length, then descending post count, then descending
+        start date.
+    """
+    if not posts_by_date:
+        return []
+
+    sorted_dates = sorted(posts_by_date.keys())
+    streaks: list[PostingStreak] = []
+
+    streak_start = sorted_dates[0]
+    streak_end = sorted_dates[0]
+    streak_post_count = posts_by_date[sorted_dates[0]]
+
+    for date in sorted_dates[1:]:
+        if date == streak_end + dt.timedelta(days=1):
+            streak_end = date
+            streak_post_count += posts_by_date[date]
+        else:
+            days = (streak_end - streak_start).days + 1
+            if days >= min_days:
+                streaks.append(
+                    PostingStreak(
+                        start_date=streak_start,
+                        end_date=streak_end,
+                        days=days,
+                        post_count=streak_post_count,
+                    )
+                )
+            streak_start = date
+            streak_end = date
+            streak_post_count = posts_by_date[date]
+
+    # Record the final streak.
+    days = (streak_end - streak_start).days + 1
+    if days >= min_days:
+        streaks.append(
+            PostingStreak(
+                start_date=streak_start,
+                end_date=streak_end,
+                days=days,
+                post_count=streak_post_count,
+            )
+        )
+
+    # Sort: most days first, then most posts, then most recent start date.
+    streaks.sort(
+        key=lambda streak: (streak.days, streak.post_count, streak.start_date),
+        reverse=True,
+    )
+
+    return streaks[:max_streaks]
+
+
 def compute_blog_stats(posts: list[Post], site_url: str = "") -> BlogStats:
     """Compute aggregated statistics from a collection of blog posts.
 
@@ -457,6 +561,9 @@ def compute_blog_stats(posts: list[Post], site_url: str = "") -> BlogStats:
     stats.streak_variants = [
         _compute_streak_variant(posts_by_date, today, n) for n in (5, 9, 10)
     ]
+
+    # Longest consecutive posting streaks (2+ days, top 10).
+    stats.longest_streaks = _compute_longest_streaks(posts_by_date)
 
     return stats
 

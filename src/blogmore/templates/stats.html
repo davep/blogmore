@@ -241,6 +241,41 @@
     {% endif %}
 
     {# ------------------------------------------------------------------ #}
+    {# Longest Posting Streaks                                            #}
+    {# ------------------------------------------------------------------ #}
+    {% if stats.longest_streaks %}
+    <section class="stats-section">
+        <h2>Longest Streaks</h2>
+        <div class="stats-table-wrap">
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Days</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Posts</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for streak in stats.longest_streaks %}
+                    {% set start_url = '/' ~ streak.start_date.year ~ '/' ~ '%02d'|format(streak.start_date.month) ~ '/' ~ '%02d'|format(streak.start_date.day) ~ '/' ~ pagination_page1_suffix %}
+                    {% set end_url = '/' ~ streak.end_date.year ~ '/' ~ '%02d'|format(streak.end_date.month) ~ '/' ~ '%02d'|format(streak.end_date.day) ~ '/' ~ pagination_page1_suffix %}
+                    <tr>
+                        <td class="stats-table-rank">{{ loop.index }}</td>
+                        <td class="stats-table-count">{{ streak.days }}</td>
+                        <td><a href="{{ start_url }}">{{ streak.start_date.strftime('%Y-%m-%d') }}</a></td>
+                        <td><a href="{{ end_url }}">{{ streak.end_date.strftime('%Y-%m-%d') }}</a></td>
+                        <td class="stats-table-count">{{ streak.post_count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
+
+    {# ------------------------------------------------------------------ #}
     {# Tags, categories and links overview                                 #}
     {# ------------------------------------------------------------------ #}
     <section class="stats-section">
