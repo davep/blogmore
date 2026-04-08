@@ -224,9 +224,9 @@ class BlogStats:
     streak_variants: list[StreakChartVariant] = field(default_factory=list)
     """Streak chart variants for responsive display.
 
-    Three pre-computed variants covering 3, 6, and 9 trailing calendar
+    Three pre-computed variants covering 5, 9, and 10 trailing calendar
     months respectively, each with week-column data and month-label positions.
-    Ordered by ascending month count (3 first, 9 last).
+    Ordered by ascending month count (5 first, 10 last).
     """
 
     longest_streaks: list[PostingStreak] = field(default_factory=list)
