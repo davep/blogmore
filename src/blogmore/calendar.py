@@ -165,10 +165,11 @@ def build_calendar(
                 f"/{year}/{month:02d}/{page1_suffix}" if month_has_posts else None
             )
 
-            # Build the week grid.  ``monthdayscalendar`` returns a list of
-            # weeks; each week is a list of 7 day numbers (Mon first), with 0
-            # for days that fall outside the month.
-            raw_weeks = month_calendar.monthdayscalendar(year, month)
+            # Build the week grid.  ``monthdayscalendar`` returns weeks in
+            # forward order; reverse them so the most recent week appears at
+            # the top of the month block (consistent with the overall
+            # reverse-chronological ordering of the calendar).
+            raw_weeks = list(reversed(month_calendar.monthdayscalendar(year, month)))
             weeks: list[list[CalendarDay]] = []
 
             for raw_week in raw_weeks:

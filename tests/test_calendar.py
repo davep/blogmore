@@ -276,17 +276,18 @@ class TestBuildCalendarMondayFirst:
     def test_first_day_of_week_is_monday(self) -> None:
         """The first column in every week row corresponds to Monday.
 
-        January 2024: the 1st is a Monday, so it should appear in column 0
-        (the first position of the first non-padding week row).
+        January 2024: the 1st is a Monday, so the last week row (weeks are
+        reversed — most recent first) should have January 1 at index 0.
         """
         post = _make_post(2024, 1, 1)
         result = build_calendar([post], "index.html")
         month = result[0].months[0]
-        # January 2024 starts on Monday, so the first week row should have
-        # January 1 at index 0 (no padding at the start).
-        first_week = month.weeks[0]
-        assert first_week[0].date is not None
-        assert first_week[0].date.day == 1
+        # Weeks are in reverse order (last week first), so the final row
+        # contains week 1 of January 2024. January 1 was a Monday, so it
+        # appears at column index 0 of that last row.
+        last_week = month.weeks[-1]
+        assert last_week[0].date is not None
+        assert last_week[0].date.day == 1
 
 
 class TestCalendarDataClasses:

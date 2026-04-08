@@ -28,19 +28,18 @@
     color: var(--hover-color);
 }
 
-/* Responsive months grid: fills available width with whole months.
- * Each month needs at least 200px. As the viewport narrows, fewer months
- * appear side-by-side, reaching 1 month wide at the narrowest.
+/* Responsive months grid: auto-fill with a fixed column width so months
+ * never grow wider than their natural compact size.  As the viewport narrows,
+ * fewer whole months appear per row, reaching 1 at the narrowest.
  */
 .calendar-months-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, 13em);
     gap: 1.5rem 2rem;
 }
 
-/* Individual month block — never split across grid lines */
+/* Individual month block */
 .calendar-month {
-    min-width: 0;
 }
 
 /* Month heading */

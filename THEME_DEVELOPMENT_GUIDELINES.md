@@ -95,15 +95,6 @@ The stylesheet is divided into clearly labelled sections:
 8. **Syntax Highlighting** — Pygments light and dark highlight rules
 9. **LISTING PAGES** — tags, categories, archive, search
 
-Page-specific styles live in separate files loaded only on the pages that need
-them:
-
-- `search.css` — search page
-- `stats.css` — statistics page (`.stats-*` classes)
-- `archive.css` — archive listing pages
-- `tag-cloud.css` — tag and category cloud pages
-- `calendar.css` — calendar page (`.calendar-*` classes)
-
 When adding new CSS, place it in the most appropriate section.
 
 ### Stable CSS custom properties
