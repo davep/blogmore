@@ -4,6 +4,10 @@
 
 **Released: WiP**
 
+- The stats page no longer carries a `noindex` robots directive; only the
+  search page is marked `noindex`. The stats page (and all other generated
+  pages) is correctly included in the sitemap.
+  ([#385](https://github.com/davep/blogmore/pull/385))
 - The "Reading Time" section is now hidden on the stats page when
   `with_read_time` is set to `false`.
   ([#383](https://github.com/davep/blogmore/pull/383))

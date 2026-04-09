@@ -5826,6 +5826,40 @@ class TestStatsPageGeneration:
         stats_content = (temp_output_dir / "stats" / "index.html").read_text()
         assert '<link rel="canonical" href="https://example.com/stats/">' in stats_content
 
+    def test_stats_page_does_not_have_noindex(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The stats page must not carry a noindex robots directive."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+            )
+        )
+        generator.generate()
+
+        stats_content = (temp_output_dir / "stats.html").read_text()
+        assert "noindex" not in stats_content
+
+    def test_stats_page_included_in_sitemap(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The stats page must be present in the sitemap when with_sitemap is enabled."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_stats=True,
+                with_sitemap=True,
+            )
+        )
+        generator.generate()
+
+        sitemap_content = (temp_output_dir / "sitemap.xml").read_text()
+        assert "stats.html" in sitemap_content
+
 
 class TestCalendarPageGeneration:
     """Tests for the calendar page (with_calendar) feature."""
