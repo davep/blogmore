@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.11.0
 
-**Released: WiP**
+**Released: 2026-04-09**
 
 - Added a table of longest posting streaks to the stats page, showing the
   top 10 consecutive-day posting streaks of two or more days.
