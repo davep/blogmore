@@ -733,6 +733,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v2111" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v2.11.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v2110" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1314,6 +1325,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v2111" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v2.11.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v2110" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1838,6 +1860,16 @@
 
 
 <h1 id="blogmore-changelog">BlogMore ChangeLog</h1>
+<h2 id="v2111">v2.11.1</h2>
+<p><strong>Released: 2026-04-09</strong></p>
+<ul>
+<li>Fixed an endless regeneration loop in <code>blogmore serve</code> on Linux caused by
+  watchdog (via inotify) emitting read-only file-access events
+  (<code>FileOpenedEvent</code>, <code>FileClosedNoWriteEvent</code>) when the site generator
+  reads <code>extras</code> files. These events are now explicitly ignored, so only
+  genuine content changes trigger a site rebuild.
+  (<a href="https://github.com/davep/blogmore/pull/381">#381</a>)</li>
+</ul>
 <h2 id="v2110">v2.11.0</h2>
 <p><strong>Released: 2026-04-09</strong></p>
 <ul>
