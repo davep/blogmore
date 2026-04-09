@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- The "Reading Time" section is now hidden on the stats page when
+  `with_read_time` is set to `false`.
+  ([#383](https://github.com/davep/blogmore/pull/383))
+
 ## v2.11.1
 
 **Released: 2026-04-09**

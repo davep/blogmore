@@ -5681,18 +5681,36 @@ class TestStatsPageGeneration:
     def test_stats_page_contains_reading_time_section(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
-        """The stats page includes the reading time detail section."""
+        """The stats page includes the reading time detail section when with_read_time is True."""
         generator = SiteGenerator(
             site_config=SiteConfig(
                 content_dir=posts_dir,
                 output_dir=temp_output_dir,
                 with_stats=True,
+                with_read_time=True,
             )
         )
         generator.generate()
 
         stats_content = (temp_output_dir / "stats.html").read_text()
         assert "Reading Time" in stats_content
+
+    def test_stats_page_omits_reading_time_section_when_with_read_time_disabled(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The stats page omits the reading time section when with_read_time is False."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+                with_read_time=False,
+            )
+        )
+        generator.generate()
+
+        stats_content = (temp_output_dir / "stats.html").read_text()
+        assert "Reading Time" not in stats_content
 
     def test_stats_page_contains_content_overview_section(
         self, posts_dir: Path, temp_output_dir: Path
