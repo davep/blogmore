@@ -184,6 +184,41 @@ class TestContentChangeHandler:
         # No regeneration should have been triggered
         assert mock_regenerate.call_count == 0
 
+    def test_on_any_event_ignores_read_only_file_events(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that read-only file access events are ignored.
+
+        On Linux, watchdog (via inotify) emits FileOpenedEvent and
+        FileClosedNoWriteEvent when files are opened for reading.  The site
+        generator reads extras files during _copy_extras, so these events must
+        not trigger a rebuild or the serve loop would regenerate forever.
+        """
+        from watchdog.events import FileClosedNoWriteEvent, FileOpenedEvent
+
+        from blogmore.generator import SiteGenerator
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
+        )
+
+        handler = ContentChangeHandler(generator=generator, debounce_seconds=0.05)
+
+        content_file = posts_dir / "extras" / "images" / "photo.jpg"
+
+        with patch.object(handler, "_regenerate") as mock_regenerate:
+            for event in (
+                FileOpenedEvent(str(content_file)),
+                FileClosedNoWriteEvent(str(content_file)),
+            ):
+                handler.on_any_event(event)
+
+            # Wait for any debounce timer that might have been set
+            time.sleep(0.15)
+
+        # Neither read-only event should have triggered regeneration
+        assert mock_regenerate.call_count == 0
+
     def test_regeneration_lock_prevents_concurrent_regenerations(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:

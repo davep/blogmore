@@ -9,7 +9,12 @@ import threading
 from pathlib import Path
 from typing import Any
 
-from watchdog.events import FileSystemEvent, FileSystemEventHandler
+from watchdog.events import (
+    FileClosedNoWriteEvent,
+    FileOpenedEvent,
+    FileSystemEvent,
+    FileSystemEventHandler,
+)
 from watchdog.observers import Observer
 
 from blogmore.config import (
@@ -131,6 +136,14 @@ class ContentChangeHandler(FileSystemEventHandler):
         if path.name.startswith(".") or path.name.endswith(
             ("~", ".swp", ".tmp", ".pyc")
         ):
+            return
+
+        # Ignore read-only file access events.  On Linux, watchdog (via
+        # inotify) emits FileOpenedEvent and FileClosedNoWriteEvent whenever a
+        # file is opened for reading — including when the site generator reads
+        # extras files during a copy.  Treating these as content changes would
+        # cause an endless regeneration loop, so they are explicitly discarded.
+        if isinstance(event, (FileOpenedEvent, FileClosedNoWriteEvent)):
             return
 
         # Ignore events originating from the output directory to avoid

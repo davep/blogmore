@@ -1,5 +1,16 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed an endless regeneration loop in `blogmore serve` on Linux caused by
+  watchdog (via inotify) emitting read-only file-access events
+  (`FileOpenedEvent`, `FileClosedNoWriteEvent`) when the site generator reads
+  extras files during `_copy_extras`.  These events are now explicitly
+  ignored, so only genuine content changes trigger a site rebuild.
+  ([#380](https://github.com/davep/blogmore/pull/380))
+
 ## v2.11.0
 
 **Released: 2026-04-09**
