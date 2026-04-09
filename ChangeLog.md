@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.11.1
 
-**Released: WiP**
+**Released: 2026-04-09**
 
 - Fixed an endless regeneration loop in `blogmore serve` on Linux caused by
   watchdog (via inotify) emitting read-only file-access events
