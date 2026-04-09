@@ -180,6 +180,54 @@ class TestCollectSitemapUrls:
         assert f"https://example.com/{CUSTOM_404_HTML}" not in urls
         assert "https://example.com/index.html" in urls
 
+    def test_extra_excluded_paths_excludes_specified_html(
+        self, tmp_path: Path
+    ) -> None:
+        """Test that HTML files in extra_excluded_paths are excluded."""
+        (tmp_path / "index.html").write_text("<html/>")
+        (tmp_path / "google287c4cf252478b0c.html").write_text("<html/>")
+
+        urls = collect_sitemap_urls(
+            tmp_path,
+            "https://example.com",
+            extra_excluded_paths=frozenset({"google287c4cf252478b0c.html"}),
+        )
+
+        assert "https://example.com/google287c4cf252478b0c.html" not in urls
+        assert "https://example.com/index.html" in urls
+
+    def test_extra_excluded_paths_excludes_nested_html(self, tmp_path: Path) -> None:
+        """Test that nested HTML files in extra_excluded_paths are excluded."""
+        (tmp_path / "index.html").write_text("<html/>")
+        verify_dir = tmp_path / "verify"
+        verify_dir.mkdir()
+        (verify_dir / "token.html").write_text("<html/>")
+
+        urls = collect_sitemap_urls(
+            tmp_path,
+            "https://example.com",
+            extra_excluded_paths=frozenset({"verify/token.html"}),
+        )
+
+        assert "https://example.com/verify/token.html" not in urls
+        assert "https://example.com/index.html" in urls
+
+    def test_extra_excluded_paths_empty_frozenset_has_no_effect(
+        self, tmp_path: Path
+    ) -> None:
+        """Test that an empty extra_excluded_paths has no effect."""
+        (tmp_path / "index.html").write_text("<html/>")
+        (tmp_path / "archive.html").write_text("<html/>")
+
+        urls = collect_sitemap_urls(
+            tmp_path,
+            "https://example.com",
+            extra_excluded_paths=frozenset(),
+        )
+
+        assert "https://example.com/index.html" in urls
+        assert "https://example.com/archive.html" in urls
+
 
 class TestGenerateSitemapXml:
     """Test the generate_sitemap_xml function."""
@@ -441,3 +489,86 @@ class TestSitemapIntegrationWithGenerator:
         content = (temp_output_dir / "sitemap.xml").read_text()
         assert "find/index.html" not in content
         assert "find/" not in content
+
+    def test_sitemap_excludes_html_from_extras(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that HTML files copied from extras are excluded from the sitemap."""
+        from blogmore.generator import SiteGenerator
+
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        extras_dir = content_dir / "extras"
+        extras_dir.mkdir()
+        (extras_dir / "google287c4cf252478b0c.html").write_text(
+            "google-site-verification: google287c4cf252478b0c.html"
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+            )
+        )
+        generator.generate()
+
+        # The extras HTML file should be present in the output but absent from the sitemap
+        assert (temp_output_dir / "google287c4cf252478b0c.html").exists()
+        content = (temp_output_dir / "sitemap.xml").read_text()
+        assert "google287c4cf252478b0c.html" not in content
+
+    def test_sitemap_excludes_nested_html_from_extras(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that nested HTML files in extras are excluded from the sitemap."""
+        from blogmore.generator import SiteGenerator
+
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        extras_dir = content_dir / "extras"
+        extras_dir.mkdir()
+        verify_dir = extras_dir / "verify"
+        verify_dir.mkdir()
+        (verify_dir / "token.html").write_text("<html>verification</html>")
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "verify" / "token.html").exists()
+        content = (temp_output_dir / "sitemap.xml").read_text()
+        assert "verify/token.html" not in content
+
+    def test_sitemap_includes_non_html_extras_normally(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that non-HTML extras files do not affect the sitemap."""
+        from blogmore.generator import SiteGenerator
+
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        extras_dir = content_dir / "extras"
+        extras_dir.mkdir()
+        (extras_dir / "robots.txt").write_text("User-agent: *\nDisallow:")
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "robots.txt").exists()
+        content = (temp_output_dir / "sitemap.xml").read_text()
+        assert "robots.txt" not in content
