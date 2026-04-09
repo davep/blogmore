@@ -953,6 +953,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-with-calendar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --with-calendar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-with-read-time" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1794,6 +1805,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-with-calendar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --with-calendar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-with-read-time" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2351,6 +2373,11 @@ blogmore<span class="w"> </span>gen<span class="w"> </span>&lt;content_dir&gt;<s
 <p>Generate a blog statistics page. When set, BlogMore generates a <code>/stats.html</code> page (path configurable via the <code>stats_path</code> configuration option) containing posting-pattern histograms, word count and reading-time summaries, blog lifespan, tag and category counts, unique external link count, and a table of the top 20 most-linked external domains. A <strong>Stats</strong> link is added to the navigation bar automatically.</p>
 <p>Stats generation is <strong>disabled by default</strong>. Pass this flag to opt in.</p>
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--with-stats
+</code></pre></div>
+<h4 id="-with-calendar"><code>--with-calendar</code></h4>
+<p>Generate a calendar view of all posts. When set, BlogMore generates a <code>calendar.html</code> page (path configurable via the <code>calendar_path</code> configuration option) displaying the full history of the blog as a reverse-chronological year calendar. Days with posts link to the daily archive, months link to the monthly archive, and years link to the yearly archive. A <strong>Calendar</strong> link is added to the navigation bar automatically.</p>
+<p>Calendar generation is <strong>disabled by default</strong>. Pass this flag to opt in.</p>
+<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--with-calendar
 </code></pre></div>
 <h4 id="-with-read-time"><code>--with-read-time</code></h4>
 <p>Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on 200 words per minute) and displays it next to the post date on all post listings and individual post pages.</p>
