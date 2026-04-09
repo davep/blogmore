@@ -16,7 +16,7 @@
 
 ## v2.10.0
 
-**Released: 2026-07-07**
+**Released: 2026-04-07**
 
 - Added a posting-streak chart to the stats page.
   ([#366](https://github.com/davep/blogmore/pull/366))
