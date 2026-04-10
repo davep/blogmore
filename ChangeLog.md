@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.12.0
 
-**Released: WiP**
+**Released: 2026-04-10**
 
 - The "Reading Time" section is now hidden on the stats page when
   `with_read_time` is set to `false`.
