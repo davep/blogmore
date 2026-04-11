@@ -228,6 +228,68 @@ class TestCollectSitemapUrls:
         assert "https://example.com/index.html" in urls
         assert "https://example.com/archive.html" in urls
 
+    def test_extra_urls_are_appended(self, tmp_path: Path) -> None:
+        """Test that extra_urls are appended to the collected URLs."""
+        (tmp_path / "index.html").write_text("<html/>")
+
+        urls = collect_sitemap_urls(
+            tmp_path,
+            "https://example.com",
+            extra_urls=["/some/path/", "/some/file.html"],
+        )
+
+        assert "https://example.com/index.html" in urls
+        assert "https://example.com/some/path/" in urls
+        assert "https://example.com/some/file.html" in urls
+
+    def test_extra_urls_none_has_no_effect(self, tmp_path: Path) -> None:
+        """Test that extra_urls=None does not add any extra URLs."""
+        (tmp_path / "index.html").write_text("<html/>")
+
+        urls_without = collect_sitemap_urls(tmp_path, "https://example.com")
+        urls_with_none = collect_sitemap_urls(
+            tmp_path, "https://example.com", extra_urls=None
+        )
+
+        assert urls_without == urls_with_none
+
+    def test_extra_urls_empty_list_has_no_effect(self, tmp_path: Path) -> None:
+        """Test that extra_urls=[] does not add any extra URLs."""
+        (tmp_path / "index.html").write_text("<html/>")
+
+        urls_without = collect_sitemap_urls(tmp_path, "https://example.com")
+        urls_with_empty = collect_sitemap_urls(
+            tmp_path, "https://example.com", extra_urls=[]
+        )
+
+        assert urls_without == urls_with_empty
+
+    def test_extra_urls_without_leading_slash_are_normalised(
+        self, tmp_path: Path
+    ) -> None:
+        """Test that extra_urls without a leading slash are normalised correctly."""
+        (tmp_path / "index.html").write_text("<html/>")
+
+        urls = collect_sitemap_urls(
+            tmp_path,
+            "https://example.com",
+            extra_urls=["some/path/"],
+        )
+
+        assert "https://example.com/some/path/" in urls
+
+    def test_extra_urls_included_in_sorted_output(self, tmp_path: Path) -> None:
+        """Test that the final URL list (including extras) is sorted."""
+        (tmp_path / "zzz.html").write_text("<html/>")
+
+        urls = collect_sitemap_urls(
+            tmp_path,
+            "https://example.com",
+            extra_urls=["/aaa/path/"],
+        )
+
+        assert urls == sorted(urls)
+
 
 class TestGenerateSitemapXml:
     """Test the generate_sitemap_xml function."""
@@ -340,6 +402,29 @@ class TestWriteSitemap:
         content = (tmp_path / SITEMAP_FILENAME).read_text()
         assert "https://example.com/posts/my-post/" in content
         assert "https://example.com/posts/my-post/index.html" not in content
+
+    def test_write_sitemap_extra_urls_are_included(self, tmp_path: Path) -> None:
+        """Test that extra_urls are included in the written sitemap."""
+        (tmp_path / "index.html").write_text("<html/>")
+
+        write_sitemap(
+            tmp_path,
+            "https://example.com",
+            extra_urls=["/some/path/", "/some/file.html"],
+        )
+
+        content = (tmp_path / SITEMAP_FILENAME).read_text()
+        assert "https://example.com/some/path/" in content
+        assert "https://example.com/some/file.html" in content
+
+    def test_write_sitemap_without_extra_urls(self, tmp_path: Path) -> None:
+        """Test that omitting extra_urls does not add any extra URLs to the sitemap."""
+        (tmp_path / "index.html").write_text("<html/>")
+
+        write_sitemap(tmp_path, "https://example.com", extra_urls=None)
+
+        content = (tmp_path / SITEMAP_FILENAME).read_text()
+        assert content.count("<url>") == 1
 
 
 class TestSitemapIntegrationWithGenerator:
@@ -572,3 +657,45 @@ class TestSitemapIntegrationWithGenerator:
         assert (temp_output_dir / "robots.txt").exists()
         content = (temp_output_dir / "sitemap.xml").read_text()
         assert "robots.txt" not in content
+
+    def test_sitemap_includes_sitemap_extras(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that sitemap_extras URLs are included in the sitemap."""
+        from blogmore.generator import SiteGenerator
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+                sitemap_extras=["/some/path/", "/some/file.html"],
+            )
+        )
+        generator.generate()
+
+        content = (temp_output_dir / "sitemap.xml").read_text()
+        assert "https://example.com/some/path/" in content
+        assert "https://example.com/some/file.html" in content
+
+    def test_sitemap_extras_none_does_not_add_extra_urls(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that sitemap_extras=None does not add unexpected URLs."""
+        from blogmore.generator import SiteGenerator
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_sitemap=True,
+                sitemap_extras=None,
+            )
+        )
+        generator.generate()
+
+        content = (temp_output_dir / "sitemap.xml").read_text()
+        assert "/some/path/" not in content
+        assert "/some/file.html" not in content

@@ -307,6 +307,19 @@ with_sitemap: true
 
 A `site_url` should be set when using this option so that sitemap entries contain absolute URLs (e.g. `https://example.com/2024/01/15/my-post.html`). If `site_url` is not provided, URLs will fall back to `https://example.com`.
 
+#### `sitemap_extras`
+
+A list of additional root-relative paths to include in the sitemap alongside the auto-discovered generated HTML pages. Each entry should be a root-relative path starting with `/`. The paths are resolved against [`site_url`](#site_url). Requires [`with_sitemap`](#with_sitemap) to be `true` to have any effect.
+
+**Type:** List of strings  
+**Default:** *(empty)*
+
+```yaml
+sitemap_extras:
+  - /some/path/
+  - /some/file.html
+```
+
 #### `with_stats`
 
 Generate a blog statistics page. When `true`, BlogMore generates a `/stats.html` page (path configurable via [`stats_path`](#stats_path)) containing posting-pattern histograms, word count and reading-time summaries, blog lifespan, tag and category counts, unique external link count, and a table of the top 20 most-linked external domains. A **Stats** link is automatically added to the navigation bar between **Search** and **RSS**.

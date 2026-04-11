@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added `sitemap_extras` configuration option. A list of root-relative paths
+  to add to `sitemap.xml` if it is being generated.
+  ([#388](https://github.com/davep/blogmore/pull/388))
+
 ## v2.12.0
 
 **Released: 2026-04-10**
