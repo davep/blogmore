@@ -59,6 +59,14 @@ posts_per_feed: 20
 # Requires site_url to be set for absolute URLs in the sitemap.
 # with_sitemap: false
 
+# Optional: Additional root-relative paths to include in the sitemap (default: none)
+# These are appended to the auto-discovered generated HTML pages when building
+# the sitemap. Each path should be root-relative (starting with "/"). The paths
+# are resolved against site_url. Requires with_sitemap: true to have any effect.
+# sitemap_extras:
+#   - /some/path/
+#   - /some/file.html
+
 # Optional: Generate a blog statistics page (default: false)
 # Generates a /stats.html page with posting patterns, word counts,
 # reading times, link counts and more. A Stats link is added to the

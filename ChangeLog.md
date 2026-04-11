@@ -1,5 +1,15 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added `sitemap_extras` configuration option. A list of root-relative paths
+  (e.g. `/some/path/`) that are resolved against `site_url` and appended to
+  the auto-discovered generated HTML pages in `sitemap.xml`. Requires
+  `with_sitemap: true` to have any effect.
+  ([#386](https://github.com/davep/blogmore/pull/386))
+
 ## v2.12.0
 
 **Released: 2026-04-10**

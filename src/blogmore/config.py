@@ -52,6 +52,7 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
     {
         "site_keywords",
         "extra_stylesheets",
+        "sitemap_extras",
         "post_path",
         "page_path",
         "page_1_path",
@@ -407,6 +408,25 @@ def parse_site_config_from_dict(
     else:
         # Absent from config with no CLI override: reset to None (SiteConfig default).
         kwargs["extra_stylesheets"] = None
+
+    # --- sitemap_extras ------------------------------------------------------
+    if "sitemap_extras" in config:
+        raw_sitemap_extras = config["sitemap_extras"]
+        if isinstance(raw_sitemap_extras, str):
+            kwargs["sitemap_extras"] = [raw_sitemap_extras]
+        elif isinstance(raw_sitemap_extras, list) and all(
+            isinstance(item, str) for item in raw_sitemap_extras
+        ):
+            kwargs["sitemap_extras"] = (
+                raw_sitemap_extras if raw_sitemap_extras else None
+            )
+        else:
+            errors.append(
+                "sitemap_extras in the configuration file must be a string "
+                "or a list of strings; ignoring value"
+            )
+    else:
+        kwargs["sitemap_extras"] = None
 
     # --- Path template fields ------------------------------------------------
     _path_template_validators: list[tuple[str, str, Callable[[str], None]]] = [

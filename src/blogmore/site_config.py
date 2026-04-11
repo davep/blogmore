@@ -100,6 +100,17 @@ class SiteConfig:
     with_sitemap: bool = False
     """Whether to generate an XML sitemap."""
 
+    sitemap_extras: list[str] | None = None
+    """Optional list of additional root-relative paths to include in the sitemap.
+
+    Each entry should be a root-relative path (e.g. ``"/some/path/"`` or
+    ``"/some/file.html"``).  These paths are resolved against ``site_url``
+    and appended to the sitemap entries collected from generated HTML files.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Empty by default.
+    """
+
     with_stats: bool = False
     """Whether to generate a blog statistics page."""
 

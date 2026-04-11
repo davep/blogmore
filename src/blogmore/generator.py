@@ -1802,6 +1802,7 @@ class SiteGenerator:
             clean_urls=self.site_config.clean_urls,
             search_path=self.site_config.search_path,
             extra_excluded_paths=self._extras_html_paths,
+            extra_urls=self.site_config.sitemap_extras,
         )
 
     def _copy_static_assets(self) -> None:
