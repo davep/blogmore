@@ -7,12 +7,11 @@
 - Added `sitemap_extras` configuration option. A list of root-relative paths
   to add to `sitemap.xml` if it is being generated.
   ([#388](https://github.com/davep/blogmore/pull/388))
+- Fixed the calendar page not respecting the `clean_urls` setting when
+  linking to the year, month, and day archives.
+  ([#390](https://github.com/davep/blogmore/pull/390))
 - Fixed canonical `<link>` tags not respecting the `clean_urls` setting.
-  Category, tag, date archive, and paginated pages now produce clean
-  canonical URLs (e.g. `/category/coding/` instead of
-  `/category/coding/index.html`) when `clean_urls` is `true`.
   ([#392](https://github.com/davep/blogmore/pull/392))
-
 
 ## v2.12.0
 
