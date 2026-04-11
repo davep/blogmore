@@ -417,8 +417,8 @@ class TestWriteSitemap:
         assert "https://example.com/some/path/" in content
         assert "https://example.com/some/file.html" in content
 
-    def test_write_sitemap_extra_urls_none_has_no_effect(self, tmp_path: Path) -> None:
-        """Test that extra_urls=None does not add any extra URLs to the sitemap."""
+    def test_write_sitemap_without_extra_urls(self, tmp_path: Path) -> None:
+        """Test that omitting extra_urls does not add any extra URLs to the sitemap."""
         (tmp_path / "index.html").write_text("<html/>")
 
         write_sitemap(tmp_path, "https://example.com", extra_urls=None)
