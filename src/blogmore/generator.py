@@ -540,6 +540,11 @@ class SiteGenerator:
     def _canonical_url_for_path(self, output_path: Path) -> str:
         """Compute the fully-qualified canonical URL for a given output file path.
 
+        When ``clean_urls`` is enabled, index filenames (e.g. ``index.html``)
+        are stripped from the URL so the canonical URL ends with a trailing
+        slash instead, matching the URLs advertised in the sitemap and
+        elsewhere.
+
         Args:
             output_path: Absolute path to the output file within the output directory.
 
@@ -547,7 +552,10 @@ class SiteGenerator:
             The fully-qualified canonical URL for the given file.
         """
         relative = output_path.relative_to(self.site_config.output_dir)
-        return f"{self.site_config.site_url}/{relative.as_posix()}"
+        url = f"/{relative.as_posix()}"
+        if self.site_config.clean_urls:
+            url = make_url_clean(url)
+        return f"{self.site_config.site_url}{url}"
 
     def generate(self) -> None:
         """Generate the complete static site."""
@@ -1127,16 +1135,7 @@ class SiteGenerator:
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # When clean URLs are enabled, page.url already has index.html stripped;
-        # use it directly so the canonical URL matches what we advertise everywhere.
-        if self.site_config.clean_urls:
-            context["canonical_url"] = (
-                f"{self.site_config.site_url}{page.url}"
-                if self.site_config.site_url
-                else page.url
-            )
-        else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)
+        context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_page(page, **context)
 

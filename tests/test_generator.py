@@ -3039,8 +3039,153 @@ class TestCanonicalLinkTags:
             in content
         )
 
+    def test_category_page_canonical_link_uses_clean_url(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a category page canonical link respects clean_urls."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
 
-class TestCustom404Page:
+        (content_dir / "2024-01-15-post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-15\ncategory: Coding\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        category_file = temp_output_dir / "category" / "coding" / "index.html"
+        assert category_file.exists()
+        content = category_file.read_text()
+
+        assert (
+            '<link rel="canonical" href="https://example.com/category/coding/">'
+            in content
+        )
+
+    def test_tag_page_canonical_link_uses_clean_url(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a tag page canonical link respects clean_urls."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-15\ntags: [python]\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        tag_file = temp_output_dir / "tag" / "python" / "index.html"
+        assert tag_file.exists()
+        content = tag_file.read_text()
+
+        assert (
+            '<link rel="canonical" href="https://example.com/tag/python/">' in content
+        )
+
+    def test_index_page_canonical_link_uses_clean_url(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the main index page canonical link respects clean_urls."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        index_file = temp_output_dir / "index.html"
+        assert index_file.exists()
+        content = index_file.read_text()
+
+        assert '<link rel="canonical" href="https://example.com/">' in content
+
+    def test_date_archive_canonical_link_uses_clean_url(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a date-based archive canonical link respects clean_urls."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "2024-01-15-post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-15\n---\n\nContent."
+        )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        year_archive_file = temp_output_dir / "2024" / "index.html"
+        assert year_archive_file.exists()
+        content = year_archive_file.read_text()
+
+        assert '<link rel="canonical" href="https://example.com/2024/">' in content
+
+    def test_paginated_category_page_canonical_link_uses_clean_url(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that paginated category pages have clean canonical links."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        for day in range(1, 12):
+            (content_dir / f"2024-01-{day:02d}-post{day}.md").write_text(
+                f"---\ntitle: Post {day}\ndate: 2024-01-{day:02d}\ncategory: Coding\n---\n\nContent."
+            )
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                clean_urls=True,
+                page_n_path="page/{page}/index.html",
+            )
+        )
+        generator.generate()
+
+        category_page2 = (
+            temp_output_dir / "category" / "coding" / "page" / "2" / "index.html"
+        )
+        assert category_page2.exists()
+        content = category_page2.read_text()
+
+        assert (
+            '<link rel="canonical" href="https://example.com/category/coding/page/2/">'
+            in content
+        )
+
     """Test custom 404 page generation."""
 
     def test_generate_creates_404_html_when_404_md_exists(
@@ -5728,9 +5873,7 @@ class TestStatsPageGeneration:
         stats_content = (temp_output_dir / "stats.html").read_text()
         assert "Content Overview" in stats_content
 
-    def test_custom_stats_path(
-        self, posts_dir: Path, temp_output_dir: Path
-    ) -> None:
+    def test_custom_stats_path(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """A custom stats_path generates the stats page at the specified location."""
         generator = SiteGenerator(
             site_config=SiteConfig(
@@ -5805,7 +5948,10 @@ class TestStatsPageGeneration:
         generator.generate()
 
         stats_content = (temp_output_dir / "stats.html").read_text()
-        assert '<link rel="canonical" href="https://example.com/stats.html">' in stats_content
+        assert (
+            '<link rel="canonical" href="https://example.com/stats.html">'
+            in stats_content
+        )
 
     def test_stats_canonical_url_clean_url_with_site_url(
         self, posts_dir: Path, temp_output_dir: Path
@@ -5824,7 +5970,9 @@ class TestStatsPageGeneration:
         generator.generate()
 
         stats_content = (temp_output_dir / "stats" / "index.html").read_text()
-        assert '<link rel="canonical" href="https://example.com/stats/">' in stats_content
+        assert (
+            '<link rel="canonical" href="https://example.com/stats/">' in stats_content
+        )
 
     def test_stats_page_does_not_have_noindex(
         self, posts_dir: Path, temp_output_dir: Path
@@ -5958,9 +6106,7 @@ class TestCalendarPageGeneration:
         calendar_content = (temp_output_dir / "calendar.html").read_text()
         assert "calendar-year-label" in calendar_content
 
-    def test_custom_calendar_path(
-        self, posts_dir: Path, temp_output_dir: Path
-    ) -> None:
+    def test_custom_calendar_path(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """A custom calendar_path generates the calendar page at the specified location."""
         generator = SiteGenerator(
             site_config=SiteConfig(
