@@ -1015,6 +1015,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#sitemap_extras" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sitemap_extras
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#with_stats" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2352,6 +2363,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#sitemap_extras" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sitemap_extras
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#with_stats" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3470,6 +3492,14 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <div class="highlight"><pre><span></span><code><span class="nt">with_sitemap</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 <p>A <code>site_url</code> should be set when using this option so that sitemap entries contain absolute URLs (e.g. <code>https://example.com/2024/01/15/my-post.html</code>). If <code>site_url</code> is not provided, URLs will fall back to <code>https://example.com</code>.</p>
+<h4 id="sitemap_extras"><code>sitemap_extras</code></h4>
+<p>A list of additional root-relative paths to include in the sitemap alongside the auto-discovered generated HTML pages. Each entry should be a root-relative path starting with <code>/</code>. The paths are resolved against <a href="#site_url"><code>site_url</code></a>. Requires <a href="#with_sitemap"><code>with_sitemap</code></a> to be <code>true</code> to have any effect.</p>
+<p><strong>Type:</strong> List of strings<br />
+<strong>Default:</strong> <em>(empty)</em></p>
+<div class="highlight"><pre><span></span><code><span class="nt">sitemap_extras</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/some/path/</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/some/file.html</span>
+</code></pre></div>
 <h4 id="with_stats"><code>with_stats</code></h4>
 <p>Generate a blog statistics page. When <code>true</code>, BlogMore generates a <code>/stats.html</code> page (path configurable via <a href="#stats_path"><code>stats_path</code></a>) containing posting-pattern histograms, word count and reading-time summaries, blog lifespan, tag and category counts, unique external link count, and a table of the top 20 most-linked external domains. A <strong>Stats</strong> link is automatically added to the navigation bar between <strong>Search</strong> and <strong>RSS</strong>.</p>
 <p><strong>Type:</strong> Boolean<br />
