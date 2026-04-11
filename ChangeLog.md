@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.13.0
 
-**Released: WiP**
+**Released: 2026-04-11**
 
 - Added `sitemap_extras` configuration option. A list of root-relative paths
   to add to `sitemap.xml` if it is being generated.
