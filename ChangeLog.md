@@ -10,6 +10,8 @@
 - Fixed the calendar page not respecting the `clean_urls` setting when
   linking to the year, month, and day archives.
   ([#390](https://github.com/davep/blogmore/pull/390))
+- Fixed canonical `<link>` tags not respecting the `clean_urls` setting.
+  ([#392](https://github.com/davep/blogmore/pull/392))
 
 ## v2.12.0
 
