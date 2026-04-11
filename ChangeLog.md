@@ -4,6 +4,11 @@
 
 **Released: WiP**
 
+- Fixed: calendar page year, month, and day archive links now respect the
+  `clean_urls` setting. When `clean_urls` is enabled, links use trailing
+  slashes (e.g. `/2024/`) instead of including `index.html` (e.g.
+  `/2024/index.html`).
+  ([#390](https://github.com/davep/blogmore/pull/390))
 - Added `sitemap_extras` configuration option. A list of root-relative paths
   to add to `sitemap.xml` if it is being generated.
   ([#388](https://github.com/davep/blogmore/pull/388))
