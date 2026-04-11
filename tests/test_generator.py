@@ -6068,3 +6068,81 @@ class TestCalendarPageGeneration:
         first_m_pos = calendar_content.find(">M<")
         first_s_pos = calendar_content.find(">S<")
         assert first_m_pos < first_s_pos
+
+    def test_calendar_clean_urls_strips_index_html_from_year_links(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls=True, year archive links in the calendar omit index.html."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_calendar=True,
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        calendar_content = (temp_output_dir / "calendar.html").read_text()
+        # Clean URLs: year links should end with a trailing slash, not /index.html.
+        assert 'href="/2024/index.html"' not in calendar_content
+        assert 'href="/2024/"' in calendar_content
+
+    def test_calendar_clean_urls_strips_index_html_from_month_links(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls=True, month archive links in the calendar omit index.html."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_calendar=True,
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        calendar_content = (temp_output_dir / "calendar.html").read_text()
+        # Clean URLs: month links should end with a trailing slash, not /index.html.
+        assert 'href="/2024/01/index.html"' not in calendar_content
+        assert 'href="/2024/01/"' in calendar_content
+
+    def test_calendar_clean_urls_strips_index_html_from_day_links(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls=True, day archive links in the calendar omit index.html."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_calendar=True,
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        calendar_content = (temp_output_dir / "calendar.html").read_text()
+        # Clean URLs: day links should end with a trailing slash, not /index.html.
+        # The fixtures include a post on 2024-01-10 and 2024-01-15.
+        assert 'href="/2024/01/10/index.html"' not in calendar_content
+        assert 'href="/2024/01/10/"' in calendar_content
+
+    def test_calendar_without_clean_urls_keeps_index_html_in_archive_links(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """When clean_urls=False, calendar archive links retain the index.html suffix."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_calendar=True,
+                clean_urls=False,
+            )
+        )
+        generator.generate()
+
+        calendar_content = (temp_output_dir / "calendar.html").read_text()
+        # Without clean URLs: links include the full index.html suffix.
+        assert 'href="/2024/index.html"' in calendar_content
+        assert 'href="/2024/01/index.html"' in calendar_content
+        assert 'href="/2024/01/10/index.html"' in calendar_content

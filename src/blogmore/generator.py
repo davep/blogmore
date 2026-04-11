@@ -1751,8 +1751,13 @@ class SiteGenerator:
             )
         else:
             context["canonical_url"] = self._canonical_url_for_path(output_path)
-        # Determine page1_suffix for archive URL construction.
+        # Determine page1_suffix for archive URL construction.  When
+        # clean_urls is enabled, strip any index filename (e.g. "index.html")
+        # so that calendar links to year/month/day archives end with a
+        # trailing slash instead of "/index.html".
         page1_suffix = self.site_config.page_1_path.lstrip("/")
+        if self.site_config.clean_urls:
+            page1_suffix = make_url_clean(f"/{page1_suffix}").lstrip("/")
         calendar_years: list[CalendarYear] = build_calendar(
             posts, page1_suffix, forward=self.site_config.forward_calendar
         )

@@ -7,6 +7,9 @@
 - Added `sitemap_extras` configuration option. A list of root-relative paths
   to add to `sitemap.xml` if it is being generated.
   ([#388](https://github.com/davep/blogmore/pull/388))
+- Fixed the calendar page not respecting the `clean_urls` setting when
+  linking to the year, month, and day archives.
+  ([#390](https://github.com/davep/blogmore/pull/390))
 
 ## v2.12.0
 
