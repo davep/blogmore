@@ -5,10 +5,8 @@
 **Released: WiP**
 
 - Added `sitemap_extras` configuration option. A list of root-relative paths
-  (e.g. `/some/path/`) that are resolved against `site_url` and appended to
-  the auto-discovered generated HTML pages in `sitemap.xml`. Requires
-  `with_sitemap: true` to have any effect.
-  ([#386](https://github.com/davep/blogmore/pull/386))
+  to add to `sitemap.xml` if it is being generated.
+  ([#388](https://github.com/davep/blogmore/pull/388))
 
 ## v2.12.0
 
