@@ -468,9 +468,13 @@ def compute_blog_stats(posts: list[Post], site_url: str = "") -> BlogStats:
         stats.posts_per_weekday[post.date.weekday()] += 1
         stats.posts_per_month[post.date.month - 1] += 1
         year_counter[post.date.year] += 1
-    stats.posts_per_year = sorted(
-        year_counter.items(), key=lambda pair: pair[0], reverse=True
-    )
+    if year_counter:
+        current_year = dt.date.today().year
+        earliest_year = min(year_counter)
+        stats.posts_per_year = [
+            (year, year_counter[year])
+            for year in range(current_year, earliest_year - 1, -1)
+        ]
 
     # --- Blog time span -------------------------------------------------------
     if dated_posts:
