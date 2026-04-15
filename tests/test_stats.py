@@ -139,6 +139,61 @@ class TestComputeBlogStats:
         assert stats.posts_per_month[2] == 1  # March
         assert stats.posts_per_month[1] == 0  # February
 
+    def test_posts_per_year_counts_correctly(self) -> None:
+        """Posts are counted by calendar year, with zero-count years filled in."""
+        import datetime as dt_mod
+
+        posts = [
+            self._make_post(date=dt.datetime(2022, 6, 1)),
+            self._make_post(date=dt.datetime(2022, 12, 31)),
+            self._make_post(date=dt.datetime(2024, 1, 15)),
+        ]
+        stats = compute_blog_stats(posts)
+        current_year = dt_mod.date.today().year
+        # 2023 must appear with count 0 between 2024 and 2022.
+        assert (2023, 0) in stats.posts_per_year
+        assert (2022, 2) in stats.posts_per_year
+        assert (2024, 1) in stats.posts_per_year
+        # Runs from current year down to 2022.
+        years = [year for year, _ in stats.posts_per_year]
+        assert years[0] == current_year
+        assert years[-1] == 2022
+
+    def test_posts_per_year_includes_gap_years(self) -> None:
+        """Years with no posts between the earliest and current year are included."""
+        import datetime as dt_mod
+
+        posts = [
+            self._make_post(date=dt.datetime(2020, 3, 1)),
+            self._make_post(date=dt.datetime(2023, 7, 1)),
+        ]
+        stats = compute_blog_stats(posts)
+        year_map = dict(stats.posts_per_year)
+        # 2021 and 2022 had no posts but must be present with count 0.
+        assert year_map.get(2021) == 0
+        assert year_map.get(2022) == 0
+        # Starts at the current year, ends at 2020.
+        current_year = dt_mod.date.today().year
+        years = [year for year, _ in stats.posts_per_year]
+        assert years[0] == current_year
+        assert years[-1] == 2020
+
+    def test_posts_per_year_sorted_newest_first(self) -> None:
+        """posts_per_year is ordered with the most recent year first."""
+        posts = [
+            self._make_post(date=dt.datetime(2020, 3, 1)),
+            self._make_post(date=dt.datetime(2023, 7, 1)),
+            self._make_post(date=dt.datetime(2021, 11, 1)),
+        ]
+        stats = compute_blog_stats(posts)
+        years = [year for year, _ in stats.posts_per_year]
+        assert years == sorted(years, reverse=True)
+
+    def test_posts_per_year_empty_without_dated_posts(self) -> None:
+        """posts_per_year is empty when no posts have a date."""
+        stats = compute_blog_stats([self._make_post(date=None)])
+        assert stats.posts_per_year == []
+
     def test_posts_without_dates_excluded_from_histograms(self) -> None:
         """Posts with no date are not included in date-based histograms."""
         posts = [
