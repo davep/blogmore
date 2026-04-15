@@ -59,6 +59,36 @@
     {{ histogram("Posts by Month of Year", ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], stats.posts_per_month) }}
 
     {# ------------------------------------------------------------------ #}
+    {# Helper macro: render a horizontal bar chart (posts per year)       #}
+    {# ------------------------------------------------------------------ #}
+    {% macro hbarchart(title, rows) %}
+    {% if rows %}
+    {% set max_count = rows | map(attribute=1) | max %}
+    {% set axis_max = ((max_count + 9) // 10 * 10) if max_count > 0 else 10 %}
+    <section class="stats-section stats-hbarchart">
+        <h2>{{ title }}</h2>
+        <figure class="stats-hchart" aria-label="{{ title }}">
+            <div class="stats-hbars">
+                {% for year, count in rows %}
+                {% set pct = (count / axis_max * 100) | round(1) %}
+                <div class="stats-hbar-row" title="{{ year }}: {{ count }} post{{ '' if count == 1 else 's' }}">
+                    <div class="stats-hbar-label">{{ year }}</div>
+                    <div class="stats-hbar-track">
+                        <div class="stats-hbar-fill" style="width: {{ pct }}%"></div>
+                    </div>
+                    <div class="stats-hbar-value">{{ count }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </figure>
+    </section>
+    {% endif %}
+    {% endmacro %}
+
+    {# Posts per year #}
+    {{ hbarchart("Posts per Year", stats.posts_per_year) }}
+
+    {# ------------------------------------------------------------------ #}
     {# Streak chart: responsive month variants (3 / 6 / 9 months)        #}
     {# ------------------------------------------------------------------ #}
     {% if stats.streak_variants %}

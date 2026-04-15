@@ -188,6 +188,64 @@
     word-break: break-all;
 }
 
+/* --- Horizontal bar chart (posts per year) --------------------------------- */
+
+.stats-hchart {
+    margin: 0;
+    padding: 0;
+}
+
+.stats-hbars {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.stats-hbar-row {
+    display: grid;
+    grid-template-columns: 3.5em 1fr 2.5em;
+    align-items: center;
+    gap: 8px;
+    min-height: 1.4em;
+}
+
+.stats-hbar-label {
+    font-size: 0.8em;
+    color: var(--text-secondary);
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.stats-hbar-track {
+    height: 1.2em;
+    background: var(--border-color-light);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.stats-hbar-fill {
+    height: 100%;
+    background: var(--link-color);
+    border-radius: 3px;
+    min-width: 2px;
+    transition: background 0.15s;
+}
+
+.stats-hbar-row:hover .stats-hbar-fill {
+    background: var(--link-hover-color);
+}
+
+.stats-hbar-value {
+    font-size: 0.75em;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+    text-align: left;
+    white-space: nowrap;
+}
+
 /* --- Responsive adjustments ----------------------------------------------- */
 
 @media (max-width: 600px) {

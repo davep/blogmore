@@ -139,6 +139,32 @@ class TestComputeBlogStats:
         assert stats.posts_per_month[2] == 1  # March
         assert stats.posts_per_month[1] == 0  # February
 
+    def test_posts_per_year_counts_correctly(self) -> None:
+        """Posts are counted by calendar year and sorted newest first."""
+        posts = [
+            self._make_post(date=dt.datetime(2022, 6, 1)),
+            self._make_post(date=dt.datetime(2022, 12, 31)),
+            self._make_post(date=dt.datetime(2024, 1, 15)),
+        ]
+        stats = compute_blog_stats(posts)
+        assert stats.posts_per_year == [(2024, 1), (2022, 2)]
+
+    def test_posts_per_year_sorted_newest_first(self) -> None:
+        """posts_per_year is ordered with the most recent year first."""
+        posts = [
+            self._make_post(date=dt.datetime(2020, 3, 1)),
+            self._make_post(date=dt.datetime(2023, 7, 1)),
+            self._make_post(date=dt.datetime(2021, 11, 1)),
+        ]
+        stats = compute_blog_stats(posts)
+        years = [year for year, _ in stats.posts_per_year]
+        assert years == sorted(years, reverse=True)
+
+    def test_posts_per_year_empty_without_dated_posts(self) -> None:
+        """posts_per_year is empty when no posts have a date."""
+        stats = compute_blog_stats([self._make_post(date=None)])
+        assert stats.posts_per_year == []
+
     def test_posts_without_dates_excluded_from_histograms(self) -> None:
         """Posts with no date are not included in date-based histograms."""
         posts = [

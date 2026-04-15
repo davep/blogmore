@@ -161,6 +161,12 @@ class BlogStats:
     posts_per_month: list[int] = field(default_factory=lambda: [0] * 12)
     """Count of posts grouped by month (0 = January, 11 = December)."""
 
+    posts_per_year: list[tuple[int, int]] = field(default_factory=list)
+    """Count of posts grouped by year as ``(year, count)`` pairs.
+
+    Sorted by year descending (most recent year first).
+    """
+
     avg_word_count: float = 0.0
     """Average word count across all posts."""
 
@@ -455,11 +461,16 @@ def compute_blog_stats(posts: list[Post], site_url: str = "") -> BlogStats:
 
     # --- Date-based histograms -----------------------------------------------
     dated_posts = [post for post in posts if post.date is not None]
+    year_counter: Counter[int] = Counter()
     for post in dated_posts:
         assert post.date is not None
         stats.posts_per_hour[post.date.hour] += 1
         stats.posts_per_weekday[post.date.weekday()] += 1
         stats.posts_per_month[post.date.month - 1] += 1
+        year_counter[post.date.year] += 1
+    stats.posts_per_year = sorted(
+        year_counter.items(), key=lambda pair: pair[0], reverse=True
+    )
 
     # --- Blog time span -------------------------------------------------------
     if dated_posts:
