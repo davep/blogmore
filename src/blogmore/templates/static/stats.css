@@ -230,7 +230,6 @@
     height: 100%;
     background: var(--link-color);
     border-radius: 3px;
-    min-width: 2px;
     transition: background 0.15s;
 }
 
