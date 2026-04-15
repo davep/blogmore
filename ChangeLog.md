@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.14.0
 
-**Released: WiP**
+**Released: 2026-04-15**
 
 - Added a "Posts per Year" horizontal bar chart to the stats page.
   ([#398](https://github.com/davep/blogmore/pull/398))
