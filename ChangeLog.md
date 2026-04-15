@@ -4,12 +4,8 @@
 
 **Released: WiP**
 
-- Added a "Posts per Year" horizontal bar chart to the stats page, placed
-  immediately after the "Posts by Month of Year" histogram. The chart shows
-  one bar per calendar year with the most recent year at the top, a
-  count label on the right, and a horizontal axis whose maximum is rounded
-  up to the nearest 10.
-  ([#394](https://github.com/davep/blogmore/pull/394))
+- Added a "Posts per Year" horizontal bar chart to the stats page.
+  ([#398](https://github.com/davep/blogmore/pull/398))
 
 ## v2.13.0
 
