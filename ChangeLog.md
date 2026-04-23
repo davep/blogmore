@@ -6,7 +6,7 @@
 
 - Added a subtle row gap between wrapped tag rows in post summaries and full
   post views, so that stacked rows of tags no longer touch.
-  ([#400](https://github.com/davep/blogmore/pull/400))
+  ([#401](https://github.com/davep/blogmore/pull/401))
 
 ## v2.14.0
 
