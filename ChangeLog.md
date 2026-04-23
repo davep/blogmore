@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added a subtle row gap between wrapped tag rows in post summaries and full
+  post views, so that stacked rows of tags no longer touch.
+  ([#400](https://github.com/davep/blogmore/pull/400))
+
 ## v2.14.0
 
 **Released: 2026-04-15**

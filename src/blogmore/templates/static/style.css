@@ -656,14 +656,15 @@ time a:visited {
 }
 
 .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 8px;
     margin-top: 10px;
 }
 
 .tag {
-    display: inline-block;
     background: var(--tag-bg);
     padding: 4px 12px;
-    margin-right: 8px;
     border-radius: 4px;
     font-size: 0.85em;
     text-decoration: none;
