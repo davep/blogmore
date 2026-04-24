@@ -204,11 +204,11 @@ class TestToPath:
 
     def test_fragment_only_returns_none(self) -> None:
         """A fragment-only link (#section) returns None."""
-        assert _to_path("#section", "") == None  # noqa: E711
+        assert _to_path("#section", "") is None
 
     def test_empty_url_returns_none(self) -> None:
         """An empty URL returns None."""
-        assert _to_path("", "") == None  # noqa: E711
+        assert _to_path("", "") is None
 
     def test_external_url_no_site_url(self) -> None:
         """An external URL with no site_url configured returns None."""
@@ -421,8 +421,8 @@ class TestBuildBacklinkMap:
             _make_post("c", "Content.", "/2024/01/c.html"),
         ]
         result = build_backlink_map(posts)
-        for post in posts:
-            assert post.url in result
+        for each_post in posts:
+            assert each_post.url in result
 
 
 ### test_backlinks.py ends here
