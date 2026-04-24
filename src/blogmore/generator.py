@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from blogmore.backlinks import Backlink
 
 from blogmore import __version__
+from blogmore.backlinks import build_backlink_map
 from blogmore.calendar import CalendarYear, build_calendar
 from blogmore.clean_url import make_url_clean
 from blogmore.code_styles import build_code_css
@@ -659,8 +660,6 @@ class SiteGenerator:
         # post.url_path is set to its final value before link matching.
         backlinks_map: dict[str, list[Backlink]] = {}
         if self.site_config.with_backlinks:
-            from blogmore.backlinks import build_backlink_map
-
             print("Building backlink map...")
             backlinks_map = build_backlink_map(
                 posts,
