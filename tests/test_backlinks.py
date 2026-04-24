@@ -57,7 +57,7 @@ def _make_post(
 
 
 ##############################################################################
-# _extract_snippet Markdown-stripping tests.
+# _extract_snippet block-level Markdown stripping tests.
 # (These verify that block-level Markdown syntax is cleaned from snippets.
 # Unit tests for the shared markdown_to_plain_text utility live in
 # tests/test_plain_text.py.)

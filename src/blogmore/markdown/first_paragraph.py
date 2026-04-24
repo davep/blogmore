@@ -14,7 +14,7 @@ import markdown
 
 from blogmore.markdown.plain_text import create_custom_extensions
 
-__all__ = ["create_custom_extensions", "extract_first_paragraph"]
+__all__ = ["extract_first_paragraph"]
 
 
 def _make_extraction_markdown() -> markdown.Markdown:
