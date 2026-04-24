@@ -96,6 +96,14 @@ posts_per_feed: 20
 # Must be a positive integer. Configuration file only.
 # read_time_wpm: 200
 
+# Optional: Show "References & mentions" section on individual post pages (default: false)
+# When enabled, BlogMore scans all post content for internal links and shows a
+# "References & mentions" section on each linked-to post page, listing which
+# posts link to it along with a short plain-text context snippet.
+# Only links in posts are considered; links in static pages are excluded.
+# Configuration file only.
+# with_backlinks: false
+
 # Optional: Show "Generated with BlogMore" footer line (default: true)
 # Set to false to hide the footer attribution line.
 # with_advert: true

@@ -28,6 +28,7 @@ below lists all variables that are available in every template.
 | `tags_url` | `str` | URL to the tags overview page (respects `tags_path` and `clean_urls`). |
 | `categories_url` | `str` | URL to the categories overview page (respects `categories_path` and `clean_urls`). |
 | `with_read_time` | `bool` | `True` when reading time display is enabled. |
+| `with_backlinks` | `bool` | `True` when the backlinks feature is enabled. |
 | `with_advert` | `bool` | `True` when the "Generated with BlogMore" footer is shown. |
 | `default_author` | `str \| None` | Default author name from configuration. |
 | `styles_css_url` | `str` | URL to the compiled stylesheet (with cache-bust query string). |
@@ -103,7 +104,7 @@ or `/tag/python/` when `clean_urls` is enabled.
 | Template | Extra variables |
 |---|---|
 | `index.html` | `all_posts` (full post list), `pages` (static pages list), `prev_page_url`, `next_page_url`, `canonical_url`, `pagination_page_urls` |
-| `post.html` | `all_posts`, `pages`, `prev_post` (`Post \| None`), `next_post` (`Post \| None`), `canonical_url` |
+| `post.html` | `all_posts`, `pages`, `prev_post` (`Post \| None`), `next_post` (`Post \| None`), `canonical_url`, `backlinks` (list of `Backlink`) |
 | `page.html` | `page` (`Page`), `pages`, `canonical_url` |
 | `archive.html` | `all_posts`, `pages`, `canonical_url`, `pagination_page_urls` |
 | `tag.html` | `tag` (display name), `safe_tag` (URL slug), `all_posts`, `pages`, `prev_page_url`, `next_page_url`, `canonical_url`, `pagination_page_urls` |
@@ -183,6 +184,21 @@ To override the draft title colour, set `--draft-title-color` (and
 | `slug` | `str` (property) | URL slug derived from filename. |
 | `url` | `str` (property) | URL path (e.g. `/about.html`). |
 | `description` | `str` (property) | Page description (from metadata or first paragraph). |
+
+## Backlink object
+
+`Backlink` objects are passed to `post.html` via the `backlinks` context variable
+when `with_backlinks` is enabled.  Each entry represents one post that links
+to the currently-displayed post.
+
+| Attribute | Type | Description |
+|---|---|---|
+| `source_post` | `Post` | The post whose Markdown content contains the link. |
+| `snippet` | `str` | Plain-text excerpt from the source post surrounding the link, with up to 100 characters of context on each side and an ellipsis (`…`) where the excerpt is truncated. |
+
+The `backlinks` list is always present in the `post.html` context (even when
+`with_backlinks` is `false`) but will be empty when the feature is disabled or
+when no other post links to the current post.
 
 ## Calendar objects
 
@@ -275,6 +291,12 @@ widget.  It is called like this:
 | `content` | Main page content (rendered inside `<main>`). |
 | `feed_nav_links` | RSS and Atom links in the header navigation. |
 
+`post.html` provides the following additional block:
+
+| Block | Description |
+|---|---|
+| `backlinks` | The "References &amp; mentions" section shown after the bottom post-navigation on individual post pages when `with_backlinks` is enabled and there are inbound links.  Override this block in a custom `post.html` to change the layout or styling of the section. |
+
 ## CSS classes used by templates
 
 The following CSS classes are part of the stable template/CSS contract:
@@ -302,6 +324,14 @@ The following CSS classes are part of the stable template/CSS contract:
 | `.category-link` | `a` | Category badge link. |
 | `.theme-toggle` | `button` | Dark/light mode toggle button. |
 | `.highlight` | `div` | Syntax-highlighted code block. |
+| `.backlinks` | `section` | "References &amp; mentions" container on a post page (only when `with_backlinks` is enabled and the post has inbound links). |
+| `.backlinks-heading` | `h2` | Heading of the backlinks section. |
+| `.backlinks-list` | `ul` | Ordered list of back-linking posts. |
+| `.backlink-item` | `li` | A single back-link entry (one per referencing post). |
+| `.backlink-meta` | `div` | Contains the source post's title link and date. |
+| `.backlink-title` | `a` | Link to the source post's title. |
+| `.backlink-date` | `time` | Publication date of the source post. |
+| `.backlink-snippet` | `p` | Plain-text context snippet around the link. |
 
 ## Stability policy
 

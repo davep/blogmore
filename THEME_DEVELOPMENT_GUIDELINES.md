@@ -156,7 +156,9 @@ v2.x.  Key ones that appear in nearly every template:
 `.sidebar-pages`, `.sidebar-section`, `.sidebar-links`, `.sidebar-socials`,
 `.main-wrapper`, `.post-header`, `.post-content`, `.post-summary`,
 `.post-navigation`, `.pagination`, `.tag-cloud`, `.tags`, `.category-link`,
-`.theme-toggle`, `.highlight`.
+`.theme-toggle`, `.highlight`,
+`.backlinks`, `.backlinks-heading`, `.backlinks-list`, `.backlink-item`,
+`.backlink-meta`, `.backlink-title`, `.backlink-date`, `.backlink-snippet`.
 
 ## Rules for making changes
 
