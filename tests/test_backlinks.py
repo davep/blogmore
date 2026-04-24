@@ -17,7 +17,6 @@ from blogmore.backlinks import (
     _extract_snippet,
     _find_links,
     _normalize_url_path,
-    _strip_markdown,
     _to_path,
     build_backlink_map,
 )
@@ -58,58 +57,38 @@ def _make_post(
 
 
 ##############################################################################
-# _strip_markdown tests.
+# _extract_snippet Markdown-stripping tests.
+# (These verify that block-level Markdown syntax is cleaned from snippets.
+# Unit tests for the shared markdown_to_plain_text utility live in
+# tests/test_plain_text.py.)
 
 
-class TestStripMarkdown:
-    """Tests for _strip_markdown."""
+class TestExtractSnippetBlockStripping:
+    """Verify that block-level Markdown is cleaned from backlink snippets."""
 
-    def test_plain_text_unchanged(self) -> None:
-        """Plain text without any Markdown is returned as-is (whitespace collapsed)."""
-        assert _strip_markdown("Hello world") == "Hello world"
+    def test_blockquote_syntax_not_in_snippet(self) -> None:
+        """A blockquote `>` marker is stripped from the snippet."""
+        content = "Before [link](/post.html) after.\n\n> This is a blockquote."
+        m = re.search(r"\[link\]\(/post\.html\)", content)
+        assert m is not None
+        snippet = _extract_snippet(content, m.start(), m.end())
+        assert ">" not in snippet
 
-    def test_bold_double_asterisk(self) -> None:
-        """**bold** is stripped to the inner text."""
-        assert _strip_markdown("This is **bold** text") == "This is bold text"
+    def test_fenced_code_backticks_not_in_snippet(self) -> None:
+        """Fenced code block delimiters (```) are stripped from the snippet."""
+        content = "See [link](/post.html).\n\n```python\nprint('hi')\n```\n"
+        m = re.search(r"\[link\]\(/post\.html\)", content)
+        assert m is not None
+        snippet = _extract_snippet(content, m.start(), m.end())
+        assert "```" not in snippet
 
-    def test_italic_single_asterisk(self) -> None:
-        """*italic* is stripped to the inner text."""
-        assert _strip_markdown("This is *italic* text") == "This is italic text"
-
-    def test_strikethrough(self) -> None:
-        """~~strikethrough~~ is stripped to the inner text."""
-        assert _strip_markdown("This is ~~struck~~ text") == "This is struck text"
-
-    def test_inline_code(self) -> None:
-        """`inline code` is stripped to the inner text."""
-        assert _strip_markdown("Use `foo()` here") == "Use foo() here"
-
-    def test_inline_link(self) -> None:
-        """[text](url) links are reduced to their link text."""
-        assert (
-            _strip_markdown("See [this post](/2024/01/post.html) for details")
-            == "See this post for details"
-        )
-
-    def test_reference_link(self) -> None:
-        """[text][ref] links are reduced to their link text."""
-        assert (
-            _strip_markdown("See [this post][ref] for details")
-            == "See this post for details"
-        )
-
-    def test_link_definition_removed(self) -> None:
-        """Reference link definitions are removed from the output."""
-        text = "Hello\n[ref]: /some/url\nworld"
-        assert _strip_markdown(text) == "Hello world"
-
-    def test_heading_marker_removed(self) -> None:
-        """ATX heading markers (## etc.) are stripped."""
-        assert _strip_markdown("## My Heading") == "My Heading"
-
-    def test_whitespace_collapsed(self) -> None:
-        """Multiple spaces and newlines are collapsed to a single space."""
-        assert _strip_markdown("Hello\n\nworld\n  text") == "Hello world text"
+    def test_heading_hash_not_in_snippet(self) -> None:
+        """ATX heading `#` markers are stripped from the snippet context."""
+        content = "## Introduction\n\nSee [link](/post.html) for more."
+        m = re.search(r"\[link\]\(/post\.html\)", content)
+        assert m is not None
+        snippet = _extract_snippet(content, m.start(), m.end())
+        assert "#" not in snippet
 
 
 ##############################################################################

@@ -20,6 +20,8 @@ from markupsafe import Markup
 
 ##############################################################################
 # Local imports.
+from blogmore.markdown.plain_text import markdown_to_plain_text
+
 if TYPE_CHECKING:
     from blogmore.parser import Post
 
@@ -59,40 +61,6 @@ class Backlink:
     snippet: Markup
 
 
-def _strip_markdown(text: str) -> str:
-    """Convert a Markdown excerpt to plain text.
-
-    Removes common inline Markdown formatting, link syntax, and heading
-    markers, then collapses all whitespace to single spaces.
-
-    Args:
-        text: Raw Markdown text to strip.
-
-    Returns:
-        Plain-text representation of the input.
-    """
-    # Remove reference link definitions (they produce no visible text).
-    text = _LINK_DEF_RE.sub("", text)
-    # Convert inline links [text](url) → text
-    text = _INLINE_LINK_RE.sub(r"\1", text)
-    # Convert reference links [text][ref] → text
-    text = _REF_LINK_RE.sub(r"\1", text)
-    # Remove any remaining bare [text] patterns
-    text = re.sub(r"\[([^\]]*)\]", r"\1", text)
-    # Remove bold/strong: ***text***, **text**, *text*, ___text___, __text__, _text_
-    text = re.sub(r"\*{1,3}([^*\n]+)\*{1,3}", r"\1", text)
-    text = re.sub(r"_{1,3}([^_\n]+)_{1,3}", r"\1", text)
-    # Remove strikethrough: ~~text~~
-    text = re.sub(r"~~([^~\n]+)~~", r"\1", text)
-    # Remove inline code: `text`
-    text = re.sub(r"`([^`\n]+)`", r"\1", text)
-    # Remove ATX heading markers: ## Heading → Heading
-    text = re.sub(r"^#{1,6}\s+", "", text, flags=re.MULTILINE)
-    # Collapse whitespace (includes newlines) to single spaces
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
-
-
 def _extract_snippet(
     content: str,
     match_start: int,
@@ -102,11 +70,18 @@ def _extract_snippet(
     """Extract an HTML-safe snippet around a matched link.
 
     Takes up to ``_SNIPPET_CONTEXT_CHARS`` characters before *match_start*
-    and after *match_end* from *content*, strips Markdown formatting, and
-    adds an ellipsis (``…``) where the excerpt is truncated.  When
-    *link_text* is provided the (stripped, HTML-escaped) link text is
-    wrapped in ``<strong class="backlink-link-text">`` so it stands out
-    from the surrounding context.
+    and after *match_end* from *content*, converts the excerpt to plain text
+    via :func:`~blogmore.markdown.plain_text.markdown_to_plain_text` (so
+    block structures such as fenced code blocks and blockquotes are handled
+    correctly), and adds an ellipsis (``…``) where the excerpt is truncated.
+    When *link_text* is provided the (stripped, HTML-escaped) link text is
+    wrapped in ``<strong class="backlink-link-text">`` so it stands out from
+    the surrounding context.
+
+    Reference-style link definitions and ``[text][ref]`` syntax are stripped
+    from the excerpt before Markdown conversion because the excerpt is a
+    partial document slice that may not include the full set of link
+    definitions.
 
     Args:
         content: The full raw Markdown source of the post.
@@ -124,7 +99,13 @@ def _extract_snippet(
     context_start = max(0, match_start - _SNIPPET_CONTEXT_CHARS)
     context_end = min(len(content), match_end + _SNIPPET_CONTEXT_CHARS)
     excerpt = content[context_start:context_end]
-    plain = _strip_markdown(excerpt)
+
+    # Pre-strip reference link syntax before Markdown conversion: the excerpt
+    # is a partial document slice that will not include link definitions.
+    excerpt = _LINK_DEF_RE.sub("", excerpt)
+    excerpt = _REF_LINK_RE.sub(r"\1", excerpt)
+
+    plain = markdown_to_plain_text(excerpt)
     prefix = "…" if context_start > 0 else ""
     suffix = "…" if context_end < len(content) else ""
 
@@ -134,7 +115,7 @@ def _extract_snippet(
 
     # Wrap the (stripped, escaped) link text in <strong> so it stands out.
     if link_text:
-        plain_link_text = _strip_markdown(link_text)
+        plain_link_text = markdown_to_plain_text(link_text)
         if plain_link_text:
             escaped_link_text = Markup.escape(plain_link_text)
             highlighted = Markup(

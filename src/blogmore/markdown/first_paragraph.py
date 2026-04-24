@@ -9,38 +9,12 @@ images.
 
 import re
 from html.parser import HTMLParser
-from typing import Any
 
 import markdown
 
-from blogmore.markdown.admonitions import AdmonitionsExtension
-from blogmore.markdown.external_links import ExternalLinksExtension
-from blogmore.markdown.heading_anchors import HeadingAnchorsExtension
-from blogmore.markdown.strikethrough import StrikethroughExtension
+from blogmore.markdown.plain_text import create_custom_extensions
 
-
-def create_custom_extensions(site_url: str = "") -> list[Any]:
-    """Create instances of all custom BlogMore Markdown extensions.
-
-    This is the single source of truth for BlogMore's custom Markdown extension
-    set.  Both the full-rendering parser and the lightweight extraction instance
-    pull their custom-extension list from here, so any new extension added to
-    this list is automatically included in both contexts.
-
-    Args:
-        site_url: Base URL of the site; forwarded to
-            :class:`~blogmore.markdown.external_links.ExternalLinksExtension`
-            so it can distinguish internal from external links.
-
-    Returns:
-        A list of configured custom Markdown extension instances.
-    """
-    return [
-        AdmonitionsExtension(),
-        ExternalLinksExtension(site_url=site_url),
-        HeadingAnchorsExtension(),
-        StrikethroughExtension(),
-    ]
+__all__ = ["create_custom_extensions", "extract_first_paragraph"]
 
 
 def _make_extraction_markdown() -> markdown.Markdown:
