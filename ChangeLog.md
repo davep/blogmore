@@ -5,12 +5,10 @@
 **Released: WiP**
 
 - Added a `with_backlinks` configuration option that enables a "References &
-  mentions" section on individual post pages.  When turned on, BlogMore scans
-  every post's Markdown content for internal links to other posts and shows a
-  collated list of back-linking posts (with title, date, and a plain-text
-  context snippet) below the bottom post-navigation links.  Off by default;
-  configuration file only.
-  ([#PR](https://github.com/davep/blogmore/pull/0))
+  mentions" section on individual post pages. When turned on, BlogMore scans
+  every post's Markdown content for internal links to other posts and shows
+  a collated list of back-linking posts.
+  ([#404](https://github.com/davep/blogmore/pull/404))
 
 ## v2.15.0
 
