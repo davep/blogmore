@@ -158,7 +158,8 @@ v2.x.  Key ones that appear in nearly every template:
 `.post-navigation`, `.pagination`, `.tag-cloud`, `.tags`, `.category-link`,
 `.theme-toggle`, `.highlight`,
 `.backlinks`, `.backlinks-heading`, `.backlinks-list`, `.backlink-item`,
-`.backlink-meta`, `.backlink-title`, `.backlink-date`, `.backlink-snippet`.
+`.backlink-meta`, `.backlink-title`, `.backlink-date`, `.backlink-snippet`,
+`.backlink-link-text`.
 
 ## Rules for making changes
 

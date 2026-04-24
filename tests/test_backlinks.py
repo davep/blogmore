@@ -3,7 +3,12 @@
 ##############################################################################
 # Python imports.
 import datetime as dt
+import re
 from pathlib import Path
+
+##############################################################################
+# Third-party imports.
+from markupsafe import Markup
 
 ##############################################################################
 # Application imports.
@@ -122,9 +127,10 @@ class TestFindLinks:
         """A single inline link is found with the correct URL."""
         links = _find_links("See [my post](/2024/01/post.html) for details.")
         assert len(links) == 1
-        url, start, end = links[0]
+        url, start, end, link_text = links[0]
         assert url == "/2024/01/post.html"
         assert start < end
+        assert link_text == "my post"
 
     def test_inline_link_with_title(self) -> None:
         """An inline link with a title attribute returns only the URL."""
@@ -136,7 +142,7 @@ class TestFindLinks:
         """Multiple inline links are all detected."""
         content = "See [A](/a.html) and [B](/b.html)."
         links = _find_links(content)
-        urls = [url for url, _, _ in links]
+        urls = [url for url, _, _, _ in links]
         assert "/a.html" in urls
         assert "/b.html" in urls
 
@@ -144,20 +150,20 @@ class TestFindLinks:
         """A reference-style link is resolved to its URL."""
         content = "See [my post][ref].\n\n[ref]: /2024/01/post.html"
         links = _find_links(content)
-        assert any(url == "/2024/01/post.html" for url, _, _ in links)
+        assert any(url == "/2024/01/post.html" for url, _, _, _ in links)
 
     def test_implicit_reference_link(self) -> None:
         """A [text][] implicit reference link is resolved using the text as the ID."""
         content = "See [my post][].\n\n[my post]: /2024/01/post.html"
         links = _find_links(content)
-        assert any(url == "/2024/01/post.html" for url, _, _ in links)
+        assert any(url == "/2024/01/post.html" for url, _, _, _ in links)
 
     def test_match_positions_span_full_syntax(self) -> None:
         """start/end positions span the full [text](url) syntax."""
         content = "pre [text](/url) post"
         links = _find_links(content)
         assert len(links) == 1
-        _, start, end = links[0]
+        _, start, end, _ = links[0]
         assert content[start:end] == "[text](/url)"
 
 
@@ -248,21 +254,18 @@ class TestExtractSnippet:
     def test_short_content_no_ellipsis(self) -> None:
         """A snippet from short content has no ellipsis when not truncated."""
         content = "Hello [world](/foo.html) end."
-        # Find the match ourselves.
-        import re
-
         m = re.search(r"\[world\]\(/foo\.html\)", content)
         assert m is not None
         snippet = _extract_snippet(content, m.start(), m.end())
         # No ellipsis — content is short.
-        assert snippet == "Hello world end."
+        assert "Hello" in snippet
+        assert "world" in snippet
+        assert "end." in snippet
 
     def test_long_prefix_adds_ellipsis(self) -> None:
         """A snippet whose prefix exceeds 100 chars gets a leading ellipsis."""
         prefix = "x" * 200
         content = f"{prefix} [link](/foo.html) end"
-        import re
-
         m = re.search(r"\[link\]\(/foo\.html\)", content)
         assert m is not None
         snippet = _extract_snippet(content, m.start(), m.end())
@@ -272,23 +275,36 @@ class TestExtractSnippet:
         """A snippet whose suffix exceeds 100 chars gets a trailing ellipsis."""
         suffix = "y" * 200
         content = f"start [link](/foo.html) {suffix}"
-        import re
-
         m = re.search(r"\[link\]\(/foo\.html\)", content)
         assert m is not None
         snippet = _extract_snippet(content, m.start(), m.end())
         assert snippet.endswith("…")
 
     def test_link_text_appears_in_snippet(self) -> None:
-        """The link text (not the URL) appears in the plain-text snippet."""
+        """The link text (not the URL) appears in the snippet."""
         content = "See [interesting article](/post.html) for more."
-        import re
-
         m = re.search(r"\[interesting article\]\(/post\.html\)", content)
         assert m is not None
         snippet = _extract_snippet(content, m.start(), m.end())
         assert "interesting article" in snippet
         assert "/post.html" not in snippet
+
+    def test_link_text_highlighted_when_provided(self) -> None:
+        """When link_text is supplied, the stripped form is wrapped in <strong>."""
+        content = "See [the article](/post.html) for more."
+        m = re.search(r"\[the article\]\(/post\.html\)", content)
+        assert m is not None
+        snippet = _extract_snippet(content, m.start(), m.end(), "the article")
+        assert isinstance(snippet, Markup)
+        assert '<strong class="backlink-link-text">the article</strong>' in snippet
+
+    def test_snippet_is_markup_instance(self) -> None:
+        """_extract_snippet always returns a Markup instance."""
+        content = "Hello [world](/foo.html) end."
+        m = re.search(r"\[world\]\(/foo\.html\)", content)
+        assert m is not None
+        snippet = _extract_snippet(content, m.start(), m.end())
+        assert isinstance(snippet, Markup)
 
 
 ##############################################################################

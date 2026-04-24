@@ -15,6 +15,10 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 ##############################################################################
+# Third-party imports.
+from markupsafe import Markup
+
+##############################################################################
 # Local imports.
 if TYPE_CHECKING:
     from blogmore.parser import Post
@@ -43,14 +47,16 @@ class Backlink:
 
     Attributes:
         source_post: The post whose Markdown content contains the link.
-        snippet: Plain-text excerpt from the source post surrounding the
+        snippet: HTML-safe excerpt from the source post surrounding the
             link, with up to ``_SNIPPET_CONTEXT_CHARS`` characters of
             context on each side and an ellipsis (``…``) where the
-            excerpt is truncated.
+            excerpt is truncated.  The link text itself is wrapped in a
+            ``<strong class="backlink-link-text">`` element so it
+            stands out from the surrounding context.
     """
 
     source_post: "Post"
-    snippet: str
+    snippet: Markup
 
 
 def _strip_markdown(text: str) -> str:
@@ -87,20 +93,33 @@ def _strip_markdown(text: str) -> str:
     return text
 
 
-def _extract_snippet(content: str, match_start: int, match_end: int) -> str:
-    """Extract a plain-text snippet around a matched link.
+def _extract_snippet(
+    content: str,
+    match_start: int,
+    match_end: int,
+    link_text: str = "",
+) -> Markup:
+    """Extract an HTML-safe snippet around a matched link.
 
     Takes up to ``_SNIPPET_CONTEXT_CHARS`` characters before *match_start*
     and after *match_end* from *content*, strips Markdown formatting, and
-    adds an ellipsis (``…``) where the excerpt is truncated.
+    adds an ellipsis (``…``) where the excerpt is truncated.  When
+    *link_text* is provided the (stripped, HTML-escaped) link text is
+    wrapped in ``<strong class="backlink-link-text">`` so it stands out
+    from the surrounding context.
 
     Args:
         content: The full raw Markdown source of the post.
         match_start: Start position of the link syntax in *content*.
         match_end: End position of the link syntax in *content*.
+        link_text: The display text of the link as it appears in the
+            Markdown source.  When provided, the stripped form of this
+            text is highlighted in the returned snippet.
 
     Returns:
-        Plain-text snippet with surrounding context and ellipsis markers.
+        An HTML-safe :class:`~markupsafe.Markup` snippet with surrounding
+        context, ellipsis markers where truncated, and the link text
+        wrapped in a ``<strong>`` element.
     """
     context_start = max(0, match_start - _SNIPPET_CONTEXT_CHARS)
     context_end = min(len(content), match_end + _SNIPPET_CONTEXT_CHARS)
@@ -108,7 +127,22 @@ def _extract_snippet(content: str, match_start: int, match_end: int) -> str:
     plain = _strip_markdown(excerpt)
     prefix = "…" if context_start > 0 else ""
     suffix = "…" if context_end < len(content) else ""
-    return f"{prefix}{plain}{suffix}"
+
+    # HTML-escape the whole plain-text snippet first so it is safe to
+    # embed in an HTML template.
+    escaped: Markup = Markup.escape(f"{prefix}{plain}{suffix}")
+
+    # Wrap the (stripped, escaped) link text in <strong> so it stands out.
+    if link_text:
+        plain_link_text = _strip_markdown(link_text)
+        if plain_link_text:
+            escaped_link_text = Markup.escape(plain_link_text)
+            highlighted = Markup(
+                f'<strong class="backlink-link-text">{escaped_link_text}</strong>'
+            )
+            escaped = Markup(escaped.replace(escaped_link_text, highlighted, 1))
+
+    return escaped
 
 
 def _extract_link_url(raw_url: str) -> str:
@@ -128,7 +162,7 @@ def _extract_link_url(raw_url: str) -> str:
     return raw_url.split()[0] if raw_url.strip() else raw_url
 
 
-def _find_links(content: str) -> list[tuple[str, int, int]]:
+def _find_links(content: str) -> list[tuple[str, int, int, str]]:
     """Find all hyperlinks in Markdown source content.
 
     Recognises inline links (``[text](url)``) and reference-style links
@@ -139,11 +173,13 @@ def _find_links(content: str) -> list[tuple[str, int, int]]:
         content: Raw Markdown source to scan.
 
     Returns:
-        A list of ``(url, match_start, match_end)`` tuples, where
+        A list of ``(url, match_start, match_end, link_text)`` tuples.
         *match_start* and *match_end* are the character positions of the
-        full link syntax within *content* (useful for context extraction).
+        full link syntax within *content* (useful for context extraction);
+        *link_text* is the display text of the link as written in the
+        Markdown source.
     """
-    results: list[tuple[str, int, int]] = []
+    results: list[tuple[str, int, int, str]] = []
 
     # Collect reference link definitions first.
     refs: dict[str, str] = {}
@@ -154,14 +190,14 @@ def _find_links(content: str) -> list[tuple[str, int, int]]:
     for match in _INLINE_LINK_RE.finditer(content):
         url = _extract_link_url(match.group(2))
         if url:
-            results.append((url, match.start(), match.end()))
+            results.append((url, match.start(), match.end(), match.group(1)))
 
     # Reference-style links: [text][ref] or [text][]
     for match in _REF_LINK_RE.finditer(content):
         ref_id = match.group(2).lower() or match.group(1).lower()
         url = refs.get(ref_id, "")
         if url:
-            results.append((url, match.start(), match.end()))
+            results.append((url, match.start(), match.end(), match.group(1)))
 
     return results
 
@@ -268,7 +304,9 @@ def build_backlink_map(
     backlinks: dict[str, list[Backlink]] = {post.url: [] for post in posts}
 
     for source_post in posts:
-        for raw_url, match_start, match_end in _find_links(source_post.content):
+        for raw_url, match_start, match_end, link_text in _find_links(
+            source_post.content
+        ):
             path = _to_path(raw_url, site_url)
             if path is None:
                 continue
@@ -276,7 +314,9 @@ def build_backlink_map(
             target_post = normalized_to_post.get(normalized)
             if target_post is None or target_post is source_post:
                 continue
-            snippet = _extract_snippet(source_post.content, match_start, match_end)
+            snippet = _extract_snippet(
+                source_post.content, match_start, match_end, link_text
+            )
             backlinks[target_post.url].append(
                 Backlink(source_post=source_post, snippet=snippet)
             )

@@ -886,6 +886,12 @@ time a:visited {
     line-height: 1.5;
 }
 
+.backlink-link-text {
+    color: var(--text-color);
+    font-style: normal;
+    font-weight: 600;
+}
+
 .post-content {
     font-size: 1.05em;
 }

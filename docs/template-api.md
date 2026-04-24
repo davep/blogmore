@@ -194,7 +194,7 @@ to the currently-displayed post.
 | Attribute | Type | Description |
 |---|---|---|
 | `source_post` | `Post` | The post whose Markdown content contains the link. |
-| `snippet` | `str` | Plain-text excerpt from the source post surrounding the link, with up to 100 characters of context on each side and an ellipsis (`…`) where the excerpt is truncated. |
+| `snippet` | `Markup` | HTML-safe excerpt from the source post surrounding the link, with up to 100 characters of context on each side and an ellipsis (`…`) where the excerpt is truncated.  The link text is wrapped in `<strong class="backlink-link-text">` so it stands out from the surrounding context. |
 
 The `backlinks` list is always present in the `post.html` context (even when
 `with_backlinks` is `false`) but will be empty when the feature is disabled or
@@ -332,6 +332,7 @@ The following CSS classes are part of the stable template/CSS contract:
 | `.backlink-title` | `a` | Link to the source post's title. |
 | `.backlink-date` | `time` | Publication date of the source post. |
 | `.backlink-snippet` | `p` | Plain-text context snippet around the link. |
+| `.backlink-link-text` | `strong` | The link text itself, highlighted within `.backlink-snippet` so it stands out from the surrounding italic context. |
 
 ## Stability policy
 
