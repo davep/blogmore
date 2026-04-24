@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.15.0
 
-**Released: WiP**
+**Released: 2026-04-24**
 
 - Added a subtle row gap between wrapped tag rows in post summaries and full
   post views, so that stacked rows of tags no longer touch.
