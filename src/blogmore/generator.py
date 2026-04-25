@@ -735,7 +735,11 @@ class SiteGenerator:
         # Generate statistics page (only when enabled)
         if self.site_config.with_stats:
             print("Generating blog statistics page...")
-            self._generate_stats_page(posts, sidebar_pages)
+            self._generate_stats_page(
+                posts,
+                sidebar_pages,
+                backlinks_map if self.site_config.with_backlinks else None,
+            )
 
         # Generate calendar page (only when enabled)
         if self.site_config.with_calendar:
@@ -1730,12 +1734,20 @@ class SiteGenerator:
         html = self.renderer.render_search_page(**context)
         self._write_html(output_path, html)
 
-    def _generate_stats_page(self, posts: list[Post], pages: list[Page]) -> None:
+    def _generate_stats_page(
+        self,
+        posts: list[Post],
+        pages: list[Page],
+        backlink_map: "dict[str, list[Backlink]] | None" = None,
+    ) -> None:
         """Generate the blog statistics page.
 
         Args:
             posts: All published posts; used to compute statistics.
             pages: List of static pages (for the sidebar navigation).
+            backlink_map: Optional mapping from post URL to list of
+                :class:`~blogmore.backlinks.Backlink` objects.  When provided,
+                the statistics page includes a "Top Internal Links" section.
         """
         context = self._get_global_context()
         context["pages"] = pages
@@ -1752,7 +1764,9 @@ class SiteGenerator:
             )
         else:
             context["canonical_url"] = self._canonical_url_for_path(output_path)
-        blog_stats: BlogStats = compute_blog_stats(posts, self.site_config.site_url)
+        blog_stats: BlogStats = compute_blog_stats(
+            posts, self.site_config.site_url, backlink_map
+        )
         html = self.renderer.render_stats_page(stats=blog_stats, **context)
         self._write_html(output_path, html)
 
