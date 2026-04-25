@@ -9,6 +9,10 @@
   every post's Markdown content for internal links to other posts and shows
   a collated list of back-linking posts.
   ([#404](https://github.com/davep/blogmore/pull/404))
+- Added a "Top Internal Links" table to the stats page. When
+  `with_backlinks` is enabled, the stats page now shows a table of up to 20
+  posts ranked by the number of other posts that link to them.
+  ([#406](https://github.com/davep/blogmore/pull/406))
 
 ## v2.15.0
 

@@ -200,6 +200,18 @@ The `backlinks` list is always present in the `post.html` context (even when
 `with_backlinks` is `false`) but will be empty when the feature is disabled or
 when no other post links to the current post.
 
+## BlogStats object
+
+The `stats` context variable in `stats.html` is a `BlogStats` instance.  The
+most template-relevant attributes are listed below.
+
+| Attribute | Type | Description |
+|---|---|---|
+| `top_domains` | `list[tuple[str, int]]` | Top 20 externally-linked domains as `(domain, count)` pairs, sorted by count descending. |
+| `top_internal_links` | `list[tuple[Post, int]]` | Top 20 posts by incoming internal link count as `(post, count)` pairs, sorted by count descending.  Only posts with at least one backlink are included.  Populated when `with_backlinks` is `true`; otherwise an empty list. |
+| `longest_streaks` | `list[PostingStreak]` | Up to 10 longest consecutive posting streaks of 2 or more days. |
+| `streak_variants` | `list[StreakChartVariant]` | Pre-computed streak chart variants (5, 9, and 10 trailing months). |
+
 ## Calendar objects
 
 The `calendar.html` template receives a `calendar_years` variable containing a

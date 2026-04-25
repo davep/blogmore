@@ -357,5 +357,34 @@
     </section>
     {% endif %}
 
+    {# ------------------------------------------------------------------ #}
+    {# Top 20 internal links (backlinks)                                   #}
+    {# ------------------------------------------------------------------ #}
+    {% if stats.top_internal_links %}
+    <section class="stats-section">
+        <h2>Top Internal Links</h2>
+        <div class="stats-table-wrap">
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Post</th>
+                        <th>Links</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post, count in stats.top_internal_links %}
+                    <tr>
+                        <td class="stats-table-rank">{{ loop.index }}</td>
+                        <td><a href="{{ post.url }}">{{ post.title }}</a></td>
+                        <td class="stats-table-count">{{ count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
+
 </div>
 {% endblock %}

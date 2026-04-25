@@ -6,12 +6,16 @@ import datetime as dt
 import re
 from collections import Counter
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
 ##############################################################################
 # Local imports.
 from blogmore.parser import Post
 from blogmore.utils import count_words
+
+if TYPE_CHECKING:
+    from blogmore.backlinks import Backlink
 
 
 @dataclass
@@ -222,6 +226,14 @@ class BlogStats:
     """Top 20 externally-linked domains as ``(domain, count)`` pairs.
 
     Sorted by count descending.
+    """
+
+    top_internal_links: list[tuple["Post", int]] = field(default_factory=list)
+    """Top 20 posts by incoming internal link count as ``(post, count)`` pairs.
+
+    Only posts with at least one backlink are included.  Sorted by count
+    descending.  Populated only when the backlink map is supplied to
+    :func:`compute_blog_stats`.
     """
 
     posts_in_last_year: int = 0
@@ -446,13 +458,22 @@ def _compute_longest_streaks(
     return streaks[:max_streaks]
 
 
-def compute_blog_stats(posts: list[Post], site_url: str = "") -> BlogStats:
+def compute_blog_stats(
+    posts: list[Post],
+    site_url: str = "",
+    backlink_map: "dict[str, list[Backlink]] | None" = None,
+) -> BlogStats:
     """Compute aggregated statistics from a collection of blog posts.
 
     Args:
         posts: The list of posts to compute statistics for.
         site_url: The configured base URL of the blog site.  Used to
             distinguish internal from external links.  May be empty.
+        backlink_map: Optional mapping from post URL to list of
+            :class:`~blogmore.backlinks.Backlink` objects, as returned by
+            :func:`~blogmore.backlinks.build_backlink_map`.  When provided,
+            :attr:`BlogStats.top_internal_links` is populated with the top 20
+            posts sorted by incoming link count descending.
 
     Returns:
         A :class:`BlogStats` instance populated from the given posts.
@@ -550,6 +571,18 @@ def compute_blog_stats(posts: list[Post], site_url: str = "") -> BlogStats:
                 domain_counter[domain] += 1
     stats.unique_external_link_count = len(all_external_urls)
     stats.top_domains = domain_counter.most_common(20)
+
+    # --- Internal links (backlinks) -------------------------------------------
+    if backlink_map is not None:
+        post_lookup: dict[str, Post] = {post.url: post for post in posts}
+        internal_link_counter: Counter[str] = Counter(
+            {url: len(links) for url, links in backlink_map.items() if links}
+        )
+        stats.top_internal_links = [
+            (post_lookup[url], count)
+            for url, count in internal_link_counter.most_common(20)
+            if url in post_lookup
+        ]
 
     # --- Streak chart variants (3, 6, 9 months) ------------------------------
     today = dt.date.today()
