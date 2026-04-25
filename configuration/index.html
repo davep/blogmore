@@ -1081,6 +1081,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#with_backlinks" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>with_backlinks</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#post_path" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -2429,6 +2440,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#with_backlinks" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>with_backlinks</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#post_path" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -3531,6 +3553,15 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <strong>Default:</strong> <code>200</code></p>
 <div class="highlight"><pre><span></span><code><span class="nt">read_time_wpm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">250</span>
 </code></pre></div>
+<h4 id="with_backlinks"><code>with_backlinks</code></h4>
+<p>Enable the "References &amp; mentions" section on individual post pages.  When enabled, BlogMore scans the Markdown content of every post for internal links and builds a map of which posts link to which other posts.  Any post that is linked to by at least one other post will have a "References &amp; mentions" section displayed after the bottom previous/next navigation, listing the posts that link to it together with a short plain-text context snippet showing where the link appears in the source post.</p>
+<p>Only links found in the Markdown of <em>posts</em> are considered — links found in static <em>pages</em> are excluded.  Self-links (a post linking to itself) and the title links BlogMore adds in the references section itself are also excluded.</p>
+<p>This is a <strong>configuration file only</strong> option — it cannot be set on the command line.  Off by default.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">with_backlinks</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<p><strong>Note:</strong> Calculating the backlink map requires scanning every post's content for internal links.  For sites with many posts this scan adds a small amount of time to each build.  The scan is skipped entirely when <code>with_backlinks</code> is <code>false</code>.</p>
 <h4 id="post_path"><code>post_path</code></h4>
 <p>Format string that controls the output path (and therefore the URL) of every blog post.  This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
 <p><strong>Type:</strong> String<br />

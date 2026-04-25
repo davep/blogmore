@@ -764,6 +764,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#backlink-object" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Backlink object
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blogstats-object" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        BlogStats object
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#calendar-objects" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1197,6 +1219,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#backlink-object" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Backlink object
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blogstats-object" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        BlogStats object
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#calendar-objects" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1444,6 +1488,11 @@ below lists all variables that are available in every template.</p>
 <td><code>True</code> when reading time display is enabled.</td>
 </tr>
 <tr>
+<td><code>with_backlinks</code></td>
+<td><code>bool</code></td>
+<td><code>True</code> when the backlinks feature is enabled.</td>
+</tr>
+<tr>
 <td><code>with_advert</code></td>
 <td><code>bool</code></td>
 <td><code>True</code> when the "Generated with BlogMore" footer is shown.</td>
@@ -1670,7 +1719,7 @@ or <code>/tag/python/</code> when <code>clean_urls</code> is enabled.</p>
 </tr>
 <tr>
 <td><code>post.html</code></td>
-<td><code>all_posts</code>, <code>pages</code>, <code>prev_post</code> (<code>Post \| None</code>), <code>next_post</code> (<code>Post \| None</code>), <code>canonical_url</code></td>
+<td><code>all_posts</code>, <code>pages</code>, <code>prev_post</code> (<code>Post \| None</code>), <code>next_post</code> (<code>Post \| None</code>), <code>canonical_url</code>, <code>backlinks</code> (list of <code>Backlink</code>)</td>
 </tr>
 <tr>
 <td><code>page.html</code></td>
@@ -1882,6 +1931,68 @@ minimal implementation:</p>
 <td><code>description</code></td>
 <td><code>str</code> (property)</td>
 <td>Page description (from metadata or first paragraph).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="backlink-object">Backlink object</h2>
+<p><code>Backlink</code> objects are passed to <code>post.html</code> via the <code>backlinks</code> context variable
+when <code>with_backlinks</code> is enabled.  Each entry represents one post that links
+to the currently-displayed post.</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>source_post</code></td>
+<td><code>Post</code></td>
+<td>The post whose Markdown content contains the link.</td>
+</tr>
+<tr>
+<td><code>snippet</code></td>
+<td><code>Markup</code></td>
+<td>HTML-safe excerpt from the source post surrounding the link, with up to 100 characters of context on each side and an ellipsis (<code>…</code>) where the excerpt is truncated.  The link text is wrapped in <code>&lt;strong class="backlink-link-text"&gt;</code> so it stands out from the surrounding context.</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>backlinks</code> list is always present in the <code>post.html</code> context (even when
+<code>with_backlinks</code> is <code>false</code>) but will be empty when the feature is disabled or
+when no other post links to the current post.</p>
+<h2 id="blogstats-object">BlogStats object</h2>
+<p>The <code>stats</code> context variable in <code>stats.html</code> is a <code>BlogStats</code> instance.  The
+most template-relevant attributes are listed below.</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>top_domains</code></td>
+<td><code>list[tuple[str, int]]</code></td>
+<td>Top 20 externally-linked domains as <code>(domain, count)</code> pairs, sorted by count descending.</td>
+</tr>
+<tr>
+<td><code>top_internal_links</code></td>
+<td><code>list[tuple[Post, int]]</code></td>
+<td>Top 20 posts by incoming internal link count as <code>(post, count)</code> pairs, sorted by count descending.  Only posts with at least one backlink are included.  Populated when <code>with_backlinks</code> is <code>true</code>; otherwise an empty list.</td>
+</tr>
+<tr>
+<td><code>longest_streaks</code></td>
+<td><code>list[PostingStreak]</code></td>
+<td>Up to 10 longest consecutive posting streaks of 2 or more days.</td>
+</tr>
+<tr>
+<td><code>streak_variants</code></td>
+<td><code>list[StreakChartVariant]</code></td>
+<td>Pre-computed streak chart variants (5, 9, and 10 trailing months).</td>
 </tr>
 </tbody>
 </table>
@@ -2108,6 +2219,21 @@ widget.  It is called like this:</p>
 </tr>
 </tbody>
 </table>
+<p><code>post.html</code> provides the following additional block:</p>
+<table>
+<thead>
+<tr>
+<th>Block</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>backlinks</code></td>
+<td>The "References &amp; mentions" section shown after the bottom post-navigation on individual post pages when <code>with_backlinks</code> is enabled and there are inbound links.  Override this block in a custom <code>post.html</code> to change the layout or styling of the section.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="css-classes-used-by-templates">CSS classes used by templates</h2>
 <p>The following CSS classes are part of the stable template/CSS contract:</p>
 <table>
@@ -2223,6 +2349,51 @@ widget.  It is called like this:</p>
 <td><code>.highlight</code></td>
 <td><code>div</code></td>
 <td>Syntax-highlighted code block.</td>
+</tr>
+<tr>
+<td><code>.backlinks</code></td>
+<td><code>section</code></td>
+<td>"References &amp; mentions" container on a post page (only when <code>with_backlinks</code> is enabled and the post has inbound links).</td>
+</tr>
+<tr>
+<td><code>.backlinks-heading</code></td>
+<td><code>h2</code></td>
+<td>Heading of the backlinks section.</td>
+</tr>
+<tr>
+<td><code>.backlinks-list</code></td>
+<td><code>ul</code></td>
+<td>Ordered list of back-linking posts.</td>
+</tr>
+<tr>
+<td><code>.backlink-item</code></td>
+<td><code>li</code></td>
+<td>A single back-link entry (one per referencing post).</td>
+</tr>
+<tr>
+<td><code>.backlink-meta</code></td>
+<td><code>div</code></td>
+<td>Contains the source post's title link and date.</td>
+</tr>
+<tr>
+<td><code>.backlink-title</code></td>
+<td><code>a</code></td>
+<td>Link to the source post's title.</td>
+</tr>
+<tr>
+<td><code>.backlink-date</code></td>
+<td><code>time</code></td>
+<td>Publication date of the source post.</td>
+</tr>
+<tr>
+<td><code>.backlink-snippet</code></td>
+<td><code>p</code></td>
+<td>Plain-text context snippet around the link.</td>
+</tr>
+<tr>
+<td><code>.backlink-link-text</code></td>
+<td><code>strong</code></td>
+<td>The link text itself, highlighted within <code>.backlink-snippet</code> so it stands out from the surrounding italic context.</td>
 </tr>
 </tbody>
 </table>
