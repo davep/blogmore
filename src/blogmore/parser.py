@@ -10,6 +10,7 @@ from typing import Any
 import frontmatter  # type: ignore[import-untyped]
 import markdown
 import yaml
+from dateutil import parser as dateutil_parser
 from pygments.formatters import HtmlFormatter
 
 from blogmore.markdown.first_paragraph import extract_first_paragraph
@@ -234,10 +235,8 @@ class Post:
                 except ValueError:
                     continue
             try:
-                from dateutil import parser as dateutil_parser
-
                 return dateutil_parser.parse(modified)
-            except (ImportError, ValueError):
+            except ValueError:
                 pass
         return None
 
@@ -424,10 +423,8 @@ class PostParser:
                 # If we still couldn't parse it, try with python-dateutil if available
                 if date is None:
                     try:
-                        from dateutil import parser as dateutil_parser
-
                         date = dateutil_parser.parse(date_value)
-                    except (ImportError, ValueError):
+                    except ValueError:
                         pass
 
         # Extract category - coerce to str in case YAML parsed it as a non-string

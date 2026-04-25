@@ -6,16 +6,13 @@ import datetime as dt
 import re
 from collections import Counter
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
 ##############################################################################
 # Local imports.
+from blogmore.backlinks import Backlink
 from blogmore.parser import Post
 from blogmore.utils import count_words
-
-if TYPE_CHECKING:
-    from blogmore.backlinks import Backlink
 
 
 @dataclass

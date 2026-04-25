@@ -7,17 +7,14 @@ import urllib.error
 from collections import defaultdict
 from importlib.resources import files
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import minify_html
 import rcssmin  # type: ignore[import-untyped]
 import rjsmin  # type: ignore[import-untyped]
 
-if TYPE_CHECKING:
-    from blogmore.backlinks import Backlink
-
 from blogmore import __version__
-from blogmore.backlinks import build_backlink_map
+from blogmore.backlinks import Backlink, build_backlink_map
 from blogmore.calendar import CalendarYear, build_calendar
 from blogmore.clean_url import make_url_clean
 from blogmore.code_styles import build_code_css
@@ -664,7 +661,6 @@ class SiteGenerator:
             backlinks_map = build_backlink_map(
                 posts,
                 site_url=self.site_config.site_url,
-                clean_urls=self.site_config.clean_urls,
             )
 
         generated_paths: set[str] = set()
