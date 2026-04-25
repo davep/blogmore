@@ -581,7 +581,7 @@ def compute_blog_stats(
         stats.top_internal_links = [
             (post_lookup[url], count)
             for url, count in internal_link_counter.most_common(20)
-            if url in post_lookup and count > 0
+            if url in post_lookup
         ]
 
     # --- Streak chart variants (3, 6, 9 months) ------------------------------

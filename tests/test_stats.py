@@ -4,7 +4,9 @@ import datetime as dt
 from pathlib import Path
 
 import pytest
+from markupsafe import Markup
 
+from blogmore.backlinks import Backlink
 from blogmore.parser import Post
 from blogmore.stats import (
     BlogStats,
@@ -322,12 +324,8 @@ class TestTopInternalLinks:
             html_content="<p>Hello.</p>",
         )
 
-    def _make_backlink(self, source_post: Post) -> "object":
+    def _make_backlink(self, source_post: Post) -> Backlink:
         """Create a minimal Backlink stub for testing."""
-        from markupsafe import Markup
-
-        from blogmore.backlinks import Backlink
-
         return Backlink(source_post=source_post, snippet=Markup("…"))
 
     def test_no_backlink_map_gives_empty_top_internal_links(self) -> None:
@@ -355,8 +353,8 @@ class TestTopInternalLinks:
         source2 = self._make_post(slug="source2", title="Source 2")
         backlink_map = {
             target.url: [
-                self._make_backlink(source1),  # type: ignore[arg-type]
-                self._make_backlink(source2),  # type: ignore[arg-type]
+                self._make_backlink(source1),
+                self._make_backlink(source2),
             ],
             source1.url: [],
             source2.url: [],
@@ -375,11 +373,11 @@ class TestTopInternalLinks:
         source = self._make_post(slug="source", title="Source")
         backlink_map = {
             popular.url: [
-                self._make_backlink(source),  # type: ignore[arg-type]
-                self._make_backlink(source),  # type: ignore[arg-type]
-                self._make_backlink(source),  # type: ignore[arg-type]
+                self._make_backlink(source),
+                self._make_backlink(source),
+                self._make_backlink(source),
             ],
-            average.url: [self._make_backlink(source)],  # type: ignore[arg-type]
+            average.url: [self._make_backlink(source)],
             source.url: [],
         }
         stats = compute_blog_stats(
@@ -394,14 +392,13 @@ class TestTopInternalLinks:
         """At most 20 posts are returned in top_internal_links."""
         posts = [self._make_post(slug=f"p{i}", title=f"Post {i}") for i in range(30)]
         source = self._make_post(slug="source", title="Source")
-        backlink_map = {
-            post.url: [self._make_backlink(source)]  # type: ignore[arg-type]
-            for post in posts
-        }
+        backlink_map = {post.url: [self._make_backlink(source)] for post in posts}
         backlink_map[source.url] = []
         stats = compute_blog_stats(posts + [source], backlink_map=backlink_map)
         assert len(stats.top_internal_links) <= 20
 
+
+class TestBlogStatsBlogSpanDays:
     """Tests for the blog_span_days property."""
 
     def test_span_is_none_when_no_dates(self) -> None:
