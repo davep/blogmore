@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.16.0
 
-**Released: WiP**
+**Released: 2026-04-25**
 
 - Added a `with_backlinks` configuration option that enables a "References &
   mentions" section on individual post pages. When turned on, BlogMore scans
