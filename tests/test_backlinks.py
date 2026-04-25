@@ -90,6 +90,25 @@ class TestExtractSnippetBlockStripping:
         snippet = _extract_snippet(content, m.start(), m.end())
         assert "#" not in snippet
 
+    def test_fenced_code_block_opening_before_window_not_in_snippet(self) -> None:
+        """A fenced code block whose opening fence is outside the window is still cleaned.
+
+        This is the core regression case: the code block starts well before the
+        link, so only its body and closing fence fall inside a simple substring
+        window.  By converting the full document we parse the fence in context
+        and the snippet contains no raw backtick fence markers.
+        """
+        preamble = "Some intro text.\n\n"
+        code_block = "```diff\n--- a/expando.el\n+++ b/expando.el\n```\n\n"
+        link_sentence = "After the code block, see [the link](/post.html) here."
+        content = preamble + code_block + link_sentence
+        m = re.search(r"\[the link\]\(/post\.html\)", content)
+        assert m is not None
+        snippet = _extract_snippet(content, m.start(), m.end(), "the link")
+        # The raw fenced-code fence markers must not appear in the snippet.
+        assert "```" not in snippet
+        assert "```diff" not in snippet
+
 
 ##############################################################################
 # _find_links tests.
@@ -235,7 +254,7 @@ class TestExtractSnippet:
         content = "Hello [world](/foo.html) end."
         m = re.search(r"\[world\]\(/foo\.html\)", content)
         assert m is not None
-        snippet = _extract_snippet(content, m.start(), m.end())
+        snippet = _extract_snippet(content, m.start(), m.end(), "world")
         # No ellipsis — content is short.
         assert "Hello" in snippet
         assert "world" in snippet
@@ -264,7 +283,7 @@ class TestExtractSnippet:
         content = "See [interesting article](/post.html) for more."
         m = re.search(r"\[interesting article\]\(/post\.html\)", content)
         assert m is not None
-        snippet = _extract_snippet(content, m.start(), m.end())
+        snippet = _extract_snippet(content, m.start(), m.end(), "interesting article")
         assert "interesting article" in snippet
         assert "/post.html" not in snippet
 

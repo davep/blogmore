@@ -31,6 +31,12 @@ if TYPE_CHECKING:
 _SNIPPET_CONTEXT_CHARS: int = 100
 
 ##############################################################################
+# Distinctive marker used to locate the link position within the full-document
+# plain-text conversion.  The string is chosen to be extremely unlikely to
+# appear in any real blog post.
+_BACKLINK_MARKER: str = "BKLINK8f3a2b19_BKLINK"
+
+##############################################################################
 # Compiled regular expressions for Markdown link detection.
 
 # Inline links: [link text](url) or [link text](url "optional title")
@@ -69,19 +75,20 @@ def _extract_snippet(
 ) -> Markup:
     """Extract an HTML-safe snippet around a matched link.
 
-    Takes up to ``_SNIPPET_CONTEXT_CHARS`` characters before *match_start*
-    and after *match_end* from *content*, converts the excerpt to plain text
-    via :func:`~blogmore.markdown.plain_text.markdown_to_plain_text` (so
-    block structures such as fenced code blocks and blockquotes are handled
-    correctly), and adds an ellipsis (``…``) where the excerpt is truncated.
-    When *link_text* is provided the (stripped, HTML-escaped) link text is
-    wrapped in ``<strong class="backlink-link-text">`` so it stands out from
-    the surrounding context.
+    Replaces the matched link syntax in the *full* document with a
+    distinctive marker, then converts the entire document to plain text via
+    :func:`~blogmore.markdown.plain_text.markdown_to_plain_text`.  Processing
+    the complete document ensures that all Markdown constructs (fenced code
+    blocks, blockquotes, etc.) are parsed in their proper context, so no raw
+    Markdown artefacts bleed into the snippet even when a construct straddles
+    the window boundary.
 
-    Reference-style link definitions and ``[text][ref]`` syntax are stripped
-    from the excerpt before Markdown conversion because the excerpt is a
-    partial document slice that may not include the full set of link
-    definitions.
+    Up to ``_SNIPPET_CONTEXT_CHARS`` plain-text characters are taken on each
+    side of the marker position, with an ellipsis (``…``) added where the
+    excerpt is truncated.  The marker is then replaced with the plain-text
+    form of the link text, which is wrapped in
+    ``<strong class="backlink-link-text">`` so it stands out from the
+    surrounding context.
 
     Args:
         content: The full raw Markdown source of the post.
@@ -96,32 +103,43 @@ def _extract_snippet(
         context, ellipsis markers where truncated, and the link text
         wrapped in a ``<strong>`` element.
     """
-    context_start = max(0, match_start - _SNIPPET_CONTEXT_CHARS)
-    context_end = min(len(content), match_end + _SNIPPET_CONTEXT_CHARS)
-    excerpt = content[context_start:context_end]
+    # Replace the matched link syntax with the marker so the full document
+    # can be converted to plain text in one pass.  This preserves all
+    # Markdown context (code fences, blockquotes, reference link definitions,
+    # etc.) and prevents raw Markdown artefacts from appearing in the snippet.
+    marked_content = content[:match_start] + _BACKLINK_MARKER + content[match_end:]
+    plain_full = markdown_to_plain_text(marked_content)
 
-    # Pre-strip reference link syntax before Markdown conversion: the excerpt
-    # is a partial document slice that will not include link definitions.
-    excerpt = _LINK_DEF_RE.sub("", excerpt)
-    excerpt = _REF_LINK_RE.sub(r"\1", excerpt)
+    marker_pos = plain_full.find(_BACKLINK_MARKER)
+    if marker_pos == -1:
+        # Very unlikely: the marker was consumed by Markdown processing.
+        # Fall back to converting the full original content with the cursor
+        # at the beginning of the document.
+        plain_full = markdown_to_plain_text(content)
+        marker_pos = 0
 
-    plain = markdown_to_plain_text(excerpt)
+    marker_end_pos = marker_pos + len(_BACKLINK_MARKER)
+    context_start = max(0, marker_pos - _SNIPPET_CONTEXT_CHARS)
+    context_end = min(len(plain_full), marker_end_pos + _SNIPPET_CONTEXT_CHARS)
+    excerpt = plain_full[context_start:context_end]
+
     prefix = "…" if context_start > 0 else ""
-    suffix = "…" if context_end < len(content) else ""
+    suffix = "…" if context_end < len(plain_full) else ""
 
-    # HTML-escape the whole plain-text snippet first so it is safe to
-    # embed in an HTML template.
-    escaped: Markup = Markup.escape(f"{prefix}{plain}{suffix}")
+    # Replace the marker with the plain-text link text before escaping.
+    plain_link_text = markdown_to_plain_text(link_text) if link_text else ""
+    excerpt = excerpt.replace(_BACKLINK_MARKER, plain_link_text)
+
+    # HTML-escape the whole plain-text snippet so it is safe to embed.
+    escaped: Markup = Markup.escape(f"{prefix}{excerpt}{suffix}")
 
     # Wrap the (stripped, escaped) link text in <strong> so it stands out.
-    if link_text:
-        plain_link_text = markdown_to_plain_text(link_text)
-        if plain_link_text:
-            escaped_link_text = Markup.escape(plain_link_text)
-            highlighted = Markup(
-                f'<strong class="backlink-link-text">{escaped_link_text}</strong>'
-            )
-            escaped = Markup(escaped.replace(escaped_link_text, highlighted, 1))
+    if plain_link_text:
+        escaped_link_text = Markup.escape(plain_link_text)
+        highlighted = Markup(
+            f'<strong class="backlink-link-text">{escaped_link_text}</strong>'
+        )
+        escaped = Markup(escaped.replace(escaped_link_text, highlighted, 1))
 
     return escaped
 
