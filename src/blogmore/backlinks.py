@@ -12,7 +12,6 @@ are called, so users pay no cost for a feature they do not use.
 # Python imports.
 import re
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
 ##############################################################################
 # Third-party imports.
@@ -21,9 +20,7 @@ from markupsafe import Markup
 ##############################################################################
 # Local imports.
 from blogmore.markdown.plain_text import markdown_to_plain_text
-
-if TYPE_CHECKING:
-    from blogmore.parser import Post
+from blogmore.parser import Post
 
 ##############################################################################
 # Number of plain-text characters to include on each side of a link in
@@ -63,7 +60,7 @@ class Backlink:
             stands out from the surrounding context.
     """
 
-    source_post: "Post"
+    source_post: Post
     snippet: Markup
 
 
@@ -271,10 +268,10 @@ def _to_path(url: str, site_url: str) -> str | None:
 
 
 def build_backlink_map(
-    posts: "list[Post]",
+    posts: list[Post],
     site_url: str = "",
     clean_urls: bool = False,
-) -> "dict[str, list[Backlink]]":
+) -> dict[str, list[Backlink]]:
     """Build a mapping from post URL to the list of posts that link to it.
 
     Scans the raw Markdown content of every post for internal links and
