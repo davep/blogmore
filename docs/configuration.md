@@ -377,6 +377,23 @@ Words per minute used when calculating estimated reading time.  Adjust this valu
 read_time_wpm: 250
 ```
 
+#### `with_backlinks`
+
+Enable the "References &amp; mentions" section on individual post pages.  When enabled, BlogMore scans the Markdown content of every post for internal links and builds a map of which posts link to which other posts.  Any post that is linked to by at least one other post will have a "References &amp; mentions" section displayed after the bottom previous/next navigation, listing the posts that link to it together with a short plain-text context snippet showing where the link appears in the source post.
+
+Only links found in the Markdown of *posts* are considered — links found in static *pages* are excluded.  Self-links (a post linking to itself) and the title links BlogMore adds in the references section itself are also excluded.
+
+This is a **configuration file only** option — it cannot be set on the command line.  Off by default.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+with_backlinks: true
+```
+
+**Note:** Calculating the backlink map requires scanning every post's content for internal links.  For sites with many posts this scan adds a small amount of time to each build.  The scan is skipped entirely when `with_backlinks` is `false`.
+
 #### `post_path`
 
 Format string that controls the output path (and therefore the URL) of every blog post.  This is a **configuration file only** option — it cannot be set on the command line.

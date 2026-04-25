@@ -12,10 +12,8 @@ import markdown
 import yaml
 from pygments.formatters import HtmlFormatter
 
-from blogmore.markdown.first_paragraph import (
-    create_custom_extensions,
-    extract_first_paragraph,
-)
+from blogmore.markdown.first_paragraph import extract_first_paragraph
+from blogmore.markdown.plain_text import create_custom_extensions
 from blogmore.utils import calculate_reading_time
 
 _DATE_FORMATS = [

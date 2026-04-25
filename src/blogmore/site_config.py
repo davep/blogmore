@@ -147,6 +147,23 @@ class SiteConfig:
     default.
     """
 
+    with_backlinks: bool = False
+    """Whether to show a "References & mentions" section on individual post pages.
+
+    When enabled the generator scans all post content for internal links and
+    builds a map of which posts link to which other posts.  On each post page
+    that is referenced by at least one other post, a "References & mentions"
+    section is appended below the bottom post-navigation links, listing the
+    posts that link here together with a short plain-text snippet showing the
+    surrounding context of each link.
+
+    Links to static *pages* (from the ``pages/`` directory) are excluded; only
+    links found in the Markdown of posts are considered.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Off by default.
+    """
+
     with_read_time: bool = False
     """Whether to show estimated reading time on posts."""
 

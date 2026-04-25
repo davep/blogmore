@@ -79,5 +79,25 @@
         {% endif %}
     </nav>
     {% endif %}
+    {% block backlinks %}
+    {% if backlinks %}
+    <section class="backlinks">
+        <h2 class="backlinks-heading">References &amp; mentions</h2>
+        <ul class="backlinks-list">
+            {% for backlink in backlinks %}
+            <li class="backlink-item">
+                <div class="backlink-meta">
+                    <a href="{{ backlink.source_post.url }}" class="backlink-title">{{ backlink.source_post.title }}</a>
+                    {% if backlink.source_post.date %}
+                    <time class="backlink-date" datetime="{{ backlink.source_post.date.isoformat() }}">{{ backlink.source_post.date|format_date }}</time>
+                    {% endif %}
+                </div>
+                <p class="backlink-snippet">{{ backlink.snippet }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+    {% endblock %}
 </article>
 {% endblock %}

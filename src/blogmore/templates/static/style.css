@@ -820,6 +820,78 @@ time a:visited {
     }
 }
 
+/* =============================================================================
+   BACKLINKS (References & mentions)
+   ============================================================================= */
+
+/* Container for the "References & mentions" section on individual post pages. */
+.backlinks {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.backlinks-heading {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+}
+
+.backlinks-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.backlink-item {
+    padding: 0.75rem 1rem;
+    background: var(--tag-bg);
+    border: 1px solid var(--border-color-light);
+    border-radius: 6px;
+}
+
+.backlink-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.4rem;
+}
+
+.backlink-title {
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--link-color);
+}
+
+.backlink-title:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+}
+
+.backlink-date {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+}
+
+.backlink-snippet {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    margin: 0;
+    font-style: italic;
+    line-height: 1.5;
+}
+
+.backlink-link-text {
+    color: var(--text-color);
+    font-style: normal;
+    font-weight: 600;
+}
+
 .post-content {
     font-size: 1.05em;
 }

@@ -7,13 +7,17 @@ import urllib.error
 from collections import defaultdict
 from importlib.resources import files
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import minify_html
 import rcssmin  # type: ignore[import-untyped]
 import rjsmin  # type: ignore[import-untyped]
 
+if TYPE_CHECKING:
+    from blogmore.backlinks import Backlink
+
 from blogmore import __version__
+from blogmore.backlinks import build_backlink_map
 from blogmore.calendar import CalendarYear, build_calendar
 from blogmore.clean_url import make_url_clean
 from blogmore.code_styles import build_code_css
@@ -425,6 +429,7 @@ class SiteGenerator:
             "forward_calendar": self.site_config.forward_calendar,
             "calendar_url": self._get_calendar_url(),
             "with_read_time": self.site_config.with_read_time,
+            "with_backlinks": self.site_config.with_backlinks,
             "with_advert": self.site_config.with_advert,
             "default_author": self.site_config.default_author,
             "extra_head_tags": self.site_config.head,
@@ -649,6 +654,19 @@ class SiteGenerator:
         # Generate individual post pages
         print("Generating post pages...")
         post_output_paths = self._resolve_post_output_paths(posts)
+
+        # Build the backlink map only when the feature is enabled.  This
+        # must happen after _resolve_post_output_paths() so that every
+        # post.url_path is set to its final value before link matching.
+        backlinks_map: dict[str, list[Backlink]] = {}
+        if self.site_config.with_backlinks:
+            print("Building backlink map...")
+            backlinks_map = build_backlink_map(
+                posts,
+                site_url=self.site_config.site_url,
+                clean_urls=self.site_config.clean_urls,
+            )
+
         generated_paths: set[str] = set()
         for post in posts:
             output_path = post_output_paths[id(post)]
@@ -657,7 +675,9 @@ class SiteGenerator:
                 # A newer post has already claimed this path; skip this older one.
                 continue
             generated_paths.add(path_key)
-            self._generate_post_page(post, posts, sidebar_pages, output_path)
+            self._generate_post_page(
+                post, posts, sidebar_pages, output_path, backlinks_map
+            )
 
         # Generate static pages
         if pages:
@@ -1014,6 +1034,7 @@ class SiteGenerator:
         all_posts: list[Post],
         pages: list[Page],
         output_path: Path,
+        backlinks_map: "dict[str, list[Backlink]] | None" = None,
     ) -> None:
         """Generate a single post page.
 
@@ -1022,10 +1043,17 @@ class SiteGenerator:
             all_posts: All posts (sorted newest first), used for prev/next navigation.
             pages: All static pages, passed to the template context.
             output_path: The pre-resolved absolute output file path for this post.
+            backlinks_map: Optional mapping from post URL to list of Backlink
+                objects, built when ``with_backlinks`` is enabled.  When
+                ``None`` or when the post URL has no entry, an empty list is
+                used so the template always receives a ``backlinks`` variable.
         """
         context = self._get_global_context()
         context["all_posts"] = all_posts
         context["pages"] = pages
+
+        # Attach the backlinks list for this post to the template context.
+        context["backlinks"] = backlinks_map.get(post.url, []) if backlinks_map else []
 
         # Find previous and next posts in chronological order
         # all_posts is already sorted by date (newest first)
