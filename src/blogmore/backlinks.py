@@ -270,7 +270,6 @@ def _to_path(url: str, site_url: str) -> str | None:
 def build_backlink_map(
     posts: list[Post],
     site_url: str = "",
-    clean_urls: bool = False,
 ) -> dict[str, list[Backlink]]:
     """Build a mapping from post URL to the list of posts that link to it.
 
@@ -287,9 +286,6 @@ def build_backlink_map(
         posts: All posts for the site, sorted by date (newest first).
         site_url: The site's base URL (e.g. ``https://example.com``).
             Used to recognise full URLs that point back to this site.
-        clean_urls: Whether clean URLs are enabled on the site.  Passed
-            through to the URL normaliser so both ``/post.html`` and
-            ``/post/`` forms are recognised.
 
     Returns:
         A dictionary mapping each post's URL to a (possibly empty) list

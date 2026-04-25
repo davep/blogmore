@@ -664,7 +664,6 @@ class SiteGenerator:
             backlinks_map = build_backlink_map(
                 posts,
                 site_url=self.site_config.site_url,
-                clean_urls=self.site_config.clean_urls,
             )
 
         generated_paths: set[str] = set()
