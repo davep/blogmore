@@ -296,6 +296,31 @@ class TestExtractSnippet:
         assert isinstance(snippet, Markup)
         assert '<strong class="backlink-link-text">the article</strong>' in snippet
 
+    def test_link_text_not_highlighted_in_containing_word(self) -> None:
+        """The link text is highlighted at its exact position, not inside a longer word.
+
+        Regression test for the Scunthorpe-style false positive: when the link
+        text ("more") also appears as a substring of a nearby word ("blogmore"),
+        only the standalone occurrence that corresponds to the actual link must
+        be wrapped in <strong>, not the first occurrence found by substring
+        search.
+        """
+        content = (
+            "After kicking off [blogmore.el](/other.html), and then tinkering "
+            "with it [more](/2026/03/20/post.html) and more."
+        )
+        m = re.search(r"\[more\]\(/2026/03/20/post\.html\)", content)
+        assert m is not None
+        snippet = _extract_snippet(content, m.start(), m.end(), "more")
+        assert isinstance(snippet, Markup)
+        # The highlighted <strong> must wrap the standalone "more" that was the
+        # link text, not the "more" embedded inside "blogmore.el".
+        strong_tag = '<strong class="backlink-link-text">more</strong>'
+        assert strong_tag in snippet
+        # The preceding text "blog" must NOT be immediately followed by the
+        # strong tag (which would mean the "more" in "blogmore" was highlighted).
+        assert f"blog{strong_tag}" not in snippet
+
     def test_snippet_is_markup_instance(self) -> None:
         """_extract_snippet always returns a Markup instance."""
         content = "Hello [world](/foo.html) end."

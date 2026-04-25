@@ -85,10 +85,12 @@ def _extract_snippet(
 
     Up to ``_SNIPPET_CONTEXT_CHARS`` plain-text characters are taken on each
     side of the marker position, with an ellipsis (``…``) added where the
-    excerpt is truncated.  The marker is then replaced with the plain-text
-    form of the link text, which is wrapped in
-    ``<strong class="backlink-link-text">`` so it stands out from the
-    surrounding context.
+    excerpt is truncated.  The excerpt is HTML-escaped, then the marker is
+    replaced directly with the plain-text link text wrapped in
+    ``<strong class="backlink-link-text">``, using the marker's exact position
+    rather than a substring search.  This prevents false-positive highlights
+    when the link text is a substring of a nearby word (e.g. "more" inside
+    "blogmore").
 
     Args:
         content: The full raw Markdown source of the post.
@@ -126,20 +128,24 @@ def _extract_snippet(
     prefix = "…" if context_start > 0 else ""
     suffix = "…" if context_end < len(plain_full) else ""
 
-    # Replace the marker with the plain-text link text before escaping.
-    plain_link_text = markdown_to_plain_text(link_text) if link_text else ""
-    excerpt = excerpt.replace(_BACKLINK_MARKER, plain_link_text)
-
-    # HTML-escape the whole plain-text snippet so it is safe to embed.
+    # HTML-escape the whole plain-text snippet.  The marker contains no
+    # HTML-special characters, so it survives Markup.escape unchanged and
+    # can be used as an exact replacement target below.
     escaped: Markup = Markup.escape(f"{prefix}{excerpt}{suffix}")
 
-    # Wrap the (stripped, escaped) link text in <strong> so it stands out.
+    # Replace the marker at the exact position of the original link with the
+    # plain-text link text wrapped in <strong>.  Using the marker as the
+    # replacement target avoids the classic substring-match false positive
+    # (e.g. matching "more" inside "blogmore" when the link text is "more").
+    plain_link_text = markdown_to_plain_text(link_text) if link_text else ""
     if plain_link_text:
         escaped_link_text = Markup.escape(plain_link_text)
         highlighted = Markup(
             f'<strong class="backlink-link-text">{escaped_link_text}</strong>'
         )
-        escaped = Markup(escaped.replace(escaped_link_text, highlighted, 1))
+        escaped = Markup(escaped.replace(_BACKLINK_MARKER, highlighted, 1))
+    else:
+        escaped = Markup(escaped.replace(_BACKLINK_MARKER, Markup(""), 1))
 
     return escaped
 
