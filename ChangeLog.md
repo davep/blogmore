@@ -8,9 +8,6 @@
   ([#412](https://github.com/davep/blogmore/pull/412))
 - Added an interactive post-relationship graph page.
   ([#414](https://github.com/davep/blogmore/pull/414))
-- Added a `--with-graph` command-line option so the graph page can be
-  enabled without editing the configuration file.
-  ([#415](https://github.com/davep/blogmore/pull/415))
 
 ## v2.16.0
 
