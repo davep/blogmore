@@ -1109,6 +1109,62 @@ class TestConfigFileIntegration:
                 "stats.html should be generated when with_stats: true is set in the config file"
             )
 
+    def test_with_graph_flag_generates_graph_page(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """--with-graph CLI flag generates graph.html on build."""
+        config_file = tmp_path / "config.yaml"
+        config = {"output": str(temp_output_dir)}
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "blogmore",
+                "build",
+                str(posts_dir),
+                "--config",
+                str(config_file),
+                "--with-graph",
+            ],
+        ):
+            result = main()
+            assert result == 0
+            assert (temp_output_dir / "graph.html").exists(), (
+                "graph.html should be generated when --with-graph flag is passed"
+            )
+
+    def test_with_graph_from_config_file_generates_graph_page(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """with_graph: true in the config file generates graph.html on build."""
+        config_file = tmp_path / "config.yaml"
+        config = {
+            "output": str(temp_output_dir),
+            "with_graph": True,
+        }
+        with open(config_file, "w") as f:
+            yaml.dump(config, f)
+
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "blogmore",
+                "build",
+                str(posts_dir),
+                "--config",
+                str(config_file),
+            ],
+        ):
+            result = main()
+            assert result == 0
+            assert (temp_output_dir / "graph.html").exists(), (
+                "graph.html should be generated when with_graph: true is set in the config file"
+            )
+
     def test_main_build_without_content_dir_fails(
         self, temp_output_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:

@@ -141,6 +141,13 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     )
 
     parser.add_argument(
+        "--with-graph",
+        action="store_true",
+        default=_SITE_CONFIG_DEFAULTS["with_graph"],
+        help="Generate an interactive post-relationship graph page (default: disabled)",
+    )
+
+    parser.add_argument(
         "--minify-css",
         action="store_true",
         default=_SITE_CONFIG_DEFAULTS["minify_css"],
