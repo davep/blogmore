@@ -1,0 +1,76 @@
+/* =============================================================================
+   GRAPH PAGE
+   ============================================================================= */
+
+.graph-page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.graph-page > h1 {
+    margin-bottom: 0.5rem;
+    flex-shrink: 0;
+}
+
+.graph-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    margin-bottom: 1rem;
+    font-size: 0.875em;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.graph-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+}
+
+.graph-legend-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.graph-legend-dot--post {
+    background-color: #4299e1;
+}
+
+.graph-legend-dot--tag {
+    background-color: #f59e0b;
+}
+
+.graph-legend-dot--category {
+    background-color: #48bb78;
+}
+
+.graph-container {
+    flex: 1;
+    width: 100%;
+    min-height: 500px;
+    height: calc(100vh - 260px);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Override the main-wrapper max-width for the graph page so the graph
+ * expands to fill as much horizontal space as possible while still
+ * respecting the sidebar layout.
+ */
+.graph-page-wrapper {
+    max-width: none !important;
+}
+
+@media (max-width: 768px) {
+    .graph-container {
+        height: calc(100vh - 320px);
+        min-height: 300px;
+    }
+}

@@ -6,6 +6,16 @@
 
 - Added an optional comment invitation section to individual post pages.
   ([#412](https://github.com/davep/blogmore/pull/412))
+- Added an interactive post-relationship graph page. When `with_graph: true`
+  is set in the configuration file, BlogMore generates a force-directed graph
+  (using the [force-graph](https://github.com/vasturiano/force-graph) library
+  loaded from CDN) that connects posts, tags, and categories. The graph script
+  is only loaded on the graph page itself. Clicking a node navigates to the
+  corresponding post, tag archive, or category archive. The page handles
+  light/dark mode and is fully responsive. A **Graph** navigation link is
+  added automatically between **Calendar** and **RSS**. The output path is
+  configurable via `graph_path` (default `graph.html`).
+  ([#TODO](https://github.com/davep/blogmore/pull/TODO))
 
 ## v2.16.0
 

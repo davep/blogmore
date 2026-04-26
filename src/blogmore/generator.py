@@ -27,6 +27,7 @@ from blogmore.fontawesome import (
     FONTAWESOME_LOCAL_CSS_PATH,
     FontAwesomeOptimizer,
 )
+from blogmore.graph import GraphData, build_graph_data
 from blogmore.icons import IconGenerator, detect_source_icon
 from blogmore.page_path import compute_page_output_path
 from blogmore.pagination_path import resolve_pagination_page_path
@@ -55,6 +56,8 @@ ARCHIVE_CSS_FILENAME = "archive.css"
 ARCHIVE_CSS_MINIFIED_FILENAME = "archive.min.css"
 CALENDAR_CSS_FILENAME = "calendar.css"
 CALENDAR_CSS_MINIFIED_FILENAME = "calendar.min.css"
+GRAPH_CSS_FILENAME = "graph.css"
+GRAPH_CSS_MINIFIED_FILENAME = "graph.min.css"
 TAG_CLOUD_CSS_FILENAME = "tag-cloud.css"
 TAG_CLOUD_CSS_MINIFIED_FILENAME = "tag-cloud.min.css"
 CODE_CSS_FILENAME = "code.css"
@@ -73,6 +76,7 @@ _PAGE_SPECIFIC_CSS: list[tuple[str, str]] = [
     (ARCHIVE_CSS_FILENAME, ARCHIVE_CSS_MINIFIED_FILENAME),
     (TAG_CLOUD_CSS_FILENAME, TAG_CLOUD_CSS_MINIFIED_FILENAME),
     (CALENDAR_CSS_FILENAME, CALENDAR_CSS_MINIFIED_FILENAME),
+    (GRAPH_CSS_FILENAME, GRAPH_CSS_MINIFIED_FILENAME),
 ]
 
 
@@ -350,6 +354,21 @@ class SiteGenerator:
             url = make_url_clean(url)
         return url
 
+    def _get_graph_url(self) -> str:
+        """Return the URL path for the configured graph page.
+
+        Derives the URL from the ``graph_path`` configuration option.  When
+        ``clean_urls`` is enabled and the path ends in ``index.html``, the
+        index filename is stripped so the URL ends with a trailing slash.
+
+        Returns:
+            The URL path for the graph page, always starting with ``/``.
+        """
+        url = "/" + self.site_config.graph_path.lstrip("/")
+        if self.site_config.clean_urls:
+            url = make_url_clean(url)
+        return url
+
     def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
         styles_css_url = self._with_cache_bust(
@@ -376,6 +395,11 @@ class SiteGenerator:
             f"/static/{CALENDAR_CSS_MINIFIED_FILENAME}"
             if self.site_config.minify_css
             else f"/static/{CALENDAR_CSS_FILENAME}"
+        )
+        graph_css_url = self._with_cache_bust(
+            f"/static/{GRAPH_CSS_MINIFIED_FILENAME}"
+            if self.site_config.minify_css
+            else f"/static/{GRAPH_CSS_FILENAME}"
         )
         tag_cloud_css_url = self._with_cache_bust(
             f"/static/{TAG_CLOUD_CSS_MINIFIED_FILENAME}"
@@ -426,6 +450,8 @@ class SiteGenerator:
             "with_calendar": self.site_config.with_calendar,
             "forward_calendar": self.site_config.forward_calendar,
             "calendar_url": self._get_calendar_url(),
+            "with_graph": self.site_config.with_graph,
+            "graph_url": self._get_graph_url(),
             "with_read_time": self.site_config.with_read_time,
             "with_backlinks": self.site_config.with_backlinks,
             "with_advert": self.site_config.with_advert,
@@ -439,6 +465,7 @@ class SiteGenerator:
             "archive_css_url": archive_css_url,
             "tag_cloud_css_url": tag_cloud_css_url,
             "calendar_css_url": calendar_css_url,
+            "graph_css_url": graph_css_url,
             "code_css_url": code_css_url,
             "theme_js_url": theme_js_url,
             "search_js_url": search_js_url,
@@ -742,6 +769,11 @@ class SiteGenerator:
         if self.site_config.with_calendar:
             print("Generating calendar page...")
             self._generate_calendar_page(posts, sidebar_pages)
+
+        # Generate graph page (only when enabled)
+        if self.site_config.with_graph:
+            print("Generating graph page...")
+            self._generate_graph_page(posts, sidebar_pages)
 
         # Copy static assets if they exist
         self._copy_static_assets()
@@ -1811,6 +1843,39 @@ class SiteGenerator:
         )
         html = self.renderer.render_calendar_page(
             calendar_years=calendar_years, **context
+        )
+        self._write_html(output_path, html)
+
+    def _generate_graph_page(self, posts: list[Post], pages: list[Page]) -> None:
+        """Generate the post-relationship graph page.
+
+        Args:
+            posts: All published posts; used to build graph nodes and edges.
+            pages: List of static pages (for the sidebar navigation).
+        """
+        context = self._get_global_context()
+        context["pages"] = pages
+        output_path = (
+            self.site_config.output_dir / self.site_config.graph_path.lstrip("/")
+        ).resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        graph_url = self._get_graph_url()
+        if self.site_config.clean_urls:
+            context["canonical_url"] = (
+                f"{self.site_config.site_url}{graph_url}"
+                if self.site_config.site_url
+                else graph_url
+            )
+        else:
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
+        graph_data: GraphData = build_graph_data(
+            posts,
+            tag_dir=self.TAG_DIR,
+            category_dir=self.CATEGORY_DIR,
+            site_url=self.site_config.site_url,
+        )
+        html = self.renderer.render_graph_page(
+            graph_data_json=graph_data.to_json(), **context
         )
         self._write_html(output_path, html)
 

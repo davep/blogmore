@@ -355,6 +355,29 @@ This is a **configuration file only** option — it cannot be set on the command
 forward_calendar: true
 ```
 
+#### `with_graph`
+
+Generate an interactive post-relationship graph.  When `true`, BlogMore produces a graph page (path configurable via [`graph_path`](#graph_path)) using the [force-graph](https://github.com/vasturiano/force-graph) library (loaded from CDN at page view time — the script is **not** included on any other page).
+
+The graph visualises three types of node:
+
+* **Posts** — one node per published post.
+* **Tags** — one node per unique tag across all posts.
+* **Categories** — one node per unique category across all posts.
+
+Edges connect each post to the tags and categories it carries, and to any other posts it links to internally via Markdown links.  Clicking a post node navigates to that post; clicking a tag or category node navigates to the corresponding archive.
+
+The graph respects the active light/dark theme and is fully responsive.  A **Graph** link is automatically added to the navigation bar between **Calendar** and **RSS**.
+
+This is a **configuration file only** option — it cannot be set on the command line.  Off by default.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+with_graph: true
+```
+
 #### `with_read_time`
 
 Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on the configured words-per-minute rate) and displays it next to the post date on all post listings and individual post pages.
@@ -846,6 +869,42 @@ clean_urls: true
 ```
 
 This makes the calendar page accessible at `/calendar/` rather than `/calendar/index.html`.
+
+#### `graph_path`
+
+Path (relative to the output directory) where the graph page is generated.  This is a **configuration file only** option — it cannot be set on the command line.  Only used when [`with_graph`](#with_graph) is `true`.
+
+**Type:** String  
+**Default:** `graph.html`
+
+```yaml
+graph_path: "graph.html"
+```
+
+##### How it works
+
+The path is joined onto the `output` directory.  Any intermediate subdirectories are created automatically.
+
+The path is always treated as relative to the output directory root — a leading `/` is stripped automatically.  So both `graph/index.html` and `/graph/index.html` produce the same output location.
+
+When `clean_urls` is enabled and the path ends in `index.html`, the `index.html` portion is omitted in any URL reference to the graph page (navigation links, canonical URL, etc.), so the page is accessible at the clean trailing-slash URL.
+
+##### Examples
+
+Default — graph page at the site root:
+
+```yaml
+graph_path: "graph.html"
+```
+
+Graph page in its own subdirectory with clean URLs:
+
+```yaml
+graph_path: "graph/index.html"
+clean_urls: true
+```
+
+This makes the graph page accessible at `/graph/` rather than `/graph/index.html`.
 
 #### `page_1_path`
 

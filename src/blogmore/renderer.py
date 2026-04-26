@@ -383,6 +383,21 @@ class TemplateRenderer:
         template = self.env.get_template("calendar.html")
         return template.render(extra_stylesheets=self.extra_stylesheets, **context)
 
+    def render_graph_page(self, **context: Any) -> str:
+        """Render the post-relationship graph page.
+
+        Args:
+            **context: Context variables to pass to the template.  Should
+                include a ``graph_data_json`` key containing the serialised
+                JSON string produced by
+                :meth:`~blogmore.graph.GraphData.to_json`.
+
+        Returns:
+            Rendered HTML string.
+        """
+        template = self.env.get_template("graph.html")
+        return template.render(extra_stylesheets=self.extra_stylesheets, **context)
+
     def render_template(self, template_name: str, **context: Any) -> str:
         """Render an arbitrary template.
 

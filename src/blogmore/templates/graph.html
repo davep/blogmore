@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Graph - {{ site_title }}{% endblock %}
+
+{% block meta_tags %}
+{% from '_listing_meta_tags.html' import listing_meta_tags with context %}
+{{ listing_meta_tags("Graph - " ~ site_title) }}
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ graph_css_url }}">
+{% endblock %}
+
+{% block content %}
+<div class="graph-page">
+    <h1>Graph</h1>
+
+    <div class="graph-legend" aria-label="Graph legend">
+        <span class="graph-legend-item">
+            <span class="graph-legend-dot graph-legend-dot--post" aria-hidden="true"></span>
+            Posts
+        </span>
+        <span class="graph-legend-item">
+            <span class="graph-legend-dot graph-legend-dot--tag" aria-hidden="true"></span>
+            Tags
+        </span>
+        <span class="graph-legend-item">
+            <span class="graph-legend-dot graph-legend-dot--category" aria-hidden="true"></span>
+            Categories
+        </span>
+    </div>
+
+    <div class="graph-container" id="graph-container" role="img" aria-label="Interactive post relationship graph. Click a node to open it.">
+    </div>
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    /** Force-graph CDN URL (loaded once, only on this page). */
+    var FORCE_GRAPH_CDN = 'https://unpkg.com/force-graph';
+
+    /** Node colour palette — same values in both light and dark mode for clarity. */
+    var NODE_COLORS = {
+        post:     '#4299e1',
+        tag:      '#f59e0b',
+        category: '#48bb78'
+    };
+
+    /** Return colours appropriate for the currently active theme. */
+    function getThemeColors() {
+        var isDark = (
+            document.documentElement.getAttribute('data-theme') === 'dark' ||
+            (
+                !document.documentElement.getAttribute('data-theme') &&
+                window.matchMedia &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches
+            )
+        );
+        return {
+            background: isDark ? '#1a1a1a' : '#ffffff',
+            link:       isDark ? '#555555' : '#cccccc',
+            label:      isDark ? '#e0e0e0' : '#333333'
+        };
+    }
+
+    /** Graph data embedded at build time. */
+    var GRAPH_DATA = {{ graph_data_json | safe }};
+
+    /** Global reference to the ForceGraph instance, updated after init. */
+    var graphInstance = null;
+
+    /** Initialize (or re-initialize) the ForceGraph inside *container*. */
+    function initGraph(container) {
+        var colors = getThemeColors();
+        var width  = container.clientWidth  || 800;
+        var height = container.clientHeight || 500;
+
+        /* Clear any previous canvas */
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
+
+        graphInstance = ForceGraph()(container)
+            .width(width)
+            .height(height)
+            .backgroundColor(colors.background)
+            .graphData(GRAPH_DATA)
+            .nodeId('id')
+            .nodeLabel('label')
+            .nodeColor(function (node) {
+                return NODE_COLORS[node.type] || '#888888';
+            })
+            .nodeRelSize(5)
+            .linkColor(function () { return colors.link; })
+            .linkWidth(1)
+            .onNodeClick(function (node) {
+                if (node.url) {
+                    window.location.href = node.url;
+                }
+            })
+            .nodeCanvasObjectMode(function () { return 'after'; })
+            .nodeCanvasObject(function (node, ctx, globalScale) {
+                /* Draw node label when zoomed in enough (globalScale > 1.5). */
+                if (globalScale < 1.5) { return; }
+                var label = node.label || '';
+                var fontSize = 10 / globalScale;
+                ctx.font = fontSize + 'px Sans-Serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = colors.label;
+                ctx.fillText(label, node.x, (node.y || 0) + 8 / globalScale);
+            });
+    }
+
+    /** Resize the graph canvas to match the container dimensions. */
+    function resizeGraph() {
+        if (!graphInstance) { return; }
+        var container = document.getElementById('graph-container');
+        if (!container) { return; }
+        graphInstance.width(container.clientWidth);
+        graphInstance.height(container.clientHeight);
+    }
+
+    /** Re-apply theme colours to a running graph without rebuilding it. */
+    function updateGraphColors() {
+        if (!graphInstance) { return; }
+        var colors = getThemeColors();
+        graphInstance.backgroundColor(colors.background);
+        graphInstance.linkColor(function () { return colors.link; });
+    }
+
+    /** Load the force-graph script dynamically, then initialise the graph. */
+    function loadAndInit() {
+        var container = document.getElementById('graph-container');
+        if (!container) { return; }
+
+        /* If ForceGraph is already on the global scope (e.g. cached) just init. */
+        if (typeof ForceGraph !== 'undefined') {
+            initGraph(container);
+            return;
+        }
+
+        var script = document.createElement('script');
+        script.src = FORCE_GRAPH_CDN;
+        script.async = true;
+        script.onload = function () { initGraph(container); };
+        script.onerror = function () {
+            container.textContent = 'Graph could not be loaded. Please check your internet connection.';
+        };
+        document.head.appendChild(script);
+    }
+
+    /* Resize on window resize (debounced). */
+    var resizeTimer = null;
+    window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(resizeGraph, 150);
+    });
+
+    /* Re-apply colours when the theme toggle fires (MutationObserver on
+     * the html element's data-theme attribute). */
+    if (window.MutationObserver) {
+        new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (mutation.attributeName === 'data-theme') {
+                    updateGraphColors();
+                }
+            });
+        }).observe(document.documentElement, { attributes: true });
+    }
+
+    /* Kick off on DOMContentLoaded (theme.js runs before us so the
+     * correct data-theme will already be set when we read colours). */
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadAndInit);
+    } else {
+        loadAndInit();
+    }
+})();
+</script>
+{% endblock %}

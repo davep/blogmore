@@ -57,6 +57,9 @@ here](https://github.com/davep/davep.github.com)).
 - **Calendar view** — optional full-history year calendar showing all posts,
   with links to day, month, and year archives; responsive design adapts from
   four months per row down to one
+- **Post graph** — optional interactive force-directed graph connecting posts,
+  tags, and categories via internal links; click any node to navigate to it;
+  respects the active light/dark theme
 - **SEO optimisation** — meta tags, Open Graph tags, and Twitter Card support
 - **Automatic organisation** — tag pages, category pages, and chronological
   archives generated automatically
