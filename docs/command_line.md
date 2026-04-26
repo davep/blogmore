@@ -215,6 +215,16 @@ Calendar generation is **disabled by default**. Pass this flag to opt in.
 blogmore build posts/ --with-calendar
 ```
 
+#### `--with-graph`
+
+Generate an interactive post-relationship graph page. When set, BlogMore generates a `graph.html` page (path configurable via the `graph_path` configuration option) using the [force-graph](https://github.com/vasturiano/force-graph) library. The graph visualises posts, tags, and categories as nodes with edges showing their relationships. A **Graph** link is added to the navigation bar automatically.
+
+Graph generation is **disabled by default**. Pass this flag to opt in.
+
+```bash
+blogmore build posts/ --with-graph
+```
+
 #### `--with-read-time`
 
 Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on 200 words per minute) and displays it next to the post date on all post listings and individual post pages.
@@ -356,6 +366,8 @@ The serve command also accepts all the build command options:
 - `--with-search`
 - `--with-sitemap`
 - `--with-stats`
+- `--with-calendar`
+- `--with-graph`
 - `--minify-css`
 - `--minify-js`
 - `--minify-html`
@@ -450,6 +462,8 @@ The publish command also accepts all the build command options:
 - `--with-search`
 - `--with-sitemap`
 - `--with-stats`
+- `--with-calendar`
+- `--with-graph`
 - `--minify-css`
 - `--minify-js`
 - `--minify-html`

@@ -369,7 +369,7 @@ Edges connect each post to the tags and categories it carries, and to any other 
 
 The graph respects the active light/dark theme and is fully responsive.  A **Graph** link is automatically added to the navigation bar between **Calendar** and **RSS**.
 
-This is a **configuration file only** option — it cannot be set on the command line.  Off by default.
+Off by default.
 
 **Type:** Boolean  
 **Default:** `false`

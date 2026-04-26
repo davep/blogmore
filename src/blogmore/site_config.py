@@ -320,8 +320,7 @@ class SiteConfig:
     is automatically added to the navigation bar between **Calendar** and
     **RSS**.
 
-    This is a **configuration file only** option — it cannot be set on the
-    command line.  Off by default.
+    Off by default.
     """
 
     graph_path: str = DEFAULT_GRAPH_PATH
