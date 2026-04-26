@@ -104,7 +104,7 @@ or `/tag/python/` when `clean_urls` is enabled.
 | Template | Extra variables |
 |---|---|
 | `index.html` | `all_posts` (full post list), `pages` (static pages list), `prev_page_url`, `next_page_url`, `canonical_url`, `pagination_page_urls` |
-| `post.html` | `all_posts`, `pages`, `prev_post` (`Post \| None`), `next_post` (`Post \| None`), `canonical_url`, `backlinks` (list of `Backlink`) |
+| `post.html` | `all_posts`, `pages`, `prev_post` (`Post \| None`), `next_post` (`Post \| None`), `canonical_url`, `backlinks` (list of `Backlink`), `invite_comments_mailto` (`str \| None`) |
 | `page.html` | `page` (`Page`), `pages`, `canonical_url` |
 | `archive.html` | `all_posts`, `pages`, `canonical_url`, `pagination_page_urls` |
 | `tag.html` | `tag` (display name), `safe_tag` (URL slug), `all_posts`, `pages`, `prev_page_url`, `next_page_url`, `canonical_url`, `pagination_page_urls` |
@@ -272,6 +272,7 @@ Partial templates included by the above:
 | `_pagination.html` | `index.html`, `tag.html`, `category.html`, `archive.html` | Renders page navigation. |
 | `_listing_meta_tags.html` | `index.html`, `tag.html`, `category.html`, `archive.html` | Renders `<meta>` tags for listing pages. |
 | `meta_tags.html` | `post.html`, `page.html` | Renders Open Graph and SEO `<meta>` tags. |
+| `_comment_invite.html` | `post.html` (via `comment_invite` block) | Renders the comment invitation section when `invite_comments` is enabled. |
 
 ### `_pagination.html` macro
 
@@ -303,11 +304,12 @@ widget.  It is called like this:
 | `content` | Main page content (rendered inside `<main>`). |
 | `feed_nav_links` | RSS and Atom links in the header navigation. |
 
-`post.html` provides the following additional block:
+`post.html` provides the following additional blocks:
 
 | Block | Description |
 |---|---|
 | `backlinks` | The "References &amp; mentions" section shown after the bottom post-navigation on individual post pages when `with_backlinks` is enabled and there are inbound links.  Override this block in a custom `post.html` to change the layout or styling of the section. |
+| `comment_invite` | The comment invitation section shown after the bottom post-navigation (and before the `backlinks` block) when `invite_comments` is enabled.  By default this block includes `_comment_invite.html`.  Override `_comment_invite.html` in your custom templates directory to change the wording or layout, or override this block entirely in a custom `post.html`. |
 
 ## CSS classes used by templates
 
@@ -345,6 +347,9 @@ The following CSS classes are part of the stable template/CSS contract:
 | `.backlink-date` | `time` | Publication date of the source post. |
 | `.backlink-snippet` | `p` | Plain-text context snippet around the link. |
 | `.backlink-link-text` | `strong` | The link text itself, highlighted within `.backlink-snippet` so it stands out from the surrounding italic context. |
+| `.comment-invite` | `section` | Comment invitation container on a post page (only when `invite_comments` is enabled and an email address is configured). |
+| `.comment-invite-content` | `p` | The invitation message paragraph. |
+| `.comment-invite-link` | `a` | The `mailto:` link within the invitation message. |
 
 ## Stability policy
 

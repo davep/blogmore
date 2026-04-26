@@ -79,6 +79,9 @@
         {% endif %}
     </nav>
     {% endif %}
+    {% block comment_invite %}
+    {% include "_comment_invite.html" %}
+    {% endblock %}
     {% block backlinks %}
     {% if backlinks %}
     <section class="backlinks">

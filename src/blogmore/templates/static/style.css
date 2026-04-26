@@ -892,6 +892,33 @@ time a:visited {
     font-weight: 600;
 }
 
+/* Container for the comment invitation section on individual post pages. */
+.comment-invite {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.comment-invite-content {
+    padding: 0.75rem 1rem;
+    background: var(--tag-bg);
+    border: 1px solid var(--border-color-light);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    margin: 0;
+}
+
+.comment-invite-link {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+.comment-invite-link:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+}
+
 .post-content {
     font-size: 1.05em;
 }

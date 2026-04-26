@@ -104,6 +104,22 @@ posts_per_feed: 20
 # Configuration file only.
 # with_backlinks: false
 
+# Optional: Enable comment invitation section on individual post pages (default: false)
+# When true and invite_comments_to is also set, every post will show a subtle
+# invitation section with a mailto: link so readers can email their comments.
+# Per-post front-matter "invite_comments" overrides this setting for individual posts.
+# Configuration file only.
+# invite_comments: false
+
+# Optional: Template for the comment invitation email address (default: not set)
+# When invite_comments is true, this template is expanded for each post using
+# the same placeholders as post_path: {slug}, {year}, {month}, {day}, {hour},
+# {minute}, {second}, {category}, {author}.
+# Per-post front-matter "invite_comments_to" overrides this with a literal address.
+# Configuration file only.
+# invite_comments_to: "you@example.com"
+# invite_comments_to: "you+{slug}@example.com"
+
 # Optional: Show "Generated with BlogMore" footer line (default: true)
 # Set to false to hide the footer attribution line.
 # with_advert: true

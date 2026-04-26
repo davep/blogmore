@@ -1,5 +1,12 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added an optional comment invitation section to individual post pages.
+  ([#412](https://github.com/davep/blogmore/pull/412))
+
 ## v2.16.0
 
 **Released: 2026-04-25**

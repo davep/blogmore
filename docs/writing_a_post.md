@@ -127,6 +127,24 @@ The date the post was last modified. Used in the `<meta name="last-modified">` t
 modified: 2024-06-01
 ```
 
+#### `invite_comments`
+
+Override the global [`invite_comments`](configuration.md#invite_comments) setting for this post.  Set to `true` to show the comment invitation section on this post even if it is disabled globally, or to `false` to hide it on this post even if it is enabled globally.
+
+```yaml
+invite_comments: false
+```
+
+#### `invite_comments_to`
+
+Override the email address used in the comment invitation link for this post.  When set, this value is used as a **literal** email address — no template expansion is applied.  This takes precedence over the global [`invite_comments_to`](configuration.md#invite_comments_to) setting.
+
+```yaml
+invite_comments_to: "specific-address@example.com"
+```
+
+This key only has an effect when the comment invitation feature is enabled (either globally via [`invite_comments`](configuration.md#invite_comments) or via the per-post `invite_comments` front-matter key above).
+
 ### Date formats
 
 BlogMore accepts dates in several formats:

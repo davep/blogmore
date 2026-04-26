@@ -381,6 +381,45 @@ class SiteConfig:
     command line.  Empty by default.
     """
 
+    invite_comments: bool = False
+    """Whether to show a comment invitation section on individual post pages.
+
+    When ``True`` and :attr:`invite_comments_to` is also configured, every
+    post will display a comment invitation section towards the bottom of the
+    page, after the next/previous navigation buttons and before any
+    "References & mentions" section.
+
+    The per-post ``invite_comments`` front-matter key overrides this setting
+    for individual posts.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Off by default.
+    """
+
+    invite_comments_to: str | None = None
+    """Template string for the comment invitation email address.
+
+    When :attr:`invite_comments` is ``True`` and this option is set, the
+    template is expanded for each post using the same variable placeholders
+    that are available for :attr:`post_path` (``{slug}``, ``{year}``,
+    ``{month}``, ``{day}``, ``{hour}``, ``{minute}``, ``{second}``,
+    ``{category}``, ``{author}``).  The resulting string is used as the
+    ``mailto:`` address in the comment invitation link.
+
+    Examples::
+
+        invite_comments_to: "davep@example.com"
+        invite_comments_to: "davep+{slug}@example.com"
+        invite_comments_to: "{author}@example.com"
+
+    The per-post ``invite_comments_to`` front-matter key, when present,
+    overrides this setting for an individual post and is used as a literal
+    email address (no template expansion).
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  ``None`` by default.
+    """
+
     light_mode_code_style: str = DEFAULT_LIGHT_STYLE
     """Pygments style name used for syntax highlighting in light mode.
 

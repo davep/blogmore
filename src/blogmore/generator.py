@@ -18,6 +18,7 @@ from blogmore.backlinks import Backlink, build_backlink_map
 from blogmore.calendar import CalendarYear, build_calendar
 from blogmore.clean_url import make_url_clean
 from blogmore.code_styles import build_code_css
+from blogmore.comment_invite import build_mailto_url, get_invite_email_for_post
 from blogmore.feeds import BlogFeedGenerator
 from blogmore.fontawesome import (
     FONTAWESOME_CDN_BRANDS_WOFF2_URL,
@@ -1054,6 +1055,16 @@ class SiteGenerator:
 
         # Attach the backlinks list for this post to the template context.
         context["backlinks"] = backlinks_map.get(post.url, []) if backlinks_map else []
+
+        # Compute the comment invitation mailto URL for this post.
+        invite_email = get_invite_email_for_post(
+            post,
+            self.site_config.invite_comments,
+            self.site_config.invite_comments_to,
+        )
+        context["invite_comments_mailto"] = (
+            build_mailto_url(invite_email, post.title) if invite_email else None
+        )
 
         # Find previous and next posts in chronological order
         # all_posts is already sorted by date (newest first)
