@@ -10,10 +10,6 @@ from pathlib import Path
 # Application imports.
 from blogmore.graph import (
     GraphData,
-    _extract_link_url,
-    _find_link_urls,
-    _normalize_path,
-    _to_root_relative,
     build_graph_data,
 )
 from blogmore.parser import Post
@@ -82,138 +78,6 @@ class TestGraphData:
         assert len(result["links"]) == 1
         assert result["nodes"][0]["id"] == "/a.html"
         assert result["links"][0]["source"] == "/a.html"
-
-
-##############################################################################
-# _extract_link_url tests.
-
-
-class TestExtractLinkUrl:
-    """Tests for the _extract_link_url helper."""
-
-    def test_plain_url(self) -> None:
-        """A bare URL is returned unchanged."""
-        assert _extract_link_url("/path/to/post.html") == "/path/to/post.html"
-
-    def test_url_with_title(self) -> None:
-        """A URL with a title attribute has the title stripped."""
-        assert (
-            _extract_link_url('/path/to/post.html "My Title"') == "/path/to/post.html"
-        )
-
-    def test_empty_string(self) -> None:
-        """An empty string returns an empty string."""
-        assert _extract_link_url("") == ""
-
-    def test_whitespace_only(self) -> None:
-        """Whitespace-only returns the original whitespace string unchanged."""
-        assert _extract_link_url("   ") == "   "
-
-
-##############################################################################
-# _find_link_urls tests.
-
-
-class TestFindLinkUrls:
-    """Tests for the _find_link_urls helper."""
-
-    def test_inline_link(self) -> None:
-        """An inline Markdown link is detected."""
-        content = "See [my post](/2024/01/01/post.html) for details."
-        urls = _find_link_urls(content)
-        assert "/2024/01/01/post.html" in urls
-
-    def test_reference_link(self) -> None:
-        """A reference-style Markdown link is detected."""
-        content = "See [my post][post].\n\n[post]: /2024/01/01/post.html\n"
-        urls = _find_link_urls(content)
-        assert "/2024/01/01/post.html" in urls
-
-    def test_multiple_links(self) -> None:
-        """Multiple inline links are all detected."""
-        content = "[A](/a.html) and [B](/b.html)"
-        urls = _find_link_urls(content)
-        assert "/a.html" in urls
-        assert "/b.html" in urls
-
-    def test_no_links(self) -> None:
-        """Content with no links returns an empty list."""
-        assert _find_link_urls("No links here.") == []
-
-    def test_external_link_included(self) -> None:
-        """External links are returned (filtering is done by _to_root_relative)."""
-        content = "[GitHub](https://github.com/user/repo)"
-        urls = _find_link_urls(content)
-        assert "https://github.com/user/repo" in urls
-
-
-##############################################################################
-# _to_root_relative tests.
-
-
-class TestToRootRelative:
-    """Tests for the _to_root_relative helper."""
-
-    def test_root_relative_path(self) -> None:
-        """A root-relative path is returned unchanged."""
-        assert _to_root_relative("/post.html", "") == "/post.html"
-
-    def test_full_url_matching_site(self) -> None:
-        """A full URL matching site_url is converted to a root-relative path."""
-        assert (
-            _to_root_relative("https://example.com/post.html", "https://example.com")
-            == "/post.html"
-        )
-
-    def test_external_full_url_rejected(self) -> None:
-        """A full URL not matching site_url is rejected."""
-        assert (
-            _to_root_relative("https://other.com/page", "https://example.com") is None
-        )
-
-    def test_fragment_only_rejected(self) -> None:
-        """A fragment-only URL is rejected."""
-        assert _to_root_relative("#section", "") is None
-
-    def test_relative_url_rejected(self) -> None:
-        """A relative URL (no leading slash) is rejected."""
-        assert _to_root_relative("../other.html", "") is None
-
-    def test_fragment_stripped(self) -> None:
-        """Fragment is stripped before comparison."""
-        assert _to_root_relative("/post.html#section", "") == "/post.html"
-
-    def test_query_string_stripped(self) -> None:
-        """Query string is stripped before comparison."""
-        assert _to_root_relative("/post.html?ref=nav", "") == "/post.html"
-
-    def test_empty_after_stripping(self) -> None:
-        """A URL that becomes empty after stripping fragments returns None."""
-        assert _to_root_relative("#", "") is None
-
-
-##############################################################################
-# _normalize_path tests.
-
-
-class TestNormalizePath:
-    """Tests for the _normalize_path helper."""
-
-    def test_plain_html(self) -> None:
-        """A .html path has the extension removed."""
-        assert _normalize_path("/post.html") == "/post"
-
-    def test_index_html(self) -> None:
-        """A path ending in index.html has it removed."""
-        assert _normalize_path("/post/index.html") == "/post"
-
-    def test_trailing_slash(self) -> None:
-        """A path with trailing slash has it removed."""
-        assert _normalize_path("/post/") == "/post"
-
-    def test_clean_url(self) -> None:
-        """A clean URL (no extension) is returned unchanged."""
-        assert _normalize_path("/post") == "/post"
 
 
 ##############################################################################
@@ -440,6 +304,25 @@ class TestBuildGraphData:
         for link in graph.links:
             assert "source" in link
             assert "target" in link
+
+    def test_reference_style_link_resolved_to_post(self) -> None:
+        """A reference-style Markdown link to another post creates an edge."""
+        posts = [
+            _make_post(
+                "post-a",
+                "See [Post B][b].\n\n[b]: /b.html\n",
+                "/a.html",
+                title="Post A",
+            ),
+            _make_post("post-b", "Content B", "/b.html", title="Post B"),
+        ]
+        graph = build_graph_data(posts)
+        post_to_post = [
+            link
+            for link in graph.links
+            if link["source"] == "/a.html" and link["target"] == "/b.html"
+        ]
+        assert len(post_to_post) == 1
 
 
 ### test_graph.py ends here
