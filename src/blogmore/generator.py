@@ -60,6 +60,8 @@ GRAPH_CSS_FILENAME = "graph.css"
 GRAPH_CSS_MINIFIED_FILENAME = "graph.min.css"
 TAG_CLOUD_CSS_FILENAME = "tag-cloud.css"
 TAG_CLOUD_CSS_MINIFIED_FILENAME = "tag-cloud.min.css"
+GRAPH_JS_FILENAME = "graph.js"
+GRAPH_JS_MINIFIED_FILENAME = "graph.min.js"
 CODE_CSS_FILENAME = "code.css"
 CODE_CSS_MINIFIED_FILENAME = "code.min.css"
 THEME_JS_FILENAME = "theme.js"
@@ -426,6 +428,11 @@ class SiteGenerator:
             if self.site_config.minify_js
             else f"/static/{CODEBLOCKS_JS_FILENAME}"
         )
+        graph_js_url = (
+            f"/static/{GRAPH_JS_MINIFIED_FILENAME}"
+            if self.site_config.minify_js
+            else f"/static/{GRAPH_JS_FILENAME}"
+        )
         page1_suffix = resolve_pagination_page_path(self.site_config.page_1_path, 1)
         if self.site_config.clean_urls:
             page1_suffix = make_url_clean(page1_suffix)
@@ -470,6 +477,7 @@ class SiteGenerator:
             "theme_js_url": theme_js_url,
             "search_js_url": search_js_url,
             "codeblocks_js_url": codeblocks_js_url,
+            "graph_js_url": graph_js_url,
             "pagination_page1_suffix": page1_suffix,
         }
         # Merge sidebar config into context
@@ -1931,7 +1939,8 @@ class SiteGenerator:
 
         When ``minify_js`` is enabled, the ``theme.js`` file is minified and
         written as ``theme.min.js`` (and ``search.js`` as ``search.min.js`` if
-        search is enabled); the originals are not written.
+        search is enabled, ``graph.js`` as ``graph.min.js`` if graph is
+        enabled); the originals are not written.
         """
         output_static = self.site_config.output_dir / "static"
 
@@ -1958,6 +1967,12 @@ class SiteGenerator:
                             and not self.site_config.with_search
                         ):
                             continue
+                        # Only copy graph.js when graph is enabled
+                        if (
+                            item.name == GRAPH_JS_FILENAME
+                            and not self.site_config.with_graph
+                        ):
+                            continue
                         # When minifying CSS, skip all source CSS files
                         if (
                             item.name in _css_source_filenames
@@ -1977,6 +1992,11 @@ class SiteGenerator:
                             continue
                         if (
                             item.name == CODEBLOCKS_JS_FILENAME
+                            and self.site_config.minify_js
+                        ):
+                            continue
+                        if (
+                            item.name == GRAPH_JS_FILENAME
                             and self.site_config.minify_js
                         ):
                             continue
@@ -2017,6 +2037,11 @@ class SiteGenerator:
                             and self.site_config.minify_js
                         ):
                             continue
+                        if (
+                            relative_path.name == GRAPH_JS_FILENAME
+                            and self.site_config.minify_js
+                        ):
+                            continue
                         output_file = output_static / relative_path
                         output_file.parent.mkdir(parents=True, exist_ok=True)
                         shutil.copy2(item, output_file)
@@ -2040,6 +2065,10 @@ class SiteGenerator:
             if self.site_config.with_search:
                 self._write_minified_js(
                     output_static, SEARCH_JS_FILENAME, SEARCH_JS_MINIFIED_FILENAME
+                )
+            if self.site_config.with_graph:
+                self._write_minified_js(
+                    output_static, GRAPH_JS_FILENAME, GRAPH_JS_MINIFIED_FILENAME
                 )
 
     def _copy_extras(self) -> None:

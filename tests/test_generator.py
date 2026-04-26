@@ -6378,7 +6378,9 @@ class TestGraphPageGeneration:
     def test_graph_page_contains_force_graph_cdn(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
-        """The graph page loads the force-graph library from CDN."""
+        """The graph JS file loads the force-graph library from CDN."""
+        from blogmore.generator import GRAPH_JS_FILENAME
+
         generator = SiteGenerator(
             site_config=SiteConfig(
                 content_dir=posts_dir,
@@ -6388,8 +6390,8 @@ class TestGraphPageGeneration:
         )
         generator.generate()
 
-        graph_content = (temp_output_dir / "graph.html").read_text()
-        assert "force-graph" in graph_content
+        graph_js_content = (temp_output_dir / "static" / GRAPH_JS_FILENAME).read_text()
+        assert "force-graph" in graph_js_content
 
     def test_graph_page_contains_graph_data(
         self, posts_dir: Path, temp_output_dir: Path
@@ -6492,3 +6494,75 @@ class TestGraphPageGeneration:
             '<link rel="canonical" href="https://example.com/graph.html">'
             in graph_content
         )
+
+    def test_graph_js_generated_when_graph_enabled(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """graph.js is written to the static directory when with_graph=True."""
+        from blogmore.generator import GRAPH_JS_FILENAME
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "static" / GRAPH_JS_FILENAME).exists()
+
+    def test_graph_js_not_generated_when_graph_disabled(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """graph.js is NOT written to the static directory when with_graph=False."""
+        from blogmore.generator import GRAPH_JS_FILENAME
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=False,
+            )
+        )
+        generator.generate()
+
+        assert not (temp_output_dir / "static" / GRAPH_JS_FILENAME).exists()
+
+    def test_graph_js_minified_when_minify_js_enabled(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """graph.min.js is written and graph.js is absent when minify_js=True."""
+        from blogmore.generator import GRAPH_JS_FILENAME, GRAPH_JS_MINIFIED_FILENAME
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=True,
+                minify_js=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "static" / GRAPH_JS_MINIFIED_FILENAME).exists()
+        assert not (temp_output_dir / "static" / GRAPH_JS_FILENAME).exists()
+
+    def test_graph_page_references_graph_js(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The graph page HTML references graph.js."""
+        from blogmore.generator import GRAPH_JS_FILENAME
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=True,
+            )
+        )
+        generator.generate()
+
+        graph_content = (temp_output_dir / "graph.html").read_text()
+        assert f"/static/{GRAPH_JS_FILENAME}" in graph_content
+
