@@ -1,0 +1,164 @@
+/* =============================================================================
+   GRAPH PAGE
+   ============================================================================= */
+
+.graph-page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.graph-page > h1 {
+    margin-bottom: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Toolbar: legend + fullscreen button in a single row. */
+.graph-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    margin-bottom: 0.75rem;
+    flex-shrink: 0;
+}
+
+.graph-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    font-size: 0.875em;
+    color: var(--text-secondary);
+}
+
+.graph-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+}
+
+/* Base shape — 13 × 13 px canvas */
+.graph-legend-shape {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+}
+
+/* Post → square (no border-radius) */
+.graph-legend-shape--post {
+    background-color: #4299e1;
+}
+
+/* Tag → circle */
+.graph-legend-shape--tag {
+    background-color: #f59e0b;
+    border-radius: 50%;
+}
+
+/* Category → upward-pointing triangle via clip-path */
+.graph-legend-shape--category {
+    background-color: #48bb78;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+/* ---- Fullscreen toggle button -------------------------------------------- */
+
+.graph-fullscreen-btn {
+    padding: 3px 10px;
+    font-size: 0.8em;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-color, #fff);
+    color: var(--text-color, #333);
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.graph-fullscreen-btn:hover {
+    opacity: 0.8;
+}
+
+.graph-fullscreen-exit {
+    display: none;
+}
+
+/* ---- Graph canvas container ---------------------------------------------- */
+
+.graph-container {
+    flex: 1;
+    width: 100%;
+    min-height: 500px;
+    height: calc(100vh - 280px);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.graph-hint {
+    font-size: 0.8em;
+    color: var(--text-secondary);
+    margin-top: 0.4rem;
+    flex-shrink: 0;
+}
+
+/* Override the main-wrapper max-width for the graph page so the graph
+ * expands to fill as much horizontal space as possible while still
+ * respecting the sidebar layout.
+ */
+.graph-page-wrapper {
+    max-width: none !important;
+}
+
+@media (max-width: 768px) {
+    .graph-container {
+        height: calc(100vh - 340px);
+        min-height: 300px;
+    }
+}
+
+/* =============================================================================
+   FULL-SCREEN MODE
+   Toggled by adding .graph-fullscreen-active to <body>.  Not sticky — removed
+   on page unload and via the Escape key.
+   ============================================================================= */
+
+body.graph-fullscreen-active .sidebar,
+body.graph-fullscreen-active header,
+body.graph-fullscreen-active footer,
+body.graph-fullscreen-active .graph-hint {
+    display: none !important;
+}
+
+body.graph-fullscreen-active .main-wrapper {
+    max-width: 100% !important;
+    padding: 0 !important;
+}
+
+body.graph-fullscreen-active .graph-page {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--bg-color, #fff);
+    margin: 0;
+    padding: 0.6rem 0.75rem 0.5rem;
+    height: 100dvh;
+    height: 100vh; /* fallback for browsers without dvh */
+    overflow: hidden;
+}
+
+body.graph-fullscreen-active .graph-container {
+    min-height: 0;
+    height: auto;
+}
+
+body.graph-fullscreen-active .graph-fullscreen-enter {
+    display: none;
+}
+
+body.graph-fullscreen-active .graph-fullscreen-exit {
+    display: inline;
+}

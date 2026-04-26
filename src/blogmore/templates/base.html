@@ -136,6 +136,9 @@
                         {% if with_calendar %}
                         <li><a href="{{ calendar_url }}">Calendar</a></li>
                         {% endif %}
+                        {% if with_graph %}
+                        <li><a href="{{ graph_url }}">Graph</a></li>
+                        {% endif %}
                         {% block feed_nav_links %}
                         <li><a href="/feed.xml" title="Subscribe via RSS feed">RSS</a></li>
                         <li><a href="/feeds/all.atom.xml" title="Subscribe via Atom feed">Atom</a></li>

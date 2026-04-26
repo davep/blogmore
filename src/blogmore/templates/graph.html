@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Graph - {{ site_title }}{% endblock %}
+
+{% block meta_tags %}
+{% from '_listing_meta_tags.html' import listing_meta_tags with context %}
+{{ listing_meta_tags("Graph - " ~ site_title) }}
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ graph_css_url }}">
+{% endblock %}
+
+{% block content %}
+<div class="graph-page">
+    <h1>Graph</h1>
+
+    <div class="graph-toolbar">
+        <div class="graph-legend" aria-label="Graph legend">
+            <span class="graph-legend-item">
+                <span class="graph-legend-shape graph-legend-shape--post" aria-hidden="true"></span>
+                Posts
+            </span>
+            <span class="graph-legend-item">
+                <span class="graph-legend-shape graph-legend-shape--tag" aria-hidden="true"></span>
+                Tags
+            </span>
+            <span class="graph-legend-item">
+                <span class="graph-legend-shape graph-legend-shape--category" aria-hidden="true"></span>
+                Categories
+            </span>
+        </div>
+
+        <button class="graph-fullscreen-btn" id="graph-fullscreen-btn" type="button"
+                aria-label="Toggle full-page graph view" aria-pressed="false">
+            <span class="graph-fullscreen-enter">&#x26F6; Full screen</span>
+            <span class="graph-fullscreen-exit">&#x2715; Exit full screen</span>
+        </button>
+    </div>
+
+    <div class="graph-container" id="graph-container"
+         role="img" aria-label="Interactive post relationship graph. Click a node to highlight its connections; click the same node again to navigate to it.">
+    </div>
+
+    <p class="graph-hint">Click a node to highlight connections &mdash; click it again to navigate.
+        Drag a node to pin it in place.</p>
+</div>
+
+<script>window.GRAPH_DATA = {{ graph_data_json | safe }};</script>
+<script src="{{ graph_js_url }}"></script>
+{% endblock %}

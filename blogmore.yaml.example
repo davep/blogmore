@@ -88,6 +88,14 @@ posts_per_feed: 20
 # Only used when with_calendar is true.
 # forward_calendar: false
 
+# Optional: Generate an interactive post-relationship graph (default: false)
+# Generates a graph.html page visualising posts, tags, and categories as an
+# interactive force-directed graph using the force-graph library (loaded from
+# CDN). Edges connect posts to the tags and categories they carry, and to
+# other posts they link to internally. A Graph link is added to the navigation
+# bar automatically, between Calendar and RSS. Configuration file only.
+# with_graph: false
+
 # Optional: Show estimated reading time on posts (default: false)
 # Displays the approximate time to read each post based on the configured WPM.
 # with_read_time: false
@@ -192,6 +200,14 @@ posts_per_feed: 20
 # stripped so both calendar.html and /calendar.html produce the same result.
 # Only used when with_calendar is true. Configuration file only.
 # calendar_path: "calendar.html"
+
+# Optional: Path for the graph page relative to the output directory
+# (default: graph.html). The full directory path is created automatically.
+# When clean_urls is enabled and the path ends in index.html, the
+# index.html portion is omitted in links to the page. Leading slashes are
+# stripped so both graph.html and /graph.html produce the same result.
+# Only used when with_graph is true. Configuration file only.
+# graph_path: "graph.html"
 
 # Optional: Generate clean URLs for posts and pages (default: false)
 # When enabled, posts and pages whose URL ends with /index.html will use the

@@ -27,6 +27,7 @@ from blogmore.fontawesome import (
     FONTAWESOME_LOCAL_CSS_PATH,
     FontAwesomeOptimizer,
 )
+from blogmore.graph import GraphData, build_graph_data
 from blogmore.icons import IconGenerator, detect_source_icon
 from blogmore.page_path import compute_page_output_path
 from blogmore.pagination_path import resolve_pagination_page_path
@@ -55,8 +56,12 @@ ARCHIVE_CSS_FILENAME = "archive.css"
 ARCHIVE_CSS_MINIFIED_FILENAME = "archive.min.css"
 CALENDAR_CSS_FILENAME = "calendar.css"
 CALENDAR_CSS_MINIFIED_FILENAME = "calendar.min.css"
+GRAPH_CSS_FILENAME = "graph.css"
+GRAPH_CSS_MINIFIED_FILENAME = "graph.min.css"
 TAG_CLOUD_CSS_FILENAME = "tag-cloud.css"
 TAG_CLOUD_CSS_MINIFIED_FILENAME = "tag-cloud.min.css"
+GRAPH_JS_FILENAME = "graph.js"
+GRAPH_JS_MINIFIED_FILENAME = "graph.min.js"
 CODE_CSS_FILENAME = "code.css"
 CODE_CSS_MINIFIED_FILENAME = "code.min.css"
 THEME_JS_FILENAME = "theme.js"
@@ -73,6 +78,7 @@ _PAGE_SPECIFIC_CSS: list[tuple[str, str]] = [
     (ARCHIVE_CSS_FILENAME, ARCHIVE_CSS_MINIFIED_FILENAME),
     (TAG_CLOUD_CSS_FILENAME, TAG_CLOUD_CSS_MINIFIED_FILENAME),
     (CALENDAR_CSS_FILENAME, CALENDAR_CSS_MINIFIED_FILENAME),
+    (GRAPH_CSS_FILENAME, GRAPH_CSS_MINIFIED_FILENAME),
 ]
 
 
@@ -350,6 +356,21 @@ class SiteGenerator:
             url = make_url_clean(url)
         return url
 
+    def _get_graph_url(self) -> str:
+        """Return the URL path for the configured graph page.
+
+        Derives the URL from the ``graph_path`` configuration option.  When
+        ``clean_urls`` is enabled and the path ends in ``index.html``, the
+        index filename is stripped so the URL ends with a trailing slash.
+
+        Returns:
+            The URL path for the graph page, always starting with ``/``.
+        """
+        url = "/" + self.site_config.graph_path.lstrip("/")
+        if self.site_config.clean_urls:
+            url = make_url_clean(url)
+        return url
+
     def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
         styles_css_url = self._with_cache_bust(
@@ -377,6 +398,11 @@ class SiteGenerator:
             if self.site_config.minify_css
             else f"/static/{CALENDAR_CSS_FILENAME}"
         )
+        graph_css_url = self._with_cache_bust(
+            f"/static/{GRAPH_CSS_MINIFIED_FILENAME}"
+            if self.site_config.minify_css
+            else f"/static/{GRAPH_CSS_FILENAME}"
+        )
         tag_cloud_css_url = self._with_cache_bust(
             f"/static/{TAG_CLOUD_CSS_MINIFIED_FILENAME}"
             if self.site_config.minify_css
@@ -402,6 +428,11 @@ class SiteGenerator:
             if self.site_config.minify_js
             else f"/static/{CODEBLOCKS_JS_FILENAME}"
         )
+        graph_js_url = (
+            f"/static/{GRAPH_JS_MINIFIED_FILENAME}"
+            if self.site_config.minify_js
+            else f"/static/{GRAPH_JS_FILENAME}"
+        )
         page1_suffix = resolve_pagination_page_path(self.site_config.page_1_path, 1)
         if self.site_config.clean_urls:
             page1_suffix = make_url_clean(page1_suffix)
@@ -426,6 +457,8 @@ class SiteGenerator:
             "with_calendar": self.site_config.with_calendar,
             "forward_calendar": self.site_config.forward_calendar,
             "calendar_url": self._get_calendar_url(),
+            "with_graph": self.site_config.with_graph,
+            "graph_url": self._get_graph_url(),
             "with_read_time": self.site_config.with_read_time,
             "with_backlinks": self.site_config.with_backlinks,
             "with_advert": self.site_config.with_advert,
@@ -439,10 +472,12 @@ class SiteGenerator:
             "archive_css_url": archive_css_url,
             "tag_cloud_css_url": tag_cloud_css_url,
             "calendar_css_url": calendar_css_url,
+            "graph_css_url": graph_css_url,
             "code_css_url": code_css_url,
             "theme_js_url": theme_js_url,
             "search_js_url": search_js_url,
             "codeblocks_js_url": codeblocks_js_url,
+            "graph_js_url": graph_js_url,
             "pagination_page1_suffix": page1_suffix,
         }
         # Merge sidebar config into context
@@ -742,6 +777,11 @@ class SiteGenerator:
         if self.site_config.with_calendar:
             print("Generating calendar page...")
             self._generate_calendar_page(posts, sidebar_pages)
+
+        # Generate graph page (only when enabled)
+        if self.site_config.with_graph:
+            print("Generating graph page...")
+            self._generate_graph_page(posts, sidebar_pages)
 
         # Copy static assets if they exist
         self._copy_static_assets()
@@ -1814,6 +1854,39 @@ class SiteGenerator:
         )
         self._write_html(output_path, html)
 
+    def _generate_graph_page(self, posts: list[Post], pages: list[Page]) -> None:
+        """Generate the post-relationship graph page.
+
+        Args:
+            posts: All published posts; used to build graph nodes and edges.
+            pages: List of static pages (for the sidebar navigation).
+        """
+        context = self._get_global_context()
+        context["pages"] = pages
+        output_path = (
+            self.site_config.output_dir / self.site_config.graph_path.lstrip("/")
+        ).resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        graph_url = self._get_graph_url()
+        if self.site_config.clean_urls:
+            context["canonical_url"] = (
+                f"{self.site_config.site_url}{graph_url}"
+                if self.site_config.site_url
+                else graph_url
+            )
+        else:
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
+        graph_data: GraphData = build_graph_data(
+            posts,
+            tag_dir=self.TAG_DIR,
+            category_dir=self.CATEGORY_DIR,
+            site_url=self.site_config.site_url,
+        )
+        html = self.renderer.render_graph_page(
+            graph_data_json=graph_data.to_json(), **context
+        )
+        self._write_html(output_path, html)
+
     def _remove_stale_search_files(self) -> None:
         """Remove search-related files left over from a previous build.
 
@@ -1866,7 +1939,8 @@ class SiteGenerator:
 
         When ``minify_js`` is enabled, the ``theme.js`` file is minified and
         written as ``theme.min.js`` (and ``search.js`` as ``search.min.js`` if
-        search is enabled); the originals are not written.
+        search is enabled, ``graph.js`` as ``graph.min.js`` if graph is
+        enabled); the originals are not written.
         """
         output_static = self.site_config.output_dir / "static"
 
@@ -1893,6 +1967,12 @@ class SiteGenerator:
                             and not self.site_config.with_search
                         ):
                             continue
+                        # Only copy graph.js when graph is enabled
+                        if (
+                            item.name == GRAPH_JS_FILENAME
+                            and not self.site_config.with_graph
+                        ):
+                            continue
                         # When minifying CSS, skip all source CSS files
                         if (
                             item.name in _css_source_filenames
@@ -1912,6 +1992,11 @@ class SiteGenerator:
                             continue
                         if (
                             item.name == CODEBLOCKS_JS_FILENAME
+                            and self.site_config.minify_js
+                        ):
+                            continue
+                        if (
+                            item.name == GRAPH_JS_FILENAME
                             and self.site_config.minify_js
                         ):
                             continue
@@ -1952,6 +2037,11 @@ class SiteGenerator:
                             and self.site_config.minify_js
                         ):
                             continue
+                        if (
+                            relative_path.name == GRAPH_JS_FILENAME
+                            and self.site_config.minify_js
+                        ):
+                            continue
                         output_file = output_static / relative_path
                         output_file.parent.mkdir(parents=True, exist_ok=True)
                         shutil.copy2(item, output_file)
@@ -1975,6 +2065,10 @@ class SiteGenerator:
             if self.site_config.with_search:
                 self._write_minified_js(
                     output_static, SEARCH_JS_FILENAME, SEARCH_JS_MINIFIED_FILENAME
+                )
+            if self.site_config.with_graph:
+                self._write_minified_js(
+                    output_static, GRAPH_JS_FILENAME, GRAPH_JS_MINIFIED_FILENAME
                 )
 
     def _copy_extras(self) -> None:

@@ -6292,3 +6292,277 @@ class TestCalendarPageGeneration:
         assert 'href="/2024/index.html"' in calendar_content
         assert 'href="/2024/01/index.html"' in calendar_content
         assert 'href="/2024/01/10/index.html"' in calendar_content
+
+
+class TestGraphPageGeneration:
+    """Tests for the graph page (with_graph) feature."""
+
+    def test_graph_disabled_by_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """graph.html is NOT generated when with_graph is False (the default)."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator.generate()
+
+        assert not (temp_output_dir / "graph.html").exists()
+
+    def test_graph_enabled_generates_graph_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """graph.html is generated when with_graph=True."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "graph.html").exists()
+
+    def test_graph_nav_link_absent_by_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The Graph nav link does not appear when with_graph is False."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/graph.html" not in index_content
+
+    def test_graph_nav_link_present_when_enabled(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The Graph nav link appears in the navigation when with_graph=True."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=True,
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/graph.html"' in index_content
+
+    def test_graph_page_links_graph_css(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The graph page includes the graph-specific CSS file."""
+        from blogmore.generator import GRAPH_CSS_FILENAME
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=True,
+            )
+        )
+        generator.generate()
+
+        graph_content = (temp_output_dir / "graph.html").read_text()
+        assert f"/static/{GRAPH_CSS_FILENAME}" in graph_content
+
+    def test_graph_page_contains_force_graph_cdn(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The graph JS file loads the force-graph library from CDN."""
+        from blogmore.generator import GRAPH_JS_FILENAME
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=True,
+            )
+        )
+        generator.generate()
+
+        graph_js_content = (temp_output_dir / "static" / GRAPH_JS_FILENAME).read_text()
+        assert "force-graph" in graph_js_content
+
+    def test_graph_page_contains_graph_data(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The graph page embeds graph data JSON."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=True,
+            )
+        )
+        generator.generate()
+
+        graph_content = (temp_output_dir / "graph.html").read_text()
+        assert '"nodes"' in graph_content
+        assert '"links"' in graph_content
+
+    def test_custom_graph_path(self, posts_dir: Path, temp_output_dir: Path) -> None:
+        """A custom graph_path generates the graph page at the specified location."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=True,
+                graph_path="blog/graph.html",
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "blog" / "graph.html").exists()
+        assert not (temp_output_dir / "graph.html").exists()
+
+    def test_custom_graph_path_nav_link_uses_configured_url(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The Graph nav link uses the custom graph_path URL."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=True,
+                graph_path="blog/graph.html",
+            )
+        )
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/blog/graph.html"' in index_content
+        assert 'href="/graph.html"' not in index_content
+
+    def test_graph_path_clean_urls_strips_index_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """With clean_urls enabled and graph_path ending in index.html, the nav link is clean."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=True,
+                graph_path="graph/index.html",
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "graph" / "index.html").exists()
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert 'href="/graph/"' in index_content
+
+    def test_graph_path_default_value(self) -> None:
+        """The graph_path setting defaults to graph.html."""
+        from blogmore.site_config import DEFAULT_GRAPH_PATH
+
+        config = SiteConfig(output_dir=Path("output"))
+        assert config.graph_path == DEFAULT_GRAPH_PATH
+        assert config.graph_path == "graph.html"
+
+    def test_with_graph_default_is_false(self) -> None:
+        """with_graph defaults to False on SiteConfig."""
+        config = SiteConfig(output_dir=Path("output"))
+        assert config.with_graph is False
+
+    def test_graph_canonical_url_with_site_url(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The graph page canonical URL includes the site_url."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=True,
+                site_url="https://example.com",
+            )
+        )
+        generator.generate()
+
+        graph_content = (temp_output_dir / "graph.html").read_text()
+        assert (
+            '<link rel="canonical" href="https://example.com/graph.html">'
+            in graph_content
+        )
+
+    def test_graph_js_generated_when_graph_enabled(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """graph.js is written to the static directory when with_graph=True."""
+        from blogmore.generator import GRAPH_JS_FILENAME
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "static" / GRAPH_JS_FILENAME).exists()
+
+    def test_graph_js_not_generated_when_graph_disabled(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """graph.js is NOT written to the static directory when with_graph=False."""
+        from blogmore.generator import GRAPH_JS_FILENAME
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=False,
+            )
+        )
+        generator.generate()
+
+        assert not (temp_output_dir / "static" / GRAPH_JS_FILENAME).exists()
+
+    def test_graph_js_minified_when_minify_js_enabled(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """graph.min.js is written and graph.js is absent when minify_js=True."""
+        from blogmore.generator import GRAPH_JS_FILENAME, GRAPH_JS_MINIFIED_FILENAME
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=True,
+                minify_js=True,
+            )
+        )
+        generator.generate()
+
+        assert (temp_output_dir / "static" / GRAPH_JS_MINIFIED_FILENAME).exists()
+        assert not (temp_output_dir / "static" / GRAPH_JS_FILENAME).exists()
+
+    def test_graph_page_references_graph_js(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The graph page HTML references graph.js."""
+        from blogmore.generator import GRAPH_JS_FILENAME
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_graph=True,
+            )
+        )
+        generator.generate()
+
+        graph_content = (temp_output_dir / "graph.html").read_text()
+        assert f"/static/{GRAPH_JS_FILENAME}" in graph_content
+

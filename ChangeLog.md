@@ -6,6 +6,8 @@
 
 - Added an optional comment invitation section to individual post pages.
   ([#412](https://github.com/davep/blogmore/pull/412))
+- Added an interactive post-relationship graph page.
+  ([#414](https://github.com/davep/blogmore/pull/414))
 
 ## v2.16.0
 

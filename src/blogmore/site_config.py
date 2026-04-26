@@ -37,6 +37,10 @@ DEFAULT_STATS_PATH = "stats.html"
 # Default calendar page path (relative to the output directory).
 DEFAULT_CALENDAR_PATH = "calendar.html"
 
+##############################################################################
+# Default graph page path (relative to the output directory).
+DEFAULT_GRAPH_PATH = "graph.html"
+
 
 @dataclass
 class SiteConfig:
@@ -305,6 +309,39 @@ class SiteConfig:
     Only used when ``with_calendar`` is ``True``.  This is a **configuration
     file only** option — it cannot be set on the command line.  Defaults to
     ``calendar.html``.
+    """
+
+    with_graph: bool = False
+    """Whether to generate a post-relationship force-directed graph page.
+
+    When ``True`` the generator produces a graph page (at the path configured
+    by :attr:`graph_path`) that visualises the relationships between posts,
+    tags, and categories using the ``force-graph`` library.  A **Graph** link
+    is automatically added to the navigation bar between **Calendar** and
+    **RSS**.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Off by default.
+    """
+
+    graph_path: str = DEFAULT_GRAPH_PATH
+    """Path (relative to the output directory) where the graph page is written.
+
+    The path is joined onto the ``output`` directory, so ``graph.html``
+    produces ``<output>/graph.html``, and ``blog/graph/index.html``
+    produces ``<output>/blog/graph/index.html``.
+
+    Parent directories are created automatically.  When ``clean_urls`` is
+    enabled and the path ends in ``index.html``, the ``index.html`` portion
+    is omitted in any URL reference to the page.
+
+    The path is always treated as relative to the output directory root, so
+    both ``/graph/index.html`` and ``graph/index.html`` produce the same
+    output location.
+
+    Only used when ``with_graph`` is ``True``.  This is a **configuration
+    file only** option — it cannot be set on the command line.  Defaults to
+    ``graph.html``.
     """
 
     page_1_path: str = DEFAULT_PAGE_1_PATH
