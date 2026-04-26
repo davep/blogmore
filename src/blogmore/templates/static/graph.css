@@ -70,7 +70,7 @@
     cursor: pointer;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    background: var(--background-color, #fff);
+    background: var(--bg-color, #fff);
     color: var(--text-color, #333);
     white-space: nowrap;
     flex-shrink: 0;
@@ -142,7 +142,7 @@ body.graph-fullscreen-active .graph-page {
     position: fixed;
     inset: 0;
     z-index: 9999;
-    background: var(--background-color, #fff);
+    background: var(--bg-color, #fff);
     margin: 0;
     padding: 0.6rem 0.75rem 0.5rem;
     height: 100dvh;
