@@ -394,6 +394,72 @@ with_backlinks: true
 
 **Note:** Calculating the backlink map requires scanning every post's content for internal links.  For sites with many posts this scan adds a small amount of time to each build.  The scan is skipped entirely when `with_backlinks` is `false`.
 
+#### `invite_comments`
+
+Enable a comment invitation section on individual post pages.  When `true` and [`invite_comments_to`](#invite_comments_to) is also configured, every post will display a subtle invitation section towards the bottom of the page, after the next/previous navigation buttons and before any "References &amp; mentions" section.  The section contains a `mailto:` link so readers can email their comments or questions about the post.
+
+The invitation section is a Jinja2 template (`_comment_invite.html`) that can be overridden in a custom templates directory.
+
+The per-post [`invite_comments` front-matter key](writing_a_post.md#invite_comments) overrides this setting for individual posts.
+
+This is a **configuration file only** option — it cannot be set on the command line.  Off by default.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+invite_comments: true
+```
+
+#### `invite_comments_to`
+
+Template string for the comment invitation email address.  When [`invite_comments`](#invite_comments) is `true` and this option is set, the template is expanded for each post using the same variable placeholders as [`post_path`](#post_path).  The resulting value is used as the `mailto:` address in the comment invitation link, with the post title as the pre-filled email subject.
+
+This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** String  
+**Default:** *(not set)*
+
+```yaml
+invite_comments_to: "davep@example.com"
+```
+
+##### Available variables
+
+The same variable placeholders as [`post_path`](#available-variables) are available:
+
+| Variable     | Description                                               | Example value   |
+|--------------|-----------------------------------------------------------|-----------------|
+| `{slug}`     | Post slug (date prefix stripped if present).              | `my-first-post` |
+| `{year}`     | 4-digit year                                              | `2024`          |
+| `{month}`    | 2-digit zero-padded month                                 | `01`            |
+| `{day}`      | 2-digit zero-padded day                                   | `15`            |
+| `{hour}`     | 2-digit zero-padded 24-hour hour                          | `09`            |
+| `{minute}`   | 2-digit zero-padded minute                                | `30`            |
+| `{second}`   | 2-digit zero-padded second                                | `05`            |
+| `{category}` | Category of the post, slugified for safe URL use          | `python`        |
+| `{author}`   | Author of the post, slugified for safe URL use            | `dave-pearson`  |
+
+For posts without a date the date/time variables are substituted with empty strings.  Posts with no category or author similarly produce an empty string for those variables.
+
+##### Examples
+
+```yaml
+# Plain address — all posts use the same address
+invite_comments_to: "davep@example.com"
+
+# Slug-based address — each post gets a unique address
+invite_comments_to: "davep+{slug}@example.com"
+
+# Author-based address
+invite_comments_to: "{author}@example.com"
+
+# Combined
+invite_comments_to: "{author}+post-{slug}-{year}{month}{day}@{category}.example.com"
+```
+
+The per-post [`invite_comments_to` front-matter key](writing_a_post.md#invite_comments_to) overrides this setting for an individual post and is used as a **literal** email address (no template expansion).
+
 #### `post_path`
 
 Format string that controls the output path (and therefore the URL) of every blog post.  This is a **configuration file only** option — it cannot be set on the command line.

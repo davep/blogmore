@@ -1,5 +1,20 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added an optional comment invitation section to individual post pages.
+  When `invite_comments: true` and `invite_comments_to` are configured,
+  each post displays a subtle `mailto:` invitation section after the
+  next/previous navigation, before the "References &amp; mentions" section.
+  The email address supports the same `{slug}`, `{year}`, `{author}`,
+  `{category}` and other placeholders as `post_path`.  Per-post front-matter
+  keys `invite_comments` and `invite_comments_to` override the global
+  configuration values for individual posts.  The invitation section is
+  rendered by the overridable `_comment_invite.html` partial template and
+  exposed as the `comment_invite` block in `post.html`.
+
 ## v2.16.0
 
 **Released: 2026-04-25**
