@@ -10,6 +10,8 @@
 - When a post's frontmatter includes a `modified` date, it is now shown
   after the publication date in parentheses.
   ([#423](https://github.com/davep/blogmore/pull/423))
+- Added richer tooltips to the graph view of blogs.
+  ([#424](https://github.com/davep/blogmore/pull/424))
 
 ## v2.17.0
 
