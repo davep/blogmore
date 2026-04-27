@@ -211,18 +211,18 @@
             html += '<strong class="graph-floater-title">' +
                         escapeHtml(node.label) +
                     '</strong>';
-            var cp = node.post_count || 0;
+            var categoryPostCount = node.post_count || 0;
             html += '<span class="graph-floater-meta">' +
-                        cp + ' post' + (cp !== 1 ? 's' : '') +
+                        categoryPostCount + ' post' + (categoryPostCount !== 1 ? 's' : '') +
                     '</span>';
 
         } else if (node.type === 'tag') {
             html += '<strong class="graph-floater-title">' +
                         escapeHtml(node.label) +
                     '</strong>';
-            var tp = node.post_count || 0;
+            var tagPostCount = node.post_count || 0;
             html += '<span class="graph-floater-meta">' +
-                        tp + ' post' + (tp !== 1 ? 's' : '') +
+                        tagPostCount + ' post' + (tagPostCount !== 1 ? 's' : '') +
                     '</span>';
 
         } else {
