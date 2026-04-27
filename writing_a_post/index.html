@@ -651,6 +651,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#invite_comments" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>invite_comments</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invite_comments_to" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>invite_comments_to</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1329,6 +1351,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#invite_comments" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>invite_comments</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invite_comments_to" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>invite_comments_to</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1585,6 +1629,15 @@ Welcome to my new blog! This is my first post.
 <p>The date the post was last modified. Used in the <code>&lt;meta name="last-modified"&gt;</code> tag. Accepts the same formats as <code>date</code>.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">modified</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2024-06-01</span>
 </code></pre></div>
+<h4 id="invite_comments"><code>invite_comments</code></h4>
+<p>Override the global <a href="../configuration/#invite_comments"><code>invite_comments</code></a> setting for this post.  Set to <code>true</code> to show the comment invitation section on this post even if it is disabled globally, or to <code>false</code> to hide it on this post even if it is enabled globally.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">invite_comments</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</code></pre></div>
+<h4 id="invite_comments_to"><code>invite_comments_to</code></h4>
+<p>Override the email address used in the comment invitation link for this post.  When set, this value is used as a <strong>literal</strong> email address — no template expansion is applied.  This takes precedence over the global <a href="../configuration/#invite_comments_to"><code>invite_comments_to</code></a> setting.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">invite_comments_to</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;specific-address@example.com&quot;</span>
+</code></pre></div>
+<p>This key only has an effect when the comment invitation feature is enabled (either globally via <a href="../configuration/#invite_comments"><code>invite_comments</code></a> or via the per-post <code>invite_comments</code> front-matter key above).</p>
 <h3 id="date-formats">Date formats</h3>
 <p>BlogMore accepts dates in several formats:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2024-01-15</span><span class="w">              </span><span class="c1"># Simple date</span>

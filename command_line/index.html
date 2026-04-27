@@ -964,6 +964,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-with-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>--with-graph</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-with-read-time" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1816,6 +1827,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-with-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>--with-graph</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-with-read-time" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -2379,6 +2401,11 @@ blogmore<span class="w"> </span>gen<span class="w"> </span>&lt;content_dir&gt;<s
 <p>Calendar generation is <strong>disabled by default</strong>. Pass this flag to opt in.</p>
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--with-calendar
 </code></pre></div>
+<h4 id="-with-graph"><code>--with-graph</code></h4>
+<p>Generate an interactive post-relationship graph page. When set, BlogMore generates a <code>graph.html</code> page (path configurable via the <code>graph_path</code> configuration option) using the <a href="https://github.com/vasturiano/force-graph">force-graph</a> library. The graph visualises posts, tags, and categories as nodes with edges showing their relationships. A <strong>Graph</strong> link is added to the navigation bar automatically.</p>
+<p>Graph generation is <strong>disabled by default</strong>. Pass this flag to opt in.</p>
+<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--with-graph
+</code></pre></div>
 <h4 id="-with-read-time"><code>--with-read-time</code></h4>
 <p>Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on 200 words per minute) and displays it next to the post date on all post listings and individual post pages.</p>
 <p>Read time display is <strong>disabled by default</strong>. Pass this flag to opt in.</p>
@@ -2464,6 +2491,8 @@ blogmore<span class="w"> </span>serve
 - <code>--with-search</code>
 - <code>--with-sitemap</code>
 - <code>--with-stats</code>
+- <code>--with-calendar</code>
+- <code>--with-graph</code>
 - <code>--minify-css</code>
 - <code>--minify-js</code>
 - <code>--minify-html</code>
@@ -2529,6 +2558,8 @@ blogmore<span class="w"> </span>serve
 - <code>--with-search</code>
 - <code>--with-sitemap</code>
 - <code>--with-stats</code>
+- <code>--with-calendar</code>
+- <code>--with-graph</code>
 - <code>--minify-css</code>
 - <code>--minify-js</code>
 - <code>--minify-html</code>

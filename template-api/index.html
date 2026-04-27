@@ -1563,6 +1563,21 @@ below lists all variables that are available in every template.</p>
 <td>URL to the calendar page (respects <code>calendar_path</code> and <code>clean_urls</code>).</td>
 </tr>
 <tr>
+<td><code>with_graph</code></td>
+<td><code>bool</code></td>
+<td><code>True</code> when the graph page is enabled.</td>
+</tr>
+<tr>
+<td><code>graph_url</code></td>
+<td><code>str</code></td>
+<td>URL to the graph page (respects <code>graph_path</code> and <code>clean_urls</code>).</td>
+</tr>
+<tr>
+<td><code>graph_css_url</code></td>
+<td><code>str</code></td>
+<td>URL to the graph-page stylesheet (with cache-bust query string).</td>
+</tr>
+<tr>
 <td><code>theme_js_url</code></td>
 <td><code>str</code></td>
 <td>URL to <code>theme.js</code> (with cache-bust query string).</td>
@@ -1719,7 +1734,7 @@ or <code>/tag/python/</code> when <code>clean_urls</code> is enabled.</p>
 </tr>
 <tr>
 <td><code>post.html</code></td>
-<td><code>all_posts</code>, <code>pages</code>, <code>prev_post</code> (<code>Post \| None</code>), <code>next_post</code> (<code>Post \| None</code>), <code>canonical_url</code>, <code>backlinks</code> (list of <code>Backlink</code>)</td>
+<td><code>all_posts</code>, <code>pages</code>, <code>prev_post</code> (<code>Post \| None</code>), <code>next_post</code> (<code>Post \| None</code>), <code>canonical_url</code>, <code>backlinks</code> (list of <code>Backlink</code>), <code>invite_comments_mailto</code> (<code>str \| None</code>)</td>
 </tr>
 <tr>
 <td><code>page.html</code></td>
@@ -2145,6 +2160,11 @@ list of <code>CalendarYear</code> objects in reverse chronological order.</p>
 <td><code>post.html</code>, <code>page.html</code></td>
 <td>Renders Open Graph and SEO <code>&lt;meta&gt;</code> tags.</td>
 </tr>
+<tr>
+<td><code>_comment_invite.html</code></td>
+<td><code>post.html</code> (via <code>comment_invite</code> block)</td>
+<td>Renders the comment invitation section when <code>invite_comments</code> is enabled.</td>
+</tr>
 </tbody>
 </table>
 <h3 id="_paginationhtml-macro"><code>_pagination.html</code> macro</h3>
@@ -2219,7 +2239,7 @@ widget.  It is called like this:</p>
 </tr>
 </tbody>
 </table>
-<p><code>post.html</code> provides the following additional block:</p>
+<p><code>post.html</code> provides the following additional blocks:</p>
 <table>
 <thead>
 <tr>
@@ -2231,6 +2251,10 @@ widget.  It is called like this:</p>
 <tr>
 <td><code>backlinks</code></td>
 <td>The "References &amp; mentions" section shown after the bottom post-navigation on individual post pages when <code>with_backlinks</code> is enabled and there are inbound links.  Override this block in a custom <code>post.html</code> to change the layout or styling of the section.</td>
+</tr>
+<tr>
+<td><code>comment_invite</code></td>
+<td>The comment invitation section shown after the bottom post-navigation (and before the <code>backlinks</code> block) when <code>invite_comments</code> is enabled.  By default this block includes <code>_comment_invite.html</code>.  Override <code>_comment_invite.html</code> in your custom templates directory to change the wording or layout, or override this block entirely in a custom <code>post.html</code>.</td>
 </tr>
 </tbody>
 </table>
@@ -2394,6 +2418,21 @@ widget.  It is called like this:</p>
 <td><code>.backlink-link-text</code></td>
 <td><code>strong</code></td>
 <td>The link text itself, highlighted within <code>.backlink-snippet</code> so it stands out from the surrounding italic context.</td>
+</tr>
+<tr>
+<td><code>.comment-invite</code></td>
+<td><code>section</code></td>
+<td>Comment invitation container on a post page (only when <code>invite_comments</code> is enabled and an email address is configured).</td>
+</tr>
+<tr>
+<td><code>.comment-invite-content</code></td>
+<td><code>p</code></td>
+<td>The invitation message paragraph.</td>
+</tr>
+<tr>
+<td><code>.comment-invite-link</code></td>
+<td><code>a</code></td>
+<td>The <code>mailto:</code> link within the invitation message.</td>
 </tr>
 </tbody>
 </table>
