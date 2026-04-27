@@ -177,6 +177,81 @@
     }
 
     /* -------------------------------------------------------------------------
+     * Rich hover tooltip
+     * ---------------------------------------------------------------------- */
+
+    /**
+     * Escape a string for safe insertion into HTML.
+     *
+     * @param {*} value - Value to escape (coerced to string).
+     * @returns {string} HTML-escaped string.
+     */
+    function escapeHtml(value) {
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    /**
+     * Build an HTML string for the hover tooltip of a graph node.
+     *
+     * Category and tag nodes display the name and post count.  Post nodes
+     * display the title, optional date, optional description, and an optional
+     * thumbnail of the cover image.
+     *
+     * @param {Object} node - The graph node object.
+     * @returns {string} HTML markup for the tooltip.
+     */
+    function buildNodeTooltip(node) {
+        var html = '<div class="graph-floater">';
+
+        if (node.type === 'category') {
+            html += '<strong class="graph-floater-title">' +
+                        escapeHtml(node.label) +
+                    '</strong>';
+            var cp = node.post_count || 0;
+            html += '<span class="graph-floater-meta">' +
+                        cp + ' post' + (cp !== 1 ? 's' : '') +
+                    '</span>';
+
+        } else if (node.type === 'tag') {
+            html += '<strong class="graph-floater-title">' +
+                        escapeHtml(node.label) +
+                    '</strong>';
+            var tp = node.post_count || 0;
+            html += '<span class="graph-floater-meta">' +
+                        tp + ' post' + (tp !== 1 ? 's' : '') +
+                    '</span>';
+
+        } else {
+            /* Post node */
+            html += '<strong class="graph-floater-title">' +
+                        escapeHtml(node.label) +
+                    '</strong>';
+            if (node.date) {
+                html += '<span class="graph-floater-date">' +
+                            escapeHtml(node.date) +
+                        '</span>';
+            }
+            if (node.cover) {
+                html += '<img class="graph-floater-cover" src="' +
+                            escapeHtml(node.cover) +
+                        '" alt="" loading="lazy">';
+            }
+            if (node.description) {
+                html += '<p class="graph-floater-desc">' +
+                            escapeHtml(node.description) +
+                        '</p>';
+            }
+        }
+
+        html += '</div>';
+        return html;
+    }
+
+    /* -------------------------------------------------------------------------
      * Graph initialisation
      * ---------------------------------------------------------------------- */
 
@@ -201,7 +276,7 @@
             .backgroundColor(colors.background)
             .graphData(GRAPH_DATA)
             .nodeId('id')
-            .nodeLabel('label')          /* tooltip on hover */
+            .nodeLabel(buildNodeTooltip)  /* rich HTML floater on hover */
             .nodeRelSize(NODE_SIZE)
             .nodeCanvasObjectMode(function () { return 'replace'; })
             .nodeCanvasObject(drawNode)

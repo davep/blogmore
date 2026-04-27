@@ -26,6 +26,7 @@ def _make_post(
     tags: list[str] | None = None,
     category: str | None = None,
     date: dt.datetime | None = None,
+    metadata: dict[str, object] | None = None,
 ) -> Post:
     """Create a minimal Post fixture for graph tests.
 
@@ -37,6 +38,7 @@ def _make_post(
         tags: Optional list of tag strings.
         category: Optional category string.
         date: Optional publication date.
+        metadata: Optional metadata dict (used for cover image etc.).
 
     Returns:
         A Post object suitable for graph tests.
@@ -49,6 +51,7 @@ def _make_post(
         tags=tags,
         category=category,
         date=date,
+        metadata=metadata,
     )
     post.url_path = url_path
     return post
@@ -294,6 +297,65 @@ class TestBuildGraphData:
             assert "label" in node
             assert "type" in node
             assert "url" in node
+
+    def test_post_node_has_date_description_cover_fields(self) -> None:
+        """Post nodes carry date, description, and cover fields."""
+        date = dt.datetime(2024, 6, 15)
+        posts = [
+            _make_post(
+                "post-a",
+                "Hello world.",
+                "/a.html",
+                title="Post A",
+                date=date,
+                metadata={"cover": "/images/cover.jpg"},
+            ),
+        ]
+        graph = build_graph_data(posts)
+        post_node = next(n for n in graph.nodes if n["type"] == "post")
+        assert post_node["date"] == "2024-06-15"
+        assert post_node["description"] == "Hello world."
+        assert post_node["cover"] == "/images/cover.jpg"
+
+    def test_post_node_date_none_when_no_date(self) -> None:
+        """Post nodes have date=None when the post has no date."""
+        posts = [_make_post("post-a", "Content", "/a.html")]
+        graph = build_graph_data(posts)
+        post_node = next(n for n in graph.nodes if n["type"] == "post")
+        assert post_node["date"] is None
+
+    def test_post_node_cover_none_when_no_cover(self) -> None:
+        """Post nodes have cover=None when the post has no cover image."""
+        posts = [_make_post("post-a", "Content", "/a.html")]
+        graph = build_graph_data(posts)
+        post_node = next(n for n in graph.nodes if n["type"] == "post")
+        assert post_node["cover"] is None
+
+    def test_tag_node_has_post_count(self) -> None:
+        """Tag nodes carry a post_count reflecting posts with that tag."""
+        posts = [
+            _make_post("post-a", "A", "/a.html", tags=["python"]),
+            _make_post("post-b", "B", "/b.html", tags=["python"]),
+            _make_post("post-c", "C", "/c.html", tags=["python", "testing"]),
+        ]
+        graph = build_graph_data(posts)
+        tag_node = next(n for n in graph.nodes if n["type"] == "tag" and n["label"] == "python")
+        assert tag_node["post_count"] == 3
+        testing_node = next(n for n in graph.nodes if n["type"] == "tag" and n["label"] == "testing")
+        assert testing_node["post_count"] == 1
+
+    def test_category_node_has_post_count(self) -> None:
+        """Category nodes carry a post_count reflecting posts in that category."""
+        posts = [
+            _make_post("post-a", "A", "/a.html", category="Tech"),
+            _make_post("post-b", "B", "/b.html", category="Tech"),
+            _make_post("post-c", "C", "/c.html", category="News"),
+        ]
+        graph = build_graph_data(posts)
+        tech_node = next(n for n in graph.nodes if n["type"] == "category" and n["label"] == "Tech")
+        assert tech_node["post_count"] == 2
+        news_node = next(n for n in graph.nodes if n["type"] == "category" and n["label"] == "News")
+        assert news_node["post_count"] == 1
 
     def test_link_fields_complete(self) -> None:
         """Every link has the required source and target fields."""
