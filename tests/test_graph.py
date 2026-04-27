@@ -331,6 +331,48 @@ class TestBuildGraphData:
         post_node = next(n for n in graph.nodes if n["type"] == "post")
         assert post_node["cover"] is None
 
+    def test_post_node_cover_absolute_url_unchanged(self) -> None:
+        """Absolute cover URLs are stored verbatim."""
+        posts = [
+            _make_post(
+                "post-a",
+                "Content",
+                "/a.html",
+                metadata={"cover": "https://example.com/img.jpg"},
+            )
+        ]
+        graph = build_graph_data(posts)
+        post_node = next(n for n in graph.nodes if n["type"] == "post")
+        assert post_node["cover"] == "https://example.com/img.jpg"
+
+    def test_post_node_cover_root_relative_unchanged(self) -> None:
+        """Cover paths that already start with '/' are stored verbatim."""
+        posts = [
+            _make_post(
+                "post-a",
+                "Content",
+                "/a.html",
+                metadata={"cover": "/images/cover.jpg"},
+            )
+        ]
+        graph = build_graph_data(posts)
+        post_node = next(n for n in graph.nodes if n["type"] == "post")
+        assert post_node["cover"] == "/images/cover.jpg"
+
+    def test_post_node_cover_bare_path_made_root_absolute(self) -> None:
+        """Bare cover paths (no leading '/') are prefixed with '/'."""
+        posts = [
+            _make_post(
+                "post-a",
+                "Content",
+                "/a.html",
+                metadata={"cover": "images/cover.jpg"},
+            )
+        ]
+        graph = build_graph_data(posts)
+        post_node = next(n for n in graph.nodes if n["type"] == "post")
+        assert post_node["cover"] == "/images/cover.jpg"
+
     def test_tag_node_has_post_count(self) -> None:
         """Tag nodes carry a post_count reflecting posts with that tag."""
         posts = [

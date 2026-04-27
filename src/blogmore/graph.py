@@ -100,11 +100,22 @@ def build_graph_data(
 
     # --- Post nodes -----------------------------------------------------------
     for post in posts:
-        cover: str | None = (
+        raw_cover: str | None = (
             str(post.metadata["cover"])
             if post.metadata and post.metadata.get("cover")
             else None
         )
+        # Normalise cover to a URL the browser can resolve from any page.
+        # Absolute URLs (http/https) are left untouched; paths that already
+        # start with "/" are root-relative and also left untouched; anything
+        # else is a bare relative path that must be made root-absolute so the
+        # tooltip <img> is not broken regardless of the current page location.
+        if raw_cover is None:
+            cover: str | None = None
+        elif raw_cover.startswith(("http://", "https://", "/")):
+            cover = raw_cover
+        else:
+            cover = f"/{raw_cover}"
         graph.nodes.append(
             {
                 "id": post.url,
