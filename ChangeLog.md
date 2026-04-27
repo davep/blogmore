@@ -6,7 +6,7 @@
 
 - Added a `backlinks_title` configuration option to override the heading of
   the "References & mentions" section on individual post pages.
-  ([#TBD](https://github.com/davep/blogmore/pull/TBD))
+  ([#422](https://github.com/davep/blogmore/pull/422))
 
 ## v2.17.0
 
