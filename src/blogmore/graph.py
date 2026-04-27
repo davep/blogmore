@@ -27,14 +27,29 @@ class GraphData:
     """Data for the post-relationship force-directed graph.
 
     Attributes:
-        nodes: List of node dicts, each with ``id``, ``label``, ``type``,
-            and ``url`` keys.
+        nodes: List of node dicts.  Each node always has ``id``, ``label``,
+            ``type``, and ``url`` keys.  Post nodes additionally carry
+            ``date`` (ISO date string or ``None``), ``description`` (str),
+            and ``cover`` (URL string or ``None``).  Tag and category nodes
+            additionally carry ``post_count`` (int).
         links: List of edge dicts, each with ``source`` and ``target`` keys
             corresponding to node ``id`` values.
     """
 
     nodes: list[dict[str, Any]] = field(default_factory=list)
     links: list[dict[str, Any]] = field(default_factory=list)
+
+    # Node dict shapes (informational — not enforced at runtime):
+    #
+    # Post node:
+    #   id, label, type="post", url, date (str|None), description (str),
+    #   cover (str|None)
+    #
+    # Tag node:
+    #   id, label, type="tag", url, post_count (int)
+    #
+    # Category node:
+    #   id, label, type="category", url, post_count (int)
 
     def to_json(self) -> str:
         """Serialise the graph data to a JSON string.
@@ -85,16 +100,44 @@ def build_graph_data(
 
     # --- Post nodes -----------------------------------------------------------
     for post in posts:
+        raw_cover: str | None = (
+            str(post.metadata["cover"])
+            if post.metadata and post.metadata.get("cover")
+            else None
+        )
+        # Normalise cover to a URL the browser can resolve from any page.
+        # Absolute URLs (http/https) are left untouched; paths that already
+        # start with "/" are root-relative and also left untouched; anything
+        # else is a bare relative path that must be made root-absolute so the
+        # tooltip <img> is not broken regardless of the current page location.
+        if raw_cover is None:
+            cover: str | None = None
+        elif raw_cover.startswith(("http://", "https://", "/")):
+            cover = raw_cover
+        else:
+            cover = f"/{raw_cover}"
         graph.nodes.append(
             {
                 "id": post.url,
                 "label": post.title,
                 "type": "post",
                 "url": post.url,
+                "date": post.date.strftime("%Y-%m-%d") if post.date else None,
+                "description": post.description,
+                "cover": cover,
             }
         )
 
     # --- Tag nodes and post->tag edges ----------------------------------------
+
+    # Count posts per tag so the tooltip can display the tally.
+    tag_post_counts: dict[str, int] = {}
+    for post in posts:
+        if post.tags:
+            for tag in post.tags:
+                safe = sanitize_for_url(tag)
+                tag_post_counts[safe] = tag_post_counts.get(safe, 0) + 1
+
     seen_tags: dict[str, str] = {}  # safe_tag -> display tag
     for post in posts:
         if post.tags:
@@ -109,11 +152,20 @@ def build_graph_data(
                             "label": tag,
                             "type": "tag",
                             "url": f"/{tag_dir}/{safe}/",
+                            "post_count": tag_post_counts[safe],
                         }
                     )
                 graph.links.append({"source": post.url, "target": tag_node_id})
 
     # --- Category nodes and post->category edges ------------------------------
+
+    # Count posts per category so the tooltip can display the tally.
+    cat_post_counts: dict[str, int] = {}
+    for post in posts:
+        if post.category:
+            safe_cat = sanitize_for_url(post.category)
+            cat_post_counts[safe_cat] = cat_post_counts.get(safe_cat, 0) + 1
+
     seen_categories: dict[str, str] = {}  # safe_category -> display category
     for post in posts:
         if post.category:
@@ -127,6 +179,7 @@ def build_graph_data(
                         "label": post.category,
                         "type": "category",
                         "url": f"/{category_dir}/{safe_cat}/",
+                        "post_count": cat_post_counts[safe_cat],
                     }
                 )
             graph.links.append({"source": post.url, "target": cat_node_id})

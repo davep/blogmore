@@ -121,6 +121,61 @@
 }
 
 /* =============================================================================
+   GRAPH HOVER FLOATER
+   Styles the rich HTML content returned by buildNodeTooltip() in graph.js.
+   The outer tooltip shell is rendered by force-graph; the inner content
+   uses these classes.
+   ============================================================================= */
+
+.graph-floater {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 220px;
+    font-size: 0.85rem;
+    line-height: 1.35;
+}
+
+.graph-floater-title {
+    display: block;
+    font-weight: 700;
+    font-size: 0.92rem;
+}
+
+.graph-floater-meta {
+    display: block;
+    font-size: 0.78rem;
+    opacity: 0.75;
+}
+
+.graph-floater-date {
+    display: block;
+    font-size: 0.78rem;
+    opacity: 0.75;
+}
+
+.graph-floater-cover {
+    display: block;
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    border-radius: 3px;
+    margin-top: 2px;
+    object-fit: cover;
+}
+
+.graph-floater-desc {
+    margin: 2px 0 0;
+    font-size: 0.8rem;
+    opacity: 0.85;
+    /* Truncate long descriptions to three lines. */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* =============================================================================
    FULL-SCREEN MODE
    Toggled by adding .graph-fullscreen-active to <body>.  Not sticky — removed
    on page unload and via the Escape key.
