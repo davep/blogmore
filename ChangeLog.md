@@ -7,6 +7,9 @@
 - Added a `backlinks_title` configuration option to override the heading of
   the "References & mentions" section on individual post pages.
   ([#422](https://github.com/davep/blogmore/pull/422))
+- When a post's frontmatter includes a `modified` date, it is now shown
+  after the publication date in parentheses.
+  ([#423](https://github.com/davep/blogmore/pull/423))
 
 ## v2.17.0
 

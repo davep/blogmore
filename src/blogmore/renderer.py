@@ -64,6 +64,7 @@ class TemplateRenderer:
 
         # Add custom filters
         self.env.filters["format_date"] = self._format_date
+        self.env.filters["format_date_plain"] = self._format_date_plain
         self.env.filters["is_external_link"] = self._is_external_link
 
         # Provide default values for pagination context variables so that
@@ -111,6 +112,40 @@ class TemplateRenderer:
                 tz_offset = date.strftime("%z")
                 if tz_offset:
                     # Format as UTC+HH:MM or UTC-HH:MM
+                    formatted = Markup(
+                        f"{formatted} UTC{tz_offset[0]}{tz_offset[1:3]}:{tz_offset[3:5]}"
+                    )
+
+        return formatted
+
+    @staticmethod
+    def _format_date_plain(date: dt.datetime | None) -> Markup:
+        """Format a datetime object as plain text without archive links.
+
+        Formats the date and time components as a plain string with no
+        hyperlinks.  Used for the modified date display where linking to
+        the archive would be misleading or redundant.
+
+        Args:
+            date: The datetime to format.
+
+        Returns:
+            Markup containing the formatted date as plain text, or empty Markup if date is None.
+        """
+        if date is None:
+            return Markup("")
+
+        time_str = date.strftime("%Y-%m-%d %H:%M:%S")
+        formatted = Markup(time_str)
+
+        # Add timezone information if available
+        if date.tzinfo is not None:
+            tz_str = date.strftime("%Z")
+            if tz_str:
+                formatted = Markup(f"{formatted} {tz_str}")
+            else:
+                tz_offset = date.strftime("%z")
+                if tz_offset:
                     formatted = Markup(
                         f"{formatted} UTC{tz_offset[0]}{tz_offset[1:3]}:{tz_offset[3:5]}"
                     )
