@@ -199,10 +199,12 @@ Custom templates that render `post.date` should replicate this pattern:
 
 ```html+jinja
 <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>
-{% if post.modified_date %}
-<span class="modified-date">(Modified: {{ post.modified_date|format_date }})</span>
-{% endif %}
+{% if post.modified_date %}<span class="modified-date"> (Modified: {{ post.modified_date|format_date_plain }})</span>{% endif %}
 ```
+
+The `format_date_plain` filter formats a datetime as plain text (no archive
+links), making it appropriate for the modified date where archive links would
+be misleading.
 
 ## Page object
 
