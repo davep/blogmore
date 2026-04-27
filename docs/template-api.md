@@ -29,6 +29,7 @@ below lists all variables that are available in every template.
 | `categories_url` | `str` | URL to the categories overview page (respects `categories_path` and `clean_urls`). |
 | `with_read_time` | `bool` | `True` when reading time display is enabled. |
 | `with_backlinks` | `bool` | `True` when the backlinks feature is enabled. |
+| `backlinks_title` | `str` | The heading text for the backlinks section (defaults to `"References & mentions"`). |
 | `with_advert` | `bool` | `True` when the "Generated with BlogMore" footer is shown. |
 | `default_author` | `str \| None` | Default author name from configuration. |
 | `styles_css_url` | `str` | URL to the compiled stylesheet (with cache-bust query string). |

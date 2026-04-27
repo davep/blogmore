@@ -417,6 +417,19 @@ with_backlinks: true
 
 **Note:** Calculating the backlink map requires scanning every post's content for internal links.  For sites with many posts this scan adds a small amount of time to each build.  The scan is skipped entirely when `with_backlinks` is `false`.
 
+#### `backlinks_title`
+
+Override the heading displayed at the top of the "References &amp; mentions" section on individual post pages.  Only meaningful when [`with_backlinks`](#with_backlinks) is `true`.
+
+This is a **configuration file only** option — it cannot be set on the command line.  Defaults to `"References & mentions"`.
+
+**Type:** String  
+**Default:** `"References & mentions"`
+
+```yaml
+backlinks_title: "References & mentions"
+```
+
 #### `invite_comments`
 
 Enable a comment invitation section on individual post pages.  When `true` and [`invite_comments_to`](#invite_comments_to) is also configured, every post will display a subtle invitation section towards the bottom of the page, after the next/previous navigation buttons and before any "References &amp; mentions" section.  The section contains a `mailto:` link so readers can email their comments or questions about the post.

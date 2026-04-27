@@ -485,3 +485,76 @@ int main() {
         index_content = (temp_output_dir / "index.html").read_text()
         assert "Generated with" not in index_content
         assert "blogmore.davep.dev" not in index_content
+
+
+class TestBacklinksTitle:
+    """Integration tests for the backlinks_title configuration option."""
+
+    def _create_linked_posts(self, content_dir: Path) -> None:
+        """Write two posts where the first links to the second.
+
+        Args:
+            content_dir: Directory to write the post Markdown files into.
+        """
+        # The target post (will have a backlink section)
+        (content_dir / "2024-01-10-target-post.md").write_text(
+            "---\ntitle: Target Post\ndate: 2024-01-10\n---\nThis is the target.\n"
+        )
+        # The source post (links to the target post)
+        (content_dir / "2024-01-15-source-post.md").write_text(
+            "---\ntitle: Source Post\ndate: 2024-01-15\n---\n"
+            "See also [Target Post](/2024/01/10/target-post.html).\n"
+        )
+
+    def test_default_backlinks_title(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that the default backlinks title is 'References & mentions'."""
+        from blogmore.generator import SiteGenerator
+
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        self._create_linked_posts(content_dir)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_backlinks=True,
+            )
+        )
+        generator.generate()
+
+        target_html = (temp_output_dir / "2024" / "01" / "10" / "target-post.html").read_text()
+        assert "References &amp; mentions" in target_html
+
+    def test_custom_backlinks_title(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a custom backlinks_title overrides the default heading."""
+        from blogmore.generator import SiteGenerator
+
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        self._create_linked_posts(content_dir)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_backlinks=True,
+                backlinks_title="Cited by",
+            )
+        )
+        generator.generate()
+
+        target_html = (temp_output_dir / "2024" / "01" / "10" / "target-post.html").read_text()
+        assert "Cited by" in target_html
+        assert "References &amp; mentions" not in target_html
+
+    def test_backlinks_title_default_value(self, tmp_path: Path) -> None:
+        """Test that SiteConfig defaults backlinks_title to 'References & mentions'."""
+        config = SiteConfig(output_dir=tmp_path)
+        assert config.backlinks_title == "References & mentions"

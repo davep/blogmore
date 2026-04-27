@@ -168,6 +168,17 @@ class SiteConfig:
     command line.  Off by default.
     """
 
+    backlinks_title: str = "References & mentions"
+    """Title displayed as the heading of the backlinks section on post pages.
+
+    Overrides the default "References & mentions" heading rendered inside the
+    ``backlinks`` template block on individual post pages.  Only meaningful
+    when :attr:`with_backlinks` is ``True``.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``"References & mentions"``.
+    """
+
     with_read_time: bool = False
     """Whether to show estimated reading time on posts."""
 
