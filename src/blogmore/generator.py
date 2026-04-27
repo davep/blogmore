@@ -461,6 +461,7 @@ class SiteGenerator:
             "graph_url": self._get_graph_url(),
             "with_read_time": self.site_config.with_read_time,
             "with_backlinks": self.site_config.with_backlinks,
+            "backlinks_title": self.site_config.backlinks_title,
             "with_advert": self.site_config.with_advert,
             "default_author": self.site_config.default_author,
             "extra_head_tags": self.site_config.head,

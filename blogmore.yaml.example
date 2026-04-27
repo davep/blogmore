@@ -112,6 +112,12 @@ posts_per_feed: 20
 # Configuration file only.
 # with_backlinks: false
 
+# Optional: Title for the backlinks section heading (default: "References & mentions")
+# Overrides the heading displayed in the "References & mentions" section on post
+# pages when with_backlinks is enabled.
+# Configuration file only.
+# backlinks_title: "References & mentions"
+
 # Optional: Enable comment invitation section on individual post pages (default: false)
 # When true and invite_comments_to is also set, every post will show a subtle
 # invitation section with a mailto: link so readers can email their comments.

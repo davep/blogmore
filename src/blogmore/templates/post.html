@@ -85,7 +85,7 @@
     {% block backlinks %}
     {% if backlinks %}
     <section class="backlinks">
-        <h2 class="backlinks-heading">References &amp; mentions</h2>
+        <h2 class="backlinks-heading">{{ backlinks_title }}</h2>
         <ul class="backlinks-list">
             {% for backlink in backlinks %}
             <li class="backlink-item">
