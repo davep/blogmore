@@ -39,7 +39,7 @@
     <header class="post-header">
         <h1>{{ post.title }}{% if post.draft %} 🚧{% endif %}</h1>
         {% if post.date %}
-        <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>
+        <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>{% if post.modified_date %} <span class="modified-date">(Modified: {{ post.modified_date|format_date }})</span>{% endif %}
         {% endif %}
         {% if with_read_time %}
         <div class="reading-time">{{ post.reading_time }} min read</div>

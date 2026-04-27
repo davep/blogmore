@@ -48,6 +48,7 @@
     --code-copy-color: #555;
     --code-copy-success-color: #1a7f37;
     --draft-title-color: #cc6600;
+    --modified-date-color: var(--text-secondary);
     --kbd-bg: #f0f0f0;
     --kbd-border: #b4b4b4;
     --streak-cell-empty: #ebedf0;
@@ -87,6 +88,7 @@
     --dark-code-copy-color: #bbb;
     --dark-code-copy-success-color: #3fb950;
     --dark-draft-title-color: #ffab40;
+    --dark-modified-date-color: var(--dark-text-secondary);
     --dark-kbd-bg: #3a3a3a;
     --dark-kbd-border: #666;
     --dark-streak-cell-empty: #21262d;
@@ -133,6 +135,7 @@
         --code-copy-color: var(--dark-code-copy-color);
         --code-copy-success-color: var(--dark-code-copy-success-color);
         --draft-title-color: var(--dark-draft-title-color);
+        --modified-date-color: var(--dark-modified-date-color);
         --kbd-bg: var(--dark-kbd-bg);
         --kbd-border: var(--dark-kbd-border);
         --streak-cell-empty: var(--dark-streak-cell-empty);
@@ -179,6 +182,7 @@
     --code-copy-color: var(--dark-code-copy-color);
     --code-copy-success-color: var(--dark-code-copy-success-color);
     --draft-title-color: var(--dark-draft-title-color);
+    --modified-date-color: var(--dark-modified-date-color);
     --kbd-bg: var(--dark-kbd-bg);
     --kbd-border: var(--dark-kbd-border);
     --streak-cell-empty: var(--dark-streak-cell-empty);
@@ -625,6 +629,12 @@ article.post {
 
 .post-header time {
     color: var(--text-secondary);
+    font-size: 0.9em;
+}
+
+.modified-date {
+    color: var(--modified-date-color);
+    font-style: italic;
     font-size: 0.9em;
 }
 

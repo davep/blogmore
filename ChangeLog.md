@@ -4,6 +4,12 @@
 
 **Released: WiP**
 
+- Added display of the modified date on post pages and listing summaries.
+  When a post's frontmatter includes a `modified` date, it is shown after
+  the publication date in parentheses and italics, e.g.
+  `2026-04-27 08:40:40 UTC+01:00 (Modified: 2026-04-28 09:40:40 UTC+01:00)`.
+  The style can be overridden via the `--modified-date-color` CSS custom property.
+  ([#425](https://github.com/davep/blogmore/pull/425))
 - Added a `backlinks_title` configuration option to override the heading of
   the "References & mentions" section on individual post pages.
   ([#422](https://github.com/davep/blogmore/pull/422))

@@ -121,7 +121,14 @@ twitter_site: "@my_blog"
 
 #### `modified`
 
-The date the post was last modified. Used in the `<meta name="last-modified">` tag. Accepts the same formats as `date`.
+The date the post was last modified. Used in the `<meta name="last-modified">` tag and displayed after the publication date on the post page and in all post listing summaries. Accepts the same formats as `date`.
+
+When present, the modified date is shown in parentheses and italics after the
+publication date:
+
+```
+2026-04-27 08:40:40 UTC+01:00 (Modified: 2026-04-28 09:40:40 UTC+01:00)
+```
 
 ```yaml
 modified: 2024-06-01

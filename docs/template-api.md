@@ -175,6 +175,35 @@ To override the draft title colour, set `--draft-title-color` (and
 `--dark-draft-title-color` for dark mode) in your custom stylesheet.  See
 [Theming](theming.md) for the full CSS variable reference.
 
+### Modified date display
+
+When `post.modified_date` is set, the built-in templates render it after the
+publication date:
+
+```
+2026-04-27 08:40:40 UTC+01:00 (Modified: 2026-04-28 09:40:40 UTC+01:00)
+```
+
+The modified portion is wrapped in a `<span class="modified-date">` element
+and styled in italics by default.  The colour is controlled by the
+`--modified-date-color` CSS custom property (defaults to `--text-secondary`).
+Override it in your custom stylesheet:
+
+```css
+.modified-date {
+    --modified-date-color: #888;
+}
+```
+
+Custom templates that render `post.date` should replicate this pattern:
+
+```html+jinja
+<time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>
+{% if post.modified_date %}
+<span class="modified-date">(Modified: {{ post.modified_date|format_date }})</span>
+{% endif %}
+```
+
 ## Page object
 
 `Page` objects represent static pages from the `pages/` directory.

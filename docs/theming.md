@@ -137,6 +137,7 @@ corresponding `--dark-*` values.
 | `--admonition-warning-title-color` | `#9a6700` | Warning admonition title |
 | `--admonition-caution-title-color` | `#d1242f` | Caution admonition title |
 | `--draft-title-color` | `#cc6600` | Draft post title colour |
+| `--modified-date-color` | `var(--text-secondary)` | Modified date text colour |
 | `--kbd-bg` | `#f0f0f0` | Keyboard key background |
 | `--kbd-border` | `#b4b4b4` | Keyboard key border |
 | `--streak-cell-empty` | `#ebedf0` | Streak chart empty day cell |
@@ -179,6 +180,7 @@ automatically to both the JavaScript toggle and the CSS media query fallback.
 | `--dark-admonition-warning-title-color` | `#d29922` | Dark warning title |
 | `--dark-admonition-caution-title-color` | `#f85149` | Dark caution title |
 | `--dark-draft-title-color` | `#ffab40` | Dark mode draft post title colour |
+| `--dark-modified-date-color` | `var(--dark-text-secondary)` | Dark mode modified date text colour |
 | `--dark-kbd-bg` | `#3a3a3a` | Dark mode keyboard key background |
 | `--dark-kbd-border` | `#666` | Dark mode keyboard key border |
 | `--dark-streak-cell-empty` | `#21262d` | Dark mode streak chart empty cell |
