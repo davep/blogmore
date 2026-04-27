@@ -127,13 +127,6 @@
    uses these classes.
    ============================================================================= */
 
-/* Reduce the transparency of the force-graph tooltip container so the
- * hover content is easy to read against the graph canvas behind it.
- * Force-graph assigns id="graph-tooltip" to its label element. */
-#graph-tooltip {
-    background: rgba(0, 0, 0, 0.88) !important;
-}
-
 .graph-floater {
     display: flex;
     flex-direction: column;

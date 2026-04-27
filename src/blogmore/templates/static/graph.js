@@ -302,24 +302,6 @@
                 node.fx = node.x;
                 node.fy = node.y;
             });
-
-        /* Dial back the tooltip's transparency so the hover content is
-         * comfortable to read.  Force-graph appends an absolutely-positioned
-         * overlay div to the container; find it by its pointer-events style
-         * and replace the default semi-transparent background with a more
-         * opaque one.  (The #graph-tooltip CSS rule in graph.css handles
-         * force-graph ≥ 1.42 which assigns that ID directly; this JS patch
-         * covers any version that does not.) */
-        var containerChildren = container.children;
-        for (var ci = 0; ci < containerChildren.length; ci++) {
-            var child = containerChildren[ci];
-            if (child.tagName === 'DIV' &&
-                    (child.style.pointerEvents === 'none' ||
-                     child.style.cssText.indexOf('pointer-events') !== -1)) {
-                child.style.background = 'rgba(0, 0, 0, 0.88)';
-                break;
-            }
-        }
     }
 
     /* -------------------------------------------------------------------------
