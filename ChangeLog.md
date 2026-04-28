@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.18.0
 
-**Released: WiP**
+**Released: 2026-04-28**
 
 - Added a `backlinks_title` configuration option to override the heading of
   the "References & mentions" section on individual post pages.
