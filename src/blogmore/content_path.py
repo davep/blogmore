@@ -44,9 +44,9 @@ def validate_path_template(
         ValueError: If the template is empty, malformed, references an
             unknown variable, or omits the required placeholder.
     """
-    assert (
-        required_variable is None or required_variable in allowed_variables
-    ), f"required_variable {required_variable!r} is not in allowed_variables"
+    assert required_variable is None or required_variable in allowed_variables, (
+        f"required_variable {required_variable!r} is not in allowed_variables"
+    )
 
     if not template:
         raise ValueError(f"{config_key} must not be empty")
