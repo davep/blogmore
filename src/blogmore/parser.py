@@ -120,25 +120,45 @@ def remove_date_prefix(slug: str) -> str:
 
 
 @dataclass
-class Post:
-    """Represents a blog post with metadata and content."""
+class ContentBase:
+    """Base class for Post and Page sharing common properties."""
 
     path: Path
     title: str
     content: str
     html_content: str
+    metadata: dict[str, Any] | None = None
+    url_path: str | None = field(default=None, repr=False, compare=False)
+
+    @property
+    def slug(self) -> str:
+        """Generate a URL slug from the filename."""
+        return self.path.stem
+
+    @property
+    def description(self) -> str:
+        """Get the description for the content.
+
+        Returns the description from metadata if present, otherwise
+        extracts and returns the first paragraph from the content.
+
+        Returns:
+            The content description as a string
+        """
+        if self.metadata and self.metadata.get("description"):
+            return str(self.metadata.get("description"))
+        return extract_first_paragraph(self.content)
+
+
+@dataclass
+class Post(ContentBase):
+    """Represents a blog post with metadata and content."""
+
     date: dt.datetime | None = None
     category: str | None = None
     tags: list[str] | None = None
     draft: bool = False
-    metadata: dict[str, Any] | None = None
-    url_path: str | None = field(default=None, repr=False, compare=False)
     words_per_minute: int = field(default=200, repr=False, compare=False)
-
-    @property
-    def slug(self) -> str:
-        """Generate a URL slug from the post filename."""
-        return self.path.stem
 
     @property
     def url(self) -> str:
@@ -184,20 +204,6 @@ class Post:
             return []
         pairs = [(tag, sanitize_for_url(tag)) for tag in self.tags]
         return sorted(pairs, key=lambda pair: pair[0].casefold())
-
-    @property
-    def description(self) -> str:
-        """Get the description for the post.
-
-        Returns the description from metadata if present, otherwise
-        extracts and returns the first paragraph from the content.
-
-        Returns:
-            The post description as a string
-        """
-        if self.metadata and self.metadata.get("description"):
-            return str(self.metadata.get("description"))
-        return extract_first_paragraph(self.content)
 
     @property
     def reading_time(self) -> int:
@@ -261,20 +267,8 @@ def post_sort_key(post: Post) -> float:
 
 
 @dataclass
-class Page:
+class Page(ContentBase):
     """Represents a static page with metadata and content."""
-
-    path: Path
-    title: str
-    content: str
-    html_content: str
-    metadata: dict[str, Any] | None = None
-    url_path: str | None = field(default=None, repr=False, compare=False)
-
-    @property
-    def slug(self) -> str:
-        """Generate a URL slug from the page filename."""
-        return self.path.stem
 
     @property
     def url(self) -> str:
@@ -292,23 +286,9 @@ class Page:
             return self.url_path
         return f"/{self.slug}.html"
 
-    @property
-    def description(self) -> str:
-        """Get the description for the page.
-
-        Returns the description from metadata if present, otherwise
-        extracts and returns the first paragraph from the content.
-
-        Returns:
-            The page description as a string
-        """
-        if self.metadata and self.metadata.get("description"):
-            return str(self.metadata.get("description"))
-        return extract_first_paragraph(self.content)
-
 
 class PostParser:
-    """Parse markdown files with frontmatter into Post objects."""
+    """Parse markdown files with frontmatter into Post and Page objects."""
 
     def __init__(self, site_url: str | None = None) -> None:
         """Initialize the parser with markdown extensions.
@@ -372,8 +352,48 @@ class PostParser:
         except Exception as e:
             raise ValueError(f"Error parsing frontmatter in {path}: {e}") from e
 
+    def _parse_common(
+        self, path: Path, content_type: str
+    ) -> tuple[frontmatter.Post, str, str]:
+        """Common parsing logic for both posts and pages.
+
+        Args:
+            path: Path to the markdown file
+            content_type: Human-readable content type ("post" or "page")
+
+        Returns:
+            A tuple of (frontmatter_data, title, html_content)
+        """
+        if not path.exists():
+            label = content_type.capitalize()
+            raise FileNotFoundError(f"{label} file not found: {path}")
+
+        # Parse frontmatter
+        data = self._load_frontmatter(path, content_type=content_type)
+
+        # Extract metadata
+        title = data.get("title")
+        if not title:
+            label = content_type.capitalize()
+            raise ValueError(f"{label} missing required 'title' in frontmatter: {path}")
+        if not isinstance(title, str):
+            label = content_type.capitalize()
+            raise ValueError(
+                f"{label} 'title' in frontmatter must be a string in: {path}\n"
+                f"  Found: {title!r} (type: {type(title).__name__})\n"
+                f"  Fix: wrap the value in quotes, e.g.  title: 'My {label} Title'"
+            )
+
+        # Convert markdown to HTML
+        html_content = self.markdown.convert(data.content)
+
+        # Reset markdown parser for next use
+        self.markdown.reset()
+
+        return data, title, html_content
+
     def parse_file(self, path: Path) -> Post:
-        """Parse a markdown file with frontmatter.
+        """Parse a markdown file with frontmatter into a Post.
 
         Args:
             path: Path to the markdown file
@@ -385,22 +405,7 @@ class PostParser:
             FileNotFoundError: If the file doesn't exist
             ValueError: If required metadata is missing or YAML is malformed
         """
-        if not path.exists():
-            raise FileNotFoundError(f"Post file not found: {path}")
-
-        # Parse frontmatter
-        post_data = self._load_frontmatter(path, content_type="post")
-
-        # Extract metadata
-        title = post_data.get("title")
-        if not title:
-            raise ValueError(f"Post missing required 'title' in frontmatter: {path}")
-        if not isinstance(title, str):
-            raise ValueError(
-                f"Post 'title' in frontmatter must be a string in: {path}\n"
-                f"  Found: {title!r} (type: {type(title).__name__})\n"
-                f"  Fix: wrap the value in quotes, e.g.  title: 'My Post Title'"
-            )
+        post_data, title, html_content = self._parse_common(path, "post")
 
         # Parse date if present
         date = None
@@ -428,20 +433,13 @@ class PostParser:
                         pass
 
         # Extract category - coerce to str in case YAML parsed it as a non-string
-        # (e.g. `category: 2024` is parsed as int by the YAML parser)
         raw_category = post_data.get("category")
         if raw_category is not None:
             category: str | None = str(raw_category).strip() or None
         else:
             category = None
 
-        # Extract tags - coerce each item to str in case YAML parsed numeric
-        # values as int (e.g. `tags: [2024, python]` gives [2024, "python"]).
-        # A bare scalar (e.g. `tags: +3` parsed as int 3) is not iterable and
-        # must be caught explicitly with a helpful error rather than letting
-        # Python raise "'int' object is not iterable".
-        # A bare `tags:` with no value is parsed by YAML as None; treat it as
-        # an empty list (no tags).
+        # Extract tags
         raw_tags = post_data.get("tags", [])
         if raw_tags is None:
             tags: list[str] = []
@@ -459,12 +457,6 @@ class PostParser:
 
         # Check draft status
         draft = post_data.get("draft", False)
-
-        # Convert markdown to HTML
-        html_content = self.markdown.convert(post_data.content)
-
-        # Reset markdown parser for next use
-        self.markdown.reset()
 
         return Post(
             path=path,
@@ -531,28 +523,7 @@ class PostParser:
             FileNotFoundError: If the file doesn't exist
             ValueError: If required metadata is missing or YAML is malformed
         """
-        if not path.exists():
-            raise FileNotFoundError(f"Page file not found: {path}")
-
-        # Parse frontmatter
-        page_data = self._load_frontmatter(path, content_type="page")
-
-        # Extract metadata
-        title = page_data.get("title")
-        if not title:
-            raise ValueError(f"Page missing required 'title' in frontmatter: {path}")
-        if not isinstance(title, str):
-            raise ValueError(
-                f"Page 'title' in frontmatter must be a string in: {path}\n"
-                f"  Found: {title!r} (type: {type(title).__name__})\n"
-                f"  Fix: wrap the value in quotes, e.g.  title: 'My Page Title'"
-            )
-
-        # Convert markdown to HTML
-        html_content = self.markdown.convert(page_data.content)
-
-        # Reset markdown parser for next use
-        self.markdown.reset()
+        page_data, title, html_content = self._parse_common(path, "page")
 
         return Page(
             path=path,

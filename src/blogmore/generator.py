@@ -266,176 +266,68 @@ class SiteGenerator:
             return url
         return f"{url}?v={self._cache_bust_token}"
 
-    def _get_search_url(self) -> str:
-        """Return the URL path for the configured search page.
+    def _get_site_url(self, path: str) -> str:
+        """Return a URL path for a given site-relative path.
 
-        Derives the URL from the ``search_path`` configuration option.  When
+        Ensures the URL starts with a single forward slash.  When
         ``clean_urls`` is enabled and the path ends in ``index.html``, the
         index filename is stripped so the URL ends with a trailing slash.
 
+        Args:
+            path: The site-relative path (e.g. ``"archive.html"``).
+
         Returns:
-            The URL path for the search page, always starting with ``/``.
+            The normalized URL path, always starting with ``/``.
         """
-        url = "/" + self.site_config.search_path.lstrip("/")
+        url = "/" + path.lstrip("/")
         if self.site_config.clean_urls:
             url = make_url_clean(url)
         return url
+
+    def _get_search_url(self) -> str:
+        """Return the URL path for the configured search page."""
+        return self._get_site_url(self.site_config.search_path)
 
     def _get_archive_url(self) -> str:
-        """Return the URL path for the configured archive page.
-
-        Derives the URL from the ``archive_path`` configuration option.  When
-        ``clean_urls`` is enabled and the path ends in ``index.html``, the
-        index filename is stripped so the URL ends with a trailing slash.
-
-        Returns:
-            The URL path for the archive page, always starting with ``/``.
-        """
-        url = "/" + self.site_config.archive_path.lstrip("/")
-        if self.site_config.clean_urls:
-            url = make_url_clean(url)
-        return url
+        """Return the URL path for the configured archive page."""
+        return self._get_site_url(self.site_config.archive_path)
 
     def _get_tags_url(self) -> str:
-        """Return the URL path for the configured tags overview page.
-
-        Derives the URL from the ``tags_path`` configuration option.  When
-        ``clean_urls`` is enabled and the path ends in ``index.html``, the
-        index filename is stripped so the URL ends with a trailing slash.
-
-        Returns:
-            The URL path for the tags page, always starting with ``/``.
-        """
-        url = "/" + self.site_config.tags_path.lstrip("/")
-        if self.site_config.clean_urls:
-            url = make_url_clean(url)
-        return url
+        """Return the URL path for the configured tags overview page."""
+        return self._get_site_url(self.site_config.tags_path)
 
     def _get_categories_url(self) -> str:
-        """Return the URL path for the configured categories overview page.
-
-        Derives the URL from the ``categories_path`` configuration option.  When
-        ``clean_urls`` is enabled and the path ends in ``index.html``, the
-        index filename is stripped so the URL ends with a trailing slash.
-
-        Returns:
-            The URL path for the categories page, always starting with ``/``.
-        """
-        url = "/" + self.site_config.categories_path.lstrip("/")
-        if self.site_config.clean_urls:
-            url = make_url_clean(url)
-        return url
+        """Return the URL path for the configured categories overview page."""
+        return self._get_site_url(self.site_config.categories_path)
 
     def _get_stats_url(self) -> str:
-        """Return the URL path for the configured statistics page.
-
-        Derives the URL from the ``stats_path`` configuration option.  When
-        ``clean_urls`` is enabled and the path ends in ``index.html``, the
-        index filename is stripped so the URL ends with a trailing slash.
-
-        Returns:
-            The URL path for the statistics page, always starting with ``/``.
-        """
-        url = "/" + self.site_config.stats_path.lstrip("/")
-        if self.site_config.clean_urls:
-            url = make_url_clean(url)
-        return url
+        """Return the URL path for the configured statistics page."""
+        return self._get_site_url(self.site_config.stats_path)
 
     def _get_calendar_url(self) -> str:
-        """Return the URL path for the configured calendar page.
-
-        Derives the URL from the ``calendar_path`` configuration option.  When
-        ``clean_urls`` is enabled and the path ends in ``index.html``, the
-        index filename is stripped so the URL ends with a trailing slash.
-
-        Returns:
-            The URL path for the calendar page, always starting with ``/``.
-        """
-        url = "/" + self.site_config.calendar_path.lstrip("/")
-        if self.site_config.clean_urls:
-            url = make_url_clean(url)
-        return url
+        """Return the URL path for the configured calendar page."""
+        return self._get_site_url(self.site_config.calendar_path)
 
     def _get_graph_url(self) -> str:
-        """Return the URL path for the configured graph page.
+        """Return the URL path for the configured graph page."""
+        return self._get_site_url(self.site_config.graph_path)
 
-        Derives the URL from the ``graph_path`` configuration option.  When
-        ``clean_urls`` is enabled and the path ends in ``index.html``, the
-        index filename is stripped so the URL ends with a trailing slash.
+    def _get_static_css_url(self, source: str, minified: str) -> str:
+        """Compute the URL for a CSS file, choosing minified if configured."""
+        filename = minified if self.site_config.minify_css else source
+        return self._with_cache_bust(f"/static/{filename}")
 
-        Returns:
-            The URL path for the graph page, always starting with ``/``.
-        """
-        url = "/" + self.site_config.graph_path.lstrip("/")
-        if self.site_config.clean_urls:
-            url = make_url_clean(url)
-        return url
+    def _get_static_js_url(self, source: str, minified: str) -> str:
+        """Compute the URL for a JS file, choosing minified if configured."""
+        filename = minified if self.site_config.minify_js else source
+        return self._with_cache_bust(f"/static/{filename}")
 
     def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
-        styles_css_url = self._with_cache_bust(
-            f"/static/{CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{CSS_FILENAME}"
-        )
-        search_css_url = self._with_cache_bust(
-            f"/static/{SEARCH_CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{SEARCH_CSS_FILENAME}"
-        )
-        stats_css_url = self._with_cache_bust(
-            f"/static/{STATS_CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{STATS_CSS_FILENAME}"
-        )
-        archive_css_url = self._with_cache_bust(
-            f"/static/{ARCHIVE_CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{ARCHIVE_CSS_FILENAME}"
-        )
-        calendar_css_url = self._with_cache_bust(
-            f"/static/{CALENDAR_CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{CALENDAR_CSS_FILENAME}"
-        )
-        graph_css_url = self._with_cache_bust(
-            f"/static/{GRAPH_CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{GRAPH_CSS_FILENAME}"
-        )
-        tag_cloud_css_url = self._with_cache_bust(
-            f"/static/{TAG_CLOUD_CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{TAG_CLOUD_CSS_FILENAME}"
-        )
-        code_css_url = self._with_cache_bust(
-            f"/static/{CODE_CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{CODE_CSS_FILENAME}"
-        )
-        theme_js_url = (
-            f"/static/{THEME_JS_MINIFIED_FILENAME}"
-            if self.site_config.minify_js
-            else f"/static/{THEME_JS_FILENAME}"
-        )
-        search_js_url = (
-            f"/static/{SEARCH_JS_MINIFIED_FILENAME}"
-            if self.site_config.minify_js
-            else f"/static/{SEARCH_JS_FILENAME}"
-        )
-        codeblocks_js_url = (
-            f"/static/{CODEBLOCKS_JS_MINIFIED_FILENAME}"
-            if self.site_config.minify_js
-            else f"/static/{CODEBLOCKS_JS_FILENAME}"
-        )
-        graph_js_url = (
-            f"/static/{GRAPH_JS_MINIFIED_FILENAME}"
-            if self.site_config.minify_js
-            else f"/static/{GRAPH_JS_FILENAME}"
-        )
         page1_suffix = resolve_pagination_page_path(self.site_config.page_1_path, 1)
         if self.site_config.clean_urls:
             page1_suffix = make_url_clean(page1_suffix)
+
         context = {
             "site_title": self.site_config.site_title,
             "site_subtitle": self.site_config.site_subtitle,
@@ -467,18 +359,42 @@ class SiteGenerator:
             "extra_head_tags": self.site_config.head,
             "fontawesome_css_url": self._with_cache_bust(self._fontawesome_css_url),
             "fontawesome_woff2_url": FONTAWESOME_CDN_BRANDS_WOFF2_URL,
-            "styles_css_url": styles_css_url,
-            "search_css_url": search_css_url,
-            "stats_css_url": stats_css_url,
-            "archive_css_url": archive_css_url,
-            "tag_cloud_css_url": tag_cloud_css_url,
-            "calendar_css_url": calendar_css_url,
-            "graph_css_url": graph_css_url,
-            "code_css_url": code_css_url,
-            "theme_js_url": theme_js_url,
-            "search_js_url": search_js_url,
-            "codeblocks_js_url": codeblocks_js_url,
-            "graph_js_url": graph_js_url,
+            "styles_css_url": self._get_static_css_url(
+                CSS_FILENAME, CSS_MINIFIED_FILENAME
+            ),
+            "search_css_url": self._get_static_css_url(
+                SEARCH_CSS_FILENAME, SEARCH_CSS_MINIFIED_FILENAME
+            ),
+            "stats_css_url": self._get_static_css_url(
+                STATS_CSS_FILENAME, STATS_CSS_MINIFIED_FILENAME
+            ),
+            "archive_css_url": self._get_static_css_url(
+                ARCHIVE_CSS_FILENAME, ARCHIVE_CSS_MINIFIED_FILENAME
+            ),
+            "tag_cloud_css_url": self._get_static_css_url(
+                TAG_CLOUD_CSS_FILENAME, TAG_CLOUD_CSS_MINIFIED_FILENAME
+            ),
+            "calendar_css_url": self._get_static_css_url(
+                CALENDAR_CSS_FILENAME, CALENDAR_CSS_MINIFIED_FILENAME
+            ),
+            "graph_css_url": self._get_static_css_url(
+                GRAPH_CSS_FILENAME, GRAPH_CSS_MINIFIED_FILENAME
+            ),
+            "code_css_url": self._get_static_css_url(
+                CODE_CSS_FILENAME, CODE_CSS_MINIFIED_FILENAME
+            ),
+            "theme_js_url": self._get_static_js_url(
+                THEME_JS_FILENAME, THEME_JS_MINIFIED_FILENAME
+            ),
+            "search_js_url": self._get_static_js_url(
+                SEARCH_JS_FILENAME, SEARCH_JS_MINIFIED_FILENAME
+            ),
+            "codeblocks_js_url": self._get_static_js_url(
+                CODEBLOCKS_JS_FILENAME, CODEBLOCKS_JS_MINIFIED_FILENAME
+            ),
+            "graph_js_url": self._get_static_js_url(
+                GRAPH_JS_FILENAME, GRAPH_JS_MINIFIED_FILENAME
+            ),
             "pagination_page1_suffix": page1_suffix,
         }
         # Merge sidebar config into context
@@ -882,6 +798,29 @@ class SiteGenerator:
             html = minify_html.minify(html, minify_js=False, minify_css=False)
         output_path.write_text(html, encoding="utf-8")
 
+    def _resolve_static_source(self, filename: str) -> str | None:
+        """Resolve a static asset source from custom or bundled templates.
+
+        Args:
+            filename: The asset filename (e.g. ``"style.css"``).
+
+        Returns:
+            The file content as a string, or ``None`` if it could not be found.
+        """
+        # Prefer custom file if a templates directory is configured.
+        if self.site_config.templates_dir is not None:
+            custom_path = self.site_config.templates_dir / "static" / filename
+            if custom_path.is_file():
+                return custom_path.read_text(encoding="utf-8")
+
+        # Fall back to bundled file.
+        try:
+            bundled_path = files("blogmore").joinpath("templates", "static", filename)
+            return bundled_path.read_text(encoding="utf-8")
+        except Exception as e:
+            print(f"Warning: Could not read bundled {filename}: {e}")
+            return None
+
     def _minify_one_css(
         self,
         output_static: Path,
@@ -890,35 +829,14 @@ class SiteGenerator:
     ) -> None:
         """Read one source CSS file, minify it, and write the minified output.
 
-        The source CSS is read from the custom templates directory (if
-        available) or from the bundled templates.  The minified output is
-        written to ``output_static/<minified_filename>``.
-
         Args:
             output_static: Path to the output static directory.
             source_filename: Source CSS filename (e.g. ``style.css``).
             minified_filename: Output minified filename (e.g. ``styles.min.css``).
         """
-        css_source: str | None = None
-
-        # Prefer custom CSS file if a templates directory is configured.
-        if self.site_config.templates_dir is not None:
-            custom_css = self.site_config.templates_dir / "static" / source_filename
-            if custom_css.is_file():
-                css_source = custom_css.read_text(encoding="utf-8")
-
-        # Fall back to bundled CSS file.
+        css_source = self._resolve_static_source(source_filename)
         if css_source is None:
-            try:
-                bundled_css = files("blogmore").joinpath(
-                    "templates", "static", source_filename
-                )
-                css_source = bundled_css.read_text(encoding="utf-8")
-            except Exception as e:
-                print(
-                    f"Warning: Could not read bundled {source_filename} for minification: {e}"
-                )
-                return
+            return
 
         minified = rcssmin.cssmin(css_source)
         output_path = output_static / minified_filename
@@ -926,34 +844,13 @@ class SiteGenerator:
         print(f"Generated minified CSS as {minified_filename}")
 
     def _write_minified_css(self, output_static: Path) -> None:
-        """Minify all CSS files and write them to the output static directory.
-
-        Minifies the main stylesheet (``style.css`` → ``styles.min.css``) and
-        each of the page-specific stylesheets (``search.css``, ``stats.css``,
-        ``archive.css``, ``tag-cloud.css``).  The source CSS for each file is
-        read from the custom templates directory (if configured) or from the
-        bundled templates.
-
-        Args:
-            output_static: Path to the output static directory.
-        """
+        """Minify all CSS files and write them to the output static directory."""
         self._minify_one_css(output_static, CSS_FILENAME, CSS_MINIFIED_FILENAME)
         for source_filename, minified_filename in _PAGE_SPECIFIC_CSS:
             self._minify_one_css(output_static, source_filename, minified_filename)
 
     def _write_code_css(self, output_static: Path) -> None:
-        """Generate and write the code syntax highlighting CSS file.
-
-        Builds a ``code.css`` (or ``code.min.css`` when ``minify_css`` is
-        enabled) from the Pygments styles configured in ``light_mode_code_style``
-        and ``dark_mode_code_style``.  The file is always regenerated from the
-        configured styles, even when the default styles are in use, so that the
-        output is self-contained and does not depend on any hardcoded CSS rules
-        in the main stylesheet.
-
-        Args:
-            output_static: Path to the output static directory.
-        """
+        """Generate and write the code syntax highlighting CSS file."""
         css_content = build_code_css(
             self.site_config.light_mode_code_style,
             self.site_config.dark_mode_code_style,
@@ -961,47 +858,30 @@ class SiteGenerator:
         if self.site_config.minify_css:
             minified = rcssmin.cssmin(css_content)
             output_path = output_static / CODE_CSS_MINIFIED_FILENAME
-            output_path.write_text(minified, encoding="utf-8")
-            print(f"Generated minified code CSS as {CODE_CSS_MINIFIED_FILENAME}")
+            label = "minified code CSS"
+            filename = CODE_CSS_MINIFIED_FILENAME
         else:
+            minified = css_content
             output_path = output_static / CODE_CSS_FILENAME
-            output_path.write_text(css_content, encoding="utf-8")
-            print(f"Generated code CSS as {CODE_CSS_FILENAME}")
+            label = "code CSS"
+            filename = CODE_CSS_FILENAME
+
+        output_path.write_text(minified, encoding="utf-8")
+        print(f"Generated {label} as {filename}")
 
     def _write_minified_js(
         self, output_static: Path, js_filename: str, js_minified_filename: str
     ) -> None:
         """Read a source JavaScript file, minify it, and write it with the minified name.
 
-        The source JS is read from the custom templates directory (if
-        available) or from the bundled templates.  The minified output is
-        written to ``output_static/<js_minified_filename>``.
-
         Args:
             output_static: Path to the output static directory.
             js_filename: The original JavaScript filename (e.g. ``theme.js``).
             js_minified_filename: The minified output filename (e.g. ``theme.min.js``).
         """
-        js_source: str | None = None
-
-        # Prefer custom JS file if a templates directory is configured
-        if self.site_config.templates_dir is not None:
-            custom_js = self.site_config.templates_dir / "static" / js_filename
-            if custom_js.is_file():
-                js_source = custom_js.read_text(encoding="utf-8")
-
-        # Fall back to bundled JS file
+        js_source = self._resolve_static_source(js_filename)
         if js_source is None:
-            try:
-                bundled_js = files("blogmore").joinpath(
-                    "templates", "static", js_filename
-                )
-                js_source = bundled_js.read_text(encoding="utf-8")
-            except Exception as e:
-                print(
-                    f"Warning: Could not read bundled {js_filename} for minification: {e}"
-                )
-                return
+            return
 
         minified = rjsmin.jsmin(js_source)
         output_path = output_static / js_minified_filename

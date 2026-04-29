@@ -18,12 +18,13 @@ def validate_path_template(
     config_key: str,
     allowed_variables: frozenset[str],
     item_name: str,
+    required_variables: frozenset[str] = frozenset({"slug"}),
 ) -> None:
     """Validate a path format string for a content type.
 
     Checks that *template* is non-empty, well-formed, references only
-    variables from *allowed_variables*, and includes the mandatory
-    ``{slug}`` placeholder.
+    variables from *allowed_variables*, and includes the
+    *required_variables*.
 
     Args:
         template: The path format string to validate.
@@ -33,10 +34,13 @@ def validate_path_template(
             template.
         item_name: The human-readable name of the content type used in
             the uniqueness error message (e.g. ``"page"`` or ``"post"``).
+        required_variables: The set of variable names that MUST appear
+            in the template to ensure uniqueness. Defaults to
+            ``{"slug"}``.
 
     Raises:
         ValueError: If the template is empty, malformed, references an
-            unknown variable, or omits the ``{slug}`` placeholder.
+            unknown variable, or omits a required variable.
     """
     if not template:
         raise ValueError(f"{config_key} must not be empty")
@@ -61,10 +65,12 @@ def validate_path_template(
             + f". Allowed variables are: {', '.join(sorted(allowed_variables))}"
         )
 
-    if "slug" not in field_names:
+    missing = required_variables - set(field_names)
+    if missing:
         raise ValueError(
-            f"{config_key} '{template}' must contain the {{slug}} variable so that "
-            f"each {item_name} can be uniquely identified"
+            f"{config_key} '{template}' must contain the "
+            + ", ".join(f"{{{v}}}" for v in sorted(missing))
+            + f" variable(s) so that each {item_name} can be uniquely identified"
         )
 
 

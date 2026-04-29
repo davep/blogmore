@@ -189,6 +189,19 @@ class TemplateRenderer:
         # All other links with schemes are external
         return True
 
+    def render_template(self, template_name: str, **context: Any) -> str:
+        """Render an arbitrary template.
+
+        Args:
+            template_name: Name of the template file
+            **context: Context variables to pass to the template
+
+        Returns:
+            Rendered HTML string
+        """
+        template = self.env.get_template(template_name)
+        return template.render(extra_stylesheets=self.extra_stylesheets, **context)
+
     def render_post(self, post: Post, **context: Any) -> str:
         """Render a single blog post.
 
@@ -199,10 +212,7 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("post.html")
-        return template.render(
-            post=post, extra_stylesheets=self.extra_stylesheets, **context
-        )
+        return self.render_template("post.html", post=post, **context)
 
     def render_page(self, page: Page, **context: Any) -> str:
         """Render a single static page.
@@ -214,10 +224,7 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("page.html")
-        return template.render(
-            page=page, extra_stylesheets=self.extra_stylesheets, **context
-        )
+        return self.render_template("page.html", page=page, **context)
 
     def render_index(
         self,
@@ -237,12 +244,11 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("index.html")
-        return template.render(
+        return self.render_template(
+            "index.html",
             posts=posts,
             page=page,
             total_pages=total_pages,
-            extra_stylesheets=self.extra_stylesheets,
             **context,
         )
 
@@ -266,13 +272,12 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("archive.html")
-        return template.render(
+        return self.render_template(
+            "archive.html",
             posts=posts,
             archive_title=archive_title,
             page=page,
             total_pages=total_pages,
-            extra_stylesheets=self.extra_stylesheets,
             **context,
         )
 
@@ -296,13 +301,12 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("tag.html")
-        return template.render(
+        return self.render_template(
+            "tag.html",
             tag=tag,
             posts=posts,
             page=page,
             total_pages=total_pages,
-            extra_stylesheets=self.extra_stylesheets,
             **context,
         )
 
@@ -326,13 +330,12 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("category.html")
-        return template.render(
+        return self.render_template(
+            "category.html",
             category=category,
             posts=posts,
             page=page,
             total_pages=total_pages,
-            extra_stylesheets=self.extra_stylesheets,
             **context,
         )
 
@@ -350,12 +353,7 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("tags.html")
-        return template.render(
-            tags=tags,
-            extra_stylesheets=self.extra_stylesheets,
-            **context,
-        )
+        return self.render_template("tags.html", tags=tags, **context)
 
     def render_categories_page(
         self,
@@ -371,12 +369,7 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("categories.html")
-        return template.render(
-            categories=categories,
-            extra_stylesheets=self.extra_stylesheets,
-            **context,
-        )
+        return self.render_template("categories.html", categories=categories, **context)
 
     def render_search_page(self, **context: Any) -> str:
         """Render the search page.
@@ -387,8 +380,7 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string.
         """
-        template = self.env.get_template("search.html")
-        return template.render(extra_stylesheets=self.extra_stylesheets, **context)
+        return self.render_template("search.html", **context)
 
     def render_stats_page(self, **context: Any) -> str:
         """Render the blog statistics page.
@@ -401,8 +393,7 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string.
         """
-        template = self.env.get_template("stats.html")
-        return template.render(extra_stylesheets=self.extra_stylesheets, **context)
+        return self.render_template("stats.html", **context)
 
     def render_calendar_page(self, **context: Any) -> str:
         """Render the calendar view page.
@@ -415,8 +406,7 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string.
         """
-        template = self.env.get_template("calendar.html")
-        return template.render(extra_stylesheets=self.extra_stylesheets, **context)
+        return self.render_template("calendar.html", **context)
 
     def render_graph_page(self, **context: Any) -> str:
         """Render the post-relationship graph page.
@@ -430,18 +420,4 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string.
         """
-        template = self.env.get_template("graph.html")
-        return template.render(extra_stylesheets=self.extra_stylesheets, **context)
-
-    def render_template(self, template_name: str, **context: Any) -> str:
-        """Render an arbitrary template.
-
-        Args:
-            template_name: Name of the template file
-            **context: Context variables to pass to the template
-
-        Returns:
-            Rendered HTML string
-        """
-        template = self.env.get_template(template_name)
-        return template.render(extra_stylesheets=self.extra_stylesheets, **context)
+        return self.render_template("graph.html", **context)

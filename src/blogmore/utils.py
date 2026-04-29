@@ -3,6 +3,38 @@
 import re
 
 
+def _strip_formatting(content: str) -> str:
+    """Internal helper to strip Markdown and HTML formatting from content.
+
+    Used by both :func:`count_words` and :func:`calculate_reading_time` to
+    ensure they operate on the same normalized prose text.
+
+    Args:
+        content: The text content to analyze.
+
+    Returns:
+        The content with code blocks, links, images, HTML tags, and Markdown
+        formatting characters removed.
+    """
+    # Remove code blocks
+    content = re.sub(r"```[\s\S]*?```", "", content)
+    content = re.sub(r"`[^`]+`", "", content)
+
+    # Remove markdown links but keep the text: [text](url) -> text
+    content = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", content)
+
+    # Remove markdown images: ![alt](url) -> ""
+    content = re.sub(r"!\[([^\]]*)\]\([^\)]+\)", "", content)
+
+    # Remove HTML tags
+    content = re.sub(r"<[^>]+>", "", content)
+
+    # Remove markdown formatting characters
+    content = re.sub(r"[*_~`#-]", " ", content)
+
+    return content
+
+
 def count_words(content: str) -> int:
     """Count the number of words in the given content.
 
@@ -22,22 +54,7 @@ def count_words(content: str) -> int:
         >>> count_words("word " * 10)
         10
     """
-    # Remove code blocks
-    content = re.sub(r"```[\s\S]*?```", "", content)
-    content = re.sub(r"`[^`]+`", "", content)
-
-    # Remove markdown links but keep the text: [text](url) -> text
-    content = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", content)
-
-    # Remove markdown images: ![alt](url) -> ""
-    content = re.sub(r"!\[([^\]]*)\]\([^\)]+\)", "", content)
-
-    # Remove HTML tags
-    content = re.sub(r"<[^>]+>", "", content)
-
-    # Remove markdown formatting characters
-    content = re.sub(r"[*_~`#-]", " ", content)
-
+    content = _strip_formatting(content)
     return len([word for word in content.split() if word])
 
 
@@ -60,21 +77,7 @@ def calculate_reading_time(content: str, words_per_minute: int = 200) -> int:
         >>> calculate_reading_time("word " * 400)
         2
     """
-    # Remove code blocks (they typically take longer to read/understand)
-    content = re.sub(r"```[\s\S]*?```", "", content)
-    content = re.sub(r"`[^`]+`", "", content)
-
-    # Remove markdown links but keep the text: [text](url) -> text
-    content = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", content)
-
-    # Remove markdown images: ![alt](url) -> ""
-    content = re.sub(r"!\[([^\]]*)\]\([^\)]+\)", "", content)
-
-    # Remove HTML tags
-    content = re.sub(r"<[^>]+>", "", content)
-
-    # Remove markdown formatting characters
-    content = re.sub(r"[*_~`#-]", " ", content)
+    content = _strip_formatting(content)
 
     # Count words (split by whitespace and filter out empty strings)
     words = [word for word in content.split() if word]

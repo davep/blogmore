@@ -1,9 +1,8 @@
 """Pagination path resolution for configurable index page output paths."""
 
 ##############################################################################
-# Python imports.
-import re
-from string import Formatter
+# Application imports.
+from blogmore.content_path import resolve_path, validate_path_template
 
 ##############################################################################
 # Default pagination path templates (match historical BlogMore behaviour).
@@ -32,27 +31,13 @@ def validate_page_1_path_template(template: str) -> None:
         ValueError: If the template is empty or references an unknown
             variable name.
     """
-    if not template:
-        raise ValueError("page_1_path must not be empty")
-
-    try:
-        field_names = [
-            field_name
-            for _, field_name, _, _ in Formatter().parse(template)
-            if field_name is not None
-        ]
-    except (ValueError, KeyError) as error:
-        raise ValueError(
-            f"page_1_path '{template}' contains an invalid placeholder: {error}"
-        ) from error
-
-    unknown = set(field_names) - ALLOWED_PAGE_1_PATH_VARIABLES
-    if unknown:
-        raise ValueError(
-            f"page_1_path '{template}' contains unknown variable(s): "
-            + ", ".join(sorted(unknown))
-            + f". Allowed variables are: {', '.join(sorted(ALLOWED_PAGE_1_PATH_VARIABLES))}"
-        )
+    validate_path_template(
+        template,
+        "page_1_path",
+        ALLOWED_PAGE_1_PATH_VARIABLES,
+        "index page",
+        required_variables=frozenset(),
+    )
 
 
 def validate_page_n_path_template(template: str) -> None:
@@ -70,33 +55,13 @@ def validate_page_n_path_template(template: str) -> None:
         ValueError: If the template is empty, contains no ``{page}``
             placeholder, or references an unknown variable name.
     """
-    if not template:
-        raise ValueError("page_n_path must not be empty")
-
-    try:
-        field_names = [
-            field_name
-            for _, field_name, _, _ in Formatter().parse(template)
-            if field_name is not None
-        ]
-    except (ValueError, KeyError) as error:
-        raise ValueError(
-            f"page_n_path '{template}' contains an invalid placeholder: {error}"
-        ) from error
-
-    unknown = set(field_names) - ALLOWED_PAGE_N_PATH_VARIABLES
-    if unknown:
-        raise ValueError(
-            f"page_n_path '{template}' contains unknown variable(s): "
-            + ", ".join(sorted(unknown))
-            + f". Allowed variables are: {', '.join(sorted(ALLOWED_PAGE_N_PATH_VARIABLES))}"
-        )
-
-    if "page" not in field_names:
-        raise ValueError(
-            f"page_n_path '{template}' must contain the {{page}} variable so that "
-            "each subsequent page can be uniquely identified"
-        )
+    validate_path_template(
+        template,
+        "page_n_path",
+        ALLOWED_PAGE_N_PATH_VARIABLES,
+        "subsequent page",
+        required_variables=frozenset({"page"}),
+    )
 
 
 def resolve_pagination_page_path(template: str, page: int) -> str:
@@ -117,15 +82,7 @@ def resolve_pagination_page_path(template: str, page: int) -> str:
         A relative path string (no leading slash) derived from the
         template.
     """
-    try:
-        result = template.format(page=page)
-    except (KeyError, ValueError) as error:
-        raise ValueError(
-            f"Failed to resolve pagination path template '{template}': {error}"
-        ) from error
-
-    result = re.sub(r"/+", "/", result)
-    return result.lstrip("/")
+    return resolve_path({"page": str(page)}, template, "pagination path")
 
 
 ### pagination_path.py ends here
