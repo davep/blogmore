@@ -7,7 +7,7 @@ from pathlib import Path
 ##############################################################################
 # Application imports.
 from blogmore.content_path import resolve_path, safe_output_path, validate_path_template
-from blogmore.parser import Post, remove_date_prefix, sanitize_for_url
+from blogmore.parser import Post, build_post_path_vars
 
 ##############################################################################
 # Default post path template (matches historical BlogMore behaviour).
@@ -68,42 +68,7 @@ def resolve_post_path(post: Post, template: str) -> str:
         ValueError: If the template references an unknown variable or is
             otherwise malformed.
     """
-    slug = remove_date_prefix(post.slug)
-
-    # Author – read from metadata, slugify for safe use in URLs/paths.
-    author = ""
-    if post.metadata:
-        raw_author = post.metadata.get("author")
-        if raw_author:
-            author = sanitize_for_url(str(raw_author))
-
-    # Category – already available as a sanitised property on Post.
-    category = post.safe_category or ""
-
-    # Date / time components – empty strings for undated posts.
-    if post.date:
-        year = str(post.date.year)
-        month = f"{post.date.month:02d}"
-        day = f"{post.date.day:02d}"
-        hour = f"{post.date.hour:02d}"
-        minute = f"{post.date.minute:02d}"
-        second = f"{post.date.second:02d}"
-    else:
-        year = month = day = hour = minute = second = ""
-
-    variables = {
-        "year": year,
-        "month": month,
-        "day": day,
-        "hour": hour,
-        "minute": minute,
-        "second": second,
-        "category": category,
-        "author": author,
-        "slug": slug,
-    }
-
-    return resolve_path(variables, template, "post_path")
+    return resolve_path(build_post_path_vars(post), template, "post_path")
 
 
 def compute_output_path(output_dir: Path, post: Post, template: str) -> Path:

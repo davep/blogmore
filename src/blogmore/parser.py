@@ -260,6 +260,55 @@ def post_sort_key(post: Post) -> float:
     return post.date.replace(tzinfo=dt.UTC).timestamp()
 
 
+def build_post_path_vars(post: Post) -> dict[str, str]:
+    """Build a template-variable mapping from a post's metadata.
+
+    Returns a dictionary suitable for use with :meth:`str.format_map` when
+    resolving post-path or comment-invite templates.  Date and time
+    components are empty strings for posts that have no date.
+
+    This is the single source of truth for the set of variables that can
+    appear in a ``post_path`` or ``invite_comments_to`` template.
+
+    Args:
+        post: The post whose metadata is used to build the mapping.
+
+    Returns:
+        A dictionary mapping variable names to their resolved string values.
+    """
+    slug = remove_date_prefix(post.slug)
+
+    author = ""
+    if post.metadata:
+        raw_author = post.metadata.get("author")
+        if raw_author:
+            author = sanitize_for_url(str(raw_author))
+
+    category = post.safe_category or ""
+
+    if post.date:
+        year = str(post.date.year)
+        month = f"{post.date.month:02d}"
+        day = f"{post.date.day:02d}"
+        hour = f"{post.date.hour:02d}"
+        minute = f"{post.date.minute:02d}"
+        second = f"{post.date.second:02d}"
+    else:
+        year = month = day = hour = minute = second = ""
+
+    return {
+        "year": year,
+        "month": month,
+        "day": day,
+        "hour": hour,
+        "minute": minute,
+        "second": second,
+        "category": category,
+        "author": author,
+        "slug": slug,
+    }
+
+
 @dataclass
 class Page:
     """Represents a static page with metadata and content."""

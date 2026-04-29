@@ -12,6 +12,33 @@ from blogmore.utils import make_urls_absolute, normalize_site_url
 FEEDS_DIR = "feeds"
 
 
+def _resolve_base_url(site_url: str) -> str:
+    """Return the effective base URL, falling back to a placeholder when empty.
+
+    Normalizes *site_url* by stripping trailing slashes, then returns a
+    ``https://example.com`` placeholder if the result is empty.  This
+    ensures callers always receive a valid absolute URL.
+
+    Args:
+        site_url: The site URL to normalize.
+
+    Returns:
+        A non-empty, slash-free base URL string.
+    """
+    return normalize_site_url(site_url) or "https://example.com"
+
+
+def _write_feed_file(path: Path, content: str) -> None:
+    """Write feed XML *content* to *path*, creating parent directories as needed.
+
+    Args:
+        path: Absolute or relative path to the feed file to write.
+        content: Feed XML content encoded as a string.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
 def create_feed_generator(
     site_title: str,
     site_url: str,
@@ -28,17 +55,9 @@ def create_feed_generator(
 
     Returns:
         Configured FeedGenerator instance
-
-    Note:
-        This function normalizes site_url internally for defense in depth,
-        even though callers like SiteGenerator and BlogFeedGenerator already
-        normalize it. This ensures correct behavior when called directly.
     """
     feed_generator = FeedGen()
-    # Normalize site_url to remove trailing slash (defense in depth)
-    normalized_site_url = normalize_site_url(site_url)
-    # Use a fallback URL if site_url is empty
-    base_url = normalized_site_url if normalized_site_url else "https://example.com"
+    base_url = _resolve_base_url(site_url)
     feed_generator.id(base_url)
     feed_generator.title(site_title)
     # IMPORTANT: Order matters! The last link becomes the channel <link> in RSS.
@@ -59,17 +78,9 @@ def add_post_to_feed(feed_generator: FeedGen, post: Post, site_url: str) -> None
         feed_generator: FeedGenerator instance
         post: Post to add to the feed
         site_url: Base URL of the site (will be normalized to remove trailing slash)
-
-    Note:
-        This function normalizes site_url internally for defense in depth,
-        even though callers like BlogFeedGenerator already normalize it.
-        This ensures correct behavior when called directly.
     """
     feed_entry = feed_generator.add_entry()
-    # Normalize site_url to remove trailing slash (defense in depth)
-    normalized_site_url = normalize_site_url(site_url)
-    # Use a fallback URL if site_url is empty
-    base_url = normalized_site_url if normalized_site_url else "https://example.com"
+    base_url = _resolve_base_url(site_url)
     feed_entry.id(f"{base_url}{post.url}")
     feed_entry.title(post.title)
     feed_entry.link(href=f"{base_url}{post.url}")
@@ -156,15 +167,8 @@ def write_feeds(
         rss_xml: RSS feed XML content
         atom_xml: Atom feed XML content
     """
-    # Write RSS feed
-    rss_file = output_dir / rss_path
-    rss_file.parent.mkdir(parents=True, exist_ok=True)
-    rss_file.write_text(rss_xml, encoding="utf-8")
-
-    # Write Atom feed
-    atom_file = output_dir / atom_path
-    atom_file.parent.mkdir(parents=True, exist_ok=True)
-    atom_file.write_text(atom_xml, encoding="utf-8")
+    _write_feed_file(output_dir / rss_path, rss_xml)
+    _write_feed_file(output_dir / atom_path, atom_xml)
 
 
 class BlogFeedGenerator:
@@ -196,7 +200,7 @@ class BlogFeedGenerator:
         Returns:
             Base URL (either site_url or fallback)
         """
-        return self.site_url if self.site_url else "https://example.com"
+        return _resolve_base_url(self.site_url)
 
     def generate_index_feeds(self, posts: list[Post]) -> None:
         """Generate main index feeds.

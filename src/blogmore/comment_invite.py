@@ -7,24 +7,7 @@ from urllib.parse import quote
 ##############################################################################
 # Application imports.
 from blogmore.content_path import resolve_path
-from blogmore.parser import Post, remove_date_prefix, sanitize_for_url
-
-##############################################################################
-# The set of variable names that may appear in an invite_comments_to template.
-# Identical to the set used for post_path templates.
-ALLOWED_EMAIL_VARIABLES = frozenset(
-    {
-        "year",
-        "month",
-        "day",
-        "hour",
-        "minute",
-        "second",
-        "category",
-        "author",
-        "slug",
-    }
-)
+from blogmore.parser import Post, build_post_path_vars
 
 
 def resolve_invite_email_template(post: "Post", template: str) -> str:
@@ -47,39 +30,7 @@ def resolve_invite_email_template(post: "Post", template: str) -> str:
         ValueError: If the template references an unknown variable or is
             otherwise malformed.
     """
-    slug = remove_date_prefix(post.slug)
-
-    author = ""
-    if post.metadata:
-        raw_author = post.metadata.get("author")
-        if raw_author:
-            author = sanitize_for_url(str(raw_author))
-
-    category = post.safe_category or ""
-
-    if post.date:
-        year = str(post.date.year)
-        month = f"{post.date.month:02d}"
-        day = f"{post.date.day:02d}"
-        hour = f"{post.date.hour:02d}"
-        minute = f"{post.date.minute:02d}"
-        second = f"{post.date.second:02d}"
-    else:
-        year = month = day = hour = minute = second = ""
-
-    variables = {
-        "year": year,
-        "month": month,
-        "day": day,
-        "hour": hour,
-        "minute": minute,
-        "second": second,
-        "category": category,
-        "author": author,
-        "slug": slug,
-    }
-
-    return resolve_path(variables, template, "invite_comments_to")
+    return resolve_path(build_post_path_vars(post), template, "invite_comments_to")
 
 
 def get_invite_email_for_post(

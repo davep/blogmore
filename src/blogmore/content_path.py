@@ -17,13 +17,15 @@ def validate_path_template(
     template: str,
     config_key: str,
     allowed_variables: frozenset[str],
-    item_name: str,
+    item_name: str = "",
+    *,
+    required_variable: str | None = "slug",
 ) -> None:
     """Validate a path format string for a content type.
 
     Checks that *template* is non-empty, well-formed, references only
-    variables from *allowed_variables*, and includes the mandatory
-    ``{slug}`` placeholder.
+    variables from *allowed_variables*, and (when *required_variable* is
+    not ``None``) includes the mandatory placeholder.
 
     Args:
         template: The path format string to validate.
@@ -33,11 +35,19 @@ def validate_path_template(
             template.
         item_name: The human-readable name of the content type used in
             the uniqueness error message (e.g. ``"page"`` or ``"post"``).
+            Ignored when *required_variable* is ``None``.
+        required_variable: The variable name that must appear in the
+            template, or ``None`` if no variable is mandatory.  Defaults
+            to ``"slug"`` for backward compatibility.
 
     Raises:
         ValueError: If the template is empty, malformed, references an
-            unknown variable, or omits the ``{slug}`` placeholder.
+            unknown variable, or omits the required placeholder.
     """
+    assert (
+        required_variable is None or required_variable in allowed_variables
+    ), f"required_variable {required_variable!r} is not in allowed_variables"
+
     if not template:
         raise ValueError(f"{config_key} must not be empty")
 
@@ -61,9 +71,9 @@ def validate_path_template(
             + f". Allowed variables are: {', '.join(sorted(allowed_variables))}"
         )
 
-    if "slug" not in field_names:
+    if required_variable is not None and required_variable not in field_names:
         raise ValueError(
-            f"{config_key} '{template}' must contain the {{slug}} variable so that "
+            f"{config_key} '{template}' must contain the {{{required_variable}}} variable so that "
             f"each {item_name} can be uniquely identified"
         )
 

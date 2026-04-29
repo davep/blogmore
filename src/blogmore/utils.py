@@ -3,6 +3,27 @@
 import re
 
 
+def _strip_markdown_formatting(content: str) -> str:
+    """Strip Markdown and HTML formatting from *content*, returning plain text.
+
+    Removes fenced and inline code blocks, Markdown links and images, HTML
+    tags, and common Markdown emphasis characters so that the result contains
+    only prose words.
+
+    Args:
+        content: Raw Markdown or HTML text to strip.
+
+    Returns:
+        The input with all Markdown and HTML formatting removed.
+    """
+    content = re.sub(r"```[\s\S]*?```", "", content)
+    content = re.sub(r"`[^`]+`", "", content)
+    content = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", content)
+    content = re.sub(r"!\[([^\]]*)\]\([^\)]+\)", "", content)
+    content = re.sub(r"<[^>]+>", "", content)
+    return re.sub(r"[*_~`#-]", " ", content)
+
+
 def count_words(content: str) -> int:
     """Count the number of words in the given content.
 
@@ -22,23 +43,7 @@ def count_words(content: str) -> int:
         >>> count_words("word " * 10)
         10
     """
-    # Remove code blocks
-    content = re.sub(r"```[\s\S]*?```", "", content)
-    content = re.sub(r"`[^`]+`", "", content)
-
-    # Remove markdown links but keep the text: [text](url) -> text
-    content = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", content)
-
-    # Remove markdown images: ![alt](url) -> ""
-    content = re.sub(r"!\[([^\]]*)\]\([^\)]+\)", "", content)
-
-    # Remove HTML tags
-    content = re.sub(r"<[^>]+>", "", content)
-
-    # Remove markdown formatting characters
-    content = re.sub(r"[*_~`#-]", " ", content)
-
-    return len([word for word in content.split() if word])
+    return len([word for word in _strip_markdown_formatting(content).split() if word])
 
 
 def calculate_reading_time(content: str, words_per_minute: int = 200) -> int:
@@ -60,30 +65,8 @@ def calculate_reading_time(content: str, words_per_minute: int = 200) -> int:
         >>> calculate_reading_time("word " * 400)
         2
     """
-    # Remove code blocks (they typically take longer to read/understand)
-    content = re.sub(r"```[\s\S]*?```", "", content)
-    content = re.sub(r"`[^`]+`", "", content)
-
-    # Remove markdown links but keep the text: [text](url) -> text
-    content = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", content)
-
-    # Remove markdown images: ![alt](url) -> ""
-    content = re.sub(r"!\[([^\]]*)\]\([^\)]+\)", "", content)
-
-    # Remove HTML tags
-    content = re.sub(r"<[^>]+>", "", content)
-
-    # Remove markdown formatting characters
-    content = re.sub(r"[*_~`#-]", " ", content)
-
-    # Count words (split by whitespace and filter out empty strings)
-    words = [word for word in content.split() if word]
-    word_count = len(words)
-
-    # Calculate minutes, rounding to the nearest minute with a minimum of 1
-    minutes = max(1, round(word_count / words_per_minute))
-
-    return minutes
+    words = [word for word in _strip_markdown_formatting(content).split() if word]
+    return max(1, round(len(words) / words_per_minute))
 
 
 def make_urls_absolute(html_content: str, base_url: str) -> str:

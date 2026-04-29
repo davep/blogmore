@@ -10,32 +10,9 @@ images.
 import re
 from html.parser import HTMLParser
 
-import markdown
-
-from blogmore.markdown.plain_text import create_custom_extensions
+from blogmore.markdown.plain_text import _make_markdown_instance
 
 __all__ = ["extract_first_paragraph"]
-
-
-def _make_extraction_markdown() -> markdown.Markdown:
-    """Create a Markdown instance configured for first-paragraph text extraction.
-
-    Includes all BlogMore custom extensions and the standard extensions needed
-    to correctly identify paragraph boundaries.  Intentionally omits
-    presentation-only extensions such as ``codehilite`` and ``toc`` that are
-    not required for plain-text extraction.
-
-    Returns:
-        A fresh, configured :class:`markdown.Markdown` instance.
-    """
-    return markdown.Markdown(
-        extensions=[
-            "fenced_code",
-            "tables",
-            "footnotes",
-            *create_custom_extensions(),
-        ],
-    )
 
 
 class _FirstParagraphExtractor(HTMLParser):
@@ -171,7 +148,7 @@ def extract_first_paragraph(content: str) -> str:
     """
     if not content.strip():
         return ""
-    html_content = _make_extraction_markdown().convert(content)
+    html_content = _make_markdown_instance().convert(content)
     extractor = _FirstParagraphExtractor()
     extractor.feed(html_content)
     return extractor.result
