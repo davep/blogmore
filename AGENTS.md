@@ -52,6 +52,10 @@ appropriately-named module rather than growing an existing large file.
   package (e.g. `types-*`) before adding `# type: ignore` comments.
 - Always generate full Google-style docstrings for every module, class,
   method, and function. Do *not* include type information in docstrings.
+- All inline code and cross-references in docstrings **must** use mkdocstrings-compatible Markdown style:
+    - Inline code: use single backticks (\`like_this\`).
+    - Cross-references: use mkdocstrings reference-style Markdown links (e.g., [`ClassName`][module.ClassName] or [module.ClassName][]).
+    - Do **not** use Sphinx roles (e.g., :class:`ClassName`) or double-backtick code (``ClassName``).
 - Docstrings always start on the *same line* as the opening triple quote.
   The closing triple quote is *always* on its own line when the docstring
   is more than one line.

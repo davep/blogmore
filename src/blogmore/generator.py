@@ -124,7 +124,7 @@ class SiteGenerator:
 
         Args:
             site_config: Configuration for the site to be generated.  The
-                ``content_dir`` field must not be ``None``.
+                [`content_dir`][blogmore.site_config.SiteConfig.content_dir] field must not be `None`.
         """
         if site_config.content_dir is None:
             raise ValueError(

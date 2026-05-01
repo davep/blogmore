@@ -52,7 +52,7 @@ class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     Uses HTTP/1.1 to enable keep-alive connections, which significantly improves
     performance in browsers like Safari that make many parallel requests.
 
-    When a ``404.html`` file exists in the served directory it is returned as
+    When a `404.html` file exists in the served directory it is returned as
     the response body for any 404 error, mirroring the behaviour of services
     such as GitHub Pages.
     """
@@ -305,8 +305,8 @@ def serve_site(
 
     Args:
         site_config: Site configuration holding all generation parameters.
-            When ``site_config.content_dir`` is not ``None`` the site will be
-            (re-)generated before serving.  ``site_config.include_drafts``
+            When `site_config.content_dir` is not `None` the site will be
+            (re-)generated before serving.  `site_config.include_drafts`
             controls whether draft posts are included.
         port: Port to serve on (default: 8000)
         watch: Whether to watch for changes and regenerate (default: True)

@@ -36,9 +36,9 @@ class _LangAwareHtmlFormatter(HtmlFormatter[str]):
     """Pygments HTML formatter that exposes the detected language via a data attribute.
 
     The codehilite Markdown extension passes the fenced code block language as
-    ``lang_str`` (e.g. ``language-python``) when constructing the formatter.
-    This subclass captures that value and writes it as a ``data-lang`` attribute
-    on the wrapper ``<div>``, making it available to JavaScript without any
+    `lang_str` (e.g. `language-python`) when constructing the formatter.
+    This subclass captures that value and writes it as a `data-lang` attribute
+    on the wrapper `<div>`, making it available to JavaScript without any
     additional post-processing.
     """
 
@@ -47,10 +47,10 @@ class _LangAwareHtmlFormatter(HtmlFormatter[str]):
 
         Args:
             lang_str: The language string passed by codehilite, typically in the
-                form ``language-<name>`` (e.g. ``language-python``).  An empty
+                form `language-<name>` (e.g. `language-python`).  An empty
                 string means no language was specified.
             **kwargs: Remaining keyword arguments forwarded to
-                :class:`pygments.formatters.HtmlFormatter`.
+                `pygments.formatters.HtmlFormatter`.
         """
         super().__init__(**kwargs)
         self._lang_name = lang_str.removeprefix(_LANG_PREFIX) if lang_str else ""
@@ -58,16 +58,16 @@ class _LangAwareHtmlFormatter(HtmlFormatter[str]):
     def _wrap_div(
         self, inner: Generator[tuple[int, str], None, None]
     ) -> Generator[tuple[int, str], None, None]:
-        """Wrap the highlighted code in a ``<div>`` element.
+        """Wrap the highlighted code in a `<div>` element.
 
-        Extends the parent implementation by adding a ``data-lang`` attribute
+        Extends the parent implementation by adding a `data-lang` attribute
         when a language name is available.
 
         Args:
-            inner: Generator of ``(token_type, value)`` tuples from the parent.
+            inner: Generator of `(token_type, value)` tuples from the parent.
 
         Yields:
-            ``(token_type, value)`` tuples forming the wrapped HTML.
+            `(token_type, value)` tuples forming the wrapped HTML.
         """
         style_parts: list[str] = []
         if (
@@ -144,13 +144,13 @@ class Post:
     def url(self) -> str:
         """Generate the URL path for the post.
 
-        If the generator has resolved a custom URL via the ``post_path``
-        configuration option it will be stored in ``url_path`` and returned
+        If the generator has resolved a custom URL via the `post_path`
+        configuration option it will be stored in `url_path` and returned
         directly.  Otherwise the URL is derived from the post date and slug
-        using the default ``/{year}/{month}/{day}/{slug}.html`` scheme.
+        using the default `/{year}/{month}/{day}/{slug}.html` scheme.
 
         Returns:
-            The URL path for the post, always beginning with ``/``.
+            The URL path for the post, always beginning with `/`.
         """
         if self.url_path is not None:
             return self.url_path
@@ -212,7 +212,7 @@ class Post:
     def modified_date(self) -> dt.datetime | None:
         """Get the modified date as a datetime object.
 
-        Parses the ``modified`` field from metadata into a proper datetime,
+        Parses the `modified` field from metadata into a proper datetime,
         handling datetime objects returned by the YAML parser as well as raw
         strings in common date formats.
 
@@ -280,13 +280,13 @@ class Page:
     def url(self) -> str:
         """Generate the URL path for the page.
 
-        If the generator has resolved a custom URL via the ``page_path``
-        configuration option it will be stored in ``url_path`` and returned
+        If the generator has resolved a custom URL via the `page_path`
+        configuration option it will be stored in `url_path` and returned
         directly.  Otherwise the URL is derived from the page slug using the
-        default ``/{slug}.html`` scheme.
+        default `/{slug}.html` scheme.
 
         Returns:
-            The URL path for the page, always beginning with ``/``.
+            The URL path for the page, always beginning with `/`.
         """
         if self.url_path is not None:
             return self.url_path
@@ -565,8 +565,8 @@ class PostParser:
     def parse_pages_directory(self, directory: Path) -> list[Page]:
         """Parse all markdown files in a pages directory.
 
-        The special file ``404.md`` is excluded from the returned list; use
-        :meth:`parse_404_page` to obtain it separately.
+        The special file `404.md` is excluded from the returned list; use
+        `blogmore.parser.parse_404_page` to obtain it separately.
 
         Args:
             directory: Directory containing page markdown files
@@ -596,11 +596,11 @@ class PostParser:
         """Parse the optional custom 404 page from a pages directory.
 
         Args:
-            directory: Directory that may contain a ``404.md`` file
+            directory: Directory that may contain a `404.md` file
 
         Returns:
-            A Page object if ``404.md`` exists and parses successfully,
-            otherwise ``None``
+            A Page object if `404.md` exists and parses successfully,
+            otherwise `None`
         """
         path = directory / CUSTOM_404_MARKDOWN
         if not path.exists():

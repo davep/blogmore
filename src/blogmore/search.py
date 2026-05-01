@@ -53,9 +53,9 @@ def build_search_index(posts: list[Post]) -> list[dict[str, Any]]:
 def write_search_index(posts: list[Post], output_dir: Path) -> None:
     """Write the search index JSON file to the output directory.
 
-    The file is written as ``search_index.json`` at the root of the
+    The file is written as `search_index.json` at the root of the
     output directory.  It is a JSON array of objects as produced by
-    :func:`build_search_index`.
+    `blogmore.search.build_search_index`.
 
     Args:
         posts: List of posts to index.

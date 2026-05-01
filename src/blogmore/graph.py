@@ -2,12 +2,12 @@
 
 Builds a force-directed graph data structure from posts, connecting them
 via internal links, shared tags, and shared categories.  This module is
-only consulted when ``with_graph`` is enabled in the site configuration.
+only consulted when `with_graph` is enabled in the site configuration.
 When the feature is disabled none of these functions are called, so users
 pay no cost for a feature they do not use.
 
 Link scanning and URL normalisation are delegated to the shared utilities
-in :mod:`blogmore.backlinks` to avoid code duplication.
+in [`blogmore.backlinks`][blogmore.backlinks] to avoid code duplication.
 """
 
 ##############################################################################
@@ -27,13 +27,13 @@ class GraphData:
     """Data for the post-relationship force-directed graph.
 
     Attributes:
-        nodes: List of node dicts.  Each node always has ``id``, ``label``,
-            ``type``, and ``url`` keys.  Post nodes additionally carry
-            ``date`` (ISO date string or ``None``), ``description`` (str),
-            and ``cover`` (URL string or ``None``).  Tag and category nodes
-            additionally carry ``post_count`` (int).
-        links: List of edge dicts, each with ``source`` and ``target`` keys
-            corresponding to node ``id`` values.
+        nodes: List of node dicts.  Each node always has `id`, `label`,
+            `type`, and `url` keys.  Post nodes additionally carry
+            `date` (ISO date string or `None`), `description` (str),
+            and `cover` (URL string or `None`).  Tag and category nodes
+            additionally carry `post_count` (int).
+        links: List of edge dicts, each with `source` and `target` keys
+            corresponding to node `id` values.
     """
 
     nodes: list[dict[str, Any]] = field(default_factory=list)
@@ -76,7 +76,7 @@ def build_graph_data(
     * Post -> category relationships (one edge per post that has a category).
     * Post -> post internal links (one edge per unique directed link found in
       Markdown content, discovered by scanning inline and reference-style
-      Markdown links via :func:`~blogmore.backlinks._find_links`).
+      Markdown links via [`blogmore.backlinks._find_links`][blogmore.backlinks._find_links]).
 
     Args:
         posts: All published posts for the site.
@@ -89,7 +89,7 @@ def build_graph_data(
             scanning post content for internal links.  May be empty.
 
     Returns:
-        A :class:`GraphData` instance populated with nodes and links.
+        A [`blogmore.graph.GraphData`][blogmore.graph.GraphData] instance populated with nodes and links.
     """
     graph = GraphData()
 

@@ -36,17 +36,17 @@ def collect_sitemap_urls(
 ) -> list[str]:
     """Collect all page URLs for the sitemap.
 
-    Walks the output directory collecting every ``.html`` file, excluding
+    Walks the output directory collecting every `.html` file, excluding
     the search page, the custom 404 page, and any paths in
-    ``extra_excluded_paths``.  Each file path is converted to an absolute
-    URL using ``site_url`` as the base.  If ``site_url`` is empty, the
-    fallback ``https://example.com`` is used.
+    `extra_excluded_paths`.  Each file path is converted to an absolute
+    URL using `site_url` as the base.  If `site_url` is empty, the
+    fallback `https://example.com` is used.
 
-    When *clean_urls* is ``True``, any URL that ends with ``/index.html``
-    has the ``index.html`` portion removed so the URL ends with a trailing
+    When *clean_urls* is `True`, any URL that ends with `/index.html`
+    has the `index.html` portion removed so the URL ends with a trailing
     slash instead.
 
-    Any root-relative paths in ``extra_urls`` (e.g. ``"/some/path/"``) are
+    Any root-relative paths in `extra_urls` (e.g. `"/some/path/"`) are
     resolved against the base URL and appended to the collected URLs.
 
     Args:
