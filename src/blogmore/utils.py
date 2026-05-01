@@ -3,12 +3,38 @@
 import re
 
 
+def strip_markdown(content: str) -> str:
+    """Remove common Markdown and HTML formatting from content.
+
+    Args:
+        content: The text content to clean up.
+
+    Returns:
+        The cleaned text with formatting removed.
+
+    Note:
+        This is *not* a full Markdown to plain text converter. It handles
+        common formatting characters and structures, but may not cover all
+        edge cases or extensions. The main goal is to remove formatting
+        characters that would interfere with things like word counting,
+        while preserving the actual text content.
+    """
+    # Remove code blocks
+    content = re.sub(r"```[\s\S]*?```", "", content)
+    # Remove markdown images: ![alt](url) -> ""
+    content = re.sub(r"!\[([^\]]*)\]\([^\)]+\)", "", content)
+    # Remove markdown links but keep the text: [text](url) -> text
+    content = re.sub(r"\[([^\]]*)\]\([^\)]+\)", r"\1", content)
+    # Remove HTML tags
+    content = re.sub(r"<[^>]+>", "", content)
+    # Remove markdown formatting characters
+    content = re.sub(r"[*_~`#-]", " ", content)
+    # Collapse multiple spaces into one.
+    return re.sub(r"\s+", " ", content).strip()
+
+
 def count_words(content: str) -> int:
     """Count the number of words in the given content.
-
-    Strips common Markdown and HTML formatting before counting so that only
-    prose words are included.  The same normalisation rules as
-    :func:`calculate_reading_time` are applied.
 
     Args:
         content: The text content to analyse (may include Markdown/HTML).
@@ -22,37 +48,18 @@ def count_words(content: str) -> int:
         >>> count_words("word " * 10)
         10
     """
-    # Remove code blocks
-    content = re.sub(r"```[\s\S]*?```", "", content)
-    content = re.sub(r"`[^`]+`", "", content)
-
-    # Remove markdown links but keep the text: [text](url) -> text
-    content = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", content)
-
-    # Remove markdown images: ![alt](url) -> ""
-    content = re.sub(r"!\[([^\]]*)\]\([^\)]+\)", "", content)
-
-    # Remove HTML tags
-    content = re.sub(r"<[^>]+>", "", content)
-
-    # Remove markdown formatting characters
-    content = re.sub(r"[*_~`#-]", " ", content)
-
-    return len([word for word in content.split() if word])
+    return len([word for word in strip_markdown(content).split() if word])
 
 
 def calculate_reading_time(content: str, words_per_minute: int = 200) -> int:
     """Calculate the estimated reading time for content in whole minutes.
 
-    Uses the standard reading speed of 200 words per minute. Strips markdown
-    formatting and counts only actual words to provide an accurate estimate.
-
     Args:
-        content: The text content to analyze (can include markdown)
+        content: The text content to analyse (can include markdown)
         words_per_minute: Average reading speed (default: 200 WPM)
 
     Returns:
-        Estimated reading time in whole minutes (minimum 1 minute)
+        Estimated reading time in whole minutes (minimum 1 minute).
 
     Examples:
         >>> calculate_reading_time("Hello world")
@@ -60,30 +67,7 @@ def calculate_reading_time(content: str, words_per_minute: int = 200) -> int:
         >>> calculate_reading_time("word " * 400)
         2
     """
-    # Remove code blocks (they typically take longer to read/understand)
-    content = re.sub(r"```[\s\S]*?```", "", content)
-    content = re.sub(r"`[^`]+`", "", content)
-
-    # Remove markdown links but keep the text: [text](url) -> text
-    content = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", content)
-
-    # Remove markdown images: ![alt](url) -> ""
-    content = re.sub(r"!\[([^\]]*)\]\([^\)]+\)", "", content)
-
-    # Remove HTML tags
-    content = re.sub(r"<[^>]+>", "", content)
-
-    # Remove markdown formatting characters
-    content = re.sub(r"[*_~`#-]", " ", content)
-
-    # Count words (split by whitespace and filter out empty strings)
-    words = [word for word in content.split() if word]
-    word_count = len(words)
-
-    # Calculate minutes, rounding to the nearest minute with a minimum of 1
-    minutes = max(1, round(word_count / words_per_minute))
-
-    return minutes
+    return max(1, round(count_words(content) / words_per_minute))
 
 
 def make_urls_absolute(html_content: str, base_url: str) -> str:
@@ -152,3 +136,6 @@ def normalize_site_url(site_url: str) -> str:
         ""
     """
     return site_url.rstrip("/") if site_url else ""
+
+
+### utils.py ends here
