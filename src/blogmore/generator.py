@@ -1469,6 +1469,9 @@ class SiteGenerator:
             context = self._get_global_context()
             context["pages"] = pages
 
+            # Default parameter values bind the current loop variables at
+            # definition time (early binding), which is the standard Python
+            # idiom for capturing loop state in a nested function.
             def _render_tag(
                 page_posts: list[Post],
                 page_num: int,
