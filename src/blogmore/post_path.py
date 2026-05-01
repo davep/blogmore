@@ -3,33 +3,33 @@
 ##############################################################################
 # Python imports.
 from pathlib import Path
+from typing import Final
 
 ##############################################################################
-# Application imports.
+# Local imports.
 from blogmore.content_path import resolve_path, safe_output_path, validate_path_template
 from blogmore.parser import Post, remove_date_prefix, sanitize_for_url
 
 ##############################################################################
-# Default post path template (matches historical BlogMore behaviour).
+# Default post path template.
 DEFAULT_POST_PATH = "{year}/{month}/{day}/{slug}.html"
 
 ##############################################################################
 # The set of variable names that may appear in a post_path template.
-ALLOWED_PATH_VARIABLES = frozenset(
-    {
-        "year",
-        "month",
-        "day",
-        "hour",
-        "minute",
-        "second",
-        "category",
-        "author",
-        "slug",
-    }
-)
+ALLOWED_PATH_VARIABLES: Final[set[str]] = {
+    "year",
+    "month",
+    "day",
+    "hour",
+    "minute",
+    "second",
+    "category",
+    "author",
+    "slug",
+}
 
 
+##############################################################################
 def validate_post_path_template(template: str) -> None:
     """Validate a post_path format string.
 
@@ -40,47 +40,29 @@ def validate_post_path_template(template: str) -> None:
         template: The post_path format string to validate.
 
     Raises:
-        ValueError: If the template is empty, contains no ``{slug}``
+        ValueError: If the template is empty, contains no `{slug}`
             placeholder, or references an unknown variable name.
     """
-    validate_path_template(template, "post_path", ALLOWED_PATH_VARIABLES, "post")
+    validate_path_template(
+        template, "post_path", ALLOWED_PATH_VARIABLES, "post", {"slug"}
+    )
 
 
-def resolve_post_path(post: Post, template: str) -> str:
-    """Resolve a post_path template for a given post.
-
-    Substitutes all recognised variable placeholders in *template* with
-    values derived from *post*.  Posts that have no date will use empty
-    strings for date and time components.  Multiple consecutive forward
-    slashes that may appear after substitution are collapsed to a single
-    slash, and any leading slash is removed so that the result can safely
-    be joined onto an output directory path.
+##############################################################################
+def get_post_path_variables(post: Post) -> dict[str, str]:
+    """Get the path-oriented variables from a post.
 
     Args:
         post: The post whose metadata is used to fill the template.
-        template: A format string containing ``{variable}`` placeholders.
 
     Returns:
-        A relative path string (no leading slash) derived by substituting
-        the template variables with the post's values.
-
-    Raises:
-        ValueError: If the template references an unknown variable or is
-            otherwise malformed.
+        A dictionary of post-oriented variables and their values.
     """
-    slug = remove_date_prefix(post.slug)
 
-    # Author – read from metadata, slugify for safe use in URLs/paths.
     author = ""
-    if post.metadata:
-        raw_author = post.metadata.get("author")
-        if raw_author:
-            author = sanitize_for_url(str(raw_author))
+    if post.metadata and (raw_author := post.metadata.get("author")):
+        author = sanitize_for_url(str(raw_author))
 
-    # Category – already available as a sanitised property on Post.
-    category = post.safe_category or ""
-
-    # Date / time components – empty strings for undated posts.
     if post.date:
         year = str(post.date.year)
         month = f"{post.date.month:02d}"
@@ -91,26 +73,51 @@ def resolve_post_path(post: Post, template: str) -> str:
     else:
         year = month = day = hour = minute = second = ""
 
-    variables = {
-        "year": year,
-        "month": month,
+    return {
+        "author": author,
+        "category": post.safe_category or "",
         "day": day,
         "hour": hour,
         "minute": minute,
+        "month": month,
         "second": second,
-        "category": category,
-        "author": author,
-        "slug": slug,
+        "slug": remove_date_prefix(post.slug),
+        "year": year,
     }
 
-    return resolve_path(variables, template, "post_path")
+
+##############################################################################
+def resolve_post_path(post: Post, template: str) -> str:
+    """Resolve a post_path template for a given post.
+
+    Substitutes all recognised variable placeholders in `template` with
+    values derived from `post`. Posts that have no date will use empty
+    strings for date and time components. Multiple consecutive forward
+    slashes that may appear after substitution are collapsed to a single
+    slash, and any leading slash is removed so that the result can safely be
+    joined onto an output directory path.
+
+    Args:
+        post: The post whose metadata is used to fill the template.
+        template: A format string containing `{variable}` placeholders.
+
+    Returns:
+        A relative path string (no leading slash) derived by substituting
+        the template variables with the post's values.
+
+    Raises:
+        ValueError: If the template references an unknown variable or is
+            otherwise malformed.
+    """
+    return resolve_path(get_post_path_variables(post), template, "post_path")
 
 
+##############################################################################
 def compute_output_path(output_dir: Path, post: Post, template: str) -> Path:
     """Compute the safe, absolute output file path for a post.
 
     Resolves *template* using the post's metadata and joins the result onto
-    *output_dir*.  The resolved path is checked to ensure it does not escape
+    `output_dir`. The resolved path is checked to ensure it does not escape
     the output directory (preventing accidental path-traversal writes).
 
     Args:

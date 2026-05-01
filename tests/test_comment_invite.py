@@ -11,13 +11,8 @@ import pytest
 
 ##############################################################################
 # Application imports.
-from blogmore.comment_invite import (
-    build_mailto_url,
-    get_invite_email_for_post,
-    resolve_invite_email_template,
-)
+from blogmore.comment_invite import build_mailto_url, get_invite_email_for_post
 from blogmore.parser import Post
-
 
 ##############################################################################
 # Fixtures.
@@ -69,74 +64,6 @@ def post_no_metadata() -> Post:
         draft=False,
         metadata=None,
     )
-
-
-##############################################################################
-# resolve_invite_email_template tests.
-
-
-class TestResolveInviteEmailTemplate:
-    """Tests for resolve_invite_email_template."""
-
-    def test_plain_email_address_unchanged(self, dated_post: Post) -> None:
-        """A plain email address with no placeholders is returned as-is."""
-        result = resolve_invite_email_template(dated_post, "user@example.com")
-        assert result == "user@example.com"
-
-    def test_slug_placeholder(self, dated_post: Post) -> None:
-        """The {slug} placeholder is replaced with the date-stripped slug."""
-        result = resolve_invite_email_template(dated_post, "user+{slug}@example.com")
-        assert result == "user+my-great-article@example.com"
-
-    def test_year_placeholder(self, dated_post: Post) -> None:
-        """The {year} placeholder is replaced with the 4-digit year."""
-        result = resolve_invite_email_template(dated_post, "user+{year}@example.com")
-        assert result == "user+2024@example.com"
-
-    def test_month_placeholder_zero_padded(self, dated_post: Post) -> None:
-        """The {month} placeholder is zero-padded to two digits."""
-        result = resolve_invite_email_template(dated_post, "u+{month}@example.com")
-        assert result == "u+01@example.com"
-
-    def test_day_placeholder_zero_padded(self, dated_post: Post) -> None:
-        """The {day} placeholder is zero-padded to two digits."""
-        result = resolve_invite_email_template(dated_post, "u+{day}@example.com")
-        assert result == "u+15@example.com"
-
-    def test_author_placeholder(self, dated_post: Post) -> None:
-        """The {author} placeholder is replaced with the slugified author."""
-        result = resolve_invite_email_template(dated_post, "{author}@example.com")
-        assert result == "dave-pearson@example.com"
-
-    def test_category_placeholder(self, dated_post: Post) -> None:
-        """The {category} placeholder is replaced with the sanitised category."""
-        result = resolve_invite_email_template(dated_post, "u+{category}@example.com")
-        assert result == "u+python@example.com"
-
-    def test_multiple_placeholders(self, dated_post: Post) -> None:
-        """Multiple placeholders are all replaced correctly."""
-        result = resolve_invite_email_template(
-            dated_post,
-            "{author}+post-{slug}-{year}{month}{day}@{category}.example.com",
-        )
-        assert result == "dave-pearson+post-my-great-article-20240115@python.example.com"
-
-    def test_undated_post_date_variables_empty(self, undated_post: Post) -> None:
-        """Date variables produce empty strings for posts with no date."""
-        result = resolve_invite_email_template(
-            undated_post, "user+{year}{month}{day}@example.com"
-        )
-        assert result == "user+@example.com"
-
-    def test_slug_not_required(self, dated_post: Post) -> None:
-        """A template without {slug} is valid for invite_comments_to."""
-        result = resolve_invite_email_template(dated_post, "static@example.com")
-        assert result == "static@example.com"
-
-    def test_unknown_variable_raises(self, dated_post: Post) -> None:
-        """An unknown placeholder raises ValueError."""
-        with pytest.raises(ValueError):
-            resolve_invite_email_template(dated_post, "{unknown}@example.com")
 
 
 ##############################################################################
@@ -203,7 +130,9 @@ class TestGetInviteEmailForPost:
         dated_post.metadata = dict(dated_post.metadata or {})
         dated_post.metadata["invite_comments_to"] = "specific@example.com"
         result = get_invite_email_for_post(
-            dated_post, invite_comments=True, invite_comments_to="template+{slug}@ex.com"
+            dated_post,
+            invite_comments=True,
+            invite_comments_to="template+{slug}@ex.com",
         )
         assert result == "specific@example.com"
 

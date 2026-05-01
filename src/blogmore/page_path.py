@@ -3,6 +3,7 @@
 ##############################################################################
 # Standard-library imports.
 from pathlib import Path
+from typing import Final
 
 ##############################################################################
 # Application imports.
@@ -17,7 +18,7 @@ DEFAULT_PAGE_PATH = "{slug}.html"
 # The set of variable names that may appear in a page_path template.
 # Pages have no date, category, or author metadata, so the only meaningful
 # variable is the page slug.
-ALLOWED_PAGE_PATH_VARIABLES = frozenset({"slug"})
+ALLOWED_PAGE_PATH_VARIABLES: Final[set[str]] = {"slug"}
 
 
 def validate_page_path_template(template: str) -> None:
@@ -33,7 +34,13 @@ def validate_page_path_template(template: str) -> None:
         ValueError: If the template is empty, contains no ``{slug}``
             placeholder, or references an unknown variable name.
     """
-    validate_path_template(template, "page_path", ALLOWED_PAGE_PATH_VARIABLES, "page")
+    validate_path_template(
+        template,
+        "page_path",
+        ALLOWED_PAGE_PATH_VARIABLES,
+        "page",
+        ALLOWED_PAGE_PATH_VARIABLES,
+    )
 
 
 def resolve_page_path(page: Page, template: str) -> str:

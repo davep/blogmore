@@ -1,6 +1,10 @@
 """Tests for the pagination_path module."""
 
 ##############################################################################
+# Python imports.
+import re
+
+##############################################################################
 # Third-party imports.
 import pytest
 
@@ -13,7 +17,6 @@ from blogmore.pagination_path import (
     validate_page_1_path_template,
     validate_page_n_path_template,
 )
-
 
 ##############################################################################
 # Tests for module-level constants.
@@ -40,15 +43,15 @@ class TestValidatePage1PathTemplate:
 
     def test_valid_simple_path(self) -> None:
         """A simple filename with no placeholders is valid."""
-        validate_page_1_path_template("index.html")  # Should not raise
+        assert validate_page_1_path_template("index.html") is None
 
     def test_valid_path_with_subdirectory(self) -> None:
         """A path with subdirectories is valid."""
-        validate_page_1_path_template("pages/index.html")  # Should not raise
+        assert validate_page_1_path_template("pages/index.html") is None
 
     def test_valid_path_with_page_placeholder(self) -> None:
         """The {page} placeholder is allowed in page_1_path."""
-        validate_page_1_path_template("page-{page}.html")  # Should not raise
+        assert validate_page_1_path_template("page-{page}.html") is None
 
     def test_empty_template_raises(self) -> None:
         """An empty template raises ValueError."""
@@ -75,11 +78,11 @@ class TestValidatePageNPathTemplate:
 
     def test_valid_path_with_page_placeholder(self) -> None:
         """A path containing {page} is valid."""
-        validate_page_n_path_template("page/{page}.html")  # Should not raise
+        assert validate_page_n_path_template("page/{page}.html") is None
 
     def test_valid_subdirectory_path_with_page(self) -> None:
         """A path with a subdirectory and {page} is valid."""
-        validate_page_n_path_template("p/{page}/index.html")  # Should not raise
+        assert validate_page_n_path_template("p/{page}/index.html") is None
 
     def test_empty_template_raises(self) -> None:
         """An empty template raises ValueError."""
@@ -88,7 +91,12 @@ class TestValidatePageNPathTemplate:
 
     def test_missing_page_placeholder_raises(self) -> None:
         """A template with no {page} placeholder raises ValueError."""
-        with pytest.raises(ValueError, match="must contain the {page} variable"):
+        with pytest.raises(
+            ValueError,
+            match=re.escape(
+                "page_n_path 'pages.html' is missing required variable(s): {page}"
+            ),
+        ):
             validate_page_n_path_template("pages.html")
 
     def test_unknown_variable_raises(self) -> None:
@@ -138,3 +146,6 @@ class TestResolvePaginationPagePath:
         """The {page} placeholder is replaced with the given page number."""
         result = resolve_pagination_page_path("p{page}/index.html", 7)
         assert result == "p7/index.html"
+
+
+### test_pagination_path.py ends here

@@ -7,81 +7,11 @@ from urllib.parse import quote
 ##############################################################################
 # Application imports.
 from blogmore.content_path import resolve_path
-from blogmore.parser import Post, remove_date_prefix, sanitize_for_url
+from blogmore.parser import Post
+from blogmore.post_path import get_post_path_variables
+
 
 ##############################################################################
-# The set of variable names that may appear in an invite_comments_to template.
-# Identical to the set used for post_path templates.
-ALLOWED_EMAIL_VARIABLES = frozenset(
-    {
-        "year",
-        "month",
-        "day",
-        "hour",
-        "minute",
-        "second",
-        "category",
-        "author",
-        "slug",
-    }
-)
-
-
-def resolve_invite_email_template(post: "Post", template: str) -> str:
-    """Expand an ``invite_comments_to`` template string for a given post.
-
-    Substitutes all recognised variable placeholders in *template* with
-    values derived from *post*.  Posts that have no date will use empty
-    strings for date and time components.  Unlike ``post_path`` templates,
-    the ``{slug}`` placeholder is **not** required.
-
-    Args:
-        post: The post whose metadata is used to fill the template.
-        template: A format string containing ``{variable}`` placeholders.
-
-    Returns:
-        The expanded string with all placeholders replaced by post-derived
-        values.
-
-    Raises:
-        ValueError: If the template references an unknown variable or is
-            otherwise malformed.
-    """
-    slug = remove_date_prefix(post.slug)
-
-    author = ""
-    if post.metadata:
-        raw_author = post.metadata.get("author")
-        if raw_author:
-            author = sanitize_for_url(str(raw_author))
-
-    category = post.safe_category or ""
-
-    if post.date:
-        year = str(post.date.year)
-        month = f"{post.date.month:02d}"
-        day = f"{post.date.day:02d}"
-        hour = f"{post.date.hour:02d}"
-        minute = f"{post.date.minute:02d}"
-        second = f"{post.date.second:02d}"
-    else:
-        year = month = day = hour = minute = second = ""
-
-    variables = {
-        "year": year,
-        "month": month,
-        "day": day,
-        "hour": hour,
-        "minute": minute,
-        "second": second,
-        "category": category,
-        "author": author,
-        "slug": slug,
-    }
-
-    return resolve_path(variables, template, "invite_comments_to")
-
-
 def get_invite_email_for_post(
     post: "Post", invite_comments: bool, invite_comments_to: str | None
 ) -> str | None:
@@ -114,11 +44,14 @@ def get_invite_email_for_post(
         return str(raw) if raw else None
 
     if invite_comments_to:
-        return resolve_invite_email_template(post, invite_comments_to)
+        return resolve_path(
+            get_post_path_variables(post), invite_comments_to, "invite_comments_to"
+        )
 
     return None
 
 
+##############################################################################
 def build_mailto_url(email: str, subject: str) -> str:
     """Build a ``mailto:`` URL with a URL-encoded subject.
 

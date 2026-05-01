@@ -16,8 +16,9 @@ from string import Formatter
 def validate_path_template(
     template: str,
     config_key: str,
-    allowed_variables: frozenset[str],
+    allowed_variables: set[str],
     item_name: str,
+    required_variables: set[str] | None = None,
 ) -> None:
     """Validate a path format string for a content type.
 
@@ -41,30 +42,34 @@ def validate_path_template(
     if not template:
         raise ValueError(f"{config_key} must not be empty")
 
+    if required_variables and not required_variables.issubset(allowed_variables):
+        raise ValueError(
+            "Internal error: required_variables must be a subset of allowed_variables"
+        )
+
     # Extract field names using the standard Formatter parser.
     try:
-        field_names = [
+        field_names = {
             field_name
             for _, field_name, _, _ in Formatter().parse(template)
             if field_name is not None
-        ]
+        }
     except (ValueError, KeyError) as error:
         raise ValueError(
             f"{config_key} '{template}' contains an invalid placeholder: {error}"
         ) from error
 
-    unknown = set(field_names) - allowed_variables
-    if unknown:
+    if unknown := (field_names - allowed_variables):
         raise ValueError(
             f"{config_key} '{template}' contains unknown variable(s): "
             + ", ".join(sorted(unknown))
             + f". Allowed variables are: {', '.join(sorted(allowed_variables))}"
         )
 
-    if "slug" not in field_names:
+    if missing := ((required_variables or set()) - field_names):
         raise ValueError(
-            f"{config_key} '{template}' must contain the {{slug}} variable so that "
-            f"each {item_name} can be uniquely identified"
+            f"{config_key} '{template}' is missing required variable(s): "
+            + ", ".join([f"{{{variable}}}" for variable in sorted(missing)])
         )
 
 
