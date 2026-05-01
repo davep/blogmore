@@ -3,7 +3,7 @@
 import re
 
 
-def _strip_markdown_and_html(content: str) -> str:
+def strip_markdown(content: str) -> str:
     """Remove common Markdown and HTML formatting from content.
 
     Args:
@@ -11,24 +11,26 @@ def _strip_markdown_and_html(content: str) -> str:
 
     Returns:
         The cleaned text with formatting removed.
+
+    Note:
+        This is *not* a full Markdown to plain text converter. It handles
+        common formatting characters and structures, but may not cover all
+        edge cases or extensions. The main goal is to remove formatting
+        characters that would interfere with things like word counting,
+        while preserving the actual text content.
     """
     # Remove code blocks
     content = re.sub(r"```[\s\S]*?```", "", content)
-    content = re.sub(r"`[^`]+`", "", content)
-
-    # Remove markdown links but keep the text: [text](url) -> text
-    content = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", content)
-
     # Remove markdown images: ![alt](url) -> ""
     content = re.sub(r"!\[([^\]]*)\]\([^\)]+\)", "", content)
-
+    # Remove markdown links but keep the text: [text](url) -> text
+    content = re.sub(r"\[([^\]]*)\]\([^\)]+\)", r"\1", content)
     # Remove HTML tags
     content = re.sub(r"<[^>]+>", "", content)
-
     # Remove markdown formatting characters
     content = re.sub(r"[*_~`#-]", " ", content)
-
-    return content
+    # Collapse multiple spaces into one.
+    return re.sub(r"\s+", " ", content).strip()
 
 
 def count_words(content: str) -> int:
@@ -46,7 +48,7 @@ def count_words(content: str) -> int:
         >>> count_words("word " * 10)
         10
     """
-    return len([word for word in _strip_markdown_and_html(content).split() if word])
+    return len([word for word in strip_markdown(content).split() if word])
 
 
 def calculate_reading_time(content: str, words_per_minute: int = 200) -> int:
