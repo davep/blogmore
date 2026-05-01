@@ -3,6 +3,7 @@
 ##############################################################################
 # Python imports.
 from pathlib import Path
+from typing import Final
 
 ##############################################################################
 # Application imports.
@@ -15,19 +16,17 @@ DEFAULT_POST_PATH = "{year}/{month}/{day}/{slug}.html"
 
 ##############################################################################
 # The set of variable names that may appear in a post_path template.
-ALLOWED_PATH_VARIABLES = frozenset(
-    {
-        "year",
-        "month",
-        "day",
-        "hour",
-        "minute",
-        "second",
-        "category",
-        "author",
-        "slug",
-    }
-)
+ALLOWED_PATH_VARIABLES: Final[set[str]] = {
+    "year",
+    "month",
+    "day",
+    "hour",
+    "minute",
+    "second",
+    "category",
+    "author",
+    "slug",
+}
 
 
 def validate_post_path_template(template: str) -> None:
@@ -43,7 +42,9 @@ def validate_post_path_template(template: str) -> None:
         ValueError: If the template is empty, contains no ``{slug}``
             placeholder, or references an unknown variable name.
     """
-    validate_path_template(template, "post_path", ALLOWED_PATH_VARIABLES, "post")
+    validate_path_template(
+        template, "post_path", ALLOWED_PATH_VARIABLES, "post", {"slug"}
+    )
 
 
 def resolve_post_path(post: Post, template: str) -> str:
