@@ -8,6 +8,14 @@
   and other pages (tag, category, archive, tags cloud, categories cloud,
   stats, calendar, graph, and search pages).
   ([#432](https://github.com/davep/blogmore/pull/432))
+- Refactored `generator.py` to eliminate high-impact code duplication: added
+  `_get_configured_url`, `_get_asset_url`, `_get_asset_source`,
+  `_group_posts_by_attribute`, `_calculate_cloud_font_sizes`, and
+  `_generate_paginated_listing` helpers, consolidating seven URL-derivation
+  methods, twelve asset-URL expressions, two asset-reading blocks, two
+  post-grouping methods, two word-cloud font-size algorithms, and three
+  paginated-listing loops into single, tested implementations.
+  ([#433](https://github.com/davep/blogmore/pull/433))
 
 ## v2.18.0
 
