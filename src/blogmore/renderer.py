@@ -78,7 +78,7 @@ class TemplateRenderer:
         """Format a datetime object as HTML with archive links.
 
         The date portion is rendered as
-        ``<a href="/{year}/">{year}</a>-<a href="/{year}/{mm}/">{mm}</a>-<a href="/{year}/{mm}/{dd}/">{dd}</a>``
+        `<a href="/{year}/">{year}</a>-<a href="/{year}/{mm}/">{mm}</a>-<a href="/{year}/{mm}/{dd}/">{dd}</a>`
         so each component links to the corresponding archive page.
 
         Args:
@@ -395,8 +395,8 @@ class TemplateRenderer:
 
         Args:
             **context: Context variables to pass to the template.  Should
-                include a ``stats`` key containing a
-                :class:`~blogmore.stats.BlogStats` instance.
+                include a `stats` key containing a
+                `blogmore.stats.BlogStats` instance.
 
         Returns:
             Rendered HTML string.
@@ -409,8 +409,8 @@ class TemplateRenderer:
 
         Args:
             **context: Context variables to pass to the template.  Should
-                include a ``calendar_years`` key containing a list of
-                :class:`~blogmore.calendar.CalendarYear` instances.
+                include a `calendar_years` key containing a list of
+                `blogmore.calendar.CalendarYear` instances.
 
         Returns:
             Rendered HTML string.
@@ -423,9 +423,9 @@ class TemplateRenderer:
 
         Args:
             **context: Context variables to pass to the template.  Should
-                include a ``graph_data_json`` key containing the serialised
+                include a `graph_data_json` key containing the serialised
                 JSON string produced by
-                :meth:`~blogmore.graph.GraphData.to_json`.
+                `blogmore.graph.GraphData.to_json`.
 
         Returns:
             Rendered HTML string.

@@ -23,7 +23,7 @@ class CalendarDay:
     date: dt.date | None
     """The calendar date for this cell.
 
-    ``None`` for padding slots that do not belong to the current month.
+    `None` for padding slots that do not belong to the current month.
     """
 
     post_count: int = 0
@@ -32,7 +32,7 @@ class CalendarDay:
     day_url: str | None = None
     """URL for the daily archive page.
 
-    Set only when ``post_count > 0``; ``None`` for padding cells and days
+    Set only when `post_count > 0`; `None` for padding cells and days
     with no posts.
     """
 
@@ -53,7 +53,7 @@ class CalendarMonth:
     month_url: str | None
     """URL linking to the monthly archive.
 
-    ``None`` when the month has no posts.
+    `None` when the month has no posts.
     """
 
     has_posts: bool
@@ -62,7 +62,7 @@ class CalendarMonth:
     weeks: list[list[CalendarDay]]
     """Calendar grid rows.
 
-    Each row contains exactly seven :class:`CalendarDay` items.  In
+    Each row contains exactly seven [`blogmore.calendar.CalendarDay`][blogmore.calendar.CalendarDay] items.  In
     reverse-chronological mode (the default) the order is Sunday-to-Monday so
     that day numbers count down left-to-right.  In forward mode the order is
     Monday-to-Sunday, matching the usual calendar convention.
@@ -79,7 +79,7 @@ class CalendarYear:
     year_url: str | None
     """URL linking to the yearly archive.
 
-    ``None`` when the year has no posts.
+    `None` when the year has no posts.
     """
 
     has_posts: bool
@@ -101,7 +101,7 @@ def build_calendar(
 ) -> list[CalendarYear]:
     """Build the calendar data structure from a list of posts.
 
-    Constructs a list of :class:`CalendarYear` objects spanning from the
+    Constructs a list of [`blogmore.calendar.CalendarYear`][blogmore.calendar.CalendarYear] objects spanning from the
     date of the first post to the date of the latest post.
 
     By default the list is in reverse chronological order (newest year
@@ -113,12 +113,12 @@ def build_calendar(
     Args:
         posts: All published posts to include in the calendar.
         page1_suffix: The URL suffix for the first pagination page (e.g.
-            ``"index.html"`` or ``""`` for clean URLs).
-        forward: When ``True``, generate the calendar in oldest-to-newest
-            order.  Defaults to ``False`` (reverse chronological).
+            `"index.html"` or `""` for clean URLs).
+        forward: When `True`, generate the calendar in oldest-to-newest
+            order.  Defaults to `False` (reverse chronological).
 
     Returns:
-        A list of :class:`CalendarYear` objects.  Returns an empty list
+        A list of [`blogmore.calendar.CalendarYear`][blogmore.calendar.CalendarYear] objects.  Returns an empty list
         when *posts* is empty or no posts have a date.
     """
     dated_posts = [p for p in posts if p.date is not None]
@@ -192,7 +192,7 @@ def build_calendar(
                 f"/{year}/{month:02d}/{page1_suffix}" if month_has_posts else None
             )
 
-            # Build the week grid.  ``monthdayscalendar`` always returns
+            # Build the week grid.  `monthdayscalendar` always returns
             # weeks in forward order (Mon first).  For reverse-chronological
             # mode, reverse both the week list and each week's day order so
             # the most recent day appears first (top-left); for forward mode,

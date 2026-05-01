@@ -15,15 +15,15 @@ def make_url_clean(url: str) -> str:
     """Strip a trailing index filename from a URL path.
 
     Checks whether the final path component of *url* is exactly one of the
-    recognised index filenames (``index.html`` or ``index.htm``).  When it
+    recognised index filenames (`index.html` or `index.htm`).  When it
     is, that component is removed so that, for example,
-    ``/posts/my-post/index.html`` becomes ``/posts/my-post/``.
+    `/posts/my-post/index.html` becomes `/posts/my-post/`.
 
     Only the exact index filename is stripped.  A URL whose final component
-    merely *ends with* an index filename (e.g. ``/search-index.html``) is
-    returned unchanged, because ``search-index.html`` is not an index file
+    merely *ends with* an index filename (e.g. `/search-index.html`) is
+    returned unchanged, because `search-index.html` is not an index file
     — it is an ordinary page whose name happens to include the word
-    ``index``.
+    `index`.
 
     Args:
         url: The URL path to clean.

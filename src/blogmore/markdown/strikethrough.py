@@ -22,7 +22,7 @@ class StrikethroughInlineProcessor(InlineProcessor):
 
         Returns:
             A tuple of the ``<del>`` element and the start and end positions
-            of the match within ``data``.
+            of the match within `data`.
         """
         element = etree.Element("del")
         element.text = m.group(1)

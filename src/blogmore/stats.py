@@ -47,10 +47,10 @@ class StreakChartVariant:
         first_date: First date of the window (first day of the oldest month).
         last_date: Last date of the window (today when the variant was built).
         month_label_positions: Month labels paired with their 1-based week
-            column index in :attr:`weeks`.  Each entry is ``(label, col)``,
-            e.g. ``("Apr", 1)``.
+            column index in `weeks`.  Each entry is (`label`, col),
+            e.g. (`"Apr"`, 1).
         weeks: Week columns, oldest first.  Each column is a list of exactly
-            7 entries ordered Sunday-first.  An entry is ``None`` when the
+            7 entries ordered Sunday-first.  An entry is `None` when the
             slot falls outside the window.
     """
 
@@ -145,9 +145,9 @@ class BlogStats:
 
     All histogram counts are fixed-length lists indexed from zero:
 
-    * ``posts_per_hour`` — 24 elements, index 0 = midnight hour.
-    * ``posts_per_weekday`` — 7 elements, index 0 = Monday.
-    * ``posts_per_month`` — 12 elements, index 0 = January.
+    * [`posts_per_hour`][blogmore.stats.BlogStats.posts_per_hour] — 24 elements, index 0 = midnight hour.
+    * [`posts_per_weekday`][blogmore.stats.BlogStats.posts_per_weekday] — 7 elements, index 0 = Monday.
+    * [`posts_per_month`][blogmore.stats.BlogStats.posts_per_month] — 12 elements, index 0 = January.
 
     Posts without a date are excluded from date-based statistics.
     Posts without any content contribute zero to word-count statistics.
@@ -230,7 +230,7 @@ class BlogStats:
 
     Only posts with at least one backlink are included.  Sorted by count
     descending.  Populated only when the backlink map is supplied to
-    :func:`compute_blog_stats`.
+    ``[blogmore.stats.compute_blog_stats][blogmore.stats.compute_blog_stats].
     """
 
     posts_in_last_year: int = 0
@@ -254,11 +254,11 @@ class BlogStats:
 
     @property
     def blog_span_days(self) -> int | None:
-        """Return the total span of the blog in days, or ``None`` if fewer than two dated posts exist.
+        """Return the total span of the blog in days, or [`None`][builtins.None] if fewer than two dated posts exist.
 
         Returns:
             Number of days between the earliest and latest post dates, or
-            ``None`` when fewer than two dated posts exist.
+            ``[`None`][builtins.None] when fewer than two dated posts exist.
         """
         if self.earliest_post_date is None or self.latest_post_date is None:
             return None
@@ -269,7 +269,7 @@ class BlogStats:
 def _extract_external_links(html_content: str, site_url: str) -> list[str]:
     """Extract all external URLs referenced in an HTML fragment.
 
-    Finds every ``href`` attribute value inside anchor tags and filters out
+    Finds every `href` attribute value inside anchor tags and filters out
     URLs that point to the same site (as determined by *site_url*).
 
     Args:
@@ -318,7 +318,7 @@ def _compute_streak_variant(
             the current (partial) month.
 
     Returns:
-        A :class:`StreakChartVariant` for the requested window.
+        A [blogmore.stats.StreakChartVariant][blogmore.stats.StreakChartVariant] for the requested window.
     """
     # 1st of the month (num_months - 1) months before today.
     start_month = today.month - (num_months - 1)
@@ -401,7 +401,7 @@ def _compute_longest_streaks(
         min_days: Minimum streak length (in days) to include.
 
     Returns:
-        A list of up to *max_streaks* :class:`PostingStreak` objects sorted
+        A list of up to *max_streaks* [blogmore.stats.PostingStreak][blogmore.stats.PostingStreak] objects sorted
         by descending length, then descending post count, then descending
         start date.
     """
@@ -467,13 +467,13 @@ def compute_blog_stats(
         site_url: The configured base URL of the blog site.  Used to
             distinguish internal from external links.  May be empty.
         backlink_map: Optional mapping from post URL to list of
-            :class:`~blogmore.backlinks.Backlink` objects, as returned by
-            :func:`~blogmore.backlinks.build_backlink_map`.  When provided,
-            :attr:`BlogStats.top_internal_links` is populated with the top 20
+            [`blogmore.backlinks.Backlink`][blogmore.backlinks.Backlink] objects, as returned by
+            [`blogmore.backlinks.build_backlink_map`][blogmore.backlinks.build_backlink_map].  When provided,
+            [`BlogStats.top_internal_links`][blogmore.stats.BlogStats.top_internal_links] is populated with the top 20
             posts sorted by incoming link count descending.
 
     Returns:
-        A :class:`BlogStats` instance populated from the given posts.
+        A [blogmore.stats.BlogStats][blogmore.stats.BlogStats] instance populated from the given posts.
     """
     stats = BlogStats()
 

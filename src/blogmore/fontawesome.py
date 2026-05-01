@@ -55,8 +55,8 @@ class FontAwesomeOptimizer:
 
     Fetches the official FontAwesome icon metadata from GitHub to obtain the
     Unicode codepoints for each requested icon, then assembles a minimal CSS
-    file containing only the ``@font-face`` declaration, the base
-    ``.fa-brands`` / ``.fab`` rules, and the individual icon definitions.
+    file containing only the `@font-face` declaration, the base
+    `.fa-brands` / `.fab` rules, and the individual icon definitions.
 
     Fonts themselves remain on the CDN so browsers can cache them across
     sites.
@@ -76,7 +76,7 @@ class FontAwesomeOptimizer:
 
         Returns:
             Dictionary mapping icon name to its metadata (including the
-            ``unicode`` codepoint field).
+            `unicode` codepoint field).
 
         Raises:
             urllib.error.URLError: If the metadata cannot be fetched from
@@ -91,11 +91,11 @@ class FontAwesomeOptimizer:
 
         Args:
             metadata: FontAwesome icon metadata as returned by
-                :meth:`fetch_icon_metadata`.
+                `blogmore.fontawesome.FontAwesomeOptimizer.fetch_icon_metadata`.
 
         Returns:
-            CSS string containing the ``@font-face`` declaration, base class
-            rules, and one ``::before`` rule per requested icon found in the
+            CSS string containing the `@font-face` declaration, base class
+            rules, and one `::before` rule per requested icon found in the
             metadata.
         """
         woff2_url = f"{FONTAWESOME_CDN_WEBFONTS_BASE}/fa-brands-400.woff2"
@@ -139,14 +139,14 @@ class FontAwesomeOptimizer:
     def generate(self, output_dir: Path) -> bool:
         """Fetch metadata, build CSS, and write it to the output directory.
 
-        The CSS file is written to ``output_dir/static/fontawesome.css``.
+        The CSS file is written to `output_dir/static/fontawesome.css`.
 
         Args:
             output_dir: Root output directory of the generated site.
 
         Returns:
-            ``True`` if the optimized CSS file was written successfully,
-            ``False`` if the metadata could not be fetched (caller should
+            `True` if the optimized CSS file was written successfully,
+            `False` if the metadata could not be fetched (caller should
             fall back to the CDN stylesheet).
         """
         try:

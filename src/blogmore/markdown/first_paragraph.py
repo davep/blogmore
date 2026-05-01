@@ -22,11 +22,11 @@ def _make_extraction_markdown() -> markdown.Markdown:
 
     Includes all BlogMore custom extensions and the standard extensions needed
     to correctly identify paragraph boundaries.  Intentionally omits
-    presentation-only extensions such as ``codehilite`` and ``toc`` that are
-    not required for plain-text extraction.
+    presentation-only extensions such as [`codehilite`][markdown.extensions.codehilite]
+    and [`toc`][markdown.extensions.toc] that are not required for plain-text extraction.
 
     Returns:
-        A fresh, configured :class:`markdown.Markdown` instance.
+        A fresh, configured ``markdown.Markdown`` instance.
     """
     return markdown.Markdown(
         extensions=[
@@ -41,8 +41,8 @@ def _make_extraction_markdown() -> markdown.Markdown:
 class _FirstParagraphExtractor(HTMLParser):
     """HTML parser that extracts plain text from the first non-image-only paragraph.
 
-    Only top-level ``<p>`` elements are considered; paragraphs nested inside
-    block-level containers such as admonition ``<div>`` elements, blockquotes,
+    Only top-level `<p>` elements are considered; paragraphs nested inside
+    block-level containers such as admonition `<div>` elements, blockquotes,
     or list items are skipped.  A paragraph that consists entirely of images
     (no text data) is also skipped so that posts that open with a banner image
     return the following descriptive paragraph instead.
@@ -77,18 +77,18 @@ class _FirstParagraphExtractor(HTMLParser):
 
         Sets up all tracking state used during parsing:
 
-        * ``_block_depth`` — current nesting level inside block-level container
-          elements (``<div>``, ``<blockquote>``, ``<ul>``, etc.).  Any ``<p>``
+        * `_block_depth` — current nesting level inside block-level container
+          elements (`<div>`, `<blockquote>`, `<ul>`, etc.).  Any `<p>`
           encountered while this is non-zero is nested and therefore skipped.
-        * ``_in_paragraph`` — whether the parser is currently inside a
-          candidate top-level ``<p>`` element.
-        * ``_chunks`` — raw character-data fragments collected from the current
+        * `_in_paragraph` — whether the parser is currently inside a
+          candidate top-level `<p>` element.
+        * `_chunks` — raw character-data fragments collected from the current
           paragraph, joined and normalised when the paragraph ends.
-        * ``_has_text`` — set to ``True`` as soon as non-whitespace data is
+        * `_has_text` — set to `True` as soon as non-whitespace data is
           seen inside the current paragraph; keeps image-only paragraphs from
           being returned.
-        * ``_result`` — the accepted plain-text paragraph (empty until found).
-        * ``_done`` — short-circuit flag; once ``True`` all further events are
+        * `_result` — the accepted plain-text paragraph (empty until found).
+        * `_done` — short-circuit flag; once `True` all further events are
           ignored.
         """
         super().__init__(convert_charrefs=True)
@@ -104,7 +104,7 @@ class _FirstParagraphExtractor(HTMLParser):
 
         Args:
             tag: The lowercase tag name.
-            attrs: List of ``(attribute-name, value)`` pairs for the tag.
+            attrs: List of (`attribute-name`, value) pairs for the tag.
         """
         if self._done:
             return

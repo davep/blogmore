@@ -3,7 +3,7 @@
 Calculates which posts link to other posts, providing data for a
 "References & mentions" section displayed on individual post pages.
 
-This module is only consulted when ``with_backlinks`` is enabled in the
+This module is only consulted when `with_backlinks` is enabled in the
 site configuration.  When the feature is disabled none of these functions
 are called, so users pay no cost for a feature they do not use.
 """
@@ -53,7 +53,7 @@ class Backlink:
     Attributes:
         source_post: The post whose Markdown content contains the link.
         snippet: HTML-safe excerpt from the source post surrounding the
-            link, with up to ``_SNIPPET_CONTEXT_CHARS`` characters of
+            link, with up to `_SNIPPET_CONTEXT_CHARS` characters of
             context on each side and an ellipsis (``…``) where the
             excerpt is truncated.  The link text itself is wrapped in a
             ``<strong class="backlink-link-text">`` element so it
@@ -74,13 +74,13 @@ def _extract_snippet(
 
     Replaces the matched link syntax in the *full* document with a
     distinctive marker, then converts the entire document to plain text via
-    :func:`~blogmore.markdown.plain_text.markdown_to_plain_text`.  Processing
-    the complete document ensures that all Markdown constructs (fenced code
+    [`blogmore.markdown.plain_text.markdown_to_plain_text`][blogmore.markdown.plain_text.markdown_to_plain_text].
+    Processing the complete document ensures that all Markdown constructs (fenced code
     blocks, blockquotes, etc.) are parsed in their proper context, so no raw
     Markdown artefacts bleed into the snippet even when a construct straddles
     the window boundary.
 
-    Up to ``_SNIPPET_CONTEXT_CHARS`` plain-text characters are taken on each
+    Up to `_SNIPPET_CONTEXT_CHARS` plain-text characters are taken on each
     side of the marker position, with an ellipsis (``…``) added where the
     excerpt is truncated.  The excerpt is HTML-escaped, then the marker is
     replaced directly with the plain-text link text wrapped in
@@ -98,7 +98,7 @@ def _extract_snippet(
             text is highlighted in the returned snippet.
 
     Returns:
-        An HTML-safe :class:`~markupsafe.Markup` snippet with surrounding
+        An HTML-safe [`markupsafe.Markup`][markupsafe.Markup] snippet with surrounding
         context, ellipsis markers where truncated, and the link text
         wrapped in a ``<strong>`` element.
     """
@@ -205,17 +205,17 @@ def _find_links(content: str) -> list[tuple[str, int, int, str]]:
 
 
 def _normalize_url_path(url: str) -> str:
-    """Normalise a URL path for comparison by removing ``index.html``, ``.html``, and trailing slashes.
+    """Normalise a URL path for comparison by removing `index.html`, `.html`, and trailing slashes.
 
     Produces a canonical form that can be compared regardless of whether
-    ``clean_urls`` is enabled or which URL format the author used in a link.
+    `clean_urls` is enabled or which URL format the author used in a link.
 
     Args:
         url: URL path to normalise (should start with ``/``).
 
     Returns:
-        The normalised path without a trailing slash, ``.html`` extension,
-        or ``index.html`` suffix.
+        The normalised path without a trailing slash, `.html` extension,
+        or `index.html` suffix.
     """
     url = url.rstrip("/")
     if url.endswith("/index.html"):
@@ -238,8 +238,8 @@ def _to_path(url: str, site_url: str) -> str | None:
             to strip the domain from full URLs that point back to this site.
 
     Returns:
-        The root-relative path (starting with ``/``) if the URL points to
-        this site, or ``None`` otherwise.
+        The root-relative path (starting with `/`) if the URL points to
+        this site, or `None` otherwise.
     """
     url = url.strip()
     if not url or url.startswith("#"):
@@ -276,10 +276,10 @@ def build_backlink_map(
     Scans the raw Markdown content of every post for internal links and
     records which posts link to which other posts.  Self-links are ignored.
     Links that resolve to pages (as opposed to posts) are automatically
-    excluded because the mapping is built solely from ``posts``.
+    excluded because the mapping is built solely from `posts`.
 
     The work to build this map is proportional to the total number of links
-    in all posts.  It is only called when ``with_backlinks`` is enabled in
+    in all posts.  It is only called when `with_backlinks` is enabled in
     the site configuration.
 
     Args:
@@ -289,7 +289,7 @@ def build_backlink_map(
 
     Returns:
         A dictionary mapping each post's URL to a (possibly empty) list
-        of :class:`Backlink` objects representing other posts that link
+        of [`blogmore.backlinks.Backlink`][blogmore.backlinks.Backlink] objects representing other posts that link
         to it.  Every post in *posts* has an entry in the returned dict,
         even if it has no inbound links.
     """

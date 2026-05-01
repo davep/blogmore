@@ -27,21 +27,21 @@ def is_valid_style(style_name: str) -> bool:
         style_name: The name of the Pygments style to check.
 
     Returns:
-        ``True`` if the style name is recognised by Pygments, ``False``
+        [`True`][builtins.True] if the style name is recognised by Pygments, [`False`][builtins.False]
         otherwise.
     """
     return style_name in get_all_styles()
 
 
 def _colour_scheme_for_style(style_name: str) -> Literal["light", "dark"]:
-    """Return the CSS ``color-scheme`` value appropriate for the given Pygments style.
+    """Return the CSS `color-scheme` value appropriate for the given Pygments style.
 
     Inspects the style's background colour and calculates its perceived
-    luminance.  Styles with a dark background are classified as ``"dark"``
-    and those with a light background as ``"light"``.
+    luminance.  Styles with a dark background are classified as `"dark"`
+    and those with a light background as `"light"`.
 
-    This is used to set ``color-scheme`` on the ``.highlight`` element so
-    that the browser's ``::selection`` highlight colours and any inherited
+    This is used to set [`color-scheme`][mdn.color-scheme] on the [`.highlight`][pygments.highlight] element so
+    that the browser's [`::selection`][mdn.selection] highlight colours and any inherited
     text colours are appropriate for the Pygments style's actual background —
     regardless of the site-wide light/dark mode setting.
 
@@ -49,7 +49,7 @@ def _colour_scheme_for_style(style_name: str) -> Literal["light", "dark"]:
         style_name: A valid Pygments style name.
 
     Returns:
-        ``"dark"`` when the style has a dark background, ``"light"``
+        `"dark"` when the style has a dark background, `"light"`
         otherwise.
     """
     style = get_style_by_name(style_name)
@@ -63,18 +63,18 @@ def _colour_scheme_for_style(style_name: str) -> Literal["light", "dark"]:
 
 
 def _highlight_rules(style_name: str) -> list[str]:
-    """Extract ``.highlight`` CSS rules for the given Pygments style.
+    """Extract [`.highlight`][pygments.highlight] CSS rules for the given Pygments style.
 
-    Uses the Pygments ``HtmlFormatter`` to produce CSS and filters the output
-    to only the lines that begin with ``.highlight``, discarding all preamble
-    rules (``pre``, ``td.linenos``, etc.) which are not relevant to inline
+    Uses the Pygments [`HtmlFormatter`][pygments.HtmlFormatter] to produce CSS and filters the output
+    to only the lines that begin with [`.highlight`][pygments.highlight], discarding all preamble
+    rules ([`pre`][pygments.pre], [`td.linenos`][pygments.td.linenos], etc.) which are not relevant to inline
     code colouring.
 
     Args:
         style_name: A valid Pygments style name.
 
     Returns:
-        A list of CSS rule strings, each starting with ``.highlight``.
+        A list of CSS rule strings, each starting with [`.highlight`][pygments.highlight].
 
     Raises:
         ClassNotFound: If *style_name* is not a valid Pygments style.
@@ -85,13 +85,14 @@ def _highlight_rules(style_name: str) -> list[str]:
 
 
 def _parse_token_rules(rules: list[str]) -> dict[str, dict[str, str]]:
-    """Parse a list of raw ``.highlight`` CSS rules into a structured mapping.
+    """Parse a list of raw [`.highlight`][pygments.highlight] CSS rules into a structured mapping.
 
     Args:
-        rules: CSS rule strings as returned by :func:`_highlight_rules`.
+        rules: CSS rule strings as returned by
+            [blogmore.code_styles._highlight_rules][blogmore.code_styles._highlight_rules].
 
     Returns:
-        A dictionary mapping each CSS selector (e.g. ``".highlight .k"``) to a
+        A dictionary mapping each CSS selector (e.g. [`.highlight .k`][pygments.highlight.k]) to a
         dictionary of CSS property names to their raw values.
     """
     parsed: dict[str, dict[str, str]] = {}
@@ -112,15 +113,15 @@ def _parse_token_rules(rules: list[str]) -> dict[str, dict[str, str]]:
 
 
 def _css_var_name(selector: str, prop: str) -> str:
-    """Generate a CSS custom property name for a ``.highlight`` selector and property.
+    """Generate a CSS custom property name for a [`.highlight`][pygments.highlight] selector and property.
 
     Args:
-        selector: A CSS selector such as ``".highlight .k"`` or ``".highlight"``.
-        prop: A CSS property name such as ``"color"`` or ``"font-weight"``.
+        selector: A CSS selector such as [`.highlight .k`][pygments.highlight.k] or [`.highlight`][pygments.highlight].
+        prop: A CSS property name such as [`color`][mdn.color] or [`font-weight`][mdn.font-weight].
 
     Returns:
-        A CSS custom property name such as ``"--hl-k-color"`` or
-        ``"--hl-background"``.
+        A CSS custom property name such as [`--hl-k-color`][css.hl-k-color] or
+        [`--hl-background`][css.hl-background].
     """
     parts = selector.strip().split()
     if len(parts) > 1:
@@ -130,22 +131,22 @@ def _css_var_name(selector: str, prop: str) -> str:
 
 
 def build_code_css(light_style: str, dark_style: str) -> str:
-    """Build a complete ``code.css`` stylesheet for the given Pygments styles.
+    """Build a complete [`code.css`][blogmore.code_css] stylesheet for the given Pygments styles.
 
-    Uses CSS custom properties so that each ``.highlight`` selector rule is
+    Uses CSS custom properties so that each [`.highlight`][pygments.highlight] selector rule is
     declared only once.  Theme switching is achieved by overriding the custom
     properties in two dark-mode contexts:
 
-    * ``@media (prefers-color-scheme: dark)`` with ``:root:not([data-theme])``
+    * `@media (prefers-color-scheme: dark)` with `:root:not([data-theme])`
       — active when the operating system reports a dark preference and the
       user has not activated the theme-toggle button.
-    * ``:root[data-theme="dark"]`` — active when the theme-toggle button has
+    * `:root[data-theme="dark"]` — active when the theme-toggle button has
       explicitly selected dark mode.
 
-    The ``color-scheme`` property on ``.highlight`` is also driven by a custom
-    property (``--hl-color-scheme``), derived from the perceived background
+    The [`color-scheme`][mdn.color-scheme] property on [`.highlight`][pygments.highlight] is also driven by a custom
+    property ([`--hl-color-scheme`][css.hl-color-scheme]), derived from the perceived background
     luminance of the chosen Pygments style.  This ensures that the browser's
-    ``::selection`` colours and any inherited text colour remain appropriate
+    [`::selection`][mdn.selection] colours and any inherited text colour remain appropriate
     regardless of the site-wide light/dark mode setting.
 
     Args:
@@ -153,7 +154,7 @@ def build_code_css(light_style: str, dark_style: str) -> str:
         dark_style: Name of the Pygments style to use in dark mode.
 
     Returns:
-        A CSS string suitable for writing to ``code.css``.
+        A CSS string suitable for writing to [`code.css`][blogmore.code_css].
 
     Raises:
         ClassNotFound: If either *light_style* or *dark_style* is not a

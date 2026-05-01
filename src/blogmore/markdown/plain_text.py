@@ -1,13 +1,13 @@
 """Markdown to plain text conversion utility.
 
-Provides :func:`markdown_to_plain_text` — the canonical way to convert a
+Provides `blogmore.markdown.plain_text.markdown_to_plain_text` — the canonical way to convert a
 Markdown string to clean, whitespace-collapsed plain text within BlogMore.
 It runs the input through the Python-Markdown library so that all block
 structures (fenced code, blockquotes, tables, admonitions, etc.) are handled
 correctly before HTML tags are stripped.
 
 This module is also the single source of truth for BlogMore's custom Markdown
-extension set via :func:`create_custom_extensions`, which is consumed by the
+extension set via `blogmore.markdown.plain_text.create_custom_extensions`, which is consumed by the
 full site parser, the first-paragraph extractor, and any other context that
 needs to render or strip BlogMore-flavoured Markdown.
 """
@@ -60,11 +60,11 @@ def _make_markdown_instance() -> markdown.Markdown:
 
     Includes all BlogMore custom extensions and the standard extensions
     needed to correctly parse all block structures.  Intentionally omits
-    presentation-only extensions (``codehilite``, ``toc``) that are not
+    presentation-only extensions (`codehilite`, `toc`) that are not
     required for text extraction.
 
     Returns:
-        A fresh, configured :class:`markdown.Markdown` instance.
+        A fresh, configured `markdown.Markdown` instance.
     """
     return markdown.Markdown(
         extensions=[
@@ -112,8 +112,8 @@ def markdown_to_plain_text(text: str) -> str:
     """Convert a Markdown string to clean plain text.
 
     Runs the input through Python-Markdown (with all BlogMore extensions and
-    common block-level extensions such as ``fenced_code``, ``tables``, and
-    ``footnotes``) to produce HTML, then strips all HTML tags and collapses
+    common block-level extensions such as `fenced_code`, `tables`, and
+    `footnotes`) to produce HTML, then strips all HTML tags and collapses
     whitespace.  This correctly handles all Markdown block structures
     including fenced code blocks, blockquotes, admonitions, and tables —
     none of these leave raw Markdown syntax characters in the result.

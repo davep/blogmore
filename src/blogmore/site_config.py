@@ -56,13 +56,13 @@ class SiteConfig:
     content_dir: Path | None = None
     """Directory containing Markdown posts.
 
-    May be ``None`` when serving an already-generated site without rebuilding.
+    May be `None` when serving an already-generated site without rebuilding.
     """
 
     templates_dir: Path | None = None
     """Optional directory containing custom Jinja2 templates.
 
-    When ``None`` the bundled templates are used.
+    When `None` the bundled templates are used.
     """
 
     site_title: str = "My Blog"
@@ -78,7 +78,7 @@ class SiteConfig:
     """Default keywords used in metadata for pages without their own keywords."""
 
     site_url: str = ""
-    """Base URL of the site (e.g. ``https://example.com``)."""
+    """Base URL of the site (e.g. `https://example.com`)."""
 
     posts_per_feed: int = 20
     """Maximum number of posts to include in RSS/Atom feeds."""
@@ -90,13 +90,13 @@ class SiteConfig:
     """Default author name for posts that lack an author in their frontmatter."""
 
     sidebar_config: dict[str, Any] = field(default_factory=dict)
-    """Sidebar configuration (``site_logo``, ``links``, ``socials``, etc.)."""
+    """Sidebar configuration (`site_logo`, `links`, `socials`, etc.)."""
 
     clean_first: bool = False
     """Whether to remove the output directory before generating."""
 
     icon_source: str | None = None
-    """Optional source icon filename in the ``extras/`` directory."""
+    """Optional source icon filename in the `extras/` directory."""
 
     with_search: bool = False
     """Whether to generate a search index and search page."""
@@ -133,11 +133,11 @@ class SiteConfig:
     running left to right in normal calendar order (Monday first).
 
     This is a **configuration file only** option — it cannot be set on the
-    command line.  Only meaningful when :attr:`with_calendar` is ``True``.
+    command line.  Only meaningful when ``with_calendar`` is ``True``.
     """
 
     minify_css: bool = False
-    """Whether to minify the CSS, writing it as ``styles.min.css``."""
+    """Whether to minify the CSS, writing it as `styles.min.css`."""
 
     minify_js: bool = False
     """Whether to minify the JavaScript output files."""
@@ -173,7 +173,7 @@ class SiteConfig:
 
     Overrides the default "References & mentions" heading rendered inside the
     ``backlinks`` template block on individual post pages.  Only meaningful
-    when :attr:`with_backlinks` is ``True``.
+    when ``with_backlinks`` is ``True``.
 
     This is a **configuration file only** option — it cannot be set on the
     command line.  Defaults to ``"References & mentions"``.
@@ -326,7 +326,7 @@ class SiteConfig:
     """Whether to generate a post-relationship force-directed graph page.
 
     When ``True`` the generator produces a graph page (at the path configured
-    by :attr:`graph_path`) that visualises the relationships between posts,
+    by ``graph_path``) that visualises the relationships between posts,
     tags, and categories using the ``force-graph`` library.  A **Graph** link
     is automatically added to the navigation bar between **Calendar** and
     **RSS**.
@@ -431,7 +431,7 @@ class SiteConfig:
     invite_comments: bool = False
     """Whether to show a comment invitation section on individual post pages.
 
-    When ``True`` and :attr:`invite_comments_to` is also configured, every
+    When ``True`` and ``invite_comments_to`` is also configured, every
     post will display a comment invitation section towards the bottom of the
     page, after the next/previous navigation buttons and before any
     "References & mentions" section.
@@ -446,9 +446,9 @@ class SiteConfig:
     invite_comments_to: str | None = None
     """Template string for the comment invitation email address.
 
-    When :attr:`invite_comments` is ``True`` and this option is set, the
+    When ``invite_comments`` is ``True`` and this option is set, the
     template is expanded for each post using the same variable placeholders
-    that are available for :attr:`post_path` (``{slug}``, ``{year}``,
+    that are available for ``post_path`` (``{slug}``, ``{year}``,
     ``{month}``, ``{day}``, ``{hour}``, ``{minute}``, ``{second}``,
     ``{category}``, ``{author}``).  The resulting string is used as the
     ``mailto:`` address in the comment invitation link.

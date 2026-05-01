@@ -23,9 +23,9 @@ def validate_page_1_path_template(template: str) -> None:
     """Validate a page_1_path format string.
 
     Checks that the template string is well-formed and only references
-    variables from the allowed set.  The ``{page}`` placeholder is
-    allowed but not required in ``page_1_path`` (since the default
-    ``index.html`` does not use it).
+    variables from the allowed set.  The `{page}` placeholder is
+    allowed but not required in `page_1_path` (since the default
+    `index.html` does not use it).
 
     Args:
         template: The page_1_path format string to validate.

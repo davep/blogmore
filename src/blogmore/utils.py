@@ -73,9 +73,9 @@ def calculate_reading_time(content: str, words_per_minute: int = 200) -> int:
 def make_urls_absolute(html_content: str, base_url: str) -> str:
     """Rewrite root-relative URLs in HTML content to absolute URLs.
 
-    Converts ``src`` and ``href`` attributes whose values begin with ``/``
+    Converts `src` and `href` attributes whose values begin with `/`
     to full absolute URLs by prepending *base_url*.  Attributes that already
-    contain an absolute URL (i.e. they include a scheme such as ``https://``)
+    contain an absolute URL (i.e. they include a scheme such as `https://`)
     are left unchanged.
 
     Args:
@@ -85,7 +85,7 @@ def make_urls_absolute(html_content: str, base_url: str) -> str:
             start with ``/``.
 
     Returns:
-        HTML string with root-relative ``src``/``href`` values replaced by
+        HTML string with root-relative `src`/`href` values replaced by
         absolute URLs.
 
     Examples:

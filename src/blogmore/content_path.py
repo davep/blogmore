@@ -1,7 +1,7 @@
 """Shared path-resolution utilities for content output paths.
 
-This module provides the generic building blocks used by ``page_path`` and
-``post_path``.  Each content type supplies its own allowed-variable set and
+This module provides the generic building blocks used by [page_path][blogmore.page_path] and
+[post_path][blogmore.post_path].  Each content type supplies its own allowed-variable set and
 variable dict; this module handles the common validation, substitution, and
 safety checks.
 """
@@ -76,7 +76,7 @@ def validate_path_template(
 def resolve_path(variables: dict[str, str], template: str, config_key: str) -> str:
     """Resolve a path template using a pre-built variables mapping.
 
-    Substitutes *variables* into *template* via :meth:`str.format_map`,
+    Substitutes *variables* into *template* via [`str.format_map`][builtins.str.format_map],
     collapses consecutive forward slashes that may result from empty
     variable substitutions, and strips any leading slash so the result
     can safely be joined onto an output directory path.
@@ -103,10 +103,10 @@ def resolve_path(variables: dict[str, str], template: str, config_key: str) -> s
         ) from error
 
     # Collapse consecutive slashes that can arise from empty variable
-    # substitutions (e.g. an undated post using {year}/{month}).
+    # substitutions (e.g. an undated post using `{year}/{month}`).
     result = re.sub(r"/+", "/", result)
 
-    # Strip the leading slash so the result joins safely with Path('/').
+    # Strip the leading slash so the result joins safely with [`Path('/')`][pathlib.Path].
     return result.lstrip("/")
 
 
@@ -114,7 +114,7 @@ def safe_output_path(output_dir: Path, relative: str, config_key: str) -> Path:
     """Join *relative* onto *output_dir* and verify the result stays inside it.
 
     Prevents accidental path-traversal writes that could occur if a
-    user-supplied template contains ``..`` segments.
+    user-supplied template contains `..` segments.
 
     Args:
         output_dir: The root output directory for the generated site.
@@ -133,7 +133,7 @@ def safe_output_path(output_dir: Path, relative: str, config_key: str) -> Path:
     output_resolved = output_dir.resolve()
 
     if not candidate.is_relative_to(output_resolved):
-        # Derive a human-readable label: "page_path" → "page path".
+        # Derive a human-readable label: `page_path` → `page path`.
         label = config_key.replace("_", " ")
         raise ValueError(
             f"The resolved {label} '{relative}' escapes the output directory. "
