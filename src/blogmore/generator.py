@@ -5,6 +5,7 @@ import shutil
 import time
 import urllib.error
 from collections import defaultdict
+from collections.abc import Callable
 from importlib.resources import files
 from pathlib import Path
 from typing import Any
@@ -266,173 +267,110 @@ class SiteGenerator:
             return url
         return f"{url}?v={self._cache_bust_token}"
 
+    def _get_configured_url(self, path_field_name: str) -> str:
+        """Return the URL path for a configured page, derived from a config field.
+
+        Strips any leading slash from the config value, prepends a fresh
+        ``/``, and optionally applies [`make_url_clean`][blogmore.clean_url.make_url_clean]
+        when ``clean_urls`` is enabled.
+
+        Args:
+            path_field_name: The name of the [`SiteConfig`][blogmore.site_config.SiteConfig]
+                attribute that holds the page path (e.g. ``"search_path"``).
+
+        Returns:
+            The URL path for the configured page, always starting with ``/``.
+        """
+        path: str = getattr(self.site_config, path_field_name)
+        url = "/" + path.lstrip("/")
+        if self.site_config.clean_urls:
+            url = make_url_clean(url)
+        return url
+
     def _get_search_url(self) -> str:
         """Return the URL path for the configured search page.
-
-        Derives the URL from the ``search_path`` configuration option.  When
-        ``clean_urls`` is enabled and the path ends in ``index.html``, the
-        index filename is stripped so the URL ends with a trailing slash.
 
         Returns:
             The URL path for the search page, always starting with ``/``.
         """
-        url = "/" + self.site_config.search_path.lstrip("/")
-        if self.site_config.clean_urls:
-            url = make_url_clean(url)
-        return url
+        return self._get_configured_url("search_path")
 
     def _get_archive_url(self) -> str:
         """Return the URL path for the configured archive page.
 
-        Derives the URL from the ``archive_path`` configuration option.  When
-        ``clean_urls`` is enabled and the path ends in ``index.html``, the
-        index filename is stripped so the URL ends with a trailing slash.
-
         Returns:
             The URL path for the archive page, always starting with ``/``.
         """
-        url = "/" + self.site_config.archive_path.lstrip("/")
-        if self.site_config.clean_urls:
-            url = make_url_clean(url)
-        return url
+        return self._get_configured_url("archive_path")
 
     def _get_tags_url(self) -> str:
         """Return the URL path for the configured tags overview page.
 
-        Derives the URL from the ``tags_path`` configuration option.  When
-        ``clean_urls`` is enabled and the path ends in ``index.html``, the
-        index filename is stripped so the URL ends with a trailing slash.
-
         Returns:
             The URL path for the tags page, always starting with ``/``.
         """
-        url = "/" + self.site_config.tags_path.lstrip("/")
-        if self.site_config.clean_urls:
-            url = make_url_clean(url)
-        return url
+        return self._get_configured_url("tags_path")
 
     def _get_categories_url(self) -> str:
         """Return the URL path for the configured categories overview page.
 
-        Derives the URL from the ``categories_path`` configuration option.  When
-        ``clean_urls`` is enabled and the path ends in ``index.html``, the
-        index filename is stripped so the URL ends with a trailing slash.
-
         Returns:
             The URL path for the categories page, always starting with ``/``.
         """
-        url = "/" + self.site_config.categories_path.lstrip("/")
-        if self.site_config.clean_urls:
-            url = make_url_clean(url)
-        return url
+        return self._get_configured_url("categories_path")
 
     def _get_stats_url(self) -> str:
         """Return the URL path for the configured statistics page.
 
-        Derives the URL from the ``stats_path`` configuration option.  When
-        ``clean_urls`` is enabled and the path ends in ``index.html``, the
-        index filename is stripped so the URL ends with a trailing slash.
-
         Returns:
             The URL path for the statistics page, always starting with ``/``.
         """
-        url = "/" + self.site_config.stats_path.lstrip("/")
-        if self.site_config.clean_urls:
-            url = make_url_clean(url)
-        return url
+        return self._get_configured_url("stats_path")
 
     def _get_calendar_url(self) -> str:
         """Return the URL path for the configured calendar page.
 
-        Derives the URL from the ``calendar_path`` configuration option.  When
-        ``clean_urls`` is enabled and the path ends in ``index.html``, the
-        index filename is stripped so the URL ends with a trailing slash.
-
         Returns:
             The URL path for the calendar page, always starting with ``/``.
         """
-        url = "/" + self.site_config.calendar_path.lstrip("/")
-        if self.site_config.clean_urls:
-            url = make_url_clean(url)
-        return url
+        return self._get_configured_url("calendar_path")
 
     def _get_graph_url(self) -> str:
         """Return the URL path for the configured graph page.
 
-        Derives the URL from the ``graph_path`` configuration option.  When
-        ``clean_urls`` is enabled and the path ends in ``index.html``, the
-        index filename is stripped so the URL ends with a trailing slash.
-
         Returns:
             The URL path for the graph page, always starting with ``/``.
         """
-        url = "/" + self.site_config.graph_path.lstrip("/")
-        if self.site_config.clean_urls:
-            url = make_url_clean(url)
-        return url
+        return self._get_configured_url("graph_path")
+
+    def _get_asset_url(
+        self,
+        regular: str,
+        minified: str,
+        minify: bool,
+        *,
+        cache_bust: bool = True,
+    ) -> str:
+        """Build the ``/static/`` URL for one asset, choosing the minified variant when requested.
+
+        Args:
+            regular: Filename for the non-minified asset (e.g. ``"style.css"``).
+            minified: Filename for the minified asset (e.g. ``"styles.min.css"``).
+            minify: When ``True``, the minified filename is used.
+            cache_bust: When ``True`` (the default), the URL is passed through
+                [`_with_cache_bust`][blogmore.generator.SiteGenerator._with_cache_bust]
+                so that browsers re-fetch the file after each build.
+
+        Returns:
+            The ``/static/<filename>`` URL, with an optional ``?v=<token>``
+            cache-busting query parameter.
+        """
+        name = minified if minify else regular
+        url = f"/static/{name}"
+        return self._with_cache_bust(url) if cache_bust else url
 
     def _get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates."""
-        styles_css_url = self._with_cache_bust(
-            f"/static/{CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{CSS_FILENAME}"
-        )
-        search_css_url = self._with_cache_bust(
-            f"/static/{SEARCH_CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{SEARCH_CSS_FILENAME}"
-        )
-        stats_css_url = self._with_cache_bust(
-            f"/static/{STATS_CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{STATS_CSS_FILENAME}"
-        )
-        archive_css_url = self._with_cache_bust(
-            f"/static/{ARCHIVE_CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{ARCHIVE_CSS_FILENAME}"
-        )
-        calendar_css_url = self._with_cache_bust(
-            f"/static/{CALENDAR_CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{CALENDAR_CSS_FILENAME}"
-        )
-        graph_css_url = self._with_cache_bust(
-            f"/static/{GRAPH_CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{GRAPH_CSS_FILENAME}"
-        )
-        tag_cloud_css_url = self._with_cache_bust(
-            f"/static/{TAG_CLOUD_CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{TAG_CLOUD_CSS_FILENAME}"
-        )
-        code_css_url = self._with_cache_bust(
-            f"/static/{CODE_CSS_MINIFIED_FILENAME}"
-            if self.site_config.minify_css
-            else f"/static/{CODE_CSS_FILENAME}"
-        )
-        theme_js_url = (
-            f"/static/{THEME_JS_MINIFIED_FILENAME}"
-            if self.site_config.minify_js
-            else f"/static/{THEME_JS_FILENAME}"
-        )
-        search_js_url = (
-            f"/static/{SEARCH_JS_MINIFIED_FILENAME}"
-            if self.site_config.minify_js
-            else f"/static/{SEARCH_JS_FILENAME}"
-        )
-        codeblocks_js_url = (
-            f"/static/{CODEBLOCKS_JS_MINIFIED_FILENAME}"
-            if self.site_config.minify_js
-            else f"/static/{CODEBLOCKS_JS_FILENAME}"
-        )
-        graph_js_url = (
-            f"/static/{GRAPH_JS_MINIFIED_FILENAME}"
-            if self.site_config.minify_js
-            else f"/static/{GRAPH_JS_FILENAME}"
-        )
         page1_suffix = resolve_pagination_page_path(self.site_config.page_1_path, 1)
         if self.site_config.clean_urls:
             page1_suffix = make_url_clean(page1_suffix)
@@ -467,18 +405,68 @@ class SiteGenerator:
             "extra_head_tags": self.site_config.head,
             "fontawesome_css_url": self._with_cache_bust(self._fontawesome_css_url),
             "fontawesome_woff2_url": FONTAWESOME_CDN_BRANDS_WOFF2_URL,
-            "styles_css_url": styles_css_url,
-            "search_css_url": search_css_url,
-            "stats_css_url": stats_css_url,
-            "archive_css_url": archive_css_url,
-            "tag_cloud_css_url": tag_cloud_css_url,
-            "calendar_css_url": calendar_css_url,
-            "graph_css_url": graph_css_url,
-            "code_css_url": code_css_url,
-            "theme_js_url": theme_js_url,
-            "search_js_url": search_js_url,
-            "codeblocks_js_url": codeblocks_js_url,
-            "graph_js_url": graph_js_url,
+            "styles_css_url": self._get_asset_url(
+                CSS_FILENAME, CSS_MINIFIED_FILENAME, self.site_config.minify_css
+            ),
+            "search_css_url": self._get_asset_url(
+                SEARCH_CSS_FILENAME,
+                SEARCH_CSS_MINIFIED_FILENAME,
+                self.site_config.minify_css,
+            ),
+            "stats_css_url": self._get_asset_url(
+                STATS_CSS_FILENAME,
+                STATS_CSS_MINIFIED_FILENAME,
+                self.site_config.minify_css,
+            ),
+            "archive_css_url": self._get_asset_url(
+                ARCHIVE_CSS_FILENAME,
+                ARCHIVE_CSS_MINIFIED_FILENAME,
+                self.site_config.minify_css,
+            ),
+            "tag_cloud_css_url": self._get_asset_url(
+                TAG_CLOUD_CSS_FILENAME,
+                TAG_CLOUD_CSS_MINIFIED_FILENAME,
+                self.site_config.minify_css,
+            ),
+            "calendar_css_url": self._get_asset_url(
+                CALENDAR_CSS_FILENAME,
+                CALENDAR_CSS_MINIFIED_FILENAME,
+                self.site_config.minify_css,
+            ),
+            "graph_css_url": self._get_asset_url(
+                GRAPH_CSS_FILENAME,
+                GRAPH_CSS_MINIFIED_FILENAME,
+                self.site_config.minify_css,
+            ),
+            "code_css_url": self._get_asset_url(
+                CODE_CSS_FILENAME,
+                CODE_CSS_MINIFIED_FILENAME,
+                self.site_config.minify_css,
+            ),
+            "theme_js_url": self._get_asset_url(
+                THEME_JS_FILENAME,
+                THEME_JS_MINIFIED_FILENAME,
+                self.site_config.minify_js,
+                cache_bust=False,
+            ),
+            "search_js_url": self._get_asset_url(
+                SEARCH_JS_FILENAME,
+                SEARCH_JS_MINIFIED_FILENAME,
+                self.site_config.minify_js,
+                cache_bust=False,
+            ),
+            "codeblocks_js_url": self._get_asset_url(
+                CODEBLOCKS_JS_FILENAME,
+                CODEBLOCKS_JS_MINIFIED_FILENAME,
+                self.site_config.minify_js,
+                cache_bust=False,
+            ),
+            "graph_js_url": self._get_asset_url(
+                GRAPH_JS_FILENAME,
+                GRAPH_JS_MINIFIED_FILENAME,
+                self.site_config.minify_js,
+                cache_bust=False,
+            ),
             "pagination_page1_suffix": page1_suffix,
         }
         # Merge sidebar config into context
@@ -882,6 +870,31 @@ class SiteGenerator:
             html = minify_html.minify(html, minify_js=False, minify_css=False)
         output_path.write_text(html, encoding="utf-8")
 
+    def _get_asset_source(self, filename: str) -> str | None:
+        """Read the text content of a static asset, preferring custom over bundled.
+
+        Looks first in the custom templates directory (``templates_dir/static/``)
+        when one is configured, then falls back to the package's bundled templates.
+        Returns ``None`` and emits a warning if the asset cannot be found.
+
+        Args:
+            filename: The asset filename to look up (e.g. ``"style.css"``).
+
+        Returns:
+            The text content of the asset, or ``None`` if it could not be read.
+        """
+        if self.site_config.templates_dir is not None:
+            custom_path = self.site_config.templates_dir / "static" / filename
+            if custom_path.is_file():
+                return custom_path.read_text(encoding="utf-8")
+
+        try:
+            bundled = files("blogmore").joinpath("templates", "static", filename)
+            return bundled.read_text(encoding="utf-8")
+        except Exception as e:
+            print(f"Warning: Could not read bundled {filename} for minification: {e}")
+            return None
+
     def _minify_one_css(
         self,
         output_static: Path,
@@ -899,26 +912,9 @@ class SiteGenerator:
             source_filename: Source CSS filename (e.g. ``style.css``).
             minified_filename: Output minified filename (e.g. ``styles.min.css``).
         """
-        css_source: str | None = None
-
-        # Prefer custom CSS file if a templates directory is configured.
-        if self.site_config.templates_dir is not None:
-            custom_css = self.site_config.templates_dir / "static" / source_filename
-            if custom_css.is_file():
-                css_source = custom_css.read_text(encoding="utf-8")
-
-        # Fall back to bundled CSS file.
+        css_source = self._get_asset_source(source_filename)
         if css_source is None:
-            try:
-                bundled_css = files("blogmore").joinpath(
-                    "templates", "static", source_filename
-                )
-                css_source = bundled_css.read_text(encoding="utf-8")
-            except Exception as e:
-                print(
-                    f"Warning: Could not read bundled {source_filename} for minification: {e}"
-                )
-                return
+            return
 
         minified = rcssmin.cssmin(css_source)
         output_path = output_static / minified_filename
@@ -982,26 +978,9 @@ class SiteGenerator:
             js_filename: The original JavaScript filename (e.g. ``theme.js``).
             js_minified_filename: The minified output filename (e.g. ``theme.min.js``).
         """
-        js_source: str | None = None
-
-        # Prefer custom JS file if a templates directory is configured
-        if self.site_config.templates_dir is not None:
-            custom_js = self.site_config.templates_dir / "static" / js_filename
-            if custom_js.is_file():
-                js_source = custom_js.read_text(encoding="utf-8")
-
-        # Fall back to bundled JS file
+        js_source = self._get_asset_source(js_filename)
         if js_source is None:
-            try:
-                bundled_js = files("blogmore").joinpath(
-                    "templates", "static", js_filename
-                )
-                js_source = bundled_js.read_text(encoding="utf-8")
-            except Exception as e:
-                print(
-                    f"Warning: Could not read bundled {js_filename} for minification: {e}"
-                )
-                return
+            return
 
         minified = rjsmin.jsmin(js_source)
         output_path = output_static / js_minified_filename
@@ -1304,6 +1283,50 @@ class SiteGenerator:
         )
         self._write_html(output_path, html)
 
+    def _generate_paginated_listing(
+        self,
+        post_list: list[Post],
+        base_url: str,
+        output_dir: Path,
+        posts_per_page: int,
+        context: dict[str, Any],
+        render_func: Callable[[list[Post], int, int], str],
+    ) -> None:
+        """Paginate *post_list* and write one HTML file per page.
+
+        Handles all the boilerplate common to date-archive, tag, and category
+        listing pages: paginating the posts, building the full list of page
+        URLs, and iterating through pages to update the shared *context* dict
+        (canonical URL, prev/next links, pagination URL list) before delegating
+        rendering to *render_func*.
+
+        Args:
+            post_list: The posts to display, already in the desired order.
+            base_url: The URL prefix for the section (e.g. ``"/tag/python"``).
+            output_dir: The directory into which page files are written.
+            posts_per_page: Maximum number of posts per page.
+            context: The shared template context dict, mutated in-place for
+                each page (``canonical_url``, ``prev_page_url``,
+                ``next_page_url``, ``pagination_page_urls``).
+            render_func: Callable with signature
+                ``(page_posts, page_num, total_pages) -> str`` that produces the
+                HTML for one page.  Any page-specific extra arguments (e.g.
+                archive title, tag name) should be captured in a closure.
+        """
+        paginated_posts = paginate_posts(post_list, posts_per_page)
+        total_pages = len(paginated_posts)
+        page_urls = self._build_pagination_page_urls(base_url, total_pages)
+
+        for page_num, page_posts in enumerate(paginated_posts, start=1):
+            output_path = self._get_pagination_output_path(output_dir, page_num)
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
+            prev_url, next_url = self._pagination_prev_next(page_num, page_urls)
+            context["prev_page_url"] = prev_url
+            context["next_page_url"] = next_url
+            context["pagination_page_urls"] = page_urls
+            html = render_func(page_posts, page_num, total_pages)
+            self._write_html(output_path, html)
+
     def _generate_date_archives(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate date-based archive pages (year, month, day) with pagination."""
         # Group posts by year, month, and day
@@ -1328,63 +1351,64 @@ class SiteGenerator:
         for year, year_posts in posts_by_year.items():
             year_dir = self.site_config.output_dir / str(year)
             year_dir.mkdir(parents=True, exist_ok=True)
-
-            # Paginate posts
-            paginated_posts = paginate_posts(year_posts, self.POSTS_PER_PAGE_ARCHIVE)
-            total_pages = len(paginated_posts)
             base_path = f"/{year}"
-            page_urls = self._build_pagination_page_urls(base_path, total_pages)
 
-            # Generate each page
-            for page_num, page_posts in enumerate(paginated_posts, start=1):
-                output_path = self._get_pagination_output_path(year_dir, page_num)
-                context["canonical_url"] = self._canonical_url_for_path(output_path)
-                prev_url, next_url = self._pagination_prev_next(page_num, page_urls)
-                context["prev_page_url"] = prev_url
-                context["next_page_url"] = next_url
-                context["pagination_page_urls"] = page_urls
-                html = self.renderer.render_archive(
+            def _render_year(
+                page_posts: list[Post],
+                page_num: int,
+                total_pages: int,
+                _year: int = year,
+                _base: str = base_path,
+            ) -> str:
+                return self.renderer.render_archive(
                     page_posts,
-                    archive_title=f"Posts from {year}",
+                    archive_title=f"Posts from {_year}",
                     page=page_num,
                     total_pages=total_pages,
-                    base_path=base_path,
+                    base_path=_base,
                     **context,
                 )
 
-                self._write_html(output_path, html)
+            self._generate_paginated_listing(
+                year_posts,
+                base_url=base_path,
+                output_dir=year_dir,
+                posts_per_page=self.POSTS_PER_PAGE_ARCHIVE,
+                context=context,
+                render_func=_render_year,
+            )
 
         # Generate month archives with pagination
         for (year, month), month_posts in posts_by_month.items():
             month_dir = self.site_config.output_dir / str(year) / f"{month:02d}"
             month_dir.mkdir(parents=True, exist_ok=True)
-
             month_name = dt.datetime(year, month, 1).strftime("%B %Y")
-
-            # Paginate posts
-            paginated_posts = paginate_posts(month_posts, self.POSTS_PER_PAGE_ARCHIVE)
-            total_pages = len(paginated_posts)
             base_path = f"/{year}/{month:02d}"
-            page_urls = self._build_pagination_page_urls(base_path, total_pages)
 
-            # Generate each page
-            for page_num, page_posts in enumerate(paginated_posts, start=1):
-                output_path = self._get_pagination_output_path(month_dir, page_num)
-                context["canonical_url"] = self._canonical_url_for_path(output_path)
-                prev_url, next_url = self._pagination_prev_next(page_num, page_urls)
-                context["prev_page_url"] = prev_url
-                context["next_page_url"] = next_url
-                context["pagination_page_urls"] = page_urls
-                html = self.renderer.render_archive(
+            def _render_month(
+                page_posts: list[Post],
+                page_num: int,
+                total_pages: int,
+                _name: str = month_name,
+                _base: str = base_path,
+            ) -> str:
+                return self.renderer.render_archive(
                     page_posts,
-                    archive_title=f"Posts from {month_name}",
+                    archive_title=f"Posts from {_name}",
                     page=page_num,
                     total_pages=total_pages,
-                    base_path=base_path,
+                    base_path=_base,
                     **context,
                 )
 
-                self._write_html(output_path, html)
+            self._generate_paginated_listing(
+                month_posts,
+                base_url=base_path,
+                output_dir=month_dir,
+                posts_per_page=self.POSTS_PER_PAGE_ARCHIVE,
+                context=context,
+                render_func=_render_month,
+            )
 
         # Generate day archives with pagination
         for (year, month, day), day_posts in posts_by_day.items():
@@ -1392,33 +1416,33 @@ class SiteGenerator:
                 self.site_config.output_dir / str(year) / f"{month:02d}" / f"{day:02d}"
             )
             day_dir.mkdir(parents=True, exist_ok=True)
-
             date_str = dt.datetime(year, month, day).strftime("%B %d, %Y")
-
-            # Paginate posts
-            paginated_posts = paginate_posts(day_posts, self.POSTS_PER_PAGE_ARCHIVE)
-            total_pages = len(paginated_posts)
             base_path = f"/{year}/{month:02d}/{day:02d}"
-            page_urls = self._build_pagination_page_urls(base_path, total_pages)
 
-            # Generate each page
-            for page_num, page_posts in enumerate(paginated_posts, start=1):
-                output_path = self._get_pagination_output_path(day_dir, page_num)
-                context["canonical_url"] = self._canonical_url_for_path(output_path)
-                prev_url, next_url = self._pagination_prev_next(page_num, page_urls)
-                context["prev_page_url"] = prev_url
-                context["next_page_url"] = next_url
-                context["pagination_page_urls"] = page_urls
-                html = self.renderer.render_archive(
+            def _render_day(
+                page_posts: list[Post],
+                page_num: int,
+                total_pages: int,
+                _date: str = date_str,
+                _base: str = base_path,
+            ) -> str:
+                return self.renderer.render_archive(
                     page_posts,
-                    archive_title=f"Posts from {date_str}",
+                    archive_title=f"Posts from {_date}",
                     page=page_num,
                     total_pages=total_pages,
-                    base_path=base_path,
+                    base_path=_base,
                     **context,
                 )
 
-                self._write_html(output_path, html)
+            self._generate_paginated_listing(
+                day_posts,
+                base_url=base_path,
+                output_dir=day_dir,
+                posts_per_page=self.POSTS_PER_PAGE_ARCHIVE,
+                context=context,
+                render_func=_render_day,
+            )
 
     def _generate_tag_pages(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate pages for each tag with pagination."""
@@ -1438,36 +1462,41 @@ class SiteGenerator:
             # Sanitize tag for filename (use lowercase version)
             safe_tag = sanitize_for_url(tag_lower)
 
-            # Paginate posts
-            paginated_posts = paginate_posts(tag_posts, self.POSTS_PER_PAGE_TAG)
-            total_pages = len(paginated_posts)
-
             base_url = f"/{self.TAG_DIR}/{safe_tag}"
             # Each tag's pages live inside tag/{safe_tag}/ directory.
             tag_base_dir = tag_dir / safe_tag
-            page_urls = self._build_pagination_page_urls(base_url, total_pages)
 
             context = self._get_global_context()
             context["pages"] = pages
 
-            # Generate each page
-            for page_num, page_posts in enumerate(paginated_posts, start=1):
-                output_path = self._get_pagination_output_path(tag_base_dir, page_num)
-                context["canonical_url"] = self._canonical_url_for_path(output_path)
-                prev_url, next_url = self._pagination_prev_next(page_num, page_urls)
-                context["prev_page_url"] = prev_url
-                context["next_page_url"] = next_url
-                context["pagination_page_urls"] = page_urls
-                html = self.renderer.render_tag_page(
-                    tag_display,  # Use display name for rendering
+            # Default parameter values bind the current loop variables at
+            # definition time (early binding), which is the standard Python
+            # idiom for capturing loop state in a nested function.
+            def _render_tag(
+                page_posts: list[Post],
+                page_num: int,
+                total_pages: int,
+                _display: str = tag_display,
+                _safe: str = safe_tag,
+                _ctx: dict[str, Any] = context,
+            ) -> str:
+                return self.renderer.render_tag_page(
+                    _display,
                     page_posts,
                     page=page_num,
                     total_pages=total_pages,
-                    safe_tag=safe_tag,
-                    **context,
+                    safe_tag=_safe,
+                    **_ctx,
                 )
 
-                self._write_html(output_path, html)
+            self._generate_paginated_listing(
+                tag_posts,
+                base_url=base_url,
+                output_dir=tag_base_dir,
+                posts_per_page=self.POSTS_PER_PAGE_TAG,
+                context=context,
+                render_func=_render_tag,
+            )
 
     def _group_posts_by_tag(
         self, posts: list[Post]
@@ -1480,16 +1509,7 @@ class SiteGenerator:
         Returns:
             Dictionary mapping lowercase tag to (display_name, posts)
         """
-        posts_by_tag: dict[str, tuple[str, list[Post]]] = {}
-        for post in posts:
-            if post.tags:
-                for tag in post.tags:
-                    tag_lower = tag.lower()
-                    if tag_lower not in posts_by_tag:
-                        # Store the first occurrence as the display name
-                        posts_by_tag[tag_lower] = (tag, [])
-                    posts_by_tag[tag_lower][1].append(post)
-        return posts_by_tag
+        return self._group_posts_by_attribute(posts, lambda p: p.tags or [])
 
     def _generate_tags_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the tags overview page with word cloud."""
@@ -1501,50 +1521,20 @@ class SiteGenerator:
             return
 
         # Calculate tag counts and prepare data
-        tag_data: list[dict[str, Any]] = []
-        min_count: int | None = None
-        max_count: int | None = None
-
-        for tag_lower, (tag_display, tag_posts) in posts_by_tag.items():
-            count = len(tag_posts)
-            safe_tag = sanitize_for_url(tag_lower)
-            tag_data.append(
-                {
-                    "display_name": tag_display,
-                    "safe_tag": safe_tag,
-                    "count": count,
-                    "tag_lower": tag_lower,
-                }
-            )
-            if min_count is None or count < min_count:
-                min_count = count
-            if max_count is None or count > max_count:
-                max_count = count
+        tag_data: list[dict[str, Any]] = [
+            {
+                "display_name": tag_display,
+                "safe_tag": sanitize_for_url(tag_lower),
+                "count": len(tag_posts),
+                "tag_lower": tag_lower,
+            }
+            for tag_lower, (tag_display, tag_posts) in posts_by_tag.items()
+        ]
 
         # Sort alphabetically by display name
         tag_data.sort(key=lambda x: x["display_name"].lower())
 
-        # Calculate font sizes for word cloud effect
-        # Font sizes range from 1.0em to 2.5em
-        min_font_size = 1.0
-        max_font_size = 2.5
-
-        # min_count and max_count are guaranteed to be set since posts_by_tag is non-empty
-        assert min_count is not None
-        assert max_count is not None
-
-        if max_count > min_count:
-            # Scale based on count
-            for tag_info in tag_data:
-                # Linear interpolation between min and max font size
-                ratio = (tag_info["count"] - min_count) / (max_count - min_count)
-                tag_info["font_size"] = min_font_size + ratio * (
-                    max_font_size - min_font_size
-                )
-        else:
-            # All tags have the same count, use middle size
-            for tag_info in tag_data:
-                tag_info["font_size"] = (min_font_size + max_font_size) / 2
+        self._calculate_cloud_font_sizes(tag_data)
 
         # Render the tags page
         context = self._get_global_context()
@@ -1577,53 +1567,23 @@ class SiteGenerator:
             return
 
         # Calculate category counts and prepare data
-        category_data: list[dict[str, Any]] = []
-        min_count: int | None = None
-        max_count: int | None = None
-
-        for category_lower, (
-            category_display,
-            category_posts,
-        ) in posts_by_category.items():
-            count = len(category_posts)
-            safe_category = sanitize_for_url(category_lower)
-            category_data.append(
-                {
-                    "display_name": category_display,
-                    "safe_category": safe_category,
-                    "count": count,
-                    "category_lower": category_lower,
-                }
-            )
-            if min_count is None or count < min_count:
-                min_count = count
-            if max_count is None or count > max_count:
-                max_count = count
+        category_data: list[dict[str, Any]] = [
+            {
+                "display_name": category_display,
+                "safe_category": sanitize_for_url(category_lower),
+                "count": len(category_posts),
+                "category_lower": category_lower,
+            }
+            for category_lower, (
+                category_display,
+                category_posts,
+            ) in posts_by_category.items()
+        ]
 
         # Sort alphabetically by display name
         category_data.sort(key=lambda x: x["display_name"].lower())
 
-        # Calculate font sizes for word cloud effect
-        # Font sizes range from 1.0em to 2.5em
-        min_font_size = 1.0
-        max_font_size = 2.5
-
-        # min_count and max_count are guaranteed to be set since posts_by_category is non-empty
-        assert min_count is not None
-        assert max_count is not None
-
-        if max_count > min_count:
-            # Scale based on count
-            for category_info in category_data:
-                # Linear interpolation between min and max font size
-                ratio = (category_info["count"] - min_count) / (max_count - min_count)
-                category_info["font_size"] = min_font_size + ratio * (
-                    max_font_size - min_font_size
-                )
-        else:
-            # All categories have the same count, use middle size
-            for category_info in category_data:
-                category_info["font_size"] = (min_font_size + max_font_size) / 2
+        self._calculate_cloud_font_sizes(category_data)
 
         # Render the categories page
         context = self._get_global_context()
@@ -1667,40 +1627,69 @@ class SiteGenerator:
             # Sanitize category for filename (use lowercase version)
             safe_category = sanitize_for_url(category_lower)
 
-            # Paginate posts
-            paginated_posts = paginate_posts(
-                category_posts, self.POSTS_PER_PAGE_CATEGORY
-            )
-            total_pages = len(paginated_posts)
-
             base_url = f"/{self.CATEGORY_DIR}/{safe_category}"
             # Each category's pages live inside category/{safe_category}/ directory.
             category_base_dir = category_dir / safe_category
-            page_urls = self._build_pagination_page_urls(base_url, total_pages)
 
             context = self._get_global_context()
             context["pages"] = pages
 
-            # Generate each page
-            for page_num, page_posts in enumerate(paginated_posts, start=1):
-                output_path = self._get_pagination_output_path(
-                    category_base_dir, page_num
-                )
-                context["canonical_url"] = self._canonical_url_for_path(output_path)
-                prev_url, next_url = self._pagination_prev_next(page_num, page_urls)
-                context["prev_page_url"] = prev_url
-                context["next_page_url"] = next_url
-                context["pagination_page_urls"] = page_urls
-                html = self.renderer.render_category_page(
-                    category_display,  # Use display name for rendering
+            def _render_category(
+                page_posts: list[Post],
+                page_num: int,
+                total_pages: int,
+                _display: str = category_display,
+                _safe: str = safe_category,
+                _ctx: dict[str, Any] = context,
+            ) -> str:
+                return self.renderer.render_category_page(
+                    _display,
                     page_posts,
                     page=page_num,
                     total_pages=total_pages,
-                    safe_category=safe_category,
-                    **context,
+                    safe_category=_safe,
+                    **_ctx,
                 )
 
-                self._write_html(output_path, html)
+            self._generate_paginated_listing(
+                category_posts,
+                base_url=base_url,
+                output_dir=category_base_dir,
+                posts_per_page=self.POSTS_PER_PAGE_CATEGORY,
+                context=context,
+                render_func=_render_category,
+            )
+
+    def _group_posts_by_attribute(
+        self,
+        posts: list[Post],
+        get_values: Callable[[Post], list[str]],
+    ) -> dict[str, tuple[str, list[Post]]]:
+        """Group posts by a string attribute (case-insensitive).
+
+        The first occurrence of each value is used as the display name; all
+        subsequent occurrences of the same value (compared case-insensitively)
+        are accumulated under the same key.
+
+        Args:
+            posts: List of posts to group.
+            get_values: Callable that returns the list of attribute values for
+                a single post (e.g. the post's tags or a single-element list
+                containing the post's category).
+
+        Returns:
+            Dictionary mapping the lowercase attribute value to a
+            ``(display_name, posts)`` tuple.
+        """
+        result: dict[str, tuple[str, list[Post]]] = {}
+        for post in posts:
+            for value in get_values(post):
+                value_lower = value.lower()
+                if value_lower not in result:
+                    # Store the first occurrence as the display name.
+                    result[value_lower] = (value, [])
+                result[value_lower][1].append(post)
+        return result
 
     def _group_posts_by_category(
         self, posts: list[Post]
@@ -1713,15 +1702,48 @@ class SiteGenerator:
         Returns:
             Dictionary mapping lowercase category to (display_name, posts)
         """
-        posts_by_category: dict[str, tuple[str, list[Post]]] = {}
-        for post in posts:
-            if post.category:
-                category_lower = post.category.lower()
-                if category_lower not in posts_by_category:
-                    # Store the first occurrence as the display name
-                    posts_by_category[category_lower] = (post.category, [])
-                posts_by_category[category_lower][1].append(post)
-        return posts_by_category
+        return self._group_posts_by_attribute(
+            posts, lambda p: [p.category] if p.category else []
+        )
+
+    def _calculate_cloud_font_sizes(
+        self,
+        data: list[dict[str, Any]],
+        min_size: float = 1.0,
+        max_size: float = 2.5,
+    ) -> None:
+        """Assign ``font_size`` to every item in a word-cloud data list.
+
+        Uses linear interpolation between *min_size* and *max_size* based on
+        each item's ``"count"`` field relative to the minimum and maximum
+        counts in the list.  When all items share the same count, the midpoint
+        size is used for every item.
+
+        Mutates each dict in *data* in-place by adding a ``"font_size"`` key.
+
+        Args:
+            data: List of dicts, each containing at least a ``"count"`` key
+                with an integer value.
+            min_size: The minimum font size (em units) for the least-frequent
+                item.
+            max_size: The maximum font size (em units) for the most-frequent
+                item.
+        """
+        if not data:
+            return
+
+        counts = [item["count"] for item in data]
+        min_count = min(counts)
+        max_count = max(counts)
+
+        if max_count > min_count:
+            for item in data:
+                ratio = (item["count"] - min_count) / (max_count - min_count)
+                item["font_size"] = min_size + ratio * (max_size - min_size)
+        else:
+            midpoint = (min_size + max_size) / 2
+            for item in data:
+                item["font_size"] = midpoint
 
     def _generate_feeds(self, posts: list[Post]) -> None:
         """Generate RSS and Atom feeds.
