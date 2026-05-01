@@ -44,7 +44,7 @@ def validate_path_template(
 
     if required_variables and not required_variables.issubset(allowed_variables):
         raise ValueError(
-            f"Internal error: required_variables must be a subset of allowed_variables"
+            "Internal error: required_variables must be a subset of allowed_variables"
         )
 
     # Extract field names using the standard Formatter parser.
