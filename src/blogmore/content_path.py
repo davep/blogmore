@@ -53,8 +53,7 @@ def validate_path_template(
             f"{config_key} '{template}' contains an invalid placeholder: {error}"
         ) from error
 
-    unknown = set(field_names) - allowed_variables
-    if unknown:
+    if unknown := (set(field_names) - allowed_variables):
         raise ValueError(
             f"{config_key} '{template}' contains unknown variable(s): "
             + ", ".join(sorted(unknown))
