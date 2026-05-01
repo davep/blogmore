@@ -1191,6 +1191,305 @@ class TestTemplateRenderer:
         assert '<meta name="description"' not in html
         assert '<meta property="og:description"' not in html
 
+    def test_listing_meta_tags_full_social_graph_on_tag_page(
+        self, sample_post: Post
+    ) -> None:
+        """Test that tag pages include full social graph meta tags."""
+        renderer = TemplateRenderer()
+        html = renderer.render_tag_page(
+            tag="python",
+            safe_tag="python",
+            posts=[sample_post],
+            site_title="Test Blog",
+            site_description="A great blog",
+            site_url="https://example.com",
+            has_platform_icons=True,
+            canonical_url="https://example.com/tags/python/",
+        )
+
+        assert '<meta property="og:type" content="website">' in html
+        assert '<meta property="og:url" content="https://example.com/tags/python/">' in html
+        assert '<meta property="og:site_name" content="Test Blog">' in html
+        assert (
+            '<meta property="og:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in html
+        )
+        assert '<meta name="twitter:card" content="summary_large_image">' in html
+        assert '<meta name="twitter:title" content="Tag: python - Test Blog">' in html
+        assert (
+            '<meta name="twitter:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in html
+        )
+
+    def test_listing_meta_tags_full_social_graph_on_category_page(
+        self, sample_post: Post
+    ) -> None:
+        """Test that category pages include full social graph meta tags."""
+        renderer = TemplateRenderer()
+        html = renderer.render_category_page(
+            category="Python",
+            safe_category="python",
+            posts=[sample_post],
+            site_title="Test Blog",
+            site_description="A great blog",
+            site_url="https://example.com",
+            has_platform_icons=True,
+            canonical_url="https://example.com/category/python/",
+        )
+
+        assert '<meta property="og:type" content="website">' in html
+        assert (
+            '<meta property="og:url" content="https://example.com/category/python/">'
+            in html
+        )
+        assert '<meta property="og:site_name" content="Test Blog">' in html
+        assert (
+            '<meta property="og:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in html
+        )
+        assert '<meta name="twitter:card" content="summary_large_image">' in html
+        assert (
+            '<meta name="twitter:title" content="Category: Python - Test Blog">' in html
+        )
+
+    def test_listing_meta_tags_full_social_graph_on_archive_page(
+        self, sample_post: Post
+    ) -> None:
+        """Test that archive pages include full social graph meta tags."""
+        renderer = TemplateRenderer()
+        html = renderer.render_archive(
+            posts=[sample_post],
+            archive_title="January 2024",
+            site_title="Test Blog",
+            site_description="A great blog",
+            site_url="https://example.com",
+            has_platform_icons=True,
+            canonical_url="https://example.com/2024/01/",
+            base_path="/2024/01",
+        )
+
+        assert '<meta property="og:type" content="website">' in html
+        assert '<meta property="og:url" content="https://example.com/2024/01/">' in html
+        assert '<meta property="og:site_name" content="Test Blog">' in html
+        assert (
+            '<meta property="og:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in html
+        )
+        assert '<meta name="twitter:card" content="summary_large_image">' in html
+        assert (
+            '<meta name="twitter:title" content="January 2024 - Test Blog">' in html
+        )
+
+    def test_listing_meta_tags_full_social_graph_on_tags_page(self) -> None:
+        """Test that the tags cloud page includes full social graph meta tags."""
+        renderer = TemplateRenderer()
+        html = renderer.render_tags_page(
+            tags=[],
+            site_title="Test Blog",
+            site_description="A great blog",
+            site_url="https://example.com",
+            has_platform_icons=True,
+            canonical_url="https://example.com/tags/",
+        )
+
+        assert '<meta property="og:title" content="All Tags - Test Blog">' in html
+        assert '<meta property="og:type" content="website">' in html
+        assert '<meta property="og:url" content="https://example.com/tags/">' in html
+        assert '<meta property="og:site_name" content="Test Blog">' in html
+        assert (
+            '<meta property="og:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in html
+        )
+        assert '<meta name="twitter:card" content="summary_large_image">' in html
+        assert '<meta name="twitter:title" content="All Tags - Test Blog">' in html
+
+    def test_listing_meta_tags_full_social_graph_on_categories_page(self) -> None:
+        """Test that the categories cloud page includes full social graph meta tags."""
+        renderer = TemplateRenderer()
+        html = renderer.render_categories_page(
+            categories=[],
+            site_title="Test Blog",
+            site_description="A great blog",
+            site_url="https://example.com",
+            has_platform_icons=True,
+            canonical_url="https://example.com/categories/",
+        )
+
+        assert (
+            '<meta property="og:title" content="All Categories - Test Blog">' in html
+        )
+        assert '<meta property="og:type" content="website">' in html
+        assert (
+            '<meta property="og:url" content="https://example.com/categories/">' in html
+        )
+        assert '<meta property="og:site_name" content="Test Blog">' in html
+        assert (
+            '<meta property="og:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in html
+        )
+        assert '<meta name="twitter:card" content="summary_large_image">' in html
+        assert (
+            '<meta name="twitter:title" content="All Categories - Test Blog">' in html
+        )
+
+    def test_listing_meta_tags_full_social_graph_on_search_page(self) -> None:
+        """Test that the search page includes full social graph meta tags."""
+        renderer = TemplateRenderer()
+        html = renderer.render_search_page(
+            site_title="Test Blog",
+            site_description="A great blog",
+            site_url="https://example.com",
+            has_platform_icons=True,
+            canonical_url="https://example.com/search/",
+        )
+
+        assert '<meta name="robots" content="noindex">' in html
+        assert '<meta property="og:title" content="Search - Test Blog">' in html
+        assert '<meta property="og:type" content="website">' in html
+        assert '<meta property="og:url" content="https://example.com/search/">' in html
+        assert '<meta property="og:site_name" content="Test Blog">' in html
+        assert (
+            '<meta property="og:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in html
+        )
+        assert '<meta name="twitter:card" content="summary_large_image">' in html
+        assert '<meta name="twitter:title" content="Search - Test Blog">' in html
+
+    def test_listing_meta_tags_full_social_graph_on_stats_page(self) -> None:
+        """Test that the stats page includes full social graph meta tags."""
+        from blogmore.stats import BlogStats
+
+        renderer = TemplateRenderer()
+        html = renderer.render_stats_page(
+            site_title="Test Blog",
+            site_description="A great blog",
+            site_url="https://example.com",
+            has_platform_icons=True,
+            canonical_url="https://example.com/stats/",
+            stats=BlogStats(),
+            with_read_time=False,
+        )
+
+        assert (
+            '<meta property="og:title" content="Blog Statistics - Test Blog">' in html
+        )
+        assert '<meta property="og:type" content="website">' in html
+        assert '<meta property="og:url" content="https://example.com/stats/">' in html
+        assert '<meta property="og:site_name" content="Test Blog">' in html
+        assert (
+            '<meta property="og:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in html
+        )
+        assert '<meta name="twitter:card" content="summary_large_image">' in html
+        assert (
+            '<meta name="twitter:title" content="Blog Statistics - Test Blog">' in html
+        )
+
+    def test_listing_meta_tags_full_social_graph_on_calendar_page(self) -> None:
+        """Test that the calendar page includes full social graph meta tags."""
+        renderer = TemplateRenderer()
+        html = renderer.render_calendar_page(
+            site_title="Test Blog",
+            site_description="A great blog",
+            site_url="https://example.com",
+            has_platform_icons=True,
+            canonical_url="https://example.com/calendar/",
+            calendar_years=[],
+            forward_calendar=True,
+        )
+
+        assert '<meta property="og:title" content="Calendar - Test Blog">' in html
+        assert '<meta property="og:type" content="website">' in html
+        assert (
+            '<meta property="og:url" content="https://example.com/calendar/">' in html
+        )
+        assert '<meta property="og:site_name" content="Test Blog">' in html
+        assert (
+            '<meta property="og:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in html
+        )
+        assert '<meta name="twitter:card" content="summary_large_image">' in html
+        assert '<meta name="twitter:title" content="Calendar - Test Blog">' in html
+
+    def test_listing_meta_tags_full_social_graph_on_graph_page(self) -> None:
+        """Test that the graph page includes full social graph meta tags."""
+        renderer = TemplateRenderer()
+        html = renderer.render_graph_page(
+            site_title="Test Blog",
+            site_description="A great blog",
+            site_url="https://example.com",
+            has_platform_icons=True,
+            canonical_url="https://example.com/graph/",
+            graph_data_json="{}",
+        )
+
+        assert '<meta property="og:title" content="Graph - Test Blog">' in html
+        assert '<meta property="og:type" content="website">' in html
+        assert '<meta property="og:url" content="https://example.com/graph/">' in html
+        assert '<meta property="og:site_name" content="Test Blog">' in html
+        assert (
+            '<meta property="og:image" content="https://example.com/icons/android-chrome-512x512.png">'
+            in html
+        )
+        assert '<meta name="twitter:card" content="summary_large_image">' in html
+        assert '<meta name="twitter:title" content="Graph - Test Blog">' in html
+
+    def test_listing_meta_tags_og_image_from_site_logo(
+        self, sample_post: Post
+    ) -> None:
+        """Test that listing pages use site_logo as og:image when no platform icons exist."""
+        renderer = TemplateRenderer()
+        html = renderer.render_tag_page(
+            tag="python",
+            safe_tag="python",
+            posts=[sample_post],
+            site_title="Test Blog",
+            site_url="https://example.com",
+            has_platform_icons=False,
+            site_logo="/images/logo.png",
+        )
+
+        assert (
+            '<meta property="og:image" content="https://example.com/images/logo.png">'
+            in html
+        )
+        assert (
+            '<meta name="twitter:image" content="https://example.com/images/logo.png">'
+            in html
+        )
+        assert '<meta name="twitter:card" content="summary_large_image">' in html
+
+    def test_listing_meta_tags_twitter_card_summary_without_image(
+        self, sample_post: Post
+    ) -> None:
+        """Test that listing pages use twitter:card summary when no image is available."""
+        renderer = TemplateRenderer()
+        html = renderer.render_tag_page(
+            tag="python",
+            safe_tag="python",
+            posts=[sample_post],
+            site_title="Test Blog",
+            has_platform_icons=False,
+        )
+
+        assert '<meta name="twitter:card" content="summary">' in html
+        assert '<meta property="og:image"' not in html
+        assert '<meta name="twitter:image"' not in html
+
+    def test_listing_meta_tags_og_url_omitted_without_canonical_url(
+        self, sample_post: Post
+    ) -> None:
+        """Test that og:url is omitted from listing pages when no canonical URL is set."""
+        renderer = TemplateRenderer()
+        html = renderer.render_tag_page(
+            tag="python",
+            safe_tag="python",
+            posts=[sample_post],
+            site_title="Test Blog",
+        )
+
+        assert '<meta property="og:url"' not in html
+
     def test_draft_post_page_has_emoji_and_class(
         self, sample_draft_post: Post
     ) -> None:

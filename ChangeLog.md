@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed missing social graph (`og:*` and `twitter:*`) meta tags on listing
+  and other pages (tag, category, archive, tags cloud, categories cloud,
+  stats, calendar, graph, and search pages).
+  ([#432](https://github.com/davep/blogmore/pull/432))
+
 ## v2.18.0
 
 **Released: 2026-04-28**

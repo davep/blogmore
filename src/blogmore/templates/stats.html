@@ -3,7 +3,8 @@
 {% block title %}Blog Statistics - {{ site_title }}{% endblock %}
 
 {% block meta_tags %}
-<meta property="og:title" content="Blog Statistics - {{ site_title }}">
+{% from '_listing_meta_tags.html' import listing_meta_tags with context %}
+{{ listing_meta_tags("Blog Statistics - " ~ site_title) }}
 {% endblock %}
 
 {% block extra_head %}
