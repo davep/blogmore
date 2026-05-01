@@ -6,12 +6,12 @@ from pathlib import Path
 from typing import Final
 
 ##############################################################################
-# Application imports.
+# Local imports.
 from blogmore.content_path import resolve_path, safe_output_path, validate_path_template
 from blogmore.parser import Post, remove_date_prefix, sanitize_for_url
 
 ##############################################################################
-# Default post path template (matches historical BlogMore behaviour).
+# Default post path template.
 DEFAULT_POST_PATH = "{year}/{month}/{day}/{slug}.html"
 
 ##############################################################################
@@ -29,6 +29,7 @@ ALLOWED_PATH_VARIABLES: Final[set[str]] = {
 }
 
 
+##############################################################################
 def validate_post_path_template(template: str) -> None:
     """Validate a post_path format string.
 
@@ -39,7 +40,7 @@ def validate_post_path_template(template: str) -> None:
         template: The post_path format string to validate.
 
     Raises:
-        ValueError: If the template is empty, contains no ``{slug}``
+        ValueError: If the template is empty, contains no `{slug}`
             placeholder, or references an unknown variable name.
     """
     validate_path_template(
@@ -85,19 +86,20 @@ def get_post_path_variables(post: Post) -> dict[str, str]:
     }
 
 
+##############################################################################
 def resolve_post_path(post: Post, template: str) -> str:
     """Resolve a post_path template for a given post.
 
-    Substitutes all recognised variable placeholders in *template* with
-    values derived from *post*.  Posts that have no date will use empty
-    strings for date and time components.  Multiple consecutive forward
+    Substitutes all recognised variable placeholders in `template` with
+    values derived from `post`. Posts that have no date will use empty
+    strings for date and time components. Multiple consecutive forward
     slashes that may appear after substitution are collapsed to a single
-    slash, and any leading slash is removed so that the result can safely
-    be joined onto an output directory path.
+    slash, and any leading slash is removed so that the result can safely be
+    joined onto an output directory path.
 
     Args:
         post: The post whose metadata is used to fill the template.
-        template: A format string containing ``{variable}`` placeholders.
+        template: A format string containing `{variable}` placeholders.
 
     Returns:
         A relative path string (no leading slash) derived by substituting
@@ -110,11 +112,12 @@ def resolve_post_path(post: Post, template: str) -> str:
     return resolve_path(get_post_path_variables(post), template, "post_path")
 
 
+##############################################################################
 def compute_output_path(output_dir: Path, post: Post, template: str) -> Path:
     """Compute the safe, absolute output file path for a post.
 
     Resolves *template* using the post's metadata and joins the result onto
-    *output_dir*.  The resolved path is checked to ensure it does not escape
+    `output_dir`. The resolved path is checked to ensure it does not escape
     the output directory (preventing accidental path-traversal writes).
 
     Args:
