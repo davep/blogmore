@@ -4,7 +4,6 @@ import datetime as dt
 import shutil
 import time
 from collections import defaultdict
-from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -28,9 +27,7 @@ from blogmore.generator.assets import (
 from blogmore.generator.context import build_global_context, resolve_sidebar_pages
 from blogmore.generator.listing import generate_paginated_listing
 from blogmore.generator.paths import (
-    build_pagination_page_urls,
     canonical_url_for_path,
-    get_asset_url,
     get_configured_url,
     get_pagination_output_path,
     get_pagination_url,
@@ -118,8 +115,14 @@ class SiteGenerator:
         assert self.site_config.content_dir is not None
         return self.site_config.content_dir
 
-    def _get_global_context(self) -> dict[str, Any]:
-        """Get the global context available to all templates."""
+    def _write_html(self, output_path: Path, html: str) -> None:
+        """Write an HTML string to a file, minifying it when configured to do so."""
+        if self.site_config.minify_html:
+            html = minify_html.minify(html, minify_js=False, minify_css=False)
+        output_path.write_text(html, encoding="utf-8")
+
+    def _build_context(self) -> dict[str, Any]:
+        """Gather generator state and build the global template context."""
         return build_global_context(
             self.site_config,
             self._cache_bust_token,
@@ -128,113 +131,6 @@ class SiteGenerator:
             detect_generated_icons(self.site_config),
             self.TAG_DIR,
             self.CATEGORY_DIR,
-        )
-
-    def _canonical_url_for_path(self, output_path: Path) -> str:
-        """Compute the fully-qualified canonical URL for a given output file path."""
-        return canonical_url_for_path(self.site_config, output_path)
-
-    def _write_html(self, output_path: Path, html: str) -> None:
-        """Write an HTML string to a file, minifying it when configured to do so."""
-        if self.site_config.minify_html:
-            html = minify_html.minify(html, minify_js=False, minify_css=False)
-        output_path.write_text(html, encoding="utf-8")
-
-    def _detect_favicon(self) -> str | None:
-        """Detect if a favicon file exists."""
-        return detect_favicon(self.site_config, self._content_dir)
-
-    def _detect_generated_icons(self) -> bool:
-        """Detect if generated platform icons exist."""
-        return detect_generated_icons(self.site_config)
-
-    def _generate_icons(self) -> None:
-        """Generate icons from a source image if present."""
-        generate_icons(self.site_config, self._content_dir)
-
-    def _resolve_sidebar_pages(self, pages: list[Page]) -> list[Page]:
-        """Resolve which pages appear in the sidebar."""
-        return resolve_sidebar_pages(self.site_config, pages)
-
-    def _copy_extras(self) -> None:
-        """Copy extra files from the extras directory."""
-        self._extras_html_paths = copy_extras(self.site_config, self._content_dir)
-
-    def _with_cache_bust(self, url: str) -> str:
-        """Return a URL with a cache-busting query parameter appended."""
-        return with_cache_bust(url, self._cache_bust_token)
-
-    def _get_configured_url(self, path_field_name: str) -> str:
-        """Return the URL path for a configured page."""
-        return get_configured_url(self.site_config, path_field_name)
-
-    def _get_search_url(self) -> str:
-        return self._get_configured_url("search_path")
-
-    def _get_archive_url(self) -> str:
-        return self._get_configured_url("archive_path")
-
-    def _get_tags_url(self) -> str:
-        return self._get_configured_url("tags_path")
-
-    def _get_categories_url(self) -> str:
-        return self._get_configured_url("categories_path")
-
-    def _get_stats_url(self) -> str:
-        return self._get_configured_url("stats_path")
-
-    def _get_calendar_url(self) -> str:
-        return self._get_configured_url("calendar_path")
-
-    def _get_graph_url(self) -> str:
-        return self._get_configured_url("graph_path")
-
-    def _get_asset_url(
-        self,
-        regular: str,
-        minify: bool,
-        *,
-        cache_bust: bool = True,
-    ) -> str:
-        return get_asset_url(
-            regular, minify, self._cache_bust_token, cache_bust=cache_bust
-        )
-
-    def _get_pagination_url(self, base_url: str, page_num: int) -> str:
-        return get_pagination_url(self.site_config, base_url, page_num)
-
-    def _build_pagination_page_urls(self, base_url: str, total_pages: int) -> list[str]:
-        return build_pagination_page_urls(self.site_config, base_url, total_pages)
-
-    def _get_pagination_output_path(self, base_dir: Path, page_num: int) -> Path:
-        return get_pagination_output_path(self.site_config, base_dir, page_num)
-
-    @staticmethod
-    def _pagination_prev_next(
-        page_num: int,
-        page_urls: list[str],
-    ) -> tuple[str | None, str | None]:
-        return pagination_prev_next(page_num, page_urls)
-
-    def _generate_paginated_listing(
-        self,
-        post_list: list[Post],
-        base_url: str,
-        output_dir: Path,
-        posts_per_page: int,
-        context: dict[str, Any],
-        render_func: Callable[[list[Post], int, int], str],
-    ) -> None:
-        generate_paginated_listing(
-            self.site_config,
-            post_list,
-            base_url,
-            output_dir,
-            posts_per_page,
-            context,
-            render_func,
-            self._write_html,
-            self._canonical_url_for_path,
         )
 
     def generate(self) -> None:
@@ -467,7 +363,7 @@ class SiteGenerator:
         backlinks_map: "dict[str, list[Backlink]] | None" = None,
     ) -> None:
         """Generate a single post page."""
-        context = self._get_global_context()
+        context = self._build_context()
         context["all_posts"] = all_posts
         context["pages"] = pages
         context["backlinks"] = backlinks_map.get(post.url, []) if backlinks_map else []
@@ -503,7 +399,9 @@ class SiteGenerator:
                 else post.url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)
+            context["canonical_url"] = canonical_url_for_path(
+                self.site_config, output_path
+            )
         html = self.renderer.render_post(post, **context)
         self._write_html(output_path, html)
 
@@ -524,25 +422,25 @@ class SiteGenerator:
 
     def _generate_page(self, page: Page, pages: list[Page], output_path: Path) -> None:
         """Generate a single static page."""
-        context = self._get_global_context()
+        context = self._build_context()
         context["pages"] = pages
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        context["canonical_url"] = self._canonical_url_for_path(output_path)
+        context["canonical_url"] = canonical_url_for_path(self.site_config, output_path)
         html = self.renderer.render_page(page, **context)
         self._write_html(output_path, html)
 
     def _generate_404_page(self, page: Page, pages: list[Page]) -> None:
         """Generate the custom 404 page in the root of the output directory."""
-        context = self._get_global_context()
+        context = self._build_context()
         context["pages"] = pages
         output_path = self.site_config.output_dir / CUSTOM_404_HTML
-        context["canonical_url"] = self._canonical_url_for_path(output_path)
+        context["canonical_url"] = canonical_url_for_path(self.site_config, output_path)
         html = self.renderer.render_page(page, **context)
         self._write_html(output_path, html)
 
     def _generate_index_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the main index page with pagination."""
-        context = self._get_global_context()
+        context = self._build_context()
         context["pages"] = pages
 
         paginated_posts = paginate_posts(posts, self.POSTS_PER_PAGE_INDEX)
@@ -567,7 +465,9 @@ class SiteGenerator:
                 output_path = get_pagination_output_path(
                     self.site_config, self.site_config.output_dir, page_num
                 )
-            context["canonical_url"] = self._canonical_url_for_path(output_path)
+            context["canonical_url"] = canonical_url_for_path(
+                self.site_config, output_path
+            )
             prev_url, next_url = pagination_prev_next(page_num, page_urls)
             context["prev_page_url"] = prev_url
             context["next_page_url"] = next_url
@@ -579,7 +479,7 @@ class SiteGenerator:
 
     def _generate_archive_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the archive page."""
-        context = self._get_global_context()
+        context = self._build_context()
         context["pages"] = pages
         output_path = (
             self.site_config.output_dir / self.site_config.archive_path.lstrip("/")
@@ -593,7 +493,9 @@ class SiteGenerator:
                 else archive_url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)
+            context["canonical_url"] = canonical_url_for_path(
+                self.site_config, output_path
+            )
         html = self.renderer.render_archive(
             posts, page=1, total_pages=1, base_path="/archive", **context
         )
@@ -612,7 +514,7 @@ class SiteGenerator:
                 posts_by_month[(year, month)].append(post)
                 posts_by_day[(year, month, day)].append(post)
 
-        context = self._get_global_context()
+        context = self._build_context()
         context["pages"] = pages
 
         for year, year_posts in posts_by_year.items():
@@ -641,7 +543,9 @@ class SiteGenerator:
                 context,
                 render_year,
                 self._write_html,
-                self._canonical_url_for_path,
+                lambda output_path: canonical_url_for_path(
+                    self.site_config, output_path
+                ),
             )
 
         for (year, month), month_posts in posts_by_month.items():
@@ -675,7 +579,9 @@ class SiteGenerator:
                 context,
                 render_month,
                 self._write_html,
-                self._canonical_url_for_path,
+                lambda output_path: canonical_url_for_path(
+                    self.site_config, output_path
+                ),
             )
 
         for (year, month, day), day_posts in posts_by_day.items():
@@ -707,7 +613,9 @@ class SiteGenerator:
                 context,
                 render_day,
                 self._write_html,
-                self._canonical_url_for_path,
+                lambda output_path: canonical_url_for_path(
+                    self.site_config, output_path
+                ),
             )
 
     def _generate_tag_pages(self, posts: list[Post], pages: list[Page]) -> None:
@@ -723,7 +631,7 @@ class SiteGenerator:
             safe_tag = sanitize_for_url(tag_lower)
             base_url = f"/{self.TAG_DIR}/{safe_tag}"
             tag_base_dir = tag_dir / safe_tag
-            context = self._get_global_context()
+            context = self._build_context()
             context["pages"] = pages
 
             def render_tag(
@@ -747,7 +655,9 @@ class SiteGenerator:
                 context,
                 render_tag,
                 self._write_html,
-                self._canonical_url_for_path,
+                lambda output_path: canonical_url_for_path(
+                    self.site_config, output_path
+                ),
             )
 
     def _generate_tags_page(self, posts: list[Post], pages: list[Page]) -> None:
@@ -777,7 +687,7 @@ class SiteGenerator:
         tag_data.sort(key=sort_key)
         calculate_cloud_font_sizes(tag_data)
 
-        context = self._get_global_context()
+        context = self._build_context()
         context["pages"] = pages
         output_path = (
             self.site_config.output_dir / self.site_config.tags_path.lstrip("/")
@@ -791,7 +701,9 @@ class SiteGenerator:
                 else tags_url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)
+            context["canonical_url"] = canonical_url_for_path(
+                self.site_config, output_path
+            )
         html = self.renderer.render_tags_page(tag_data, **context)
         self._write_html(output_path, html)
 
@@ -811,19 +723,24 @@ class SiteGenerator:
             safe_category = sanitize_for_url(category_lower)
             base_url = f"/{self.CATEGORY_DIR}/{safe_category}"
             category_base_dir = category_dir / safe_category
-            context = self._get_global_context()
+            context = self._build_context()
             context["pages"] = pages
 
             def render_category(
-                p: list[Post],
-                n: int,
-                t: int,
-                d: str = category_display,
-                s: str = safe_category,
-                ctx: dict[str, Any] = context,
+                posts_to_render: list[Post],
+                page_num: int,
+                total_pages: int,
+                display_name: str = category_display,
+                safe_slug: str = safe_category,
+                template_context: dict[str, Any] = context,
             ) -> str:
                 return self.renderer.render_category_page(
-                    d, p, page=n, total_pages=t, safe_category=s, **ctx
+                    display_name,
+                    posts_to_render,
+                    page=page_num,
+                    total_pages=total_pages,
+                    safe_category=safe_slug,
+                    **template_context,
                 )
 
             generate_paginated_listing(
@@ -835,7 +752,9 @@ class SiteGenerator:
                 context,
                 render_category,
                 self._write_html,
-                self._canonical_url_for_path,
+                lambda output_path: canonical_url_for_path(
+                    self.site_config, output_path
+                ),
             )
 
     def _generate_categories_page(self, posts: list[Post], pages: list[Page]) -> None:
@@ -868,7 +787,7 @@ class SiteGenerator:
         category_data.sort(key=sort_key)
         calculate_cloud_font_sizes(category_data)
 
-        context = self._get_global_context()
+        context = self._build_context()
         context["pages"] = pages
         output_path = (
             self.site_config.output_dir / self.site_config.categories_path.lstrip("/")
@@ -882,7 +801,9 @@ class SiteGenerator:
                 else categories_url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)
+            context["canonical_url"] = canonical_url_for_path(
+                self.site_config, output_path
+            )
         html = self.renderer.render_categories_page(category_data, **context)
         self._write_html(output_path, html)
 
@@ -907,7 +828,7 @@ class SiteGenerator:
 
     def _generate_search_page(self, sidebar_pages: list[Page]) -> None:
         """Generate the search page."""
-        context = self._get_global_context()
+        context = self._build_context()
         context["pages"] = sidebar_pages
         output_path = (
             self.site_config.output_dir / self.site_config.search_path.lstrip("/")
@@ -921,7 +842,9 @@ class SiteGenerator:
                 else search_url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)
+            context["canonical_url"] = canonical_url_for_path(
+                self.site_config, output_path
+            )
         html = self.renderer.render_search_page(**context)
         self._write_html(output_path, html)
 
@@ -932,7 +855,7 @@ class SiteGenerator:
         backlink_map: "dict[str, list[Backlink]] | None" = None,
     ) -> None:
         """Generate the blog statistics page."""
-        context = self._get_global_context()
+        context = self._build_context()
         context["pages"] = sidebar_pages
         output_path = (
             self.site_config.output_dir / self.site_config.stats_path.lstrip("/")
@@ -946,7 +869,9 @@ class SiteGenerator:
                 else stats_url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)
+            context["canonical_url"] = canonical_url_for_path(
+                self.site_config, output_path
+            )
         blog_stats: BlogStats = compute_blog_stats(
             posts, self.site_config.site_url, backlink_map
         )
@@ -957,7 +882,7 @@ class SiteGenerator:
         self, posts: list[Post], sidebar_pages: list[Page]
     ) -> None:
         """Generate the calendar view page."""
-        context = self._get_global_context()
+        context = self._build_context()
         context["pages"] = sidebar_pages
         output_path = (
             self.site_config.output_dir / self.site_config.calendar_path.lstrip("/")
@@ -971,7 +896,9 @@ class SiteGenerator:
                 else calendar_url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)
+            context["canonical_url"] = canonical_url_for_path(
+                self.site_config, output_path
+            )
 
         page1_suffix = self.site_config.page_1_path.lstrip("/")
         if self.site_config.clean_urls:
@@ -988,7 +915,7 @@ class SiteGenerator:
         self, posts: list[Post], sidebar_pages: list[Page]
     ) -> None:
         """Generate the post-relationship graph page."""
-        context = self._get_global_context()
+        context = self._build_context()
         context["pages"] = sidebar_pages
         output_path = (
             self.site_config.output_dir / self.site_config.graph_path.lstrip("/")
@@ -1002,7 +929,9 @@ class SiteGenerator:
                 else graph_url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)
+            context["canonical_url"] = canonical_url_for_path(
+                self.site_config, output_path
+            )
         graph_data: GraphData = build_graph_data(
             posts,
             tag_dir=self.TAG_DIR,

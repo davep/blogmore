@@ -17,6 +17,8 @@ from blogmore.generator import (
     paginate_posts,
     sanitize_for_url,
 )
+from blogmore.generator.assets import copy_extras, detect_favicon, generate_icons
+from blogmore.generator.context import build_global_context, resolve_sidebar_pages
 from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN, Page, Post
 from blogmore.site_config import SiteConfig
 
@@ -131,7 +133,7 @@ class TestSiteGenerator:
             )
         )
 
-        result = generator._resolve_sidebar_pages(pages)
+        result = resolve_sidebar_pages(generator.site_config, pages)
         assert result == pages
 
     def test_resolve_sidebar_pages_empty_list(
@@ -148,7 +150,7 @@ class TestSiteGenerator:
             )
         )
 
-        result = generator._resolve_sidebar_pages(pages)
+        result = resolve_sidebar_pages(generator.site_config, pages)
         assert result == pages
 
     def test_resolve_sidebar_pages_filters_to_listed_slugs(
@@ -171,7 +173,7 @@ class TestSiteGenerator:
             )
         )
 
-        result = generator._resolve_sidebar_pages(pages)
+        result = resolve_sidebar_pages(generator.site_config, pages)
         assert result == [page2]
 
     def test_resolve_sidebar_pages_respects_order(
@@ -194,7 +196,7 @@ class TestSiteGenerator:
             )
         )
 
-        result = generator._resolve_sidebar_pages(pages)
+        result = resolve_sidebar_pages(generator.site_config, pages)
         assert result == [page2, sample_page]
 
     def test_resolve_sidebar_pages_ignores_unknown_slugs(
@@ -211,7 +213,7 @@ class TestSiteGenerator:
             )
         )
 
-        result = generator._resolve_sidebar_pages(pages)
+        result = resolve_sidebar_pages(generator.site_config, pages)
         assert result == [sample_page]
 
     def test_init(self, posts_dir: Path, temp_output_dir: Path) -> None:
@@ -821,7 +823,10 @@ class TestSiteGenerator:
         )
 
         # Test the _detect_favicon method
-        assert generator._detect_favicon() == "/favicon.ico"
+        assert (
+            detect_favicon(generator.site_config, generator._content_dir)
+            == "/favicon.ico"
+        )
 
     def test_detect_favicon_png(self, tmp_path: Path, temp_output_dir: Path) -> None:
         """Test detecting favicon.png file."""
@@ -836,7 +841,10 @@ class TestSiteGenerator:
             site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
         )
 
-        assert generator._detect_favicon() == "/favicon.png"
+        assert (
+            detect_favicon(generator.site_config, generator._content_dir)
+            == "/favicon.png"
+        )
 
     def test_detect_favicon_svg(self, tmp_path: Path, temp_output_dir: Path) -> None:
         """Test detecting favicon.svg file."""
@@ -851,7 +859,10 @@ class TestSiteGenerator:
             site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
         )
 
-        assert generator._detect_favicon() == "/favicon.svg"
+        assert (
+            detect_favicon(generator.site_config, generator._content_dir)
+            == "/favicon.svg"
+        )
 
     def test_detect_favicon_no_extras_dir(
         self, tmp_path: Path, temp_output_dir: Path
@@ -864,7 +875,7 @@ class TestSiteGenerator:
             site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
         )
 
-        assert generator._detect_favicon() is None
+        assert detect_favicon(generator.site_config, generator._content_dir) is None
 
     def test_detect_favicon_no_favicon_file(
         self, tmp_path: Path, temp_output_dir: Path
@@ -881,7 +892,7 @@ class TestSiteGenerator:
             site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
         )
 
-        assert generator._detect_favicon() is None
+        assert detect_favicon(generator.site_config, generator._content_dir) is None
 
     def test_detect_favicon_priority(
         self, tmp_path: Path, temp_output_dir: Path
@@ -900,7 +911,10 @@ class TestSiteGenerator:
         )
 
         # .ico should be preferred (first in list)
-        assert generator._detect_favicon() == "/favicon.ico"
+        assert (
+            detect_favicon(generator.site_config, generator._content_dir)
+            == "/favicon.ico"
+        )
 
     def test_favicon_in_generated_html(
         self, tmp_path: Path, temp_output_dir: Path
@@ -977,7 +991,7 @@ class TestSiteGenerator:
             site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
         )
 
-        generator._generate_icons()
+        generate_icons(generator.site_config, generator._content_dir)
 
         # favicon.ico should exist in the icons subdirectory
         assert (temp_output_dir / "icons" / "favicon.ico").is_file()
@@ -1142,7 +1156,7 @@ class TestSiteGenerator:
                 output_dir=temp_output_dir,
             )
         )
-        generator._copy_extras()
+        copy_extras(generator.site_config, generator._content_dir)
 
         assert (
             temp_output_dir / "robots.txt"
@@ -1175,7 +1189,7 @@ class TestSiteGenerator:
                 output_dir=temp_output_dir,
             )
         )
-        generator._copy_extras()
+        copy_extras(generator.site_config, generator._content_dir)
 
         assert (temp_output_dir / "robots.txt").exists()
         assert (temp_output_dir / "images" / "splash.png").read_bytes() == b"\x89PNG"
@@ -1200,7 +1214,7 @@ class TestSiteGenerator:
             )
         )
         # Should not raise
-        generator._copy_extras()
+        copy_extras(generator.site_config, generator._content_dir)
 
     def test_copy_extras_overriding_existing_file(
         self, tmp_path: Path, temp_output_dir: Path, capsys: pytest.CaptureFixture[str]
@@ -1219,7 +1233,7 @@ class TestSiteGenerator:
                 output_dir=temp_output_dir,
             )
         )
-        generator._copy_extras()
+        copy_extras(generator.site_config, generator._content_dir)
 
         assert (temp_output_dir / "robots.txt").read_text() == "New content"
         captured = capsys.readouterr()
@@ -1239,7 +1253,17 @@ class TestSiteGenerator:
             )
         )
 
-        context = generator._get_global_context()
+        from blogmore.generator.assets import detect_favicon, detect_generated_icons
+
+        context = build_global_context(
+            generator.site_config,
+            generator._cache_bust_token,
+            generator._fontawesome_css_url,
+            detect_favicon(generator.site_config, generator._content_dir),
+            detect_generated_icons(generator.site_config),
+            generator.TAG_DIR,
+            generator.CATEGORY_DIR,
+        )
 
         assert "blogmore_version" in context
         assert context["blogmore_version"] == __version__
@@ -1255,7 +1279,17 @@ class TestSiteGenerator:
             )
         )
 
-        context = generator._get_global_context()
+        from blogmore.generator.assets import detect_favicon, detect_generated_icons
+
+        context = build_global_context(
+            generator.site_config,
+            generator._cache_bust_token,
+            generator._fontawesome_css_url,
+            detect_favicon(generator.site_config, generator._content_dir),
+            detect_generated_icons(generator.site_config),
+            generator.TAG_DIR,
+            generator.CATEGORY_DIR,
+        )
 
         assert "with_advert" in context
         assert context["with_advert"] is True
@@ -1272,7 +1306,17 @@ class TestSiteGenerator:
             )
         )
 
-        context = generator._get_global_context()
+        from blogmore.generator.assets import detect_favicon, detect_generated_icons
+
+        context = build_global_context(
+            generator.site_config,
+            generator._cache_bust_token,
+            generator._fontawesome_css_url,
+            detect_favicon(generator.site_config, generator._content_dir),
+            detect_generated_icons(generator.site_config),
+            generator.TAG_DIR,
+            generator.CATEGORY_DIR,
+        )
 
         assert context["with_advert"] is False
 
@@ -1288,7 +1332,17 @@ class TestSiteGenerator:
             )
         )
 
-        context = generator._get_global_context()
+        from blogmore.generator.assets import detect_favicon, detect_generated_icons
+
+        context = build_global_context(
+            generator.site_config,
+            generator._cache_bust_token,
+            generator._fontawesome_css_url,
+            detect_favicon(generator.site_config, generator._content_dir),
+            detect_generated_icons(generator.site_config),
+            generator.TAG_DIR,
+            generator.CATEGORY_DIR,
+        )
 
         assert context["site_description"] == "A great blog about things"
 
@@ -1567,7 +1621,17 @@ class TestSiteGenerator:
             )
         )
 
-        context = generator._get_global_context()
+        from blogmore.generator.assets import detect_favicon, detect_generated_icons
+
+        context = build_global_context(
+            generator.site_config,
+            generator._cache_bust_token,
+            generator._fontawesome_css_url,
+            detect_favicon(generator.site_config, generator._content_dir),
+            detect_generated_icons(generator.site_config),
+            generator.TAG_DIR,
+            generator.CATEGORY_DIR,
+        )
         assert context["site_keywords"] == keywords
 
     def test_site_keywords_none_in_global_context(
@@ -1578,7 +1642,17 @@ class TestSiteGenerator:
             site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
-        context = generator._get_global_context()
+        from blogmore.generator.assets import detect_favicon, detect_generated_icons
+
+        context = build_global_context(
+            generator.site_config,
+            generator._cache_bust_token,
+            generator._fontawesome_css_url,
+            detect_favicon(generator.site_config, generator._content_dir),
+            detect_generated_icons(generator.site_config),
+            generator.TAG_DIR,
+            generator.CATEGORY_DIR,
+        )
         assert context["site_keywords"] is None
 
     def test_index_page_og_type_is_website(
@@ -3471,7 +3545,17 @@ class TestWithReadTime:
                 content_dir=posts_dir, output_dir=temp_output_dir, with_read_time=True
             )
         )
-        context = generator._get_global_context()
+        from blogmore.generator.assets import detect_favicon, detect_generated_icons
+
+        context = build_global_context(
+            generator.site_config,
+            generator._cache_bust_token,
+            generator._fontawesome_css_url,
+            detect_favicon(generator.site_config, generator._content_dir),
+            detect_generated_icons(generator.site_config),
+            generator.TAG_DIR,
+            generator.CATEGORY_DIR,
+        )
         assert context["with_read_time"] is True
 
     def test_with_read_time_false_in_global_context(
@@ -3483,7 +3567,17 @@ class TestWithReadTime:
                 content_dir=posts_dir, output_dir=temp_output_dir, with_read_time=False
             )
         )
-        context = generator._get_global_context()
+        from blogmore.generator.assets import detect_favicon, detect_generated_icons
+
+        context = build_global_context(
+            generator.site_config,
+            generator._cache_bust_token,
+            generator._fontawesome_css_url,
+            detect_favicon(generator.site_config, generator._content_dir),
+            detect_generated_icons(generator.site_config),
+            generator.TAG_DIR,
+            generator.CATEGORY_DIR,
+        )
         assert context["with_read_time"] is False
 
     def test_archive_page_has_table_of_contents_sidebar(
@@ -4588,7 +4682,17 @@ class TestHeadTags:
             )
         )
 
-        context = generator._get_global_context()
+        from blogmore.generator.assets import detect_favicon, detect_generated_icons
+
+        context = build_global_context(
+            generator.site_config,
+            generator._cache_bust_token,
+            generator._fontawesome_css_url,
+            detect_favicon(generator.site_config, generator._content_dir),
+            detect_generated_icons(generator.site_config),
+            generator.TAG_DIR,
+            generator.CATEGORY_DIR,
+        )
 
         assert "extra_head_tags" in context
         assert context["extra_head_tags"] == head
@@ -4604,7 +4708,17 @@ class TestHeadTags:
             )
         )
 
-        context = generator._get_global_context()
+        from blogmore.generator.assets import detect_favicon, detect_generated_icons
+
+        context = build_global_context(
+            generator.site_config,
+            generator._cache_bust_token,
+            generator._fontawesome_css_url,
+            detect_favicon(generator.site_config, generator._content_dir),
+            detect_generated_icons(generator.site_config),
+            generator.TAG_DIR,
+            generator.CATEGORY_DIR,
+        )
 
         assert context["extra_head_tags"] == []
 

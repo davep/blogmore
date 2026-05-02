@@ -39,12 +39,14 @@ def group_posts_by_attribute(
 
 def group_posts_by_tag(posts: list[Post]) -> dict[str, tuple[str, list[Post]]]:
     """Group posts by tag (case-insensitive)."""
-    return group_posts_by_attribute(posts, lambda p: p.tags or [])
+    return group_posts_by_attribute(posts, lambda post: post.tags or [])
 
 
 def group_posts_by_category(posts: list[Post]) -> dict[str, tuple[str, list[Post]]]:
     """Group posts by category (case-insensitive)."""
-    return group_posts_by_attribute(posts, lambda p: [p.category] if p.category else [])
+    return group_posts_by_attribute(
+        posts, lambda post: [post.category] if post.category else []
+    )
 
 
 def calculate_cloud_font_sizes(
