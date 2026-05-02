@@ -40,26 +40,21 @@ class TestSanitizeForUrl:
 class TestMinifiedFilename:
     """Test the minified_filename utility function."""
 
-    def test_css_extension_becomes_min_css(self) -> None:
-        """Test that a .css extension is replaced with .min.css."""
-        assert minified_filename("style.css") == "style.min.css"
-
-    def test_js_extension_becomes_min_js(self) -> None:
-        """Test that a .js extension is replaced with .min.js."""
-        assert minified_filename("theme.js") == "theme.min.js"
-
-    def test_hyphenated_css_filename(self) -> None:
-        """Test that a hyphenated CSS filename is handled correctly."""
-        assert minified_filename("tag-cloud.css") == "tag-cloud.min.css"
-
-    def test_hyphenated_js_filename(self) -> None:
-        """Test that a hyphenated JS filename is handled correctly."""
-        assert minified_filename("search.js") == "search.min.js"
-
-    def test_unsupported_extension_raises(self) -> None:
-        """Test that an unsupported extension raises ValueError."""
-        with pytest.raises(ValueError, match="Unsupported file extension"):
-            minified_filename("style.txt")
+    @pytest.mark.parametrize(
+        "before,after",
+        [
+            ("style.css", "style.min.css"),
+            ("theme.js", "theme.min.js"),
+            ("style.min.css", "style.min.min.css"),
+            ("file", "file"),
+            (".file", ".file"),
+            (".file.css", ".file.min.css"),
+            ("", ""),
+        ],
+    )
+    def test_min_file(self, before: str, after: str) -> None:
+        """Test that converting a filename to the minified version has the expected effect."""
+        assert minified_filename(before) == after
 
 
 class TestPaginatePosts:
@@ -532,9 +527,9 @@ class TestSiteGenerator:
         about_pos = index_content.find("About Me")
         assert seo_pos != -1
         assert about_pos != -1
-        assert seo_pos < about_pos, (
-            "SEO Test Page should appear before About Me in the sidebar"
-        )
+        assert (
+            seo_pos < about_pos
+        ), "SEO Test Page should appear before About Me in the sidebar"
 
     def test_generate_with_sidebar_pages_unknown_slug_ignored(
         self, posts_dir: Path, pages_dir: Path, temp_output_dir: Path
@@ -4409,12 +4404,12 @@ class TestPagePathConfiguration:
         assert post_file.exists(), f"Expected post file at {post_file}"
         post_content = post_file.read_text()
         # The sidebar link must use the clean URL scheme, not the default /{slug}.html.
-        assert "/dotfiles/" in post_content, (
-            "Expected clean URL /dotfiles/ in sidebar of post page"
-        )
-        assert "/dotfiles.html" not in post_content, (
-            "Unexpected default URL /dotfiles.html found in sidebar of post page"
-        )
+        assert (
+            "/dotfiles/" in post_content
+        ), "Expected clean URL /dotfiles/ in sidebar of post page"
+        assert (
+            "/dotfiles.html" not in post_content
+        ), "Unexpected default URL /dotfiles.html found in sidebar of post page"
 
 
 class TestCacheBusting:
@@ -4495,9 +4490,9 @@ class TestCacheBusting:
         for html_file in temp_output_dir.rglob("*.html"):
             page_content = html_file.read_text()
             if "/static/style.css" in page_content:
-                assert f"/static/style.css?v={token}" in page_content, (
-                    f"File {html_file} uses a different cache-busting token"
-                )
+                assert (
+                    f"/static/style.css?v={token}" in page_content
+                ), f"File {html_file} uses a different cache-busting token"
 
     def test_new_generation_produces_different_token(
         self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path

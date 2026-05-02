@@ -71,27 +71,20 @@ _PAGE_SPECIFIC_CSS: list[str] = [
 ]
 
 
-def minified_filename(source: str) -> str:
+def minified_filename(source: str | Path) -> str:
     """Compute the minified output filename for a given source filename.
 
-    Transforms the file extension: ``.css`` becomes ``.min.css`` and
-    ``.js`` becomes ``.min.js``.  For example, ``theme.js`` becomes
-    ``theme.min.js`` and ``style.css`` becomes ``style.min.css``.
-
     Args:
-        source: Source filename ending in ``.css`` or ``.js``.
+        source: Source filename.
 
     Returns:
         The corresponding minified filename.
-
-    Raises:
-        ValueError: If *source* does not end with ``.css`` or ``.js``.
     """
-    if source.endswith(".css"):
-        return source.removesuffix(".css") + ".min.css"
-    if source.endswith(".js"):
-        return source.removesuffix(".js") + ".min.js"
-    raise ValueError(f"Unsupported file extension for minification: {source!r}")
+    if isinstance(source, str) and not source:
+        return source
+    if (source := Path(source)).suffix:
+        source = source.with_suffix("".join([".min", source.suffix]))
+    return str(source)
 
 
 def paginate_posts(posts: list[Post], posts_per_page: int) -> list[list[Post]]:
