@@ -48,39 +48,43 @@ from blogmore.sitemap import write_sitemap
 from blogmore.stats import BlogStats, compute_blog_stats
 
 CSS_FILENAME = "style.css"
-CSS_MINIFIED_FILENAME = "styles.min.css"
 SEARCH_CSS_FILENAME = "search.css"
-SEARCH_CSS_MINIFIED_FILENAME = "search.min.css"
 STATS_CSS_FILENAME = "stats.css"
-STATS_CSS_MINIFIED_FILENAME = "stats.min.css"
 ARCHIVE_CSS_FILENAME = "archive.css"
-ARCHIVE_CSS_MINIFIED_FILENAME = "archive.min.css"
 CALENDAR_CSS_FILENAME = "calendar.css"
-CALENDAR_CSS_MINIFIED_FILENAME = "calendar.min.css"
 GRAPH_CSS_FILENAME = "graph.css"
-GRAPH_CSS_MINIFIED_FILENAME = "graph.min.css"
 TAG_CLOUD_CSS_FILENAME = "tag-cloud.css"
-TAG_CLOUD_CSS_MINIFIED_FILENAME = "tag-cloud.min.css"
 GRAPH_JS_FILENAME = "graph.js"
-GRAPH_JS_MINIFIED_FILENAME = "graph.min.js"
 CODE_CSS_FILENAME = "code.css"
-CODE_CSS_MINIFIED_FILENAME = "code.min.css"
 THEME_JS_FILENAME = "theme.js"
-THEME_JS_MINIFIED_FILENAME = "theme.min.js"
 SEARCH_JS_FILENAME = "search.js"
-SEARCH_JS_MINIFIED_FILENAME = "search.min.js"
 CODEBLOCKS_JS_FILENAME = "codeblocks.js"
-CODEBLOCKS_JS_MINIFIED_FILENAME = "codeblocks.min.js"
 
-# All page-specific CSS files (source filename, minified filename).
-_PAGE_SPECIFIC_CSS: list[tuple[str, str]] = [
-    (SEARCH_CSS_FILENAME, SEARCH_CSS_MINIFIED_FILENAME),
-    (STATS_CSS_FILENAME, STATS_CSS_MINIFIED_FILENAME),
-    (ARCHIVE_CSS_FILENAME, ARCHIVE_CSS_MINIFIED_FILENAME),
-    (TAG_CLOUD_CSS_FILENAME, TAG_CLOUD_CSS_MINIFIED_FILENAME),
-    (CALENDAR_CSS_FILENAME, CALENDAR_CSS_MINIFIED_FILENAME),
-    (GRAPH_CSS_FILENAME, GRAPH_CSS_MINIFIED_FILENAME),
+# All page-specific CSS files (source filenames only).
+_PAGE_SPECIFIC_CSS: list[str] = [
+    SEARCH_CSS_FILENAME,
+    STATS_CSS_FILENAME,
+    ARCHIVE_CSS_FILENAME,
+    TAG_CLOUD_CSS_FILENAME,
+    CALENDAR_CSS_FILENAME,
+    GRAPH_CSS_FILENAME,
 ]
+
+
+def minified_filename(source: str | Path) -> str:
+    """Compute the minified output filename for a given source filename.
+
+    Args:
+        source: Source filename.
+
+    Returns:
+        The corresponding minified filename.
+    """
+    if isinstance(source, str) and not source:
+        return source
+    if (source := Path(source)).suffix:
+        source = source.with_suffix("".join([".min", source.suffix]))
+    return str(source)
 
 
 def paginate_posts(posts: list[Post], posts_per_page: int) -> list[list[Post]]:
@@ -346,16 +350,17 @@ class SiteGenerator:
     def _get_asset_url(
         self,
         regular: str,
-        minified: str,
         minify: bool,
         *,
         cache_bust: bool = True,
     ) -> str:
         """Build the ``/static/`` URL for one asset, choosing the minified variant when requested.
 
+        When *minify* is ``True`` the minified filename is derived from
+        *regular* via [`minified_filename`][blogmore.generator.minified_filename].
+
         Args:
             regular: Filename for the non-minified asset (e.g. ``"style.css"``).
-            minified: Filename for the minified asset (e.g. ``"styles.min.css"``).
             minify: When ``True``, the minified filename is used.
             cache_bust: When ``True`` (the default), the URL is passed through
                 [`_with_cache_bust`][blogmore.generator.SiteGenerator._with_cache_bust]
@@ -365,7 +370,7 @@ class SiteGenerator:
             The ``/static/<filename>`` URL, with an optional ``?v=<token>``
             cache-busting query parameter.
         """
-        name = minified if minify else regular
+        name = minified_filename(regular) if minify else regular
         url = f"/static/{name}"
         return self._with_cache_bust(url) if cache_bust else url
 
@@ -406,64 +411,53 @@ class SiteGenerator:
             "fontawesome_css_url": self._with_cache_bust(self._fontawesome_css_url),
             "fontawesome_woff2_url": FONTAWESOME_CDN_BRANDS_WOFF2_URL,
             "styles_css_url": self._get_asset_url(
-                CSS_FILENAME, CSS_MINIFIED_FILENAME, self.site_config.minify_css
+                CSS_FILENAME, self.site_config.minify_css
             ),
             "search_css_url": self._get_asset_url(
                 SEARCH_CSS_FILENAME,
-                SEARCH_CSS_MINIFIED_FILENAME,
                 self.site_config.minify_css,
             ),
             "stats_css_url": self._get_asset_url(
                 STATS_CSS_FILENAME,
-                STATS_CSS_MINIFIED_FILENAME,
                 self.site_config.minify_css,
             ),
             "archive_css_url": self._get_asset_url(
                 ARCHIVE_CSS_FILENAME,
-                ARCHIVE_CSS_MINIFIED_FILENAME,
                 self.site_config.minify_css,
             ),
             "tag_cloud_css_url": self._get_asset_url(
                 TAG_CLOUD_CSS_FILENAME,
-                TAG_CLOUD_CSS_MINIFIED_FILENAME,
                 self.site_config.minify_css,
             ),
             "calendar_css_url": self._get_asset_url(
                 CALENDAR_CSS_FILENAME,
-                CALENDAR_CSS_MINIFIED_FILENAME,
                 self.site_config.minify_css,
             ),
             "graph_css_url": self._get_asset_url(
                 GRAPH_CSS_FILENAME,
-                GRAPH_CSS_MINIFIED_FILENAME,
                 self.site_config.minify_css,
             ),
             "code_css_url": self._get_asset_url(
                 CODE_CSS_FILENAME,
-                CODE_CSS_MINIFIED_FILENAME,
                 self.site_config.minify_css,
             ),
             "theme_js_url": self._get_asset_url(
                 THEME_JS_FILENAME,
-                THEME_JS_MINIFIED_FILENAME,
                 self.site_config.minify_js,
                 cache_bust=False,
             ),
             "search_js_url": self._get_asset_url(
                 SEARCH_JS_FILENAME,
-                SEARCH_JS_MINIFIED_FILENAME,
                 self.site_config.minify_js,
                 cache_bust=False,
             ),
             "codeblocks_js_url": self._get_asset_url(
                 CODEBLOCKS_JS_FILENAME,
-                CODEBLOCKS_JS_MINIFIED_FILENAME,
                 self.site_config.minify_js,
                 cache_bust=False,
             ),
             "graph_js_url": self._get_asset_url(
                 GRAPH_JS_FILENAME,
-                GRAPH_JS_MINIFIED_FILENAME,
                 self.site_config.minify_js,
                 cache_bust=False,
             ),
@@ -847,9 +841,10 @@ class SiteGenerator:
         static_dir.mkdir(parents=True, exist_ok=True)
         if self.site_config.minify_css:
             minified = rcssmin.cssmin(css_content)
-            css_path = static_dir / "fontawesome.min.css"
+            fa_min = minified_filename("fontawesome.css")
+            css_path = static_dir / fa_min
             css_path.write_text(minified, encoding="utf-8")
-            print("Generated minified FontAwesome CSS as fontawesome.min.css")
+            print(f"Generated minified FontAwesome CSS as {fa_min}")
         else:
             css_path = static_dir / "fontawesome.css"
             css_path.write_text(css_content, encoding="utf-8")
@@ -899,32 +894,33 @@ class SiteGenerator:
         self,
         output_static: Path,
         source_filename: str,
-        minified_filename: str,
     ) -> None:
         """Read one source CSS file, minify it, and write the minified output.
 
         The source CSS is read from the custom templates directory (if
-        available) or from the bundled templates.  The minified output is
-        written to ``output_static/<minified_filename>``.
+        available) or from the bundled templates.  The minified output filename
+        is derived from *source_filename* via
+        [`minified_filename`][blogmore.generator.minified_filename] and written
+        to ``output_static/<minified_name>``.
 
         Args:
             output_static: Path to the output static directory.
             source_filename: Source CSS filename (e.g. ``style.css``).
-            minified_filename: Output minified filename (e.g. ``styles.min.css``).
         """
         css_source = self._get_asset_source(source_filename)
         if css_source is None:
             return
 
+        minified_name = minified_filename(source_filename)
         minified = rcssmin.cssmin(css_source)
-        output_path = output_static / minified_filename
+        output_path = output_static / minified_name
         output_path.write_text(minified, encoding="utf-8")
-        print(f"Generated minified CSS as {minified_filename}")
+        print(f"Generated minified CSS as {minified_name}")
 
     def _write_minified_css(self, output_static: Path) -> None:
         """Minify all CSS files and write them to the output static directory.
 
-        Minifies the main stylesheet (``style.css`` → ``styles.min.css``) and
+        Minifies the main stylesheet (``style.css`` → ``style.min.css``) and
         each of the page-specific stylesheets (``search.css``, ``stats.css``,
         ``archive.css``, ``tag-cloud.css``).  The source CSS for each file is
         read from the custom templates directory (if configured) or from the
@@ -933,9 +929,9 @@ class SiteGenerator:
         Args:
             output_static: Path to the output static directory.
         """
-        self._minify_one_css(output_static, CSS_FILENAME, CSS_MINIFIED_FILENAME)
-        for source_filename, minified_filename in _PAGE_SPECIFIC_CSS:
-            self._minify_one_css(output_static, source_filename, minified_filename)
+        self._minify_one_css(output_static, CSS_FILENAME)
+        for source_filename in _PAGE_SPECIFIC_CSS:
+            self._minify_one_css(output_static, source_filename)
 
     def _write_code_css(self, output_static: Path) -> None:
         """Generate and write the code syntax highlighting CSS file.
@@ -956,36 +952,37 @@ class SiteGenerator:
         )
         if self.site_config.minify_css:
             minified = rcssmin.cssmin(css_content)
-            output_path = output_static / CODE_CSS_MINIFIED_FILENAME
+            code_css_min = minified_filename(CODE_CSS_FILENAME)
+            output_path = output_static / code_css_min
             output_path.write_text(minified, encoding="utf-8")
-            print(f"Generated minified code CSS as {CODE_CSS_MINIFIED_FILENAME}")
+            print(f"Generated minified code CSS as {code_css_min}")
         else:
             output_path = output_static / CODE_CSS_FILENAME
             output_path.write_text(css_content, encoding="utf-8")
             print(f"Generated code CSS as {CODE_CSS_FILENAME}")
 
-    def _write_minified_js(
-        self, output_static: Path, js_filename: str, js_minified_filename: str
-    ) -> None:
+    def _write_minified_js(self, output_static: Path, js_filename: str) -> None:
         """Read a source JavaScript file, minify it, and write it with the minified name.
 
         The source JS is read from the custom templates directory (if
-        available) or from the bundled templates.  The minified output is
-        written to ``output_static/<js_minified_filename>``.
+        available) or from the bundled templates.  The minified output filename
+        is derived from *js_filename* via
+        [`minified_filename`][blogmore.generator.minified_filename] and written
+        to ``output_static/<minified_name>``.
 
         Args:
             output_static: Path to the output static directory.
             js_filename: The original JavaScript filename (e.g. ``theme.js``).
-            js_minified_filename: The minified output filename (e.g. ``theme.min.js``).
         """
         js_source = self._get_asset_source(js_filename)
         if js_source is None:
             return
 
+        js_min = minified_filename(js_filename)
         minified = rjsmin.jsmin(js_source)
-        output_path = output_static / js_minified_filename
+        output_path = output_static / js_min
         output_path.write_text(minified, encoding="utf-8")
-        print(f"Generated minified JS as {js_minified_filename}")
+        print(f"Generated minified JS as {js_min}")
 
     def _resolve_post_output_paths(self, posts: list[Post]) -> dict[int, Path]:
         """Resolve the output path for every post and detect path clashes.
@@ -1968,9 +1965,7 @@ class SiteGenerator:
         output_static = self.site_config.output_dir / "static"
 
         # Pre-compute set of CSS source filenames to skip when minifying.
-        _css_source_filenames = {CSS_FILENAME} | {
-            source for source, _ in _PAGE_SPECIFIC_CSS
-        }
+        _css_source_filenames = {CSS_FILENAME} | set(_PAGE_SPECIFIC_CSS)
 
         # Clear output static directory if it exists
         if output_static.exists():
@@ -2079,20 +2074,12 @@ class SiteGenerator:
 
         # Minify JS if requested
         if self.site_config.minify_js:
-            self._write_minified_js(
-                output_static, THEME_JS_FILENAME, THEME_JS_MINIFIED_FILENAME
-            )
-            self._write_minified_js(
-                output_static, CODEBLOCKS_JS_FILENAME, CODEBLOCKS_JS_MINIFIED_FILENAME
-            )
+            self._write_minified_js(output_static, THEME_JS_FILENAME)
+            self._write_minified_js(output_static, CODEBLOCKS_JS_FILENAME)
             if self.site_config.with_search:
-                self._write_minified_js(
-                    output_static, SEARCH_JS_FILENAME, SEARCH_JS_MINIFIED_FILENAME
-                )
+                self._write_minified_js(output_static, SEARCH_JS_FILENAME)
             if self.site_config.with_graph:
-                self._write_minified_js(
-                    output_static, GRAPH_JS_FILENAME, GRAPH_JS_MINIFIED_FILENAME
-                )
+                self._write_minified_js(output_static, GRAPH_JS_FILENAME)
 
     def _copy_extras(self) -> None:
         """Copy extra files from the extras directory to the output directory.
