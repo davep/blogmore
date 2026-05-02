@@ -4,16 +4,13 @@
 
 from collections import defaultdict
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from blogmore.clean_url import make_url_clean
 from blogmore.page_path import compute_page_output_path
 from blogmore.pagination_path import resolve_pagination_page_path
 from blogmore.parser import Page, Post
 from blogmore.post_path import compute_output_path
-
-if TYPE_CHECKING:
-    from blogmore.site_config import SiteConfig
+from blogmore.site_config import SiteConfig
 
 
 class _PathsMixin:

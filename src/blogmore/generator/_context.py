@@ -2,7 +2,7 @@
 [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
 """
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from blogmore import __version__
 from blogmore.clean_url import make_url_clean
@@ -27,9 +27,7 @@ from blogmore.generator.constants import (
 )
 from blogmore.generator.utils import minified_filename
 from blogmore.pagination_path import resolve_pagination_page_path
-
-if TYPE_CHECKING:
-    from blogmore.site_config import SiteConfig
+from blogmore.site_config import SiteConfig
 
 
 class _ContextMixin:

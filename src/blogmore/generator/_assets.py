@@ -6,7 +6,7 @@ import shutil
 import urllib.error
 from importlib.resources import files
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from blogmore.fontawesome import (
     FONTAWESOME_CDN_CSS_URL,
@@ -24,10 +24,8 @@ from blogmore.generator.constants import (
     THEME_JS_FILENAME,
 )
 from blogmore.icons import IconGenerator, detect_source_icon
-
-if TYPE_CHECKING:
-    from blogmore.renderer import TemplateRenderer
-    from blogmore.site_config import SiteConfig
+from blogmore.renderer import TemplateRenderer
+from blogmore.site_config import SiteConfig
 
 
 class _AssetsMixin(_MinifyMixin):

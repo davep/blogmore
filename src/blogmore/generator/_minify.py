@@ -4,7 +4,6 @@
 
 from importlib.resources import files
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import minify_html
 import rcssmin  # type: ignore[import-untyped]
@@ -17,9 +16,7 @@ from blogmore.generator.constants import (
     CSS_FILENAME,
 )
 from blogmore.generator.utils import minified_filename
-
-if TYPE_CHECKING:
-    from blogmore.site_config import SiteConfig
+from blogmore.site_config import SiteConfig
 
 
 class _MinifyMixin:

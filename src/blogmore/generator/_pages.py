@@ -3,17 +3,14 @@
 """
 
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from blogmore.backlinks import Backlink
 from blogmore.clean_url import make_url_clean
 from blogmore.comment_invite import build_mailto_url, get_invite_email_for_post
 from blogmore.generator._optional_pages import _OptionalPagesMixin
 from blogmore.parser import CUSTOM_404_HTML, Page, Post
-
-if TYPE_CHECKING:
-    from blogmore.renderer import TemplateRenderer
-    from blogmore.site_config import SiteConfig
+from blogmore.renderer import TemplateRenderer
+from blogmore.site_config import SiteConfig
 
 
 class _PagesMixin(_OptionalPagesMixin):

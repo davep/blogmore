@@ -4,13 +4,11 @@
 
 import datetime as dt
 from collections import defaultdict
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from blogmore.parser import Page, Post
-
-if TYPE_CHECKING:
-    from blogmore.renderer import TemplateRenderer
-    from blogmore.site_config import SiteConfig
+from blogmore.renderer import TemplateRenderer
+from blogmore.site_config import SiteConfig
 
 
 class _DateArchivesMixin:

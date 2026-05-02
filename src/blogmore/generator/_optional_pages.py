@@ -4,8 +4,6 @@
 Covers feeds, search, statistics, calendar, graph, and sitemap output.
 """
 
-from typing import TYPE_CHECKING
-
 from blogmore.backlinks import Backlink
 from blogmore.calendar import CalendarYear, build_calendar
 from blogmore.clean_url import make_url_clean
@@ -13,13 +11,11 @@ from blogmore.feeds import BlogFeedGenerator
 from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
 from blogmore.graph import GraphData, build_graph_data
 from blogmore.parser import Page, Post, post_sort_key
+from blogmore.renderer import TemplateRenderer
 from blogmore.search import write_search_index
+from blogmore.site_config import SiteConfig
 from blogmore.sitemap import write_sitemap
 from blogmore.stats import BlogStats, compute_blog_stats
-
-if TYPE_CHECKING:
-    from blogmore.renderer import TemplateRenderer
-    from blogmore.site_config import SiteConfig
 
 
 class _OptionalPagesMixin:

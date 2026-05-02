@@ -4,16 +4,14 @@
 
 from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from blogmore.generator._date_archives import _DateArchivesMixin
 from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
 from blogmore.generator.utils import paginate_posts
 from blogmore.parser import Page, Post, post_sort_key, sanitize_for_url
-
-if TYPE_CHECKING:
-    from blogmore.renderer import TemplateRenderer
-    from blogmore.site_config import SiteConfig
+from blogmore.renderer import TemplateRenderer
+from blogmore.site_config import SiteConfig
 
 
 class _ListingMixin(_DateArchivesMixin):
