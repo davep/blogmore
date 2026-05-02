@@ -1,5 +1,9 @@
 """Filename constants and internal configuration for the site generator."""
 
+# Directory names used for tag and category URL paths in the output site.
+TAG_DIR = "tag"
+CATEGORY_DIR = "category"
+
 CSS_FILENAME = "style.css"
 SEARCH_CSS_FILENAME = "search.css"
 STATS_CSS_FILENAME = "stats.css"

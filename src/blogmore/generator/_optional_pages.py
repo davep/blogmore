@@ -10,6 +10,7 @@ from blogmore.backlinks import Backlink
 from blogmore.calendar import CalendarYear, build_calendar
 from blogmore.clean_url import make_url_clean
 from blogmore.feeds import BlogFeedGenerator
+from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
 from blogmore.graph import GraphData, build_graph_data
 from blogmore.parser import Page, Post, post_sort_key
 from blogmore.search import write_search_index
@@ -31,15 +32,11 @@ class _OptionalPagesMixin:
 
     - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])
     - `renderer` ([`TemplateRenderer`][blogmore.renderer.TemplateRenderer])
-    - `TAG_DIR` (`str`)
-    - `CATEGORY_DIR` (`str`)
     - `_extras_html_paths` (`frozenset[str]`)
     """
 
     site_config: "SiteConfig"
     renderer: "TemplateRenderer"
-    TAG_DIR: str
-    CATEGORY_DIR: str
     _extras_html_paths: frozenset[str]
 
     def _generate_feeds(self, posts: list[Post]) -> None:
@@ -198,8 +195,8 @@ class _OptionalPagesMixin:
             context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
         graph_data: GraphData = build_graph_data(
             posts,
-            tag_dir=self.TAG_DIR,
-            category_dir=self.CATEGORY_DIR,
+            tag_dir=TAG_DIR,
+            category_dir=CATEGORY_DIR,
             site_url=self.site_config.site_url,
         )
         html = self.renderer.render_graph_page(

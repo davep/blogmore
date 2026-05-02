@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from blogmore.generator._date_archives import _DateArchivesMixin
+from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
 from blogmore.generator.utils import paginate_posts
 from blogmore.parser import Page, Post, post_sort_key, sanitize_for_url
 
@@ -24,8 +25,6 @@ class _ListingMixin(_DateArchivesMixin):
 
     - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])
     - `renderer` ([`TemplateRenderer`][blogmore.renderer.TemplateRenderer])
-    - `TAG_DIR` (`str`)
-    - `CATEGORY_DIR` (`str`)
     - `POSTS_PER_PAGE_TAG` (`int`)
     - `POSTS_PER_PAGE_CATEGORY` (`int`)
     - `POSTS_PER_PAGE_ARCHIVE` (`int`)
@@ -33,8 +32,6 @@ class _ListingMixin(_DateArchivesMixin):
 
     site_config: "SiteConfig"
     renderer: "TemplateRenderer"
-    TAG_DIR: str
-    CATEGORY_DIR: str
     POSTS_PER_PAGE_TAG: int
     POSTS_PER_PAGE_CATEGORY: int
     POSTS_PER_PAGE_ARCHIVE: int
@@ -95,7 +92,7 @@ class _ListingMixin(_DateArchivesMixin):
         posts_by_tag = self._group_posts_by_tag(posts)  # type: ignore[attr-defined]
 
         # Create tag directory
-        tag_dir = self.site_config.output_dir / self.TAG_DIR
+        tag_dir = self.site_config.output_dir / TAG_DIR
         tag_dir.mkdir(exist_ok=True)
 
         # Generate paginated pages for each tag
@@ -106,7 +103,7 @@ class _ListingMixin(_DateArchivesMixin):
             # Sanitize tag for filename (use lowercase version)
             safe_tag = sanitize_for_url(tag_lower)
 
-            base_url = f"/{self.TAG_DIR}/{safe_tag}"
+            base_url = f"/{TAG_DIR}/{safe_tag}"
             # Each tag's pages live inside tag/{safe_tag}/ directory.
             tag_base_dir = tag_dir / safe_tag
 
@@ -259,7 +256,7 @@ class _ListingMixin(_DateArchivesMixin):
         posts_by_category = self._group_posts_by_category(posts)  # type: ignore[attr-defined]
 
         # Create category directory
-        category_dir = self.site_config.output_dir / self.CATEGORY_DIR
+        category_dir = self.site_config.output_dir / CATEGORY_DIR
         category_dir.mkdir(exist_ok=True)
 
         # Generate paginated pages for each category
@@ -273,7 +270,7 @@ class _ListingMixin(_DateArchivesMixin):
             # Sanitize category for filename (use lowercase version)
             safe_category = sanitize_for_url(category_lower)
 
-            base_url = f"/{self.CATEGORY_DIR}/{safe_category}"
+            base_url = f"/{CATEGORY_DIR}/{safe_category}"
             # Each category's pages live inside category/{safe_category}/ directory.
             category_base_dir = category_dir / safe_category
 

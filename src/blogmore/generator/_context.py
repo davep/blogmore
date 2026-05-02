@@ -12,6 +12,7 @@ from blogmore.fontawesome import (
 from blogmore.generator.constants import (
     ARCHIVE_CSS_FILENAME,
     CALENDAR_CSS_FILENAME,
+    CATEGORY_DIR,
     CODE_CSS_FILENAME,
     CODEBLOCKS_JS_FILENAME,
     CSS_FILENAME,
@@ -21,6 +22,7 @@ from blogmore.generator.constants import (
     SEARCH_JS_FILENAME,
     STATS_CSS_FILENAME,
     TAG_CLOUD_CSS_FILENAME,
+    TAG_DIR,
     THEME_JS_FILENAME,
 )
 from blogmore.generator.utils import minified_filename
@@ -189,8 +191,8 @@ class _ContextMixin:
             "site_description": self.site_config.site_description,
             "site_keywords": self.site_config.site_keywords,
             "site_url": self.site_config.site_url,
-            "tag_dir": self.TAG_DIR,  # type: ignore[attr-defined]
-            "category_dir": self.CATEGORY_DIR,  # type: ignore[attr-defined]
+            "tag_dir": TAG_DIR,
+            "category_dir": CATEGORY_DIR,
             "favicon_url": self._detect_favicon(),  # type: ignore[attr-defined]
             "has_platform_icons": self._detect_generated_icons(),  # type: ignore[attr-defined]
             "blogmore_version": __version__,

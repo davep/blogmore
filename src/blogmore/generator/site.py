@@ -26,10 +26,6 @@ class SiteGenerator(
 ):
     """Generate a static blog site from markdown posts."""
 
-    # Directory names for organizing content
-    TAG_DIR = "tag"
-    CATEGORY_DIR = "category"
-
     # Pagination constants - posts per page for each index type
     POSTS_PER_PAGE_INDEX = 10
     POSTS_PER_PAGE_TAG = 10
