@@ -444,22 +444,18 @@ class SiteGenerator:
             "theme_js_url": self._get_asset_url(
                 THEME_JS_FILENAME,
                 self.site_config.minify_js,
-                cache_bust=False,
             ),
             "search_js_url": self._get_asset_url(
                 SEARCH_JS_FILENAME,
                 self.site_config.minify_js,
-                cache_bust=False,
             ),
             "codeblocks_js_url": self._get_asset_url(
                 CODEBLOCKS_JS_FILENAME,
                 self.site_config.minify_js,
-                cache_bust=False,
             ),
             "graph_js_url": self._get_asset_url(
                 GRAPH_JS_FILENAME,
                 self.site_config.minify_js,
-                cache_bust=False,
             ),
             "pagination_page1_suffix": page1_suffix,
         }
