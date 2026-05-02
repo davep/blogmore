@@ -1112,10 +1112,10 @@ class TestSiteGenerator:
 
         with (
             patch(
-                "blogmore.generator.shutil.rmtree",
+                "blogmore.generator.site.shutil.rmtree",
                 side_effect=rmtree_fail_first_attempt,
             ),
-            patch("blogmore.generator.time.sleep"),
+            patch("blogmore.generator.site.time.sleep"),
         ):
             generator.generate()
 

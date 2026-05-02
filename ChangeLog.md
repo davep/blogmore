@@ -4,6 +4,9 @@
 
 **Released: WiP**
 
+- Refactored `SiteGenerator` from a single monolithic file into a modular
+  package structure (`src/blogmore/generator/`) to improve maintainability
+  and readability.
 - Fixed missing social graph (`og:*` and `twitter:*`) meta tags on listing
   and other pages (tag, category, archive, tags cloud, categories cloud,
   stats, calendar, graph, and search pages).
