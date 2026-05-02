@@ -88,9 +88,9 @@ def minified_filename(source: str) -> str:
         ValueError: If *source* does not end with ``.css`` or ``.js``.
     """
     if source.endswith(".css"):
-        return source[: -len(".css")] + ".min.css"
+        return source.removesuffix(".css") + ".min.css"
     if source.endswith(".js"):
-        return source[: -len(".js")] + ".min.js"
+        return source.removesuffix(".js") + ".min.js"
     raise ValueError(f"Unsupported file extension for minification: {source!r}")
 
 

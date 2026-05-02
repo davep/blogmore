@@ -58,8 +58,6 @@ class TestMinifiedFilename:
 
     def test_unsupported_extension_raises(self) -> None:
         """Test that an unsupported extension raises ValueError."""
-        import pytest
-
         with pytest.raises(ValueError, match="Unsupported file extension"):
             minified_filename("style.txt")
 
