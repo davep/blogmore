@@ -8,6 +8,8 @@
   and other pages (tag, category, archive, tags cloud, categories cloud,
   stats, calendar, graph, and search pages).
   ([#432](https://github.com/davep/blogmore/pull/432))
+- Extended per-build cache busting to the theme, search, code blocks and
+  graph JavaScript files.
 
 ## v2.18.0
 
