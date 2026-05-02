@@ -9,14 +9,11 @@ import pytest
 
 from blogmore.generator import (
     ARCHIVE_CSS_FILENAME,
-    ARCHIVE_CSS_MINIFIED_FILENAME,
     SEARCH_CSS_FILENAME,
-    SEARCH_CSS_MINIFIED_FILENAME,
     STATS_CSS_FILENAME,
-    STATS_CSS_MINIFIED_FILENAME,
     TAG_CLOUD_CSS_FILENAME,
-    TAG_CLOUD_CSS_MINIFIED_FILENAME,
     SiteGenerator,
+    minified_filename,
     paginate_posts,
     sanitize_for_url,
 )
@@ -38,6 +35,33 @@ class TestSanitizeForUrl:
     def test_sanitize_empty(self) -> None:
         """Test empty string returns 'unnamed'."""
         assert sanitize_for_url("") == "unnamed"
+
+
+class TestMinifiedFilename:
+    """Test the minified_filename utility function."""
+
+    def test_css_extension_becomes_min_css(self) -> None:
+        """Test that a .css extension is replaced with .min.css."""
+        assert minified_filename("style.css") == "style.min.css"
+
+    def test_js_extension_becomes_min_js(self) -> None:
+        """Test that a .js extension is replaced with .min.js."""
+        assert minified_filename("theme.js") == "theme.min.js"
+
+    def test_hyphenated_css_filename(self) -> None:
+        """Test that a hyphenated CSS filename is handled correctly."""
+        assert minified_filename("tag-cloud.css") == "tag-cloud.min.css"
+
+    def test_hyphenated_js_filename(self) -> None:
+        """Test that a hyphenated JS filename is handled correctly."""
+        assert minified_filename("search.js") == "search.min.js"
+
+    def test_unsupported_extension_raises(self) -> None:
+        """Test that an unsupported extension raises ValueError."""
+        import pytest
+
+        with pytest.raises(ValueError, match="Unsupported file extension"):
+            minified_filename("style.txt")
 
 
 class TestPaginatePosts:
@@ -1854,12 +1878,14 @@ class TestMinifyCss:
         generator.generate()
 
         assert (temp_output_dir / "static" / "style.css").exists()
-        assert not (temp_output_dir / "static" / "styles.min.css").exists()
+        assert not (
+            temp_output_dir / "static" / minified_filename("style.css")
+        ).exists()
 
     def test_minify_css_generates_min_css(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
-        """Test that minify_css generates styles.min.css and not style.css."""
+        """Test that minify_css generates style.min.css and not style.css."""
         generator = SiteGenerator(
             site_config=SiteConfig(
                 content_dir=posts_dir, output_dir=temp_output_dir, minify_css=True
@@ -1868,7 +1894,7 @@ class TestMinifyCss:
 
         generator.generate()
 
-        assert (temp_output_dir / "static" / "styles.min.css").exists()
+        assert (temp_output_dir / "static" / minified_filename("style.css")).exists()
         assert not (temp_output_dir / "static" / "style.css").exists()
 
     def test_minify_css_produces_smaller_file(
@@ -1891,13 +1917,15 @@ class TestMinifyCss:
         minified_generator.generate()
 
         normal_size = (normal_output / "static" / "style.css").stat().st_size
-        minified_size = (minified_output / "static" / "styles.min.css").stat().st_size
+        minified_size = (
+            (minified_output / "static" / minified_filename("style.css")).stat().st_size
+        )
         assert minified_size < normal_size
 
     def test_minify_css_url_in_html(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
-        """Test that pages reference styles.min.css when minify_css is enabled."""
+        """Test that pages reference style.min.css when minify_css is enabled."""
         generator = SiteGenerator(
             site_config=SiteConfig(
                 content_dir=posts_dir, output_dir=temp_output_dir, minify_css=True
@@ -1907,7 +1935,7 @@ class TestMinifyCss:
         generator.generate()
 
         content = (temp_output_dir / "index.html").read_text()
-        assert "/static/styles.min.css" in content
+        assert "/static/style.min.css" in content
         assert "/static/style.css" not in content
 
     def test_normal_css_url_in_html(
@@ -1922,7 +1950,7 @@ class TestMinifyCss:
 
         content = (temp_output_dir / "index.html").read_text()
         assert "/static/style.css" in content
-        assert "/static/styles.min.css" not in content
+        assert "/static/style.min.css" not in content
 
     def test_minify_css_with_custom_templates(
         self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
@@ -1945,11 +1973,11 @@ class TestMinifyCss:
 
         generator.generate()
 
-        assert (temp_output_dir / "static" / "styles.min.css").exists()
+        assert (temp_output_dir / "static" / minified_filename("style.css")).exists()
         assert not (temp_output_dir / "static" / "style.css").exists()
-        minified_content = (temp_output_dir / "static" / "styles.min.css").read_text(
-            encoding="utf-8"
-        )
+        minified_content = (
+            temp_output_dir / "static" / minified_filename("style.css")
+        ).read_text(encoding="utf-8")
         assert "body" in minified_content
         assert "color" in minified_content
 
@@ -1993,10 +2021,18 @@ class TestPageSpecificCss:
 
         generator.generate()
 
-        assert (temp_output_dir / "static" / SEARCH_CSS_MINIFIED_FILENAME).exists()
-        assert (temp_output_dir / "static" / STATS_CSS_MINIFIED_FILENAME).exists()
-        assert (temp_output_dir / "static" / ARCHIVE_CSS_MINIFIED_FILENAME).exists()
-        assert (temp_output_dir / "static" / TAG_CLOUD_CSS_MINIFIED_FILENAME).exists()
+        assert (
+            temp_output_dir / "static" / minified_filename(SEARCH_CSS_FILENAME)
+        ).exists()
+        assert (
+            temp_output_dir / "static" / minified_filename(STATS_CSS_FILENAME)
+        ).exists()
+        assert (
+            temp_output_dir / "static" / minified_filename(ARCHIVE_CSS_FILENAME)
+        ).exists()
+        assert (
+            temp_output_dir / "static" / minified_filename(TAG_CLOUD_CSS_FILENAME)
+        ).exists()
 
     def test_page_specific_css_source_not_present_when_minifying(
         self, posts_dir: Path, temp_output_dir: Path
@@ -2156,16 +2192,16 @@ class TestPageSpecificCss:
         generator.generate()
 
         search_html = (temp_output_dir / "search.html").read_text()
-        assert f"/static/{SEARCH_CSS_MINIFIED_FILENAME}" in search_html
+        assert f"/static/{minified_filename(SEARCH_CSS_FILENAME)}" in search_html
 
         stats_html = (temp_output_dir / "stats.html").read_text()
-        assert f"/static/{STATS_CSS_MINIFIED_FILENAME}" in stats_html
+        assert f"/static/{minified_filename(STATS_CSS_FILENAME)}" in stats_html
 
         archive_html = (temp_output_dir / "archive.html").read_text()
-        assert f"/static/{ARCHIVE_CSS_MINIFIED_FILENAME}" in archive_html
+        assert f"/static/{minified_filename(ARCHIVE_CSS_FILENAME)}" in archive_html
 
         tags_html = (temp_output_dir / "tags.html").read_text()
-        assert f"/static/{TAG_CLOUD_CSS_MINIFIED_FILENAME}" in tags_html
+        assert f"/static/{minified_filename(TAG_CLOUD_CSS_FILENAME)}" in tags_html
 
 
 class TestMinifyJs:
@@ -4417,7 +4453,7 @@ class TestCacheBusting:
         generator.generate()
 
         content = (temp_output_dir / "index.html").read_text()
-        assert "/static/styles.min.css?v=" in content
+        assert "/static/style.min.css?v=" in content
 
     def test_cache_bust_token_is_numeric(
         self, posts_dir: Path, temp_output_dir: Path
@@ -6533,7 +6569,7 @@ class TestGraphPageGeneration:
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
         """graph.min.js is written and graph.js is absent when minify_js=True."""
-        from blogmore.generator import GRAPH_JS_FILENAME, GRAPH_JS_MINIFIED_FILENAME
+        from blogmore.generator import GRAPH_JS_FILENAME, minified_filename
 
         generator = SiteGenerator(
             site_config=SiteConfig(
@@ -6545,7 +6581,9 @@ class TestGraphPageGeneration:
         )
         generator.generate()
 
-        assert (temp_output_dir / "static" / GRAPH_JS_MINIFIED_FILENAME).exists()
+        assert (
+            temp_output_dir / "static" / minified_filename(GRAPH_JS_FILENAME)
+        ).exists()
         assert not (temp_output_dir / "static" / GRAPH_JS_FILENAME).exists()
 
     def test_graph_page_references_graph_js(
@@ -6565,4 +6603,3 @@ class TestGraphPageGeneration:
 
         graph_content = (temp_output_dir / "graph.html").read_text()
         assert f"/static/{GRAPH_JS_FILENAME}" in graph_content
-

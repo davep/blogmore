@@ -4,6 +4,13 @@
 
 **Released: WiP**
 
+- Refactored CSS and JS minification to use a single `minified_filename`
+  utility function that derives the minified output filename from the source
+  filename (e.g. `style.css` → `style.min.css`, `theme.js` →
+  `theme.min.js`).  The duplicate `*_MINIFIED_FILENAME` module-level
+  constants have been removed.  **Note:** the minified main stylesheet is
+  now written as `style.min.css` (previously `styles.min.css`).
+  ([#433](https://github.com/davep/blogmore/pull/433))
 - Fixed missing social graph (`og:*` and `twitter:*`) meta tags on listing
   and other pages (tag, category, archive, tags cloud, categories cloud,
   stats, calendar, graph, and search pages).
