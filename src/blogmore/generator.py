@@ -83,7 +83,7 @@ def minified_filename(source: str | Path) -> str:
     if isinstance(source, str) and not source:
         return source
     if (source := Path(source)).suffix:
-        source = source.with_suffix("".join([".min", source.suffix]))
+        source = source.with_suffix(f".min{source.suffix}")
     return str(source)
 
 
