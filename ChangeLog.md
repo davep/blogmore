@@ -10,6 +10,7 @@
   ([#432](https://github.com/davep/blogmore/pull/432))
 - Extended per-build cache busting to the theme, search, code blocks and
   graph JavaScript files.
+  ([#439](https://github.com/davep/blogmore/pull/439))
 
 ## v2.18.0
 
