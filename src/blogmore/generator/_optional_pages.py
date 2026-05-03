@@ -78,21 +78,9 @@ class OptionalPagesMixin:
         """
         context = self._get_global_context()  # type: ignore[attr-defined]
         context["pages"] = pages
-        output_path = (
-            self.site_config.output_dir / self.site_config.search_path.lstrip("/")
-        ).resolve()
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        search_url = self._get_search_url()  # type: ignore[attr-defined]
-        if self.site_config.clean_urls:
-            context["canonical_url"] = (
-                f"{self.site_config.site_url}{search_url}"
-                if self.site_config.site_url
-                else search_url
-            )
-        else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
-        html = self.renderer.render_search_page(**context)
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
+        self._generate_single_page(  # type: ignore[attr-defined]
+            "search_path", self.renderer.render_search_page, context
+        )
 
     def _generate_stats_page(
         self,
@@ -111,24 +99,12 @@ class OptionalPagesMixin:
         """
         context = self._get_global_context()  # type: ignore[attr-defined]
         context["pages"] = pages
-        output_path = (
-            self.site_config.output_dir / self.site_config.stats_path.lstrip("/")
-        ).resolve()
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        stats_url = self._get_stats_url()  # type: ignore[attr-defined]
-        if self.site_config.clean_urls:
-            context["canonical_url"] = (
-                f"{self.site_config.site_url}{stats_url}"
-                if self.site_config.site_url
-                else stats_url
-            )
-        else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
         blog_stats: BlogStats = compute_blog_stats(
             posts, self.site_config.site_url, backlink_map
         )
-        html = self.renderer.render_stats_page(stats=blog_stats, **context)
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
+        self._generate_single_page(  # type: ignore[attr-defined]
+            "stats_path", self.renderer.render_stats_page, context, stats=blog_stats
+        )
 
     def _generate_calendar_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the calendar view page.
@@ -139,19 +115,7 @@ class OptionalPagesMixin:
         """
         context = self._get_global_context()  # type: ignore[attr-defined]
         context["pages"] = pages
-        output_path = (
-            self.site_config.output_dir / self.site_config.calendar_path.lstrip("/")
-        ).resolve()
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        calendar_url = self._get_calendar_url()  # type: ignore[attr-defined]
-        if self.site_config.clean_urls:
-            context["canonical_url"] = (
-                f"{self.site_config.site_url}{calendar_url}"
-                if self.site_config.site_url
-                else calendar_url
-            )
-        else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
+
         # Determine page1_suffix for archive URL construction.  When
         # clean_urls is enabled, strip any index filename (e.g. "index.html")
         # so that calendar links to year/month/day archives end with a
@@ -159,13 +123,16 @@ class OptionalPagesMixin:
         page1_suffix = self.site_config.page_1_path.lstrip("/")
         if self.site_config.clean_urls:
             page1_suffix = make_url_clean(f"/{page1_suffix}").lstrip("/")
+
         calendar_years: list[CalendarYear] = build_calendar(
             posts, page1_suffix, forward=self.site_config.forward_calendar
         )
-        html = self.renderer.render_calendar_page(
-            calendar_years=calendar_years, **context
+        self._generate_single_page(  # type: ignore[attr-defined]
+            "calendar_path",
+            self.renderer.render_calendar_page,
+            context,
+            calendar_years=calendar_years,
         )
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
 
     def _generate_graph_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the post-relationship graph page.
@@ -176,29 +143,18 @@ class OptionalPagesMixin:
         """
         context = self._get_global_context()  # type: ignore[attr-defined]
         context["pages"] = pages
-        output_path = (
-            self.site_config.output_dir / self.site_config.graph_path.lstrip("/")
-        ).resolve()
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        graph_url = self._get_graph_url()  # type: ignore[attr-defined]
-        if self.site_config.clean_urls:
-            context["canonical_url"] = (
-                f"{self.site_config.site_url}{graph_url}"
-                if self.site_config.site_url
-                else graph_url
-            )
-        else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
         graph_data: GraphData = build_graph_data(
             posts,
             tag_dir=TAG_DIR,
             category_dir=CATEGORY_DIR,
             site_url=self.site_config.site_url,
         )
-        html = self.renderer.render_graph_page(
-            graph_data_json=graph_data.to_json(), **context
+        self._generate_single_page(  # type: ignore[attr-defined]
+            "graph_path",
+            self.renderer.render_graph_page,
+            context,
+            graph_data_json=graph_data.to_json(),
         )
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
 
     def _remove_stale_search_files(self) -> None:
         """Remove search-related files left over from a previous build.

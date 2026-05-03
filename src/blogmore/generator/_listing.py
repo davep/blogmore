@@ -170,23 +170,9 @@ class ListingMixin(DateArchivesMixin):
         # Render the tags page
         context = self._get_global_context()  # type: ignore[attr-defined]
         context["pages"] = pages
-        output_path = (
-            self.site_config.output_dir / self.site_config.tags_path.lstrip("/")
-        ).resolve()
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        tags_url = self._get_tags_url()  # type: ignore[attr-defined]
-        if self.site_config.clean_urls:
-            context["canonical_url"] = (
-                f"{self.site_config.site_url}{tags_url}"
-                if self.site_config.site_url
-                else tags_url
-            )
-        else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
-
-        html = self.renderer.render_tags_page(tag_data, **context)
-
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
+        self._generate_single_page(  # type: ignore[attr-defined]
+            "tags_path", self.renderer.render_tags_page, context, tags=tag_data
+        )
 
     def _generate_categories_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the categories overview page with word cloud.
@@ -224,23 +210,12 @@ class ListingMixin(DateArchivesMixin):
         # Render the categories page
         context = self._get_global_context()  # type: ignore[attr-defined]
         context["pages"] = pages
-        output_path = (
-            self.site_config.output_dir / self.site_config.categories_path.lstrip("/")
-        ).resolve()
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        categories_url = self._get_categories_url()  # type: ignore[attr-defined]
-        if self.site_config.clean_urls:
-            context["canonical_url"] = (
-                f"{self.site_config.site_url}{categories_url}"
-                if self.site_config.site_url
-                else categories_url
-            )
-        else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
-
-        html = self.renderer.render_categories_page(category_data, **context)
-
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
+        self._generate_single_page(  # type: ignore[attr-defined]
+            "categories_path",
+            self.renderer.render_categories_page,
+            context,
+            categories=category_data,
+        )
 
     def _generate_category_pages(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate pages for each category with pagination.

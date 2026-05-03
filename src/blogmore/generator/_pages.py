@@ -88,16 +88,7 @@ class PagesMixin(OptionalPagesMixin):
             context["next_post"] = None
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        # When clean URLs are enabled, post.url already has index.html stripped;
-        # use it directly so the canonical URL matches what we advertise everywhere.
-        if self.site_config.clean_urls:
-            context["canonical_url"] = (
-                f"{self.site_config.site_url}{post.url}"
-                if self.site_config.site_url
-                else post.url
-            )
-        else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
+        context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
         html = self.renderer.render_post(post, **context)
         self._write_html(output_path, html)  # type: ignore[attr-defined]
 
@@ -201,22 +192,14 @@ class PagesMixin(OptionalPagesMixin):
         """
         context = self._get_global_context()  # type: ignore[attr-defined]
         context["pages"] = pages
-        output_path = (
-            self.site_config.output_dir / self.site_config.archive_path.lstrip("/")
-        ).resolve()
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        archive_url = self._get_archive_url()  # type: ignore[attr-defined]
-        if self.site_config.clean_urls:
-            context["canonical_url"] = (
-                f"{self.site_config.site_url}{archive_url}"
-                if self.site_config.site_url
-                else archive_url
-            )
-        else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
-        html = self.renderer.render_archive(
-            posts, page=1, total_pages=1, base_path="/archive", **context
+        self._generate_single_page(  # type: ignore[attr-defined]
+            "archive_path",
+            self.renderer.render_archive,
+            context,
+            posts=posts,
+            page=1,
+            total_pages=1,
+            base_path="/archive",
         )
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
 
     ### _pages.py ends here

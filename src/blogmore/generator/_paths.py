@@ -3,7 +3,9 @@
 """
 
 from collections import defaultdict
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 from blogmore.clean_url import make_url_clean
 from blogmore.page_path import compute_page_output_path
@@ -134,6 +136,40 @@ class PathsMixin:
         if self.site_config.clean_urls:
             url = make_url_clean(url)
         return f"{self.site_config.site_url}{url}"
+
+    def _generate_single_page(
+        self,
+        config_path_attr: str,
+        render_func: Callable[..., str],
+        context: dict[str, Any],
+        **render_kwargs: Any,
+    ) -> None:
+        """Helper to generate a single non-paginated page.
+
+        Resolves the output path from the given configuration attribute,
+        computes the canonical URL, renders the content using the provided
+        function and context, and writes the result to disk.
+
+        Args:
+            config_path_attr: The name of the ``SiteConfig`` attribute that
+                holds the page path (e.g. ``"search_path"``).
+            render_func: Callable that produces the HTML string for the page.
+            context: The shared template context dict.  A copy is used so that
+                ``canonical_url`` and *render_kwargs* do not leak into other
+                pages.
+            **render_kwargs: Additional arguments passed to *render_func*.
+        """
+        path_str: str = getattr(self.site_config, config_path_attr)
+        output_path = (self.site_config.output_dir / path_str.lstrip("/")).resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Use a copy of the context to avoid side-effects on the shared dict.
+        page_context = context.copy()
+        page_context["canonical_url"] = self._canonical_url_for_path(output_path)
+        page_context.update(render_kwargs)
+
+        html = render_func(**page_context)
+        self._write_html(output_path, html)  # type: ignore[attr-defined]
 
     def _resolve_post_output_paths(self, posts: list[Post]) -> dict[int, Path]:
         """Resolve the output path for every post and detect path clashes.
