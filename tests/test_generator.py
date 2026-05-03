@@ -8,13 +8,18 @@ from pathlib import Path
 import pytest
 
 from blogmore.generator import (
-    ARCHIVE_CSS_FILENAME,
-    SEARCH_CSS_FILENAME,
-    STATS_CSS_FILENAME,
-    TAG_CLOUD_CSS_FILENAME,
     SiteGenerator,
     minified_filename,
     paginate_posts,
+)
+from blogmore.generator.constants import (
+    ARCHIVE_CSS_FILENAME,
+    CALENDAR_CSS_FILENAME,
+    GRAPH_CSS_FILENAME,
+    GRAPH_JS_FILENAME,
+    SEARCH_CSS_FILENAME,
+    STATS_CSS_FILENAME,
+    TAG_CLOUD_CSS_FILENAME,
 )
 from blogmore.parser import (
     CUSTOM_404_HTML,
@@ -6110,8 +6115,6 @@ class TestCalendarPageGeneration:
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
         """The calendar page includes the calendar-specific CSS file."""
-        from blogmore.generator import CALENDAR_CSS_FILENAME
-
         generator = SiteGenerator(
             site_config=SiteConfig(
                 content_dir=posts_dir,
@@ -6395,8 +6398,6 @@ class TestGraphPageGeneration:
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
         """The graph page includes the graph-specific CSS file."""
-        from blogmore.generator import GRAPH_CSS_FILENAME
-
         generator = SiteGenerator(
             site_config=SiteConfig(
                 content_dir=posts_dir,
@@ -6413,8 +6414,6 @@ class TestGraphPageGeneration:
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
         """The graph JS file loads the force-graph library from CDN."""
-        from blogmore.generator import GRAPH_JS_FILENAME
-
         generator = SiteGenerator(
             site_config=SiteConfig(
                 content_dir=posts_dir,
@@ -6533,8 +6532,6 @@ class TestGraphPageGeneration:
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
         """graph.js is written to the static directory when with_graph=True."""
-        from blogmore.generator import GRAPH_JS_FILENAME
-
         generator = SiteGenerator(
             site_config=SiteConfig(
                 content_dir=posts_dir,
@@ -6550,8 +6547,6 @@ class TestGraphPageGeneration:
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
         """graph.js is NOT written to the static directory when with_graph=False."""
-        from blogmore.generator import GRAPH_JS_FILENAME
-
         generator = SiteGenerator(
             site_config=SiteConfig(
                 content_dir=posts_dir,
@@ -6567,8 +6562,6 @@ class TestGraphPageGeneration:
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
         """graph.min.js is written and graph.js is absent when minify_js=True."""
-        from blogmore.generator import GRAPH_JS_FILENAME, minified_filename
-
         generator = SiteGenerator(
             site_config=SiteConfig(
                 content_dir=posts_dir,
@@ -6588,8 +6581,6 @@ class TestGraphPageGeneration:
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
         """The graph page HTML references graph.js."""
-        from blogmore.generator import GRAPH_JS_FILENAME
-
         generator = SiteGenerator(
             site_config=SiteConfig(
                 content_dir=posts_dir,
