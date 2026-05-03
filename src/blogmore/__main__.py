@@ -17,7 +17,7 @@ from blogmore.config import (
 from blogmore.generator import SiteGenerator
 from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
-from blogmore.site_config import SiteConfig
+from blogmore.site_config import SiteConfig, site_config_defaults
 
 
 def main() -> int:
@@ -236,38 +236,24 @@ def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
     Returns:
         Dictionary of argument names to values that were explicitly set
     """
-    # Define defaults for each argument
-    defaults = {
-        "site_title": "My Blog",
-        "site_subtitle": "",
-        "site_description": "",
-        "site_keywords": None,
-        "site_url": "",
-        "output": Path("output"),
-        "templates": None,
-        "include_drafts": False,
-        "posts_per_feed": 20,
-        "extra_stylesheets": None,
-        "port": 8000,
-        "no_watch": False,
-        "content_dir": None,
-        "default_author": None,
-        "clean_first": False,
-        "branch": "gh-pages",
-        "remote": "origin",
-        "icon_source": None,
-        "with_search": False,
-        "with_sitemap": False,
-        "with_stats": False,
-        "with_calendar": False,
-        "with_graph": False,
-        "minify_css": False,
-        "minify_js": False,
-        "minify_html": False,
-        "with_read_time": False,
-        "socials_title": "Social",
-        "links_title": "Links",
-    }
+    # Build defaults from SiteConfig (single source of truth for site config fields).
+    defaults: dict[str, Any] = site_config_defaults()
+    # SiteConfig uses templates_dir but the CLI arg is named templates.
+    defaults["templates"] = defaults.pop("templates_dir")
+    # SiteConfig.output_dir is a required field with no default; the CLI arg
+    # output defaults to Path("output").
+    defaults["output"] = Path("output")
+    # Defaults for CLI-only arguments that have no SiteConfig equivalent.
+    defaults.update(
+        {
+            "port": 8000,
+            "no_watch": False,
+            "branch": "gh-pages",
+            "remote": "origin",
+            "socials_title": "Social",
+            "links_title": "Links",
+        }
+    )
 
     overrides: dict[str, Any] = {}
 
