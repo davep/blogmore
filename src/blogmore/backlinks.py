@@ -37,7 +37,11 @@ _BACKLINK_MARKER: str = "BKLINK8f3a2b19_BKLINK"
 # Compiled regular expressions for Markdown link detection.
 
 # Inline links: [link text](url) or [link text](url "optional title")
-_INLINE_LINK_RE: re.Pattern[str] = re.compile(r"\[([^\]]*)\]\(([^)]+)\)")
+# The URL portion allows one level of balanced parentheses so that paths such
+# as /2016/11/15/seen_by_davep_(the_return).html are captured in full.
+_INLINE_LINK_RE: re.Pattern[str] = re.compile(
+    r"\[([^\]]*)\]\(((?:[^()]+|\([^()]*\))*)\)"
+)
 
 # Reference-style link definitions: [id]: url  (at the start of any line)
 _LINK_DEF_RE: re.Pattern[str] = re.compile(r"^\[([^\]]+)\]:\s+(\S+)", re.MULTILINE)

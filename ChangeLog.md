@@ -4,6 +4,9 @@
 
 **Released: WiP**
 
+- Fixed backlinks being silently dropped when a post's URL contains
+  parentheses (e.g. `/2016/11/15/seen_by_davep_(the_return).html`).
+  ([#443](https://github.com/davep/blogmore/pull/443))
 - Fixed missing social graph (`og:*` and `twitter:*`) meta tags on listing
   and other pages (tag, category, archive, tags cloud, categories cloud,
   stats, calendar, graph, and search pages).
