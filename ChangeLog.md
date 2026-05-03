@@ -11,10 +11,6 @@
 - Extended per-build cache busting to the theme, search, code blocks and
   graph JavaScript files.
   ([#439](https://github.com/davep/blogmore/pull/439))
-- Modularized `generator.py` (2,146 lines) into a `generator/` package with
-  13 focused sub-modules, each under 400 lines, to improve maintainability
-  and reduce "God Object" complexity.
-  ([#447](https://github.com/davep/blogmore/pull/447))
 
 ## v2.18.0
 
