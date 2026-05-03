@@ -6,7 +6,6 @@ compatibility for existing imports.
 """
 
 from blogmore.generator.constants import (
-    _PAGE_SPECIFIC_CSS,
     ARCHIVE_CSS_FILENAME,
     CALENDAR_CSS_FILENAME,
     CODE_CSS_FILENAME,
@@ -36,7 +35,6 @@ __all__ = [
     "STATS_CSS_FILENAME",
     "TAG_CLOUD_CSS_FILENAME",
     "THEME_JS_FILENAME",
-    "_PAGE_SPECIFIC_CSS",
     "SiteGenerator",
     "minified_filename",
     "paginate_posts",
