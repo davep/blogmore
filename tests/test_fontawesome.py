@@ -271,7 +271,7 @@ class TestFontAwesomeOptimizerInGenerator:
             )
         )
 
-        with patch("blogmore.generator.FontAwesomeOptimizer") as mock_cls:
+        with patch("blogmore.generator._assets.FontAwesomeOptimizer") as mock_cls:
             generator.generate()
 
         # Optimizer should not have been constructed at all

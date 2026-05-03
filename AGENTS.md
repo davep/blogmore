@@ -9,7 +9,7 @@ All source lives in `src/blogmore/`. Key modules and their responsibilities:
 | `__main__.py` / `cli.py` | Entry point; CLI argument parsing |
 | `config.py` | Loads and merges `blogmore.yaml` into a runtime config object; `parse_site_config_from_dict` is the single source of truth for YAML→`SiteConfig` field mapping |
 | `site_config.py` | `SiteConfig` dataclass — the validated, typed site configuration |
-| `generator.py` | Core static site generator; orchestrates all page/feed/asset output |
+| `generator/` | Core static site generator (see sub-package table below) |
 | `parser.py` | Markdown + frontmatter parser; produces `Post` and `Page` objects |
 | `renderer.py` | Jinja2 template rendering |
 | `publisher.py` | Git-based publishing (`blogmore publish`) |
@@ -25,6 +25,43 @@ All source lives in `src/blogmore/`. Key modules and their responsibilities:
 | `clean_url.py` | Clean URL transformation utilities (removes index.html from URLs when enabled) |
 | `page_path.py` | Page path resolution for configurable output file paths |
 | `utils.py` | Shared utility helpers |
+
+The `generator/` sub-package (`src/blogmore/generator/`) breaks the site
+generator into focused modules and mixin classes:
+
+| Module | Responsibility |
+|---|---|
+| `generator/constants.py` | Filename constants, `TAG_DIR`, `CATEGORY_DIR`, `_PAGE_SPECIFIC_CSS` |
+| `generator/utils.py` | `minified_filename`, `paginate_posts` |
+| `generator/_grouping.py` | `GroupingMixin` — post grouping by tag/category; word-cloud font-size interpolation |
+| `generator/_context.py` | `ContextMixin` — global template context, asset URL helpers, cache-busting |
+| `generator/_paths.py` | `PathsMixin` — pagination paths, canonical URLs, output path resolution, sidebar filtering |
+| `generator/_minify.py` | `MinifyMixin` — HTML/CSS/JS writing and minification |
+| `generator/_assets.py` | `AssetsMixin` (extends `MinifyMixin`) — icons, FontAwesome CSS, static file copying, extras |
+| `generator/_date_archives.py` | `DateArchivesMixin` — year/month/day archive page generation |
+| `generator/_listing.py` | `ListingMixin` (extends `DateArchivesMixin`) — tag and category paginated listings |
+| `generator/_optional_pages.py` | `OptionalPagesMixin` — feeds, search, stats, calendar, graph, sitemap |
+| `generator/_pages.py` | `PagesMixin` (extends `OptionalPagesMixin`) — core page generation (post, static page, index, archive) |
+| `generator/site.py` | `SiteGenerator.__init__` and `generate()` orchestration |
+| `generator/__init__.py` | Backward-compatible re-exports (`from blogmore.generator import SiteGenerator` unchanged) |
+
+`SiteGenerator` composes all mixin classes:
+
+```
+MinifyMixin
+  └── AssetsMixin          (adds icons, file copying)
+
+DateArchivesMixin
+  └── ListingMixin         (adds tag/category listings)
+
+OptionalPagesMixin
+  └── PagesMixin           (adds core post/page/index/archive)
+
+SiteGenerator(
+    AssetsMixin, ContextMixin, GroupingMixin,
+    ListingMixin, PagesMixin, PathsMixin
+)
+```
 
 The `markdown/` sub-package (`src/blogmore/markdown/`) groups all custom
 Markdown extensions:
