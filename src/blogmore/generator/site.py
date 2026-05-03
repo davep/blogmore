@@ -2,6 +2,7 @@
 
 import shutil
 import time
+from pathlib import Path
 
 from blogmore.backlinks import Backlink, build_backlink_map
 from blogmore.fontawesome import FONTAWESOME_CDN_CSS_URL
@@ -11,7 +12,7 @@ from blogmore.generator._grouping import GroupingMixin
 from blogmore.generator._listing import ListingMixin
 from blogmore.generator._pages import PagesMixin
 from blogmore.generator._paths import PathsMixin
-from blogmore.parser import PostParser
+from blogmore.parser import Page, Post, PostParser
 from blogmore.renderer import TemplateRenderer
 from blogmore.site_config import SiteConfig
 
@@ -70,19 +71,48 @@ class SiteGenerator(
 
     def generate(self) -> None:
         """Generate the complete static site."""
-        content_dir = self._content_dir
+        self._prepare_generation()
 
-        # Mint a fresh cache-busting token for this generation.  All pages
-        # rendered during this run will share the same token so that once a
-        # visitor downloads a stylesheet it stays cached for the lifetime of
-        # this deployment.  A new generation produces a new token, which forces
-        # browsers to re-fetch any updated stylesheets.
+        # Parse all content
+        posts, pages, page_404 = self._parse_content()
+
+        # Resolve sidebar and paths
+        sidebar_pages = self._resolve_sidebar_pages(pages)
+        page_output_paths = self._resolve_page_output_paths(pages)
+        post_output_paths = self._resolve_post_output_paths(posts)
+
+        # Build cross-post metadata
+        backlinks_map = self._build_backlinks(posts)
+
+        # Prepare assets and directories
+        self.site_config.output_dir.mkdir(parents=True, exist_ok=True)
+        self._generate_icons()
+        fontawesome_css_content = self._prepare_fontawesome_css()
+
+        # Generate all HTML pages
+        self._generate_content_pages(
+            posts,
+            pages,
+            page_404,
+            sidebar_pages,
+            post_output_paths,
+            page_output_paths,
+            backlinks_map,
+        )
+        self._generate_listing_pages(posts, sidebar_pages)
+        self._generate_optional_pages(posts, sidebar_pages, backlinks_map)
+
+        # Finalize assets and site metadata
+        self._finalize_site(fontawesome_css_content)
+
+        print(f"Site generation complete! Output: {self.site_config.output_dir}")
+
+    def _prepare_generation(self) -> None:
+        """Initialize generation state and clean output directory if requested."""
+        # Mint a fresh cache-busting token for this generation.
         self._cache_bust_token = str(int(time.time()))
 
-        # Apply cache-busting to any local extra stylesheets so they are also
-        # re-fetched after a new site generation.  Always reassign the list so
-        # that removing extra_stylesheets from the config correctly clears the
-        # renderer's list on the next build.
+        # Apply cache-busting to any local extra stylesheets.
         extra_stylesheets = self.site_config.extra_stylesheets or []
         self.renderer.extra_stylesheets = [
             self._with_cache_bust(url) for url in extra_stylesheets
@@ -94,9 +124,6 @@ class SiteGenerator(
             try:
                 shutil.rmtree(self.site_config.output_dir)
             except OSError:
-                # On Linux with concurrent operations the directory may not be
-                # fully empty yet.  Wait briefly and retry once before falling
-                # back to a best-effort removal.
                 time.sleep(0.1)
                 try:
                     shutil.rmtree(self.site_config.output_dir)
@@ -106,13 +133,18 @@ class SiteGenerator(
                         "Warning: Some files could not be removed from output directory"
                     )
 
-        # Parse all pages from the pages subdirectory (must be done first so we
-        # can exclude them when scanning for posts)
+    def _parse_content(self) -> tuple[list[Post], list[Page], Page | None]:
+        """Parse all posts and pages from the content directory.
+
+        Returns:
+            Tuple of (posts, pages, page_404).
+        """
+        content_dir = self._content_dir
         pages_dir = content_dir / "pages"
+
         pages = self.parser.parse_pages_directory(pages_dir)
         page_404 = self.parser.parse_404_page(pages_dir)
 
-        # Parse all posts, excluding the pages subdirectory
         print(f"Parsing posts from {content_dir}...")
         posts = self.parser.parse_directory(
             content_dir,
@@ -121,158 +153,154 @@ class SiteGenerator(
         )
         print(f"Found {len(posts)} posts")
 
-        # Apply configured reading-speed to every post so that reading_time
-        # reflects the user's read_time_wpm setting.
+        # Apply configured reading-speed and default author
         for post in posts:
             post.words_per_minute = self.site_config.read_time_wpm
+            if self.site_config.default_author and (
+                post.metadata is None or "author" not in post.metadata
+            ):
+                if post.metadata is None:
+                    post.metadata = {}
+                post.metadata["author"] = self.site_config.default_author
 
-        # Apply default author to posts that don't have one
-        if self.site_config.default_author:
-            for post in posts:
-                if post.metadata is not None and "author" not in post.metadata:
-                    post.metadata["author"] = self.site_config.default_author
         if pages:
             print(f"Found {len(pages)} pages")
 
-        # Resolve the list of pages to display in the sidebar.  This may be a
-        # filtered/reordered subset when the user has configured ``pages:`` in
-        # the config file; otherwise it equals ``pages`` unchanged.
-        sidebar_pages = self._resolve_sidebar_pages(pages)
+        return posts, pages, page_404
 
-        # Create output directory
-        self.site_config.output_dir.mkdir(parents=True, exist_ok=True)
+    def _build_backlinks(self, posts: list[Post]) -> dict[str, list[Backlink]]:
+        """Build the backlink map if the feature is enabled.
 
-        # Generate icons from source image BEFORE generating HTML pages
-        # so that the has_apple_touch_icons flag is correctly set
-        self._generate_icons()
+        Args:
+            posts: All published posts.
 
-        # Prepare the FontAwesome CSS URL (and content if optimisation succeeds).
-        # Must be done before any HTML is rendered so the correct URL is embedded
-        # in every page, but the CSS file itself is written after _copy_static_assets()
-        # so it is not overwritten by that step.
-        fontawesome_css_content = self._prepare_fontawesome_css()
-
-        # Resolve page output paths before generating any HTML so that
-        # page.url_path is set correctly for all pages (including when they
-        # appear in the sidebar of individual post pages).
-        page_output_paths = self._resolve_page_output_paths(pages)
-
-        # Generate individual post pages
-        print("Generating post pages...")
-        post_output_paths = self._resolve_post_output_paths(posts)
-
-        # Build the backlink map only when the feature is enabled.  This
-        # must happen after _resolve_post_output_paths() so that every
-        # post.url_path is set to its final value before link matching.
-        backlinks_map: dict[str, list[Backlink]] = {}
+        Returns:
+            Mapping from post URL to list of backlinks.
+        """
         if self.site_config.with_backlinks:
             print("Building backlink map...")
-            backlinks_map = build_backlink_map(
-                posts,
-                site_url=self.site_config.site_url,
-            )
+            return build_backlink_map(posts, site_url=self.site_config.site_url)
+        return {}
 
+    def _generate_content_pages(
+        self,
+        posts: list[Post],
+        pages: list[Page],
+        page_404: Page | None,
+        sidebar_pages: list[Page],
+        post_output_paths: dict[int, Path],
+        page_output_paths: dict[int, Path],
+        backlinks_map: dict[str, list[Backlink]],
+    ) -> None:
+        """Generate individual post and static pages.
+
+        Args:
+            posts: All published posts.
+            pages: All static pages.
+            page_404: Custom 404 page if present.
+            sidebar_pages: Pages to display in the sidebar.
+            post_output_paths: Pre-resolved output paths for posts.
+            page_output_paths: Pre-resolved output paths for pages.
+            backlinks_map: Mapping of posts to their incoming links.
+        """
+        print("Generating post pages...")
         generated_paths: set[str] = set()
         for post in posts:
             output_path = post_output_paths[id(post)]
             path_key = str(output_path)
             if path_key in generated_paths:
-                # A newer post has already claimed this path; skip this older one.
                 continue
             generated_paths.add(path_key)
             self._generate_post_page(
                 post, posts, sidebar_pages, output_path, backlinks_map
             )
 
-        # Generate static pages
         if pages:
             print("Generating static pages...")
             for page in pages:
                 self._generate_page(page, sidebar_pages, page_output_paths[id(page)])
 
-        # Generate custom 404 page if present
         if page_404 is not None:
             print("Generating custom 404 page...")
             self._generate_404_page(page_404, sidebar_pages)
 
-        # Generate index page
+    def _generate_listing_pages(self, posts: list[Post], pages: list[Page]) -> None:
+        """Generate all index and listing pages (archives, tags, categories).
+
+        Args:
+            posts: All published posts.
+            pages: Sidebar pages.
+        """
         print("Generating index page...")
-        self._generate_index_page(posts, sidebar_pages)
+        self._generate_index_page(posts, pages)
 
-        # Generate archive page
-        print("Generating archive page...")
-        self._generate_archive_page(posts, sidebar_pages)
+        print("Generating archive pages...")
+        self._generate_archive_page(posts, pages)
+        self._generate_date_archives(posts, pages)
 
-        # Generate date-based archive pages
-        print("Generating date-based archive pages...")
-        self._generate_date_archives(posts, sidebar_pages)
-
-        # Generate tag pages
         print("Generating tag pages...")
-        self._generate_tag_pages(posts, sidebar_pages)
+        self._generate_tag_pages(posts, pages)
+        self._generate_tags_page(posts, pages)
 
-        # Generate tags overview page
-        print("Generating tags overview page...")
-        self._generate_tags_page(posts, sidebar_pages)
-
-        # Generate category pages
         print("Generating category pages...")
-        self._generate_category_pages(posts, sidebar_pages)
+        self._generate_category_pages(posts, pages)
+        self._generate_categories_page(posts, pages)
 
-        # Generate categories overview page
-        print("Generating categories overview page...")
-        self._generate_categories_page(posts, sidebar_pages)
+    def _generate_optional_pages(
+        self,
+        posts: list[Post],
+        pages: list[Page],
+        backlinks_map: dict[str, list[Backlink]],
+    ) -> None:
+        """Generate optional feature pages (feeds, search, stats, etc.).
 
-        # Generate feeds
+        Args:
+            posts: All published posts.
+            pages: Sidebar pages.
+            backlinks_map: Backlink mapping.
+        """
         print("Generating RSS and Atom feeds...")
         self._generate_feeds(posts)
 
-        # Generate search index and search page (only when enabled)
         if self.site_config.with_search:
             print("Generating search index and search page...")
             self._generate_search_index(posts)
-            self._generate_search_page(sidebar_pages)
+            self._generate_search_page(pages)
         else:
-            # Remove any stale search files left over from a previous build
-            # that had search enabled.
             self._remove_stale_search_files()
 
-        # Generate statistics page (only when enabled)
         if self.site_config.with_stats:
             print("Generating blog statistics page...")
             self._generate_stats_page(
                 posts,
-                sidebar_pages,
+                pages,
                 backlinks_map if self.site_config.with_backlinks else None,
             )
 
-        # Generate calendar page (only when enabled)
         if self.site_config.with_calendar:
             print("Generating calendar page...")
-            self._generate_calendar_page(posts, sidebar_pages)
+            self._generate_calendar_page(posts, pages)
 
-        # Generate graph page (only when enabled)
         if self.site_config.with_graph:
             print("Generating graph page...")
-            self._generate_graph_page(posts, sidebar_pages)
+            self._generate_graph_page(posts, pages)
 
-        # Copy static assets if they exist
+    def _finalize_site(self, fontawesome_css_content: str | None) -> None:
+        """Finalize site by copying assets and generating sitemap.
+
+        Args:
+            fontawesome_css_content: Optimized FontAwesome CSS if generated.
+        """
         self._copy_static_assets()
 
-        # Write the optimised FontAwesome CSS file after static assets have been
-        # copied so it is not overwritten by _copy_static_assets().
         if fontawesome_css_content is not None:
             self._write_fontawesome_css(fontawesome_css_content)
 
-        # Copy extra files from extras directory
         self._copy_extras()
 
-        # Generate XML sitemap (only when enabled)
         if self.site_config.with_sitemap:
             print("Generating XML sitemap...")
             self._generate_sitemap()
-
-        print(f"Site generation complete! Output: {self.site_config.output_dir}")
 
 
 ### site.py ends here

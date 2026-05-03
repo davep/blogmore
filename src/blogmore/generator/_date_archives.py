@@ -4,6 +4,7 @@
 
 import datetime as dt
 from collections import defaultdict
+from collections.abc import Callable
 from typing import Any
 
 from blogmore.parser import Page, Post
@@ -27,6 +28,56 @@ class DateArchivesMixin:
     site_config: SiteConfig
     renderer: TemplateRenderer
     POSTS_PER_PAGE_ARCHIVE: int
+
+    def _generate_date_archive_level(
+        self,
+        posts_by_date: dict[Any, list[Post]],
+        context: dict[str, Any],
+        path_format: str,
+        title_format: str,
+        date_args_func: Callable[[Any], dict[str, Any]],
+    ) -> None:
+        """Helper to generate one level of date-based archives (year, month, or day).
+
+        Args:
+            posts_by_date: Mapping of date key (int or tuple) to posts.
+            context: Shared template context dict.
+            path_format: Format string for the URL path.
+            title_format: Format string for the archive title.
+            date_args_func: Callable that converts a date key to format kwargs.
+        """
+        for date_key, level_posts in posts_by_date.items():
+            date_args = date_args_func(date_key)
+            base_path = path_format.format(**date_args)
+            output_dir = self.site_config.output_dir / base_path.lstrip("/")
+            output_dir.mkdir(parents=True, exist_ok=True)
+            archive_title = title_format.format(**date_args)
+
+            def _render(
+                page_posts: list[Post],
+                page_num: int,
+                total_pages: int,
+                _title: str = archive_title,
+                _base: str = base_path,
+                _ctx: dict[str, Any] = context,
+            ) -> str:
+                return self.renderer.render_archive(
+                    page_posts,
+                    archive_title=f"Posts from {_title}",
+                    page=page_num,
+                    total_pages=total_pages,
+                    base_path=_base,
+                    **_ctx,
+                )
+
+            self._generate_paginated_listing(  # type: ignore[attr-defined]
+                level_posts,
+                base_url=base_path,
+                output_dir=output_dir,
+                posts_per_page=self.POSTS_PER_PAGE_ARCHIVE,
+                context=context,
+                render_func=_render,
+            )
 
     def _generate_date_archives(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate date-based archive pages (year, month, day) with pagination.
@@ -53,105 +104,41 @@ class DateArchivesMixin:
         context = self._get_global_context()  # type: ignore[attr-defined]
         context["pages"] = pages
 
-        # Generate year archives with pagination
-        for year, year_posts in posts_by_year.items():
-            year_dir = self.site_config.output_dir / str(year)
-            year_dir.mkdir(parents=True, exist_ok=True)
-            base_path = f"/{year}"
+        # Generate year archives
+        self._generate_date_archive_level(
+            posts_by_year,
+            context,
+            path_format="/{year}",
+            title_format="{year}",
+            date_args_func=lambda y: {"year": y},
+        )
 
-            def _render_year(
-                page_posts: list[Post],
-                page_num: int,
-                total_pages: int,
-                _year: int = year,
-                _base: str = base_path,
-                _ctx: dict[str, Any] = context,
-            ) -> str:
-                return self.renderer.render_archive(
-                    page_posts,
-                    archive_title=f"Posts from {_year}",
-                    page=page_num,
-                    total_pages=total_pages,
-                    base_path=_base,
-                    **_ctx,
-                )
+        # Generate month archives
+        self._generate_date_archive_level(
+            posts_by_month,
+            context,
+            path_format="/{year}/{month:02d}",
+            title_format="{month_name} {year}",
+            date_args_func=lambda k: {
+                "year": k[0],
+                "month": k[1],
+                "month_name": dt.datetime(k[0], k[1], 1).strftime("%B"),
+            },
+        )
 
-            self._generate_paginated_listing(  # type: ignore[attr-defined]
-                year_posts,
-                base_url=base_path,
-                output_dir=year_dir,
-                posts_per_page=self.POSTS_PER_PAGE_ARCHIVE,
-                context=context,
-                render_func=_render_year,
-            )
-
-        # Generate month archives with pagination
-        for (year, month), month_posts in posts_by_month.items():
-            month_dir = self.site_config.output_dir / str(year) / f"{month:02d}"
-            month_dir.mkdir(parents=True, exist_ok=True)
-            month_name = dt.datetime(year, month, 1).strftime("%B %Y")
-            base_path = f"/{year}/{month:02d}"
-
-            def _render_month(
-                page_posts: list[Post],
-                page_num: int,
-                total_pages: int,
-                _name: str = month_name,
-                _base: str = base_path,
-                _ctx: dict[str, Any] = context,
-            ) -> str:
-                return self.renderer.render_archive(
-                    page_posts,
-                    archive_title=f"Posts from {_name}",
-                    page=page_num,
-                    total_pages=total_pages,
-                    base_path=_base,
-                    **_ctx,
-                )
-
-            self._generate_paginated_listing(  # type: ignore[attr-defined]
-                month_posts,
-                base_url=base_path,
-                output_dir=month_dir,
-                posts_per_page=self.POSTS_PER_PAGE_ARCHIVE,
-                context=context,
-                render_func=_render_month,
-            )
-
-        # Generate day archives with pagination
-        for (year, month, day), day_posts in posts_by_day.items():
-            day_dir = (
-                self.site_config.output_dir / str(year) / f"{month:02d}" / f"{day:02d}"
-            )
-            day_dir.mkdir(parents=True, exist_ok=True)
-            date_str = dt.datetime(year, month, day).strftime("%B %d, %Y")
-            base_path = f"/{year}/{month:02d}/{day:02d}"
-
-            def _render_day(
-                page_posts: list[Post],
-                page_num: int,
-                total_pages: int,
-                _date: str = date_str,
-                _base: str = base_path,
-                _ctx: dict[str, Any] = context,
-            ) -> str:
-                return self.renderer.render_archive(
-                    page_posts,
-                    archive_title=f"Posts from {_date}",
-                    page=page_num,
-                    total_pages=total_pages,
-                    base_path=_base,
-                    **_ctx,
-                )
-
-            self._generate_paginated_listing(  # type: ignore[attr-defined]
-                day_posts,
-                base_url=base_path,
-                output_dir=day_dir,
-                posts_per_page=self.POSTS_PER_PAGE_ARCHIVE,
-                context=context,
-                render_func=_render_day,
-            )
+        # Generate day archives
+        self._generate_date_archive_level(
+            posts_by_day,
+            context,
+            path_format="/{year}/{month:02d}/{day:02d}",
+            title_format="{month_name} {day:02d}, {year}",
+            date_args_func=lambda k: {
+                "year": k[0],
+                "month": k[1],
+                "day": k[2],
+                "month_name": dt.datetime(k[0], k[1], 1).strftime("%B"),
+            },
+        )
 
 
 ### _date_archives.py ends here

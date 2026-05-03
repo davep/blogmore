@@ -372,6 +372,105 @@ class PostParser:
         except Exception as e:
             raise ValueError(f"Error parsing frontmatter in {path}: {e}") from e
 
+    def _extract_title(
+        self, metadata: dict[str, Any], path: Path, content_type: str
+    ) -> str:
+        """Extract and validate the title from frontmatter metadata.
+
+        Args:
+            metadata: Frontmatter metadata dictionary.
+            path: Path to the markdown file (for error messages).
+            content_type: Human-readable description of the file type (e.g. "post"
+                          or "page").
+
+        Returns:
+            The validated title string.
+
+        Raises:
+            ValueError: If the title is missing or not a string.
+        """
+        title = metadata.get("title")
+        if not title:
+            raise ValueError(
+                f"{content_type.capitalize()} missing required 'title' in frontmatter: {path}"
+            )
+        if not isinstance(title, str):
+            raise ValueError(
+                f"{content_type.capitalize()} 'title' in frontmatter must be a string in: {path}\n"
+                f"  Found: {title!r} (type: {type(title).__name__})\n"
+                f"  Fix: wrap the value in quotes, e.g.  title: 'My Title'"
+            )
+        return title
+
+    def _extract_date(self, metadata: dict[str, Any]) -> dt.datetime | None:
+        """Extract and parse the publication date from frontmatter metadata.
+
+        Args:
+            metadata: Frontmatter metadata dictionary.
+
+        Returns:
+            The parsed datetime object, or None if no date was provided.
+        """
+        if "date" not in metadata:
+            return None
+        date_value = metadata["date"]
+        if isinstance(date_value, dt.datetime):
+            return date_value
+        if isinstance(date_value, dt.date):
+            return dt.datetime.combine(date_value, dt.time())
+        if isinstance(date_value, str):
+            for fmt in _DATE_FORMATS:
+                try:
+                    return dt.datetime.strptime(date_value, fmt)
+                except ValueError:
+                    continue
+            try:
+                return dateutil_parser.parse(date_value)
+            except ValueError:
+                pass
+        return None
+
+    def _extract_category(self, metadata: dict[str, Any]) -> str | None:
+        """Extract the category from frontmatter metadata.
+
+        Args:
+            metadata: Frontmatter metadata dictionary.
+
+        Returns:
+            The category string (stripped), or None if no category was provided.
+        """
+        raw_category = metadata.get("category")
+        if raw_category is not None:
+            return str(raw_category).strip() or None
+        return None
+
+    def _extract_tags(self, metadata: dict[str, Any], path: Path) -> list[str]:
+        """Extract and validate the tags from frontmatter metadata.
+
+        Args:
+            metadata: Frontmatter metadata dictionary.
+            path: Path to the markdown file (for error messages).
+
+        Returns:
+            A list of tag strings.
+
+        Raises:
+            ValueError: If tags are present but in an invalid format.
+        """
+        raw_tags = metadata.get("tags", [])
+        if raw_tags is None:
+            return []
+        if isinstance(raw_tags, str):
+            return [tag.strip() for tag in raw_tags.split(",")]
+        if isinstance(raw_tags, list):
+            return [str(tag).strip() for tag in raw_tags]
+        raise ValueError(
+            f"Post 'tags' in frontmatter must be a string or list in: {path}\n"
+            f"  Found: {raw_tags!r} (type: {type(raw_tags).__name__})\n"
+            f"  Fix: wrap the value in quotes or brackets, e.g. "
+            f" tags: 'my-tag'  or  tags: [tag1, tag2]"
+        )
+
     def parse_file(self, path: Path) -> Post:
         """Parse a markdown file with frontmatter.
 
@@ -390,75 +489,14 @@ class PostParser:
 
         # Parse frontmatter
         post_data = self._load_frontmatter(path, content_type="post")
+        metadata = dict(post_data.metadata)
 
-        # Extract metadata
-        title = post_data.get("title")
-        if not title:
-            raise ValueError(f"Post missing required 'title' in frontmatter: {path}")
-        if not isinstance(title, str):
-            raise ValueError(
-                f"Post 'title' in frontmatter must be a string in: {path}\n"
-                f"  Found: {title!r} (type: {type(title).__name__})\n"
-                f"  Fix: wrap the value in quotes, e.g.  title: 'My Post Title'"
-            )
-
-        # Parse date if present
-        date = None
-        if "date" in post_data:
-            date_value = post_data["date"]
-            if isinstance(date_value, dt.datetime):
-                date = date_value
-            elif isinstance(date_value, dt.date):
-                # Convert date to datetime
-                date = dt.datetime.combine(date_value, dt.time())
-            elif isinstance(date_value, str):
-                # Try to parse common date formats, including timezone-aware formats
-                for fmt in _DATE_FORMATS:
-                    try:
-                        date = dt.datetime.strptime(date_value, fmt)
-                        break
-                    except ValueError:
-                        continue
-
-                # If we still couldn't parse it, try with python-dateutil if available
-                if date is None:
-                    try:
-                        date = dateutil_parser.parse(date_value)
-                    except ValueError:
-                        pass
-
-        # Extract category - coerce to str in case YAML parsed it as a non-string
-        # (e.g. `category: 2024` is parsed as int by the YAML parser)
-        raw_category = post_data.get("category")
-        if raw_category is not None:
-            category: str | None = str(raw_category).strip() or None
-        else:
-            category = None
-
-        # Extract tags - coerce each item to str in case YAML parsed numeric
-        # values as int (e.g. `tags: [2024, python]` gives [2024, "python"]).
-        # A bare scalar (e.g. `tags: +3` parsed as int 3) is not iterable and
-        # must be caught explicitly with a helpful error rather than letting
-        # Python raise "'int' object is not iterable".
-        # A bare `tags:` with no value is parsed by YAML as None; treat it as
-        # an empty list (no tags).
-        raw_tags = post_data.get("tags", [])
-        if raw_tags is None:
-            tags: list[str] = []
-        elif isinstance(raw_tags, str):
-            tags = [tag.strip() for tag in raw_tags.split(",")]
-        elif isinstance(raw_tags, list):
-            tags = [str(tag).strip() for tag in raw_tags]
-        else:
-            raise ValueError(
-                f"Post 'tags' in frontmatter must be a string or list in: {path}\n"
-                f"  Found: {raw_tags!r} (type: {type(raw_tags).__name__})\n"
-                f"  Fix: wrap the value in quotes or brackets, e.g. "
-                f" tags: 'my-tag'  or  tags: [tag1, tag2]"
-            )
-
-        # Check draft status
-        draft = post_data.get("draft", False)
+        # Extract and validate metadata
+        title = self._extract_title(metadata, path, "post")
+        date = self._extract_date(metadata)
+        category = self._extract_category(metadata)
+        tags = self._extract_tags(metadata, path)
+        draft = metadata.get("draft", False)
 
         # Convert markdown to HTML
         html_content = self.markdown.convert(post_data.content)
@@ -536,17 +574,10 @@ class PostParser:
 
         # Parse frontmatter
         page_data = self._load_frontmatter(path, content_type="page")
+        metadata = dict(page_data.metadata)
 
-        # Extract metadata
-        title = page_data.get("title")
-        if not title:
-            raise ValueError(f"Page missing required 'title' in frontmatter: {path}")
-        if not isinstance(title, str):
-            raise ValueError(
-                f"Page 'title' in frontmatter must be a string in: {path}\n"
-                f"  Found: {title!r} (type: {type(title).__name__})\n"
-                f"  Fix: wrap the value in quotes, e.g.  title: 'My Page Title'"
-            )
+        # Extract and validate metadata
+        title = self._extract_title(metadata, path, "page")
 
         # Convert markdown to HTML
         html_content = self.markdown.convert(page_data.content)

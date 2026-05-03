@@ -78,6 +78,111 @@ class ListingMixin(DateArchivesMixin):
             html = render_func(page_posts, page_num, total_pages)
             self._write_html(output_path, html)  # type: ignore[attr-defined]
 
+    def _generate_attribute_pages(
+        self,
+        posts_by_attr: dict[str, tuple[str, list[Post]]],
+        pages: list[Page],
+        attr_dir_name: str,
+        posts_per_page: int,
+        render_func: Callable[..., str],
+        display_kwarg: str,
+        safe_kwarg: str,
+    ) -> None:
+        """Helper to generate paginated listing pages for a grouped attribute.
+
+        Args:
+            posts_by_attr: Mapping of attribute slug to (display_name, posts).
+            pages: List of static pages for the sidebar.
+            attr_dir_name: Directory name for the attribute (e.g. ``"tag"``).
+            posts_per_page: Maximum number of posts per page.
+            render_func: Renderer method (e.g. ``self.renderer.render_tag_page``).
+            display_kwarg: The kwarg name for the display name in *render_func*.
+            safe_kwarg: The kwarg name for the sanitized slug in *render_func*.
+        """
+        attr_dir = self.site_config.output_dir / attr_dir_name
+        attr_dir.mkdir(exist_ok=True)
+
+        for attr_lower, (attr_display, attr_posts) in posts_by_attr.items():
+            attr_posts.sort(key=post_sort_key, reverse=True)
+            safe_attr = sanitize_for_url(attr_lower)
+            base_url = f"/{attr_dir_name}/{safe_attr}"
+            attr_base_dir = attr_dir / safe_attr
+            context = self._get_global_context()  # type: ignore[attr-defined]
+            context["pages"] = pages
+
+            def _render(
+                page_posts: list[Post],
+                page_num: int,
+                total_pages: int,
+                _display: str = attr_display,
+                _safe: str = safe_attr,
+                _ctx: dict[str, Any] = context,
+            ) -> str:
+                kwargs = {
+                    display_kwarg: _display,
+                    safe_kwarg: _safe,
+                    "posts": page_posts,
+                    "page": page_num,
+                    "total_pages": total_pages,
+                }
+                return render_func(**kwargs, **_ctx)
+
+            self._generate_paginated_listing(
+                attr_posts,
+                base_url=base_url,
+                output_dir=attr_base_dir,
+                posts_per_page=posts_per_page,
+                context=context,
+                render_func=_render,
+            )
+
+    def _generate_attribute_overview_page(
+        self,
+        posts_by_attr: dict[str, tuple[str, list[Post]]],
+        pages: list[Page],
+        path_attr: str,
+        render_func: Callable[..., str],
+        context_kwarg: str,
+        safe_attr_key: str,
+        attr_lower_key: str,
+    ) -> None:
+        """Helper to generate a grouped attribute overview page (e.g. tags cloud).
+
+        Args:
+            posts_by_attr: Mapping of attribute slug to (display_name, posts).
+            pages: List of static pages for the sidebar.
+            path_attr: SiteConfig attribute name for the page path.
+            render_func: Renderer method (e.g. ``self.renderer.render_tags_page``).
+            context_kwarg: The kwarg name for the data list in *render_func*.
+            safe_attr_key: Key name for the sanitized slug in the data dict.
+            attr_lower_key: Key name for the lowercase attribute name in the data dict.
+        """
+        if not posts_by_attr:
+            return
+
+        attr_data: list[dict[str, Any]] = [
+            {
+                "display_name": attr_display,
+                safe_attr_key: sanitize_for_url(attr_lower),
+                "count": len(attr_posts),
+                attr_lower_key: attr_lower,
+            }
+            for attr_lower, (attr_display, attr_posts) in posts_by_attr.items()
+        ]
+
+        # Sort alphabetically by display name
+        attr_data.sort(key=lambda x: x["display_name"].lower())
+
+        self._calculate_cloud_font_sizes(attr_data)  # type: ignore[attr-defined]
+
+        # Render the page
+        context = self._get_global_context()  # type: ignore[attr-defined]
+        context["pages"] = pages
+        kwargs = {context_kwarg: attr_data}
+        self._generate_single_page(  # type: ignore[attr-defined]
+            path_attr, render_func, context, **kwargs
+        )
+
     def _generate_tag_pages(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate pages for each tag with pagination.
 
@@ -89,53 +194,15 @@ class ListingMixin(DateArchivesMixin):
         # Key is lowercase tag, value is (display_name, posts)
         posts_by_tag = self._group_posts_by_tag(posts)  # type: ignore[attr-defined]
 
-        # Create tag directory
-        tag_dir = self.site_config.output_dir / TAG_DIR
-        tag_dir.mkdir(exist_ok=True)
-
-        # Generate paginated pages for each tag
-        for tag_lower, (tag_display, tag_posts) in posts_by_tag.items():
-            # Sort tag posts by date (newest first)
-            tag_posts.sort(key=post_sort_key, reverse=True)
-
-            # Sanitize tag for filename (use lowercase version)
-            safe_tag = sanitize_for_url(tag_lower)
-
-            base_url = f"/{TAG_DIR}/{safe_tag}"
-            # Each tag's pages live inside tag/{safe_tag}/ directory.
-            tag_base_dir = tag_dir / safe_tag
-
-            context = self._get_global_context()  # type: ignore[attr-defined]
-            context["pages"] = pages
-
-            # Default parameter values bind the current loop variables at
-            # definition time (early binding), which is the standard Python
-            # idiom for capturing loop state in a nested function.
-            def _render_tag(
-                page_posts: list[Post],
-                page_num: int,
-                total_pages: int,
-                _display: str = tag_display,
-                _safe: str = safe_tag,
-                _ctx: dict[str, Any] = context,
-            ) -> str:
-                return self.renderer.render_tag_page(
-                    _display,
-                    page_posts,
-                    page=page_num,
-                    total_pages=total_pages,
-                    safe_tag=_safe,
-                    **_ctx,
-                )
-
-            self._generate_paginated_listing(
-                tag_posts,
-                base_url=base_url,
-                output_dir=tag_base_dir,
-                posts_per_page=self.POSTS_PER_PAGE_TAG,
-                context=context,
-                render_func=_render_tag,
-            )
+        self._generate_attribute_pages(
+            posts_by_tag,
+            pages,
+            TAG_DIR,
+            self.POSTS_PER_PAGE_TAG,
+            self.renderer.render_tag_page,
+            "tag",
+            "safe_tag",
+        )
 
     def _generate_tags_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the tags overview page with word cloud.
@@ -147,31 +214,14 @@ class ListingMixin(DateArchivesMixin):
         # Group posts by tag to get counts
         posts_by_tag = self._group_posts_by_tag(posts)  # type: ignore[attr-defined]
 
-        if not posts_by_tag:
-            # No tags, skip generation
-            return
-
-        # Calculate tag counts and prepare data
-        tag_data: list[dict[str, Any]] = [
-            {
-                "display_name": tag_display,
-                "safe_tag": sanitize_for_url(tag_lower),
-                "count": len(tag_posts),
-                "tag_lower": tag_lower,
-            }
-            for tag_lower, (tag_display, tag_posts) in posts_by_tag.items()
-        ]
-
-        # Sort alphabetically by display name
-        tag_data.sort(key=lambda x: x["display_name"].lower())
-
-        self._calculate_cloud_font_sizes(tag_data)  # type: ignore[attr-defined]
-
-        # Render the tags page
-        context = self._get_global_context()  # type: ignore[attr-defined]
-        context["pages"] = pages
-        self._generate_single_page(  # type: ignore[attr-defined]
-            "tags_path", self.renderer.render_tags_page, context, tags=tag_data
+        self._generate_attribute_overview_page(
+            posts_by_tag,
+            pages,
+            "tags_path",
+            self.renderer.render_tags_page,
+            "tags",
+            "safe_tag",
+            "tag_lower",
         )
 
     def _generate_categories_page(self, posts: list[Post], pages: list[Page]) -> None:
@@ -184,37 +234,14 @@ class ListingMixin(DateArchivesMixin):
         # Group posts by category to get counts
         posts_by_category = self._group_posts_by_category(posts)  # type: ignore[attr-defined]
 
-        if not posts_by_category:
-            # No categories, skip generation
-            return
-
-        # Calculate category counts and prepare data
-        category_data: list[dict[str, Any]] = [
-            {
-                "display_name": category_display,
-                "safe_category": sanitize_for_url(category_lower),
-                "count": len(category_posts),
-                "category_lower": category_lower,
-            }
-            for category_lower, (
-                category_display,
-                category_posts,
-            ) in posts_by_category.items()
-        ]
-
-        # Sort alphabetically by display name
-        category_data.sort(key=lambda x: x["display_name"].lower())
-
-        self._calculate_cloud_font_sizes(category_data)  # type: ignore[attr-defined]
-
-        # Render the categories page
-        context = self._get_global_context()  # type: ignore[attr-defined]
-        context["pages"] = pages
-        self._generate_single_page(  # type: ignore[attr-defined]
+        self._generate_attribute_overview_page(
+            posts_by_category,
+            pages,
             "categories_path",
             self.renderer.render_categories_page,
-            context,
-            categories=category_data,
+            "categories",
+            "safe_category",
+            "category_lower",
         )
 
     def _generate_category_pages(self, posts: list[Post], pages: list[Page]) -> None:
@@ -228,53 +255,15 @@ class ListingMixin(DateArchivesMixin):
         # Key is lowercase category, value is (display_name, posts)
         posts_by_category = self._group_posts_by_category(posts)  # type: ignore[attr-defined]
 
-        # Create category directory
-        category_dir = self.site_config.output_dir / CATEGORY_DIR
-        category_dir.mkdir(exist_ok=True)
-
-        # Generate paginated pages for each category
-        for category_lower, (
-            category_display,
-            category_posts,
-        ) in posts_by_category.items():
-            # Sort category posts by date (newest first)
-            category_posts.sort(key=post_sort_key, reverse=True)
-
-            # Sanitize category for filename (use lowercase version)
-            safe_category = sanitize_for_url(category_lower)
-
-            base_url = f"/{CATEGORY_DIR}/{safe_category}"
-            # Each category's pages live inside category/{safe_category}/ directory.
-            category_base_dir = category_dir / safe_category
-
-            context = self._get_global_context()  # type: ignore[attr-defined]
-            context["pages"] = pages
-
-            def _render_category(
-                page_posts: list[Post],
-                page_num: int,
-                total_pages: int,
-                _display: str = category_display,
-                _safe: str = safe_category,
-                _ctx: dict[str, Any] = context,
-            ) -> str:
-                return self.renderer.render_category_page(
-                    _display,
-                    page_posts,
-                    page=page_num,
-                    total_pages=total_pages,
-                    safe_category=_safe,
-                    **_ctx,
-                )
-
-            self._generate_paginated_listing(
-                category_posts,
-                base_url=base_url,
-                output_dir=category_base_dir,
-                posts_per_page=self.POSTS_PER_PAGE_CATEGORY,
-                context=context,
-                render_func=_render_category,
-            )
+        self._generate_attribute_pages(
+            posts_by_category,
+            pages,
+            CATEGORY_DIR,
+            self.POSTS_PER_PAGE_CATEGORY,
+            self.renderer.render_category_page,
+            "category",
+            "safe_category",
+        )
 
 
 ### _listing.py ends here
