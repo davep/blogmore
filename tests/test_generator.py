@@ -15,9 +15,14 @@ from blogmore.generator import (
     SiteGenerator,
     minified_filename,
     paginate_posts,
+)
+from blogmore.parser import (
+    CUSTOM_404_HTML,
+    CUSTOM_404_MARKDOWN,
+    Page,
+    Post,
     sanitize_for_url,
 )
-from blogmore.parser import CUSTOM_404_HTML, CUSTOM_404_MARKDOWN, Page, Post
 from blogmore.site_config import SiteConfig
 
 

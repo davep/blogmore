@@ -23,10 +23,6 @@ from blogmore.generator.constants import (
 from blogmore.generator.site import SiteGenerator
 from blogmore.generator.utils import minified_filename, paginate_posts
 
-# Re-export sanitize_for_url from the parser so callers that previously
-# imported it from blogmore.generator continue to work.
-from blogmore.parser import sanitize_for_url
-
 __all__ = [
     "ARCHIVE_CSS_FILENAME",
     "CALENDAR_CSS_FILENAME",
@@ -44,7 +40,6 @@ __all__ = [
     "SiteGenerator",
     "minified_filename",
     "paginate_posts",
-    "sanitize_for_url",
 ]
 
 ### __init__.py ends here
