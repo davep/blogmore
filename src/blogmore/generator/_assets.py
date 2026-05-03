@@ -14,7 +14,7 @@ from blogmore.fontawesome import (
     FONTAWESOME_LOCAL_CSS_PATH,
     FontAwesomeOptimizer,
 )
-from blogmore.generator._minify import _MinifyMixin
+from blogmore.generator._minify import MinifyMixin
 from blogmore.generator.constants import (
     _PAGE_SPECIFIC_CSS,
     CODEBLOCKS_JS_FILENAME,
@@ -28,7 +28,7 @@ from blogmore.renderer import TemplateRenderer
 from blogmore.site_config import SiteConfig
 
 
-class _AssetsMixin(_MinifyMixin):
+class AssetsMixin(MinifyMixin):
     """Mixin that manages icon generation and static file copying.
 
     This mixin is intended to be composed into

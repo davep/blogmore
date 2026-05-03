@@ -6,13 +6,12 @@ from typing import Any
 from blogmore.parser import Post
 
 
-class _GroupingMixin:
+class GroupingMixin:
     """Mixin that groups posts by tag or category and calculates word-cloud sizes.
 
     This mixin is intended to be composed into
     [`SiteGenerator`][blogmore.generator.site.SiteGenerator] alongside the
-    other ``_*Mixin`` classes.  It has no instance-variable dependencies of
-    its own.
+    other mixin classes.  It has no instance-variable dependencies of its own.
     """
 
     def _group_posts_by_attribute(

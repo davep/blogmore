@@ -7,13 +7,13 @@ from pathlib import Path
 from blogmore.backlinks import Backlink
 from blogmore.clean_url import make_url_clean
 from blogmore.comment_invite import build_mailto_url, get_invite_email_for_post
-from blogmore.generator._optional_pages import _OptionalPagesMixin
+from blogmore.generator._optional_pages import OptionalPagesMixin
 from blogmore.parser import CUSTOM_404_HTML, Page, Post
 from blogmore.renderer import TemplateRenderer
 from blogmore.site_config import SiteConfig
 
 
-class _PagesMixin(_OptionalPagesMixin):
+class PagesMixin(OptionalPagesMixin):
     """Mixin that generates each type of HTML page written to the output directory.
 
     This mixin is intended to be composed into

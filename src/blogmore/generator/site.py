@@ -5,24 +5,24 @@ import time
 
 from blogmore.backlinks import Backlink, build_backlink_map
 from blogmore.fontawesome import FONTAWESOME_CDN_CSS_URL
-from blogmore.generator._assets import _AssetsMixin
-from blogmore.generator._context import _ContextMixin
-from blogmore.generator._grouping import _GroupingMixin
-from blogmore.generator._listing import _ListingMixin
-from blogmore.generator._pages import _PagesMixin
-from blogmore.generator._paths import _PathsMixin
+from blogmore.generator._assets import AssetsMixin
+from blogmore.generator._context import ContextMixin
+from blogmore.generator._grouping import GroupingMixin
+from blogmore.generator._listing import ListingMixin
+from blogmore.generator._pages import PagesMixin
+from blogmore.generator._paths import PathsMixin
 from blogmore.parser import PostParser
 from blogmore.renderer import TemplateRenderer
 from blogmore.site_config import SiteConfig
 
 
 class SiteGenerator(
-    _AssetsMixin,
-    _ContextMixin,
-    _GroupingMixin,
-    _ListingMixin,
-    _PagesMixin,
-    _PathsMixin,
+    AssetsMixin,
+    ContextMixin,
+    GroupingMixin,
+    ListingMixin,
+    PagesMixin,
+    PathsMixin,
 ):
     """Generate a static blog site from markdown posts."""
 

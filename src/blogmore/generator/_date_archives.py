@@ -11,12 +11,12 @@ from blogmore.renderer import TemplateRenderer
 from blogmore.site_config import SiteConfig
 
 
-class _DateArchivesMixin:
+class DateArchivesMixin:
     """Mixin that generates year, month, and day archive pages with pagination.
 
     This mixin is intended to be composed into
     [`SiteGenerator`][blogmore.generator.site.SiteGenerator] via
-    [`_ListingMixin`][blogmore.generator._listing._ListingMixin].  It expects
+    [`ListingMixin`][blogmore.generator._listing.ListingMixin].  It expects
     the host class to provide the following instance attributes:
 
     - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])

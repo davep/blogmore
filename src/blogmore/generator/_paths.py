@@ -13,7 +13,7 @@ from blogmore.post_path import compute_output_path
 from blogmore.site_config import SiteConfig
 
 
-class _PathsMixin:
+class PathsMixin:
     """Mixin that resolves pagination paths, canonical URLs, and output paths.
 
     This mixin is intended to be composed into

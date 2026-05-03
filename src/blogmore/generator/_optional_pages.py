@@ -18,12 +18,12 @@ from blogmore.sitemap import write_sitemap
 from blogmore.stats import BlogStats, compute_blog_stats
 
 
-class _OptionalPagesMixin:
+class OptionalPagesMixin:
     """Mixin that generates optional-feature pages (feeds, search, stats, calendar, graph).
 
     This mixin is intended to be composed into
     [`SiteGenerator`][blogmore.generator.site.SiteGenerator] via
-    [`_PagesMixin`][blogmore.generator._pages._PagesMixin].  It expects
+    [`PagesMixin`][blogmore.generator._pages.PagesMixin].  It expects
     the host class to provide the following instance attributes:
 
     - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])

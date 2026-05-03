@@ -19,12 +19,12 @@ from blogmore.generator.utils import minified_filename
 from blogmore.site_config import SiteConfig
 
 
-class _MinifyMixin:
+class MinifyMixin:
     """Mixin that writes HTML pages and minifies CSS/JS assets.
 
     This mixin is intended to be composed into
     [`SiteGenerator`][blogmore.generator.site.SiteGenerator] (via
-    [`_AssetsMixin`][blogmore.generator._assets._AssetsMixin]).  It expects
+    [`AssetsMixin`][blogmore.generator._assets.AssetsMixin]).  It expects
     the host class to provide a ``site_config`` attribute of type
     [`SiteConfig`][blogmore.site_config.SiteConfig].
     """
@@ -169,7 +169,7 @@ class _MinifyMixin:
         """Write the optimised FontAwesome CSS file to the static directory.
 
         Must be called *after*
-        [`_copy_static_assets`][blogmore.generator._assets._AssetsMixin._copy_static_assets]
+        [`_copy_static_assets`][blogmore.generator._assets.AssetsMixin._copy_static_assets]
         so the file is not overwritten.  When ``minify_css`` is enabled the
         content is minified and written as ``fontawesome.min.css``; otherwise
         it is written as ``fontawesome.css``.

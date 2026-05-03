@@ -6,7 +6,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from blogmore.generator._date_archives import _DateArchivesMixin
+from blogmore.generator._date_archives import DateArchivesMixin
 from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
 from blogmore.generator.utils import paginate_posts
 from blogmore.parser import Page, Post, post_sort_key, sanitize_for_url
@@ -14,7 +14,7 @@ from blogmore.renderer import TemplateRenderer
 from blogmore.site_config import SiteConfig
 
 
-class _ListingMixin(_DateArchivesMixin):
+class ListingMixin(DateArchivesMixin):
     """Mixin that generates paginated listing pages for archives, tags, and categories.
 
     This mixin is intended to be composed into

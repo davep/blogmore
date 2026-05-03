@@ -30,7 +30,7 @@ from blogmore.pagination_path import resolve_pagination_page_path
 from blogmore.site_config import SiteConfig
 
 
-class _ContextMixin:
+class ContextMixin:
     """Mixin that builds template contexts and resolves configured page URLs.
 
     This mixin is intended to be composed into
@@ -163,7 +163,7 @@ class _ContextMixin:
             regular: Filename for the non-minified asset (e.g. ``"style.css"``).
             minify: When ``True``, the minified filename is used.
             cache_bust: When ``True`` (the default), the URL is passed through
-                [`_with_cache_bust`][blogmore.generator._context._ContextMixin._with_cache_bust]
+                [`_with_cache_bust`][blogmore.generator._context.ContextMixin._with_cache_bust]
                 so that browsers re-fetch the file after each build.
 
         Returns:
