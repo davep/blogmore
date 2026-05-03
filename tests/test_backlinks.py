@@ -4,6 +4,7 @@
 # Python imports.
 import datetime as dt
 import re
+import time
 from pathlib import Path
 
 ##############################################################################
@@ -180,6 +181,20 @@ class TestFindLinks:
         assert len(links) == 1
         url, _, _, _ = links[0]
         assert url == "/path_(foo).html"
+
+    def test_unclosed_link_does_not_hang(self) -> None:
+        """A malformed link with no closing ')' returns in constant time.
+
+        Regression guard against catastrophic backtracking: the atomic group
+        ``(?>...)`` around the URL alternation ensures the engine fails fast
+        rather than trying every possible partition of the character run.
+        """
+        bad_input = "[](" + "'" * 5000
+        start = time.monotonic()
+        result = _find_links(bad_input)
+        elapsed = time.monotonic() - start
+        assert result == []
+        assert elapsed < 1.0, f"_find_links took {elapsed:.3f}s on a pathological input"
 
 
 ##############################################################################

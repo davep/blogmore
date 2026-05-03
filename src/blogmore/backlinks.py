@@ -39,8 +39,11 @@ _BACKLINK_MARKER: str = "BKLINK8f3a2b19_BKLINK"
 # Inline links: [link text](url) or [link text](url "optional title")
 # The URL portion allows one level of balanced parentheses so that paths such
 # as /2016/11/15/seen_by_davep_(the_return).html are captured in full.
+# The atomic group (?>...) prevents catastrophic backtracking when the regex
+# engine encounters a long run of characters without a matching closing ")"
+# (Python 3.11+ feature; this codebase targets 3.12+).
 _INLINE_LINK_RE: re.Pattern[str] = re.compile(
-    r"\[([^\]]*)\]\(((?:[^()]+|\([^()]*\))*)\)"
+    r"\[([^\]]*)\]\(((?>[^()]+|\([^()]*\))*)\)"
 )
 
 # Reference-style link definitions: [id]: url  (at the start of any line)
