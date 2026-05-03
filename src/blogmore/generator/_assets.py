@@ -40,8 +40,8 @@ class AssetsMixin(MinifyMixin):
     - `_extras_html_paths` (`frozenset[str]`)
     """
 
-    site_config: "SiteConfig"
-    renderer: "TemplateRenderer"
+    site_config: SiteConfig
+    renderer: TemplateRenderer
     _fontawesome_css_url: str
     _extras_html_paths: frozenset[str]
 

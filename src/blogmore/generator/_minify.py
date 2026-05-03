@@ -29,7 +29,7 @@ class MinifyMixin:
     [`SiteConfig`][blogmore.site_config.SiteConfig].
     """
 
-    site_config: "SiteConfig"
+    site_config: SiteConfig
 
     def _write_html(self, output_path: Path, html: str) -> None:
         """Write an HTML string to a file, minifying it when configured to do so.

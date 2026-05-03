@@ -42,7 +42,7 @@ class ContextMixin:
     - `_cache_bust_token` (`str`)
     """
 
-    site_config: "SiteConfig"
+    site_config: SiteConfig
     _fontawesome_css_url: str
     _cache_bust_token: str
 

@@ -22,7 +22,7 @@ class PathsMixin:
     [`SiteConfig`][blogmore.site_config.SiteConfig].
     """
 
-    site_config: "SiteConfig"
+    site_config: SiteConfig
 
     def _get_pagination_url(self, base_url: str, page_num: int) -> str:
         """Compute the URL for a given pagination page.

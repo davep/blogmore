@@ -28,8 +28,8 @@ class ListingMixin(DateArchivesMixin):
     - `POSTS_PER_PAGE_ARCHIVE` (`int`)
     """
 
-    site_config: "SiteConfig"
-    renderer: "TemplateRenderer"
+    site_config: SiteConfig
+    renderer: TemplateRenderer
     POSTS_PER_PAGE_TAG: int
     POSTS_PER_PAGE_CATEGORY: int
     POSTS_PER_PAGE_ARCHIVE: int

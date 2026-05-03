@@ -26,8 +26,8 @@ class PagesMixin(OptionalPagesMixin):
     - `_extras_html_paths` (`frozenset[str]`)
     """
 
-    site_config: "SiteConfig"
-    renderer: "TemplateRenderer"
+    site_config: SiteConfig
+    renderer: TemplateRenderer
     POSTS_PER_PAGE_INDEX: int
     _extras_html_paths: frozenset[str]
 

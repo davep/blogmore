@@ -24,8 +24,8 @@ class DateArchivesMixin:
     - `POSTS_PER_PAGE_ARCHIVE` (`int`)
     """
 
-    site_config: "SiteConfig"
-    renderer: "TemplateRenderer"
+    site_config: SiteConfig
+    renderer: TemplateRenderer
     POSTS_PER_PAGE_ARCHIVE: int
 
     def _generate_date_archives(self, posts: list[Post], pages: list[Page]) -> None:

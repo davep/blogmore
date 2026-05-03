@@ -31,8 +31,8 @@ class OptionalPagesMixin:
     - `_extras_html_paths` (`frozenset[str]`)
     """
 
-    site_config: "SiteConfig"
-    renderer: "TemplateRenderer"
+    site_config: SiteConfig
+    renderer: TemplateRenderer
     _extras_html_paths: frozenset[str]
 
     def _generate_feeds(self, posts: list[Post]) -> None:
