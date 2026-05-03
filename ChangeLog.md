@@ -4,9 +4,6 @@
 
 **Released: WiP**
 
-- Fixed backlinks being silently dropped when a post's URL contains
-  parentheses (e.g. `/2016/11/15/seen_by_davep_(the_return).html`).
-  ([#443](https://github.com/davep/blogmore/pull/443))
 - Fixed missing social graph (`og:*` and `twitter:*`) meta tags on listing
   and other pages (tag, category, archive, tags cloud, categories cloud,
   stats, calendar, graph, and search pages).
@@ -14,6 +11,8 @@
 - Extended per-build cache busting to the theme, search, code blocks and
   graph JavaScript files.
   ([#439](https://github.com/davep/blogmore/pull/439))
+- Fixed backlinks being silently dropped when a post's URL contains
+  parentheses. ([#445](https://github.com/davep/blogmore/pull/445))
 
 ## v2.18.0
 
