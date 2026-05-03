@@ -4,6 +4,7 @@
 # Python imports.
 import datetime as dt
 import re
+import time
 from pathlib import Path
 
 ##############################################################################
@@ -163,6 +164,37 @@ class TestFindLinks:
         assert len(links) == 1
         _, start, end, _ = links[0]
         assert content[start:end] == "[text](/url)"
+
+    def test_inline_link_url_with_parentheses(self) -> None:
+        """A URL containing parentheses is captured in full."""
+        links = _find_links(
+            "[photoblogging](/2016/11/15/seen_by_davep_(the_return).html)."
+        )
+        assert len(links) == 1
+        url, _, _, link_text = links[0]
+        assert url == "/2016/11/15/seen_by_davep_(the_return).html"
+        assert link_text == "photoblogging"
+
+    def test_inline_link_url_with_parentheses_and_title(self) -> None:
+        """A URL containing parentheses followed by a title is parsed correctly."""
+        links = _find_links('[text](/path_(foo).html "My Title")')
+        assert len(links) == 1
+        url, _, _, _ = links[0]
+        assert url == "/path_(foo).html"
+
+    def test_unclosed_link_does_not_hang(self) -> None:
+        """A malformed link with no closing ')' returns in constant time.
+
+        Regression guard against catastrophic backtracking: the atomic group
+        ``(?>...)`` around the URL alternation ensures the engine fails fast
+        rather than trying every possible partition of the character run.
+        """
+        bad_input = "[](" + "'" * 5000
+        start = time.monotonic()
+        result = _find_links(bad_input)
+        elapsed = time.monotonic() - start
+        assert result == []
+        assert elapsed < 1.0, f"_find_links took {elapsed:.3f}s on a pathological input"
 
 
 ##############################################################################
@@ -462,6 +494,30 @@ class TestBuildBacklinkMap:
         result = build_backlink_map(posts)
         for each_post in posts:
             assert each_post.url in result
+
+    def test_backlink_detected_for_url_with_parentheses(self) -> None:
+        """A link whose URL contains parentheses creates the correct backlink.
+
+        Regression test: a URL such as /2016/11/15/seen_by_davep_(the_return).html
+        was previously truncated by the inline-link regex, causing the backlink
+        to be silently dropped.
+        """
+        target = _make_post(
+            "target",
+            "Target post content.",
+            "/2016/11/15/seen_by_davep_(the_return).html",
+            title="Target",
+        )
+        source = _make_post(
+            "source",
+            "See [photoblogging](/2016/11/15/seen_by_davep_(the_return).html).",
+            "/2017/03/08/source.html",
+            title="Source",
+        )
+        result = build_backlink_map([target, source])
+        backlinks = result["/2016/11/15/seen_by_davep_(the_return).html"]
+        assert len(backlinks) == 1
+        assert backlinks[0].source_post is source
 
 
 ### test_backlinks.py ends here

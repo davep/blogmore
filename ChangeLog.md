@@ -11,6 +11,8 @@
 - Extended per-build cache busting to the theme, search, code blocks and
   graph JavaScript files.
   ([#439](https://github.com/davep/blogmore/pull/439))
+- Fixed backlinks being silently dropped when a post's URL contains
+  parentheses. ([#445](https://github.com/davep/blogmore/pull/445))
 
 ## v2.18.0
 
