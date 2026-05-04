@@ -569,16 +569,20 @@ class TestGetSidebarConfig:
         assert "site_url" not in result
 
     def test_extract_socials_title(self) -> None:
-        """Test extracting socials_title from config."""
+        """Test that socials_title is not extracted by get_sidebar_config.
+
+        `socials_title` is now a proper `SiteConfig` field and is no longer
+        carried through `sidebar_config`.
+        """
         config = {
             "socials_title": "Connect",
             "socials": [{"site": "github", "url": "https://github.com/user"}],
         }
         result = get_sidebar_config(config)
-        assert result["socials_title"] == "Connect"
+        assert "socials_title" not in result
 
     def test_extract_all_sidebar_options_with_socials_title(self) -> None:
-        """Test that socials_title is included when all sidebar options are present."""
+        """Test that socials_title is not included in sidebar config."""
         config = {
             "site_logo": "/images/logo.png",
             "links": [{"title": "Home", "url": "/"}],
@@ -591,7 +595,6 @@ class TestGetSidebarConfig:
             "site_logo": "/images/logo.png",
             "links": [{"title": "Home", "url": "/"}],
             "socials": [{"site": "github", "url": "https://github.com"}],
-            "socials_title": "Follow Me",
         }
 
     def test_socials_title_absent_when_not_in_config(self) -> None:
@@ -603,16 +606,20 @@ class TestGetSidebarConfig:
         assert "socials_title" not in result
 
     def test_extract_links_title(self) -> None:
-        """Test extracting links_title from config."""
+        """Test that links_title is not extracted by get_sidebar_config.
+
+        `links_title` is now a proper `SiteConfig` field and is no longer
+        carried through `sidebar_config`.
+        """
         config = {
             "links_title": "Elsewhere",
             "links": [{"title": "Home", "url": "/"}],
         }
         result = get_sidebar_config(config)
-        assert result["links_title"] == "Elsewhere"
+        assert "links_title" not in result
 
     def test_extract_all_sidebar_options_with_links_title(self) -> None:
-        """Test that links_title is included when all sidebar options are present."""
+        """Test that links_title and socials_title are not included in sidebar config."""
         config = {
             "site_logo": "/images/logo.png",
             "links": [{"title": "Home", "url": "/"}],
@@ -625,9 +632,7 @@ class TestGetSidebarConfig:
         assert result == {
             "site_logo": "/images/logo.png",
             "links": [{"title": "Home", "url": "/"}],
-            "links_title": "Navigate",
             "socials": [{"site": "github", "url": "https://github.com"}],
-            "socials_title": "Follow Me",
         }
 
     def test_links_title_absent_when_not_in_config(self) -> None:

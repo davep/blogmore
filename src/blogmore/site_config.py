@@ -179,6 +179,26 @@ class SiteConfig:
     command line.  Defaults to ``"References & mentions"``.
     """
 
+    socials_title: str = "Social"
+    """Title displayed as the heading of the social media icons section in the sidebar.
+
+    Overrides the default "Social" heading rendered above the social media
+    icons in the sidebar.  Only meaningful when ``socials`` is configured.
+
+    Can be set from the command line via ``--socials-title``.  Defaults to
+    ``"Social"``.
+    """
+
+    links_title: str = "Links"
+    """Title displayed as the heading of the links section in the sidebar.
+
+    Overrides the default "Links" heading rendered above the links list in
+    the sidebar.  Only meaningful when ``links`` is configured.
+
+    Can be set from the command line via ``--links-title``.  Defaults to
+    ``"Links"``.
+    """
+
     with_read_time: bool = False
     """Whether to show estimated reading time on posts."""
 

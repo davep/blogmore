@@ -172,8 +172,6 @@ def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
             "no_watch": False,
             "branch": "gh-pages",
             "remote": "origin",
-            "socials_title": "Social",
-            "links_title": "Links",
         }
     )
 
@@ -213,8 +211,8 @@ def merge_config_with_args(config: dict[str, Any], args: Any) -> None:
 def get_sidebar_config(config: dict[str, Any]) -> dict[str, Any]:
     """Extract sidebar configuration from the config dictionary.
 
-    Returns sidebar configuration items (site_logo, links, socials,
-    socials_title, links_title) if they exist in the configuration file.
+    Returns sidebar configuration items (site_logo, links, socials)
+    if they exist in the configuration file.
     The ``socials`` list is sorted alphabetically by site name.
 
     Args:
@@ -225,7 +223,7 @@ def get_sidebar_config(config: dict[str, Any]) -> dict[str, Any]:
     """
     sidebar_config: dict[str, Any] = {}
 
-    for key in ("site_logo", "links", "socials", "socials_title", "links_title"):
+    for key in ("site_logo", "links", "socials"):
         if key in config:
             sidebar_config[key] = config[key]
 

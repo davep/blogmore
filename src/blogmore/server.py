@@ -254,13 +254,8 @@ class ConfigChangeHandler(FileSystemEventHandler):
             # Reload the configuration
             config = load_config(self.config_path)
 
-            # Extract sidebar config from the reloaded YAML, then layer any
-            # sidebar-related CLI overrides on top so that values set at
-            # startup (e.g. --socials-title) are always preserved.
+            # Extract sidebar config from the reloaded YAML.
             sidebar_config = get_sidebar_config(config)
-            for key in ("socials_title", "links_title"):
-                if key in self.cli_overrides:
-                    sidebar_config[key] = self.cli_overrides[key]
 
             # Update the generator with new config values
             self._update_generator(config, sidebar_config)
