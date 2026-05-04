@@ -40,6 +40,9 @@ class GeneratorProtocol(Protocol):
     POSTS_PER_PAGE_CATEGORY: int
     POSTS_PER_PAGE_ARCHIVE: int
 
+    @property
+    def _content_dir(self) -> Path: ...
+
     def _with_cache_bust(self, url: str) -> str: ...
 
     def _get_asset_url(
@@ -70,6 +73,8 @@ class GeneratorProtocol(Protocol):
 
     def _get_graph_url(self) -> str: ...
 
+    def _get_configured_url(self, path_field_name: str) -> str: ...
+
     def _get_pagination_url(self, base_url: str, page_num: int) -> str: ...
 
     def _build_pagination_page_urls(
@@ -87,6 +92,20 @@ class GeneratorProtocol(Protocol):
     def _canonical_url_for_path(self, output_path: Path) -> str: ...
 
     def _write_html(self, output_path: Path, html: str) -> None: ...
+
+    def _get_asset_source(self, filename: str) -> str | None: ...
+
+    def _minify_one_css(
+        self,
+        output_static: Path,
+        source_filename: str,
+    ) -> None: ...
+
+    def _write_minified_css(self, output_static: Path) -> None: ...
+
+    def _write_code_css(self, output_static: Path) -> None: ...
+
+    def _write_minified_js(self, output_static: Path, js_filename: str) -> None: ...
 
     def _generate_paginated_listing(
         self,

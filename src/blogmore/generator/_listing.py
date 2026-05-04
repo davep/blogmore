@@ -12,8 +12,6 @@ from blogmore.generator._date_archives import DateArchivesMixin
 from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
 from blogmore.generator.utils import paginate_posts
 from blogmore.parser import Page, Post, post_sort_key, sanitize_for_url
-from blogmore.renderer import TemplateRenderer
-from blogmore.site_config import SiteConfig
 
 if TYPE_CHECKING:
     from blogmore.generator._protocol import GeneratorProtocol
@@ -23,21 +21,8 @@ class ListingMixin(DateArchivesMixin):
     """Mixin that generates paginated listing pages for archives, tags, and categories.
 
     This mixin is intended to be composed into
-    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].  It expects
-    the host class to provide the following instance attributes:
-
-    - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])
-    - `renderer` ([`TemplateRenderer`][blogmore.renderer.TemplateRenderer])
-    - `POSTS_PER_PAGE_TAG` (`int`)
-    - `POSTS_PER_PAGE_CATEGORY` (`int`)
-    - `POSTS_PER_PAGE_ARCHIVE` (`int`)
+    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
     """
-
-    site_config: SiteConfig
-    renderer: TemplateRenderer
-    POSTS_PER_PAGE_TAG: int
-    POSTS_PER_PAGE_CATEGORY: int
-    POSTS_PER_PAGE_ARCHIVE: int
 
     def _generate_paginated_listing(
         self: GeneratorProtocol,

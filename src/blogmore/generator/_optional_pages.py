@@ -15,9 +15,7 @@ from blogmore.feeds import BlogFeedGenerator
 from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
 from blogmore.graph import GraphData, build_graph_data
 from blogmore.parser import Page, Post, post_sort_key
-from blogmore.renderer import TemplateRenderer
 from blogmore.search import write_search_index
-from blogmore.site_config import SiteConfig
 from blogmore.sitemap import write_sitemap
 from blogmore.stats import BlogStats, compute_blog_stats
 
@@ -30,17 +28,8 @@ class OptionalPagesMixin:
 
     This mixin is intended to be composed into
     [`SiteGenerator`][blogmore.generator.site.SiteGenerator] via
-    [`PagesMixin`][blogmore.generator._pages.PagesMixin].  It expects
-    the host class to provide the following instance attributes:
-
-    - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])
-    - `renderer` ([`TemplateRenderer`][blogmore.renderer.TemplateRenderer])
-    - `_extras_html_paths` (`frozenset[str]`)
+    [`PagesMixin`][blogmore.generator._pages.PagesMixin].
     """
-
-    site_config: SiteConfig
-    renderer: TemplateRenderer
-    _extras_html_paths: frozenset[str]
 
     def _generate_feeds(self: GeneratorProtocol, posts: list[Post]) -> None:
         """Generate RSS and Atom feeds.
@@ -69,7 +58,7 @@ class OptionalPagesMixin:
 
         feed_gen.generate_category_feeds(posts_by_category)
 
-    def _generate_search_index(self, posts: list[Post]) -> None:
+    def _generate_search_index(self: GeneratorProtocol, posts: list[Post]) -> None:
         """Generate the search index JSON file.
 
         Args:
@@ -211,7 +200,7 @@ class OptionalPagesMixin:
         )
         self._write_html(output_path, html)
 
-    def _remove_stale_search_files(self) -> None:
+    def _remove_stale_search_files(self: GeneratorProtocol) -> None:
         """Remove search-related files left over from a previous build.
 
         When search is disabled, any search page (at the configured
@@ -238,7 +227,7 @@ class OptionalPagesMixin:
         if default_page.exists() and default_page != stale_page:
             default_page.unlink()
 
-    def _generate_sitemap(self) -> None:
+    def _generate_sitemap(self: GeneratorProtocol) -> None:
         """Generate the XML sitemap file.
 
         Writes ``sitemap.xml`` to the root of the output directory,

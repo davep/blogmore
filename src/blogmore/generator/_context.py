@@ -29,7 +29,6 @@ from blogmore.generator.constants import (
 )
 from blogmore.generator.utils import minified_filename
 from blogmore.pagination_path import resolve_pagination_page_path
-from blogmore.site_config import SiteConfig
 
 if TYPE_CHECKING:
     from blogmore.generator._protocol import GeneratorProtocol
@@ -39,19 +38,10 @@ class ContextMixin:
     """Mixin that builds template contexts and resolves configured page URLs.
 
     This mixin is intended to be composed into
-    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].  It expects
-    the host class to provide the following instance attributes:
-
-    - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])
-    - `_fontawesome_css_url` (`str`)
-    - `_cache_bust_token` (`str`)
+    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
     """
 
-    site_config: SiteConfig
-    _fontawesome_css_url: str
-    _cache_bust_token: str
-
-    def _with_cache_bust(self, url: str) -> str:
+    def _with_cache_bust(self: GeneratorProtocol, url: str) -> str:
         """Return a URL with a cache-busting query parameter appended.
 
         External URLs (i.e. those that start with ``http://`` or ``https://``)
@@ -76,7 +66,7 @@ class ContextMixin:
             return url
         return f"{url}?v={self._cache_bust_token}"
 
-    def _get_configured_url(self, path_field_name: str) -> str:
+    def _get_configured_url(self: GeneratorProtocol, path_field_name: str) -> str:
         """Return the URL path for a configured page, derived from a config field.
 
         Strips any leading slash from the config value, prepends a fresh
@@ -96,7 +86,7 @@ class ContextMixin:
             url = make_url_clean(url)
         return url
 
-    def _get_search_url(self) -> str:
+    def _get_search_url(self: GeneratorProtocol) -> str:
         """Return the URL path for the configured search page.
 
         Returns:
@@ -104,7 +94,7 @@ class ContextMixin:
         """
         return self._get_configured_url("search_path")
 
-    def _get_archive_url(self) -> str:
+    def _get_archive_url(self: GeneratorProtocol) -> str:
         """Return the URL path for the configured archive page.
 
         Returns:
@@ -112,7 +102,7 @@ class ContextMixin:
         """
         return self._get_configured_url("archive_path")
 
-    def _get_tags_url(self) -> str:
+    def _get_tags_url(self: GeneratorProtocol) -> str:
         """Return the URL path for the configured tags overview page.
 
         Returns:
@@ -120,7 +110,7 @@ class ContextMixin:
         """
         return self._get_configured_url("tags_path")
 
-    def _get_categories_url(self) -> str:
+    def _get_categories_url(self: GeneratorProtocol) -> str:
         """Return the URL path for the configured categories overview page.
 
         Returns:
@@ -128,7 +118,7 @@ class ContextMixin:
         """
         return self._get_configured_url("categories_path")
 
-    def _get_stats_url(self) -> str:
+    def _get_stats_url(self: GeneratorProtocol) -> str:
         """Return the URL path for the configured statistics page.
 
         Returns:
@@ -136,7 +126,7 @@ class ContextMixin:
         """
         return self._get_configured_url("stats_path")
 
-    def _get_calendar_url(self) -> str:
+    def _get_calendar_url(self: GeneratorProtocol) -> str:
         """Return the URL path for the configured calendar page.
 
         Returns:
@@ -144,7 +134,7 @@ class ContextMixin:
         """
         return self._get_configured_url("calendar_path")
 
-    def _get_graph_url(self) -> str:
+    def _get_graph_url(self: GeneratorProtocol) -> str:
         """Return the URL path for the configured graph page.
 
         Returns:
@@ -153,7 +143,7 @@ class ContextMixin:
         return self._get_configured_url("graph_path")
 
     def _get_asset_url(
-        self,
+        self: GeneratorProtocol,
         regular: str,
         minify: bool,
         *,

@@ -2,29 +2,32 @@
 [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
 """
 
+from __future__ import annotations
+
 from collections import defaultdict
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from blogmore.clean_url import make_url_clean
 from blogmore.page_path import compute_page_output_path
 from blogmore.pagination_path import resolve_pagination_page_path
 from blogmore.parser import Page, Post
 from blogmore.post_path import compute_output_path
-from blogmore.site_config import SiteConfig
+
+if TYPE_CHECKING:
+    from blogmore.generator._protocol import GeneratorProtocol
 
 
 class PathsMixin:
     """Mixin that resolves pagination paths, canonical URLs, and output paths.
 
     This mixin is intended to be composed into
-    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].  It expects
-    the host class to provide a ``site_config`` attribute of type
-    [`SiteConfig`][blogmore.site_config.SiteConfig].
+    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
     """
 
-    site_config: SiteConfig
-
-    def _get_pagination_url(self, base_url: str, page_num: int) -> str:
+    def _get_pagination_url(
+        self: GeneratorProtocol, base_url: str, page_num: int
+    ) -> str:
         """Compute the URL for a given pagination page.
 
         Joins *base_url* with the path resolved from the configured
@@ -54,7 +57,9 @@ class PathsMixin:
             url = make_url_clean(url)
         return url
 
-    def _build_pagination_page_urls(self, base_url: str, total_pages: int) -> list[str]:
+    def _build_pagination_page_urls(
+        self: GeneratorProtocol, base_url: str, total_pages: int
+    ) -> list[str]:
         """Build the full list of page URLs for a paginated section.
 
         Args:
@@ -70,7 +75,9 @@ class PathsMixin:
             for page_num in range(1, total_pages + 1)
         ]
 
-    def _get_pagination_output_path(self, base_dir: Path, page_num: int) -> Path:
+    def _get_pagination_output_path(
+        self: GeneratorProtocol, base_dir: Path, page_num: int
+    ) -> Path:
         """Compute the output file path for a given pagination page.
 
         Resolves the appropriate path template from the site configuration
@@ -115,7 +122,7 @@ class PathsMixin:
         )
         return prev_url, next_url
 
-    def _canonical_url_for_path(self, output_path: Path) -> str:
+    def _canonical_url_for_path(self: GeneratorProtocol, output_path: Path) -> str:
         """Compute the fully-qualified canonical URL for a given output file path.
 
         When ``clean_urls`` is enabled, index filenames (e.g. ``index.html``)
@@ -135,7 +142,9 @@ class PathsMixin:
             url = make_url_clean(url)
         return f"{self.site_config.site_url}{url}"
 
-    def _resolve_post_output_paths(self, posts: list[Post]) -> dict[int, Path]:
+    def _resolve_post_output_paths(
+        self: GeneratorProtocol, posts: list[Post]
+    ) -> dict[int, Path]:
         """Resolve the output path for every post and detect path clashes.
 
         For each post the method:
@@ -197,7 +206,9 @@ class PathsMixin:
 
         return post_output_paths
 
-    def _resolve_page_output_paths(self, pages: list[Page]) -> dict[int, Path]:
+    def _resolve_page_output_paths(
+        self: GeneratorProtocol, pages: list[Page]
+    ) -> dict[int, Path]:
         """Resolve the output path for every static page.
 
         For each page the method:
@@ -234,7 +245,9 @@ class PathsMixin:
 
         return page_output_paths
 
-    def _resolve_sidebar_pages(self, pages: list[Page]) -> list[Page]:
+    def _resolve_sidebar_pages(
+        self: GeneratorProtocol, pages: list[Page]
+    ) -> list[Page]:
         """Resolve which pages appear in the sidebar and in what order.
 
         When ``site_config.sidebar_pages`` is ``None`` or empty every page in

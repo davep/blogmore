@@ -2,11 +2,13 @@
 [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
 """
 
+from __future__ import annotations
+
 import shutil
 import urllib.error
 from importlib.resources import files
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from blogmore.fontawesome import (
     FONTAWESOME_CDN_CSS_URL,
@@ -24,29 +26,20 @@ from blogmore.generator.constants import (
     THEME_JS_FILENAME,
 )
 from blogmore.icons import IconGenerator, detect_source_icon
-from blogmore.renderer import TemplateRenderer
-from blogmore.site_config import SiteConfig
+
+if TYPE_CHECKING:
+    from blogmore.generator._protocol import GeneratorProtocol
 
 
 class AssetsMixin(MinifyMixin):
     """Mixin that manages icon generation and static file copying.
 
     This mixin is intended to be composed into
-    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].  It expects
-    the host class to provide the following instance attributes:
-
-    - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])
-    - `_fontawesome_css_url` (`str`)
-    - `_extras_html_paths` (`frozenset[str]`)
+    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
     """
 
-    site_config: SiteConfig
-    renderer: TemplateRenderer
-    _fontawesome_css_url: str
-    _extras_html_paths: frozenset[str]
-
     @property
-    def _content_dir(self) -> Path:
+    def _content_dir(self: GeneratorProtocol) -> Path:
         """Return the content directory as a ``Path``, guaranteed non-``None``.
 
         Returns:
@@ -55,7 +48,7 @@ class AssetsMixin(MinifyMixin):
         assert self.site_config.content_dir is not None
         return self.site_config.content_dir
 
-    def _detect_favicon(self) -> str | None:
+    def _detect_favicon(self: GeneratorProtocol) -> str | None:
         """Detect if a favicon file exists in the icons or extras directory.
 
         Checks for favicon files with common extensions in priority order.
@@ -88,7 +81,7 @@ class AssetsMixin(MinifyMixin):
 
         return None
 
-    def _detect_generated_icons(self) -> bool:
+    def _detect_generated_icons(self: GeneratorProtocol) -> bool:
         """Detect if generated platform icons exist in the icons directory.
 
         Returns:
@@ -102,7 +95,7 @@ class AssetsMixin(MinifyMixin):
         apple_icon_path = icons_dir / "apple-touch-icon.png"
         return apple_icon_path.is_file()
 
-    def _generate_icons(self) -> None:
+    def _generate_icons(self: GeneratorProtocol) -> None:
         """Generate icons from a source image if present."""
         extras_dir = self._content_dir / "extras"
 
@@ -132,7 +125,7 @@ class AssetsMixin(MinifyMixin):
             else:
                 print("Warning: No icons were generated")
 
-    def _prepare_fontawesome_css(self) -> str | None:
+    def _prepare_fontawesome_css(self: GeneratorProtocol) -> str | None:
         """Determine the FontAwesome CSS URL and optionally build optimised CSS.
 
         Extracts the social icon names from the sidebar configuration and
@@ -174,7 +167,7 @@ class AssetsMixin(MinifyMixin):
         )
         return optimizer.build_css(metadata)
 
-    def _copy_static_assets(self) -> None:
+    def _copy_static_assets(self: GeneratorProtocol) -> None:
         """Copy static assets (CSS, JS, images) to output directory.
 
         When ``minify_css`` is enabled, ``style.css`` and all page-specific
@@ -304,7 +297,7 @@ class AssetsMixin(MinifyMixin):
             if self.site_config.with_graph:
                 self._write_minified_js(output_static, GRAPH_JS_FILENAME)
 
-    def _copy_extras(self) -> None:
+    def _copy_extras(self: GeneratorProtocol) -> None:
         """Copy extra files from the extras directory to the output directory.
 
         Files in the extras directory are copied to the output root, preserving

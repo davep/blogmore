@@ -9,8 +9,6 @@ from collections import defaultdict
 from typing import TYPE_CHECKING, Any
 
 from blogmore.parser import Page, Post
-from blogmore.renderer import TemplateRenderer
-from blogmore.site_config import SiteConfig
 
 if TYPE_CHECKING:
     from blogmore.generator._protocol import GeneratorProtocol
@@ -21,17 +19,8 @@ class DateArchivesMixin:
 
     This mixin is intended to be composed into
     [`SiteGenerator`][blogmore.generator.site.SiteGenerator] via
-    [`ListingMixin`][blogmore.generator._listing.ListingMixin].  It expects
-    the host class to provide the following instance attributes:
-
-    - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])
-    - `renderer` ([`TemplateRenderer`][blogmore.renderer.TemplateRenderer])
-    - `POSTS_PER_PAGE_ARCHIVE` (`int`)
+    [`ListingMixin`][blogmore.generator._listing.ListingMixin].
     """
-
-    site_config: SiteConfig
-    renderer: TemplateRenderer
-    POSTS_PER_PAGE_ARCHIVE: int
 
     def _generate_date_archives(
         self: GeneratorProtocol, posts: list[Post], pages: list[Page]

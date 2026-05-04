@@ -12,8 +12,6 @@ from blogmore.clean_url import make_url_clean
 from blogmore.comment_invite import build_mailto_url, get_invite_email_for_post
 from blogmore.generator._optional_pages import OptionalPagesMixin
 from blogmore.parser import CUSTOM_404_HTML, Page, Post
-from blogmore.renderer import TemplateRenderer
-from blogmore.site_config import SiteConfig
 
 if TYPE_CHECKING:
     from blogmore.generator._protocol import GeneratorProtocol
@@ -23,19 +21,8 @@ class PagesMixin(OptionalPagesMixin):
     """Mixin that generates each type of HTML page written to the output directory.
 
     This mixin is intended to be composed into
-    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].  It expects
-    the host class to provide the following instance attributes:
-
-    - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])
-    - `renderer` ([`TemplateRenderer`][blogmore.renderer.TemplateRenderer])
-    - `POSTS_PER_PAGE_INDEX` (`int`)
-    - `_extras_html_paths` (`frozenset[str]`)
+    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
     """
-
-    site_config: SiteConfig
-    renderer: TemplateRenderer
-    POSTS_PER_PAGE_INDEX: int
-    _extras_html_paths: frozenset[str]
 
     def _generate_post_page(
         self: GeneratorProtocol,

@@ -95,11 +95,13 @@ appropriately-named module rather than growing an existing large file.
 ## Code style
 
 - Always write full type hints that pass `mypy` in strict mode.
-- When a mixin method in `src/blogmore/generator/` needs to call a method
-  defined in another mixin, use [`GeneratorProtocol`][blogmore.generator._protocol.GeneratorProtocol]
-  as the type for `self` to ensure type safety while avoiding circular imports.
-  Always use `from __future__ import annotations` and the `if TYPE_CHECKING:`
-  idiom for this.
+- When writing methods in `src/blogmore/generator/` mixins, always type `self`
+  as [`GeneratorProtocol`][blogmore.generator._protocol.GeneratorProtocol].
+  This provides type-safe access to shared attributes (`site_config`,
+  `renderer`) and methods defined in other mixins without requiring circular
+  imports or redundant class-level declarations. Always use
+  `from __future__ import annotations` and the `if TYPE_CHECKING:` idiom for
+  this.
 - If a third-party library lacks type hints, search for a companion type-stub
   package (e.g. `types-*`) before adding `# type: ignore` comments.
 - Always generate full Google-style docstrings for every module, class,

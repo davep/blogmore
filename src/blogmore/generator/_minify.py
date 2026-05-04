@@ -2,8 +2,11 @@
 [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
 """
 
+from __future__ import annotations
+
 from importlib.resources import files
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import minify_html
 import rcssmin  # type: ignore[import-untyped]
@@ -16,7 +19,9 @@ from blogmore.generator.constants import (
     CSS_FILENAME,
 )
 from blogmore.generator.utils import minified_filename
-from blogmore.site_config import SiteConfig
+
+if TYPE_CHECKING:
+    from blogmore.generator._protocol import GeneratorProtocol
 
 
 class MinifyMixin:
@@ -24,14 +29,10 @@ class MinifyMixin:
 
     This mixin is intended to be composed into
     [`SiteGenerator`][blogmore.generator.site.SiteGenerator] (via
-    [`AssetsMixin`][blogmore.generator._assets.AssetsMixin]).  It expects
-    the host class to provide a ``site_config`` attribute of type
-    [`SiteConfig`][blogmore.site_config.SiteConfig].
+    [`AssetsMixin`][blogmore.generator._assets.AssetsMixin]).
     """
 
-    site_config: SiteConfig
-
-    def _write_html(self, output_path: Path, html: str) -> None:
+    def _write_html(self: GeneratorProtocol, output_path: Path, html: str) -> None:
         """Write an HTML string to a file, minifying it when configured to do so.
 
         When ``minify_html`` is enabled the HTML content is passed through the
@@ -46,7 +47,7 @@ class MinifyMixin:
             html = minify_html.minify(html, minify_js=False, minify_css=False)
         output_path.write_text(html, encoding="utf-8")
 
-    def _get_asset_source(self, filename: str) -> str | None:
+    def _get_asset_source(self: GeneratorProtocol, filename: str) -> str | None:
         """Read the text content of a static asset, preferring custom over bundled.
 
         Looks first in the custom templates directory (``templates_dir/static/``)
@@ -72,7 +73,7 @@ class MinifyMixin:
             return None
 
     def _minify_one_css(
-        self,
+        self: GeneratorProtocol,
         output_static: Path,
         source_filename: str,
     ) -> None:
@@ -98,7 +99,7 @@ class MinifyMixin:
         output_path.write_text(minified, encoding="utf-8")
         print(f"Generated minified CSS as {minified_name}")
 
-    def _write_minified_css(self, output_static: Path) -> None:
+    def _write_minified_css(self: GeneratorProtocol, output_static: Path) -> None:
         """Minify all CSS files and write them to the output static directory.
 
         Minifies the main stylesheet (``style.css`` → ``style.min.css``) and
@@ -114,7 +115,7 @@ class MinifyMixin:
         for source_filename in _PAGE_SPECIFIC_CSS:
             self._minify_one_css(output_static, source_filename)
 
-    def _write_code_css(self, output_static: Path) -> None:
+    def _write_code_css(self: GeneratorProtocol, output_static: Path) -> None:
         """Generate and write the code syntax highlighting CSS file.
 
         Builds a ``code.css`` (or ``code.min.css`` when ``minify_css`` is
@@ -142,7 +143,9 @@ class MinifyMixin:
             output_path.write_text(css_content, encoding="utf-8")
             print(f"Generated code CSS as {CODE_CSS_FILENAME}")
 
-    def _write_minified_js(self, output_static: Path, js_filename: str) -> None:
+    def _write_minified_js(
+        self: GeneratorProtocol, output_static: Path, js_filename: str
+    ) -> None:
         """Read a source JavaScript file, minify it, and write it with the minified name.
 
         The source JS is read from the custom templates directory (if
@@ -165,7 +168,7 @@ class MinifyMixin:
         output_path.write_text(minified, encoding="utf-8")
         print(f"Generated minified JS as {js_min}")
 
-    def _write_fontawesome_css(self, css_content: str) -> None:
+    def _write_fontawesome_css(self: GeneratorProtocol, css_content: str) -> None:
         """Write the optimised FontAwesome CSS file to the static directory.
 
         Must be called *after*
