@@ -24,6 +24,12 @@ All source lives in `src/blogmore/`. Key modules and their responsibilities:
 | `content_path.py` | Shared path-resolution utilities for content output paths (used by page_path and post_path) |
 | `clean_url.py` | Clean URL transformation utilities (removes index.html from URLs when enabled) |
 | `page_path.py` | Page path resolution for configurable output file paths |
+| `backlinks.py` | Internal link analysis and backlink map generation |
+| `calendar.py` | Calendar grid calculation and data structures |
+| `graph.py` | Post relationship graph data generation (JSON) |
+| `stats.py` | Blog statistics computation (word counts, top tags, etc.) |
+| `comment_invite.py` | mailto: URL generation for "Invite comments" links |
+| `code_styles.py` | Pygments-based CSS generation for code blocks |
 | `utils.py` | Shared utility helpers |
 
 The `generator/` sub-package (`src/blogmore/generator/`) breaks the site
@@ -33,6 +39,7 @@ generator into focused modules and mixin classes:
 |---|---|
 | `generator/constants.py` | Filename constants, `TAG_DIR`, `CATEGORY_DIR`, `_PAGE_SPECIFIC_CSS` |
 | `generator/utils.py` | `minified_filename`, `paginate_posts` |
+| `generator/_protocol.py` | `GeneratorProtocol` — defines the combined interface of all mixins for type safety |
 | `generator/_grouping.py` | `GroupingMixin` — post grouping by tag/category; word-cloud font-size interpolation |
 | `generator/_context.py` | `ContextMixin` — global template context, asset URL helpers, cache-busting |
 | `generator/_paths.py` | `PathsMixin` — pagination paths, canonical URLs, output path resolution, sidebar filtering |
@@ -64,7 +71,7 @@ SiteGenerator(
 ```
 
 The `markdown/` sub-package (`src/blogmore/markdown/`) groups all custom
-Markdown extensions:
+Markdown extensions and utility modules:
 
 | Module | Responsibility |
 |---|---|
@@ -72,9 +79,12 @@ Markdown extensions:
 | `markdown/external_links.py` | Markdown extension: opens external links in a new tab |
 | `markdown/heading_anchors.py` | Markdown extension: hover anchor links on headings |
 | `markdown/strikethrough.py` | Markdown extension: `~~strikethrough~~` syntax |
+| `markdown/plain_text.py` | Markdown-to-plain-text conversion; **single source of truth for the custom extension set** |
+| `markdown/first_paragraph.py` | Logic for extracting the first meaningful paragraph as plain text |
 
 Any new Markdown extensions must be added as a new module inside
-`src/blogmore/markdown/` and registered in `parser.py`.
+`src/blogmore/markdown/`, registered in `create_custom_extensions` in
+`markdown/plain_text.py`, and imported in `parser.py`.
 
 Templates live in `src/blogmore/templates/`; the stylesheet is
 `src/blogmore/templates/static/style.css`.
@@ -85,6 +95,11 @@ appropriately-named module rather than growing an existing large file.
 ## Code style
 
 - Always write full type hints that pass `mypy` in strict mode.
+- When a mixin method in `src/blogmore/generator/` needs to call a method
+  defined in another mixin, use [`GeneratorProtocol`][blogmore.generator._protocol.GeneratorProtocol]
+  as the type for `self` to ensure type safety while avoiding circular imports.
+  Always use `from __future__ import annotations` and the `if TYPE_CHECKING:`
+  idiom for this.
 - If a third-party library lacks type hints, search for a companion type-stub
   package (e.g. `types-*`) before adding `# type: ignore` comments.
 - Always generate full Google-style docstrings for every module, class,
