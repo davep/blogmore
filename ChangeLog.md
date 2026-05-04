@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.19.0
 
-**Released: WiP**
+**Released: 2026-05-04**
 
 - Fixed missing social graph (`og:*` and `twitter:*`) meta tags on listing
   and other pages (tag, category, archive, tags cloud, categories cloud,
