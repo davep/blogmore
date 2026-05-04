@@ -6,27 +6,17 @@ import datetime as dt
 from collections import defaultdict
 from typing import Any
 
+from blogmore.generator._base import GeneratorBase
 from blogmore.parser import Page, Post
-from blogmore.renderer import TemplateRenderer
-from blogmore.site_config import SiteConfig
 
 
-class DateArchivesMixin:
+class DateArchivesMixin(GeneratorBase):
     """Mixin that generates year, month, and day archive pages with pagination.
 
     This mixin is intended to be composed into
     [`SiteGenerator`][blogmore.generator.site.SiteGenerator] via
-    [`ListingMixin`][blogmore.generator._listing.ListingMixin].  It expects
-    the host class to provide the following instance attributes:
-
-    - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])
-    - `renderer` ([`TemplateRenderer`][blogmore.renderer.TemplateRenderer])
-    - `POSTS_PER_PAGE_ARCHIVE` (`int`)
+    [`ListingMixin`][blogmore.generator._listing.ListingMixin].
     """
-
-    site_config: SiteConfig
-    renderer: TemplateRenderer
-    POSTS_PER_PAGE_ARCHIVE: int
 
     def _generate_date_archives(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate date-based archive pages (year, month, day) with pagination.
@@ -50,7 +40,7 @@ class DateArchivesMixin:
                 posts_by_month[(year, month)].append(post)
                 posts_by_day[(year, month, day)].append(post)
 
-        context = self._get_global_context()  # type: ignore[attr-defined]
+        context = self._get_global_context()
         context["pages"] = pages
 
         # Generate year archives with pagination
@@ -76,7 +66,7 @@ class DateArchivesMixin:
                     **_ctx,
                 )
 
-            self._generate_paginated_listing(  # type: ignore[attr-defined]
+            self._generate_paginated_listing(
                 year_posts,
                 base_url=base_path,
                 output_dir=year_dir,
@@ -109,7 +99,7 @@ class DateArchivesMixin:
                     **_ctx,
                 )
 
-            self._generate_paginated_listing(  # type: ignore[attr-defined]
+            self._generate_paginated_listing(
                 month_posts,
                 base_url=base_path,
                 output_dir=month_dir,
@@ -144,7 +134,7 @@ class DateArchivesMixin:
                     **_ctx,
                 )
 
-            self._generate_paginated_listing(  # type: ignore[attr-defined]
+            self._generate_paginated_listing(
                 day_posts,
                 base_url=base_path,
                 output_dir=day_dir,

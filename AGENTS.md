@@ -33,6 +33,7 @@ generator into focused modules and mixin classes:
 |---|---|
 | `generator/constants.py` | Filename constants, `TAG_DIR`, `CATEGORY_DIR`, `_PAGE_SPECIFIC_CSS` |
 | `generator/utils.py` | `minified_filename`, `paginate_posts` |
+| `generator/_base.py` | `GeneratorBase` — shared ABC; declares all cross-mixin method stubs and instance attributes |
 | `generator/_grouping.py` | `GroupingMixin` — post grouping by tag/category; word-cloud font-size interpolation |
 | `generator/_context.py` | `ContextMixin` — global template context, asset URL helpers, cache-busting |
 | `generator/_paths.py` | `PathsMixin` — pagination paths, canonical URLs, output path resolution, sidebar filtering |
@@ -48,14 +49,16 @@ generator into focused modules and mixin classes:
 `SiteGenerator` composes all mixin classes:
 
 ```
-MinifyMixin
-  └── AssetsMixin          (adds icons, file copying)
-
-DateArchivesMixin
-  └── ListingMixin         (adds tag/category listings)
-
-OptionalPagesMixin
-  └── PagesMixin           (adds core post/page/index/archive)
+GeneratorBase(ABC)          (shared stubs + attribute declarations)
+  ├── ContextMixin
+  ├── GroupingMixin
+  ├── MinifyMixin
+  │     └── AssetsMixin      (adds icons, file copying)
+  ├── PathsMixin
+  ├── DateArchivesMixin
+  │     └── ListingMixin     (adds tag/category listings)
+  └── OptionalPagesMixin
+        └── PagesMixin       (adds core post/page/index/archive)
 
 SiteGenerator(
     AssetsMixin, ContextMixin, GroupingMixin,

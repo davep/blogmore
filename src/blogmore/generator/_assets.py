@@ -24,26 +24,14 @@ from blogmore.generator.constants import (
     THEME_JS_FILENAME,
 )
 from blogmore.icons import IconGenerator, detect_source_icon
-from blogmore.renderer import TemplateRenderer
-from blogmore.site_config import SiteConfig
 
 
 class AssetsMixin(MinifyMixin):
     """Mixin that manages icon generation and static file copying.
 
     This mixin is intended to be composed into
-    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].  It expects
-    the host class to provide the following instance attributes:
-
-    - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])
-    - `_fontawesome_css_url` (`str`)
-    - `_extras_html_paths` (`frozenset[str]`)
+    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
     """
-
-    site_config: SiteConfig
-    renderer: TemplateRenderer
-    _fontawesome_css_url: str
-    _extras_html_paths: frozenset[str]
 
     @property
     def _content_dir(self) -> Path:

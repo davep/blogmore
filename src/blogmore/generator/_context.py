@@ -9,6 +9,7 @@ from blogmore.clean_url import make_url_clean
 from blogmore.fontawesome import (
     FONTAWESOME_CDN_BRANDS_WOFF2_URL,
 )
+from blogmore.generator._base import GeneratorBase
 from blogmore.generator.constants import (
     ARCHIVE_CSS_FILENAME,
     CALENDAR_CSS_FILENAME,
@@ -27,24 +28,14 @@ from blogmore.generator.constants import (
 )
 from blogmore.generator.utils import minified_filename
 from blogmore.pagination_path import resolve_pagination_page_path
-from blogmore.site_config import SiteConfig
 
 
-class ContextMixin:
+class ContextMixin(GeneratorBase):
     """Mixin that builds template contexts and resolves configured page URLs.
 
     This mixin is intended to be composed into
-    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].  It expects
-    the host class to provide the following instance attributes:
-
-    - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])
-    - `_fontawesome_css_url` (`str`)
-    - `_cache_bust_token` (`str`)
+    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
     """
-
-    site_config: SiteConfig
-    _fontawesome_css_url: str
-    _cache_bust_token: str
 
     def _with_cache_bust(self, url: str) -> str:
         """Return a URL with a cache-busting query parameter appended.
@@ -191,8 +182,8 @@ class ContextMixin:
             "site_url": self.site_config.site_url,
             "tag_dir": TAG_DIR,
             "category_dir": CATEGORY_DIR,
-            "favicon_url": self._detect_favicon(),  # type: ignore[attr-defined]
-            "has_platform_icons": self._detect_generated_icons(),  # type: ignore[attr-defined]
+            "favicon_url": self._detect_favicon(),
+            "has_platform_icons": self._detect_generated_icons(),
             "blogmore_version": __version__,
             "with_search": self.site_config.with_search,
             "search_url": self._get_search_url(),

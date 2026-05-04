@@ -10,29 +10,14 @@ from blogmore.generator._date_archives import DateArchivesMixin
 from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
 from blogmore.generator.utils import paginate_posts
 from blogmore.parser import Page, Post, post_sort_key, sanitize_for_url
-from blogmore.renderer import TemplateRenderer
-from blogmore.site_config import SiteConfig
 
 
 class ListingMixin(DateArchivesMixin):
     """Mixin that generates paginated listing pages for archives, tags, and categories.
 
     This mixin is intended to be composed into
-    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].  It expects
-    the host class to provide the following instance attributes:
-
-    - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])
-    - `renderer` ([`TemplateRenderer`][blogmore.renderer.TemplateRenderer])
-    - `POSTS_PER_PAGE_TAG` (`int`)
-    - `POSTS_PER_PAGE_CATEGORY` (`int`)
-    - `POSTS_PER_PAGE_ARCHIVE` (`int`)
+    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
     """
-
-    site_config: SiteConfig
-    renderer: TemplateRenderer
-    POSTS_PER_PAGE_TAG: int
-    POSTS_PER_PAGE_CATEGORY: int
-    POSTS_PER_PAGE_ARCHIVE: int
 
     def _generate_paginated_listing(
         self,
@@ -66,17 +51,17 @@ class ListingMixin(DateArchivesMixin):
         """
         paginated_posts = paginate_posts(post_list, posts_per_page)
         total_pages = len(paginated_posts)
-        page_urls = self._build_pagination_page_urls(base_url, total_pages)  # type: ignore[attr-defined]
+        page_urls = self._build_pagination_page_urls(base_url, total_pages)
 
         for page_num, page_posts in enumerate(paginated_posts, start=1):
-            output_path = self._get_pagination_output_path(output_dir, page_num)  # type: ignore[attr-defined]
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
-            prev_url, next_url = self._pagination_prev_next(page_num, page_urls)  # type: ignore[attr-defined]
+            output_path = self._get_pagination_output_path(output_dir, page_num)
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
+            prev_url, next_url = self._pagination_prev_next(page_num, page_urls)
             context["prev_page_url"] = prev_url
             context["next_page_url"] = next_url
             context["pagination_page_urls"] = page_urls
             html = render_func(page_posts, page_num, total_pages)
-            self._write_html(output_path, html)  # type: ignore[attr-defined]
+            self._write_html(output_path, html)
 
     def _generate_tag_pages(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate pages for each tag with pagination.
@@ -87,7 +72,7 @@ class ListingMixin(DateArchivesMixin):
         """
         # Group posts by tag (case-insensitive)
         # Key is lowercase tag, value is (display_name, posts)
-        posts_by_tag = self._group_posts_by_tag(posts)  # type: ignore[attr-defined]
+        posts_by_tag = self._group_posts_by_tag(posts)
 
         # Create tag directory
         tag_dir = self.site_config.output_dir / TAG_DIR
@@ -105,7 +90,7 @@ class ListingMixin(DateArchivesMixin):
             # Each tag's pages live inside tag/{safe_tag}/ directory.
             tag_base_dir = tag_dir / safe_tag
 
-            context = self._get_global_context()  # type: ignore[attr-defined]
+            context = self._get_global_context()
             context["pages"] = pages
 
             # Default parameter values bind the current loop variables at
@@ -145,7 +130,7 @@ class ListingMixin(DateArchivesMixin):
             pages: All static pages, for sidebar navigation.
         """
         # Group posts by tag to get counts
-        posts_by_tag = self._group_posts_by_tag(posts)  # type: ignore[attr-defined]
+        posts_by_tag = self._group_posts_by_tag(posts)
 
         if not posts_by_tag:
             # No tags, skip generation
@@ -165,16 +150,16 @@ class ListingMixin(DateArchivesMixin):
         # Sort alphabetically by display name
         tag_data.sort(key=lambda x: x["display_name"].lower())
 
-        self._calculate_cloud_font_sizes(tag_data)  # type: ignore[attr-defined]
+        self._calculate_cloud_font_sizes(tag_data)
 
         # Render the tags page
-        context = self._get_global_context()  # type: ignore[attr-defined]
+        context = self._get_global_context()
         context["pages"] = pages
         output_path = (
             self.site_config.output_dir / self.site_config.tags_path.lstrip("/")
         ).resolve()
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        tags_url = self._get_tags_url()  # type: ignore[attr-defined]
+        tags_url = self._get_tags_url()
         if self.site_config.clean_urls:
             context["canonical_url"] = (
                 f"{self.site_config.site_url}{tags_url}"
@@ -182,11 +167,11 @@ class ListingMixin(DateArchivesMixin):
                 else tags_url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_tags_page(tag_data, **context)
 
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
+        self._write_html(output_path, html)
 
     def _generate_categories_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the categories overview page with word cloud.
@@ -196,7 +181,7 @@ class ListingMixin(DateArchivesMixin):
             pages: All static pages, for sidebar navigation.
         """
         # Group posts by category to get counts
-        posts_by_category = self._group_posts_by_category(posts)  # type: ignore[attr-defined]
+        posts_by_category = self._group_posts_by_category(posts)
 
         if not posts_by_category:
             # No categories, skip generation
@@ -219,16 +204,16 @@ class ListingMixin(DateArchivesMixin):
         # Sort alphabetically by display name
         category_data.sort(key=lambda x: x["display_name"].lower())
 
-        self._calculate_cloud_font_sizes(category_data)  # type: ignore[attr-defined]
+        self._calculate_cloud_font_sizes(category_data)
 
         # Render the categories page
-        context = self._get_global_context()  # type: ignore[attr-defined]
+        context = self._get_global_context()
         context["pages"] = pages
         output_path = (
             self.site_config.output_dir / self.site_config.categories_path.lstrip("/")
         ).resolve()
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        categories_url = self._get_categories_url()  # type: ignore[attr-defined]
+        categories_url = self._get_categories_url()
         if self.site_config.clean_urls:
             context["canonical_url"] = (
                 f"{self.site_config.site_url}{categories_url}"
@@ -236,11 +221,11 @@ class ListingMixin(DateArchivesMixin):
                 else categories_url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_categories_page(category_data, **context)
 
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
+        self._write_html(output_path, html)
 
     def _generate_category_pages(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate pages for each category with pagination.
@@ -251,7 +236,7 @@ class ListingMixin(DateArchivesMixin):
         """
         # Group posts by category (case-insensitive)
         # Key is lowercase category, value is (display_name, posts)
-        posts_by_category = self._group_posts_by_category(posts)  # type: ignore[attr-defined]
+        posts_by_category = self._group_posts_by_category(posts)
 
         # Create category directory
         category_dir = self.site_config.output_dir / CATEGORY_DIR
@@ -272,7 +257,7 @@ class ListingMixin(DateArchivesMixin):
             # Each category's pages live inside category/{safe_category}/ directory.
             category_base_dir = category_dir / safe_category
 
-            context = self._get_global_context()  # type: ignore[attr-defined]
+            context = self._get_global_context()
             context["pages"] = pages
 
             def _render_category(

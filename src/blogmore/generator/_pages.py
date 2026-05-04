@@ -9,27 +9,14 @@ from blogmore.clean_url import make_url_clean
 from blogmore.comment_invite import build_mailto_url, get_invite_email_for_post
 from blogmore.generator._optional_pages import OptionalPagesMixin
 from blogmore.parser import CUSTOM_404_HTML, Page, Post
-from blogmore.renderer import TemplateRenderer
-from blogmore.site_config import SiteConfig
 
 
 class PagesMixin(OptionalPagesMixin):
     """Mixin that generates each type of HTML page written to the output directory.
 
     This mixin is intended to be composed into
-    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].  It expects
-    the host class to provide the following instance attributes:
-
-    - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])
-    - `renderer` ([`TemplateRenderer`][blogmore.renderer.TemplateRenderer])
-    - `POSTS_PER_PAGE_INDEX` (`int`)
-    - `_extras_html_paths` (`frozenset[str]`)
+    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
     """
-
-    site_config: SiteConfig
-    renderer: TemplateRenderer
-    POSTS_PER_PAGE_INDEX: int
-    _extras_html_paths: frozenset[str]
 
     def _generate_post_page(
         self,
@@ -51,7 +38,7 @@ class PagesMixin(OptionalPagesMixin):
                 ``None`` or when the post URL has no entry, an empty list is
                 used so the template always receives a ``backlinks`` variable.
         """
-        context = self._get_global_context()  # type: ignore[attr-defined]
+        context = self._get_global_context()
         context["all_posts"] = all_posts
         context["pages"] = pages
 
@@ -97,9 +84,9 @@ class PagesMixin(OptionalPagesMixin):
                 else post.url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
         html = self.renderer.render_post(post, **context)
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
+        self._write_html(output_path, html)
 
     def _generate_page(self, page: Page, pages: list[Page], output_path: Path) -> None:
         """Generate a single static page.
@@ -109,16 +96,16 @@ class PagesMixin(OptionalPagesMixin):
             pages: All static pages, passed to the template context.
             output_path: The pre-resolved absolute output file path for this page.
         """
-        context = self._get_global_context()  # type: ignore[attr-defined]
+        context = self._get_global_context()
         context["pages"] = pages
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
+        context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_page(page, **context)
 
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
+        self._write_html(output_path, html)
 
     def _generate_404_page(self, page: Page, pages: list[Page]) -> None:
         """Generate the custom 404 page in the root of the output directory.
@@ -127,14 +114,14 @@ class PagesMixin(OptionalPagesMixin):
             page: The 404 page content to render.
             pages: All static pages, passed to the template context.
         """
-        context = self._get_global_context()  # type: ignore[attr-defined]
+        context = self._get_global_context()
         context["pages"] = pages
         output_path = self.site_config.output_dir / CUSTOM_404_HTML
-        context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
+        context["canonical_url"] = self._canonical_url_for_path(output_path)
 
         html = self.renderer.render_page(page, **context)
 
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
+        self._write_html(output_path, html)
 
     def _generate_index_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the main index page with pagination.
@@ -152,7 +139,7 @@ class PagesMixin(OptionalPagesMixin):
         """
         from blogmore.generator.utils import paginate_posts
 
-        context = self._get_global_context()  # type: ignore[attr-defined]
+        context = self._get_global_context()
         context["pages"] = pages
 
         # Paginate posts
@@ -168,7 +155,7 @@ class PagesMixin(OptionalPagesMixin):
         if self.site_config.clean_urls:
             page1_url = make_url_clean(page1_url)
         page_urls = [page1_url] + [
-            self._get_pagination_url("", page_num)  # type: ignore[attr-defined]
+            self._get_pagination_url("", page_num)
             for page_num in range(2, total_pages + 1)
         ]
 
@@ -178,11 +165,11 @@ class PagesMixin(OptionalPagesMixin):
                 output_path = self.site_config.output_dir / "index.html"
                 output_path.parent.mkdir(parents=True, exist_ok=True)
             else:
-                output_path = self._get_pagination_output_path(  # type: ignore[attr-defined]
+                output_path = self._get_pagination_output_path(
                     self.site_config.output_dir, page_num
                 )
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
-            prev_url, next_url = self._pagination_prev_next(page_num, page_urls)  # type: ignore[attr-defined]
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
+            prev_url, next_url = self._pagination_prev_next(page_num, page_urls)
             context["prev_page_url"] = prev_url
             context["next_page_url"] = next_url
             context["pagination_page_urls"] = page_urls
@@ -190,7 +177,7 @@ class PagesMixin(OptionalPagesMixin):
                 page_posts, page=page_num, total_pages=total_pages, **context
             )
 
-            self._write_html(output_path, html)  # type: ignore[attr-defined]
+            self._write_html(output_path, html)
 
     def _generate_archive_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the archive page.
@@ -199,13 +186,13 @@ class PagesMixin(OptionalPagesMixin):
             posts: All published posts.
             pages: All static pages, for sidebar navigation.
         """
-        context = self._get_global_context()  # type: ignore[attr-defined]
+        context = self._get_global_context()
         context["pages"] = pages
         output_path = (
             self.site_config.output_dir / self.site_config.archive_path.lstrip("/")
         ).resolve()
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        archive_url = self._get_archive_url()  # type: ignore[attr-defined]
+        archive_url = self._get_archive_url()
         if self.site_config.clean_urls:
             context["canonical_url"] = (
                 f"{self.site_config.site_url}{archive_url}"
@@ -213,10 +200,10 @@ class PagesMixin(OptionalPagesMixin):
                 else archive_url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
         html = self.renderer.render_archive(
             posts, page=1, total_pages=1, base_path="/archive", **context
         )
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
+        self._write_html(output_path, html)
 
     ### _pages.py ends here

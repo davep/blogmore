@@ -10,26 +10,22 @@ import rcssmin  # type: ignore[import-untyped]
 import rjsmin  # type: ignore[import-untyped]
 
 from blogmore.code_styles import build_code_css
+from blogmore.generator._base import GeneratorBase
 from blogmore.generator.constants import (
     _PAGE_SPECIFIC_CSS,
     CODE_CSS_FILENAME,
     CSS_FILENAME,
 )
 from blogmore.generator.utils import minified_filename
-from blogmore.site_config import SiteConfig
 
 
-class MinifyMixin:
+class MinifyMixin(GeneratorBase):
     """Mixin that writes HTML pages and minifies CSS/JS assets.
 
     This mixin is intended to be composed into
     [`SiteGenerator`][blogmore.generator.site.SiteGenerator] (via
-    [`AssetsMixin`][blogmore.generator._assets.AssetsMixin]).  It expects
-    the host class to provide a ``site_config`` attribute of type
-    [`SiteConfig`][blogmore.site_config.SiteConfig].
+    [`AssetsMixin`][blogmore.generator._assets.AssetsMixin]).
     """
-
-    site_config: SiteConfig
 
     def _write_html(self, output_path: Path, html: str) -> None:
         """Write an HTML string to a file, minifying it when configured to do so.

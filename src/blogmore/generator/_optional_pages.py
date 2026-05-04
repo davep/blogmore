@@ -8,32 +8,22 @@ from blogmore.backlinks import Backlink
 from blogmore.calendar import CalendarYear, build_calendar
 from blogmore.clean_url import make_url_clean
 from blogmore.feeds import BlogFeedGenerator
+from blogmore.generator._base import GeneratorBase
 from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
 from blogmore.graph import GraphData, build_graph_data
 from blogmore.parser import Page, Post, post_sort_key
-from blogmore.renderer import TemplateRenderer
 from blogmore.search import write_search_index
-from blogmore.site_config import SiteConfig
 from blogmore.sitemap import write_sitemap
 from blogmore.stats import BlogStats, compute_blog_stats
 
 
-class OptionalPagesMixin:
+class OptionalPagesMixin(GeneratorBase):
     """Mixin that generates optional-feature pages (feeds, search, stats, calendar, graph).
 
     This mixin is intended to be composed into
     [`SiteGenerator`][blogmore.generator.site.SiteGenerator] via
-    [`PagesMixin`][blogmore.generator._pages.PagesMixin].  It expects
-    the host class to provide the following instance attributes:
-
-    - `site_config` ([`SiteConfig`][blogmore.site_config.SiteConfig])
-    - `renderer` ([`TemplateRenderer`][blogmore.renderer.TemplateRenderer])
-    - `_extras_html_paths` (`frozenset[str]`)
+    [`PagesMixin`][blogmore.generator._pages.PagesMixin].
     """
-
-    site_config: SiteConfig
-    renderer: TemplateRenderer
-    _extras_html_paths: frozenset[str]
 
     def _generate_feeds(self, posts: list[Post]) -> None:
         """Generate RSS and Atom feeds.
@@ -52,7 +42,7 @@ class OptionalPagesMixin:
         feed_gen.generate_index_feeds(posts)
 
         # Generate category feeds
-        posts_by_category = self._group_posts_by_category(posts)  # type: ignore[attr-defined]
+        posts_by_category = self._group_posts_by_category(posts)
         # Sort posts by date for each category
         for _category_lower, (
             _category_display,
@@ -76,13 +66,13 @@ class OptionalPagesMixin:
         Args:
             pages: List of static pages (for the sidebar navigation).
         """
-        context = self._get_global_context()  # type: ignore[attr-defined]
+        context = self._get_global_context()
         context["pages"] = pages
         output_path = (
             self.site_config.output_dir / self.site_config.search_path.lstrip("/")
         ).resolve()
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        search_url = self._get_search_url()  # type: ignore[attr-defined]
+        search_url = self._get_search_url()
         if self.site_config.clean_urls:
             context["canonical_url"] = (
                 f"{self.site_config.site_url}{search_url}"
@@ -90,9 +80,9 @@ class OptionalPagesMixin:
                 else search_url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
         html = self.renderer.render_search_page(**context)
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
+        self._write_html(output_path, html)
 
     def _generate_stats_page(
         self,
@@ -109,13 +99,13 @@ class OptionalPagesMixin:
                 [`Backlink`][blogmore.backlinks.Backlink] objects.  When provided,
                 the statistics page includes a "Top Internal Links" section.
         """
-        context = self._get_global_context()  # type: ignore[attr-defined]
+        context = self._get_global_context()
         context["pages"] = pages
         output_path = (
             self.site_config.output_dir / self.site_config.stats_path.lstrip("/")
         ).resolve()
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        stats_url = self._get_stats_url()  # type: ignore[attr-defined]
+        stats_url = self._get_stats_url()
         if self.site_config.clean_urls:
             context["canonical_url"] = (
                 f"{self.site_config.site_url}{stats_url}"
@@ -123,12 +113,12 @@ class OptionalPagesMixin:
                 else stats_url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
         blog_stats: BlogStats = compute_blog_stats(
             posts, self.site_config.site_url, backlink_map
         )
         html = self.renderer.render_stats_page(stats=blog_stats, **context)
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
+        self._write_html(output_path, html)
 
     def _generate_calendar_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the calendar view page.
@@ -137,13 +127,13 @@ class OptionalPagesMixin:
             posts: All published posts; used to populate the calendar grid.
             pages: List of static pages (for the sidebar navigation).
         """
-        context = self._get_global_context()  # type: ignore[attr-defined]
+        context = self._get_global_context()
         context["pages"] = pages
         output_path = (
             self.site_config.output_dir / self.site_config.calendar_path.lstrip("/")
         ).resolve()
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        calendar_url = self._get_calendar_url()  # type: ignore[attr-defined]
+        calendar_url = self._get_calendar_url()
         if self.site_config.clean_urls:
             context["canonical_url"] = (
                 f"{self.site_config.site_url}{calendar_url}"
@@ -151,7 +141,7 @@ class OptionalPagesMixin:
                 else calendar_url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
         # Determine page1_suffix for archive URL construction.  When
         # clean_urls is enabled, strip any index filename (e.g. "index.html")
         # so that calendar links to year/month/day archives end with a
@@ -165,7 +155,7 @@ class OptionalPagesMixin:
         html = self.renderer.render_calendar_page(
             calendar_years=calendar_years, **context
         )
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
+        self._write_html(output_path, html)
 
     def _generate_graph_page(self, posts: list[Post], pages: list[Page]) -> None:
         """Generate the post-relationship graph page.
@@ -174,13 +164,13 @@ class OptionalPagesMixin:
             posts: All published posts; used to build graph nodes and edges.
             pages: List of static pages (for the sidebar navigation).
         """
-        context = self._get_global_context()  # type: ignore[attr-defined]
+        context = self._get_global_context()
         context["pages"] = pages
         output_path = (
             self.site_config.output_dir / self.site_config.graph_path.lstrip("/")
         ).resolve()
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        graph_url = self._get_graph_url()  # type: ignore[attr-defined]
+        graph_url = self._get_graph_url()
         if self.site_config.clean_urls:
             context["canonical_url"] = (
                 f"{self.site_config.site_url}{graph_url}"
@@ -188,7 +178,7 @@ class OptionalPagesMixin:
                 else graph_url
             )
         else:
-            context["canonical_url"] = self._canonical_url_for_path(output_path)  # type: ignore[attr-defined]
+            context["canonical_url"] = self._canonical_url_for_path(output_path)
         graph_data: GraphData = build_graph_data(
             posts,
             tag_dir=TAG_DIR,
@@ -198,7 +188,7 @@ class OptionalPagesMixin:
         html = self.renderer.render_graph_page(
             graph_data_json=graph_data.to_json(), **context
         )
-        self._write_html(output_path, html)  # type: ignore[attr-defined]
+        self._write_html(output_path, html)
 
     def _remove_stale_search_files(self) -> None:
         """Remove search-related files left over from a previous build.

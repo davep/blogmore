@@ -5,10 +5,12 @@ directly from the ``blogmore.generator`` module, ensuring full backward
 compatibility for existing imports.
 """
 
+from blogmore.generator._base import GeneratorBase
 from blogmore.generator.site import SiteGenerator
 from blogmore.generator.utils import minified_filename, paginate_posts
 
 __all__ = [
+    "GeneratorBase",
     "SiteGenerator",
     "minified_filename",
     "paginate_posts",

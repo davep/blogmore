@@ -6,23 +6,19 @@ from collections import defaultdict
 from pathlib import Path
 
 from blogmore.clean_url import make_url_clean
+from blogmore.generator._base import GeneratorBase
 from blogmore.page_path import compute_page_output_path
 from blogmore.pagination_path import resolve_pagination_page_path
 from blogmore.parser import Page, Post
 from blogmore.post_path import compute_output_path
-from blogmore.site_config import SiteConfig
 
 
-class PathsMixin:
+class PathsMixin(GeneratorBase):
     """Mixin that resolves pagination paths, canonical URLs, and output paths.
 
     This mixin is intended to be composed into
-    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].  It expects
-    the host class to provide a ``site_config`` attribute of type
-    [`SiteConfig`][blogmore.site_config.SiteConfig].
+    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
     """
-
-    site_config: SiteConfig
 
     def _get_pagination_url(self, base_url: str, page_num: int) -> str:
         """Compute the URL for a given pagination page.
