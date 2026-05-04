@@ -2,7 +2,9 @@
 [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
 """
 
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from blogmore import __version__
 from blogmore.clean_url import make_url_clean
@@ -28,6 +30,9 @@ from blogmore.generator.constants import (
 from blogmore.generator.utils import minified_filename
 from blogmore.pagination_path import resolve_pagination_page_path
 from blogmore.site_config import SiteConfig
+
+if TYPE_CHECKING:
+    from blogmore.generator._protocol import GeneratorProtocol
 
 
 class ContextMixin:
@@ -174,7 +179,7 @@ class ContextMixin:
         url = f"/static/{name}"
         return self._with_cache_bust(url) if cache_bust else url
 
-    def _get_global_context(self) -> dict[str, Any]:
+    def _get_global_context(self: GeneratorProtocol) -> dict[str, Any]:
         """Get the global context available to all templates.
 
         Returns:
@@ -191,8 +196,8 @@ class ContextMixin:
             "site_url": self.site_config.site_url,
             "tag_dir": TAG_DIR,
             "category_dir": CATEGORY_DIR,
-            "favicon_url": self._detect_favicon(),  # type: ignore[attr-defined]
-            "has_platform_icons": self._detect_generated_icons(),  # type: ignore[attr-defined]
+            "favicon_url": self._detect_favicon(),
+            "has_platform_icons": self._detect_generated_icons(),
             "blogmore_version": __version__,
             "with_search": self.site_config.with_search,
             "search_url": self._get_search_url(),
