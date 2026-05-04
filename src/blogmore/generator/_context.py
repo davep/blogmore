@@ -265,6 +265,9 @@ class ContextMixin:
         }
         # Merge sidebar config into context
         context.update(self.site_config.sidebar_config)
+        # Ensure SiteConfig fields take precedence over any residual sidebar_config values.
+        context["socials_title"] = self.site_config.socials_title
+        context["links_title"] = self.site_config.links_title
         return context
 
 

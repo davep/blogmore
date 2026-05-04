@@ -1,5 +1,16 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Promoted `socials_title` and `links_title` to proper `SiteConfig` fields,
+  eliminating redundant default definitions in `__main__.py` and making them
+  consistent with all other site configuration options.
+- Cleaned up `_extract_cli_overrides` in `__main__.py` to use
+  `site_config_defaults()` as the single source of truth, removing the
+  previously duplicated defaults dictionary.
+
 ## v2.19.0
 
 **Released: 2026-05-04**

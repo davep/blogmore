@@ -177,13 +177,13 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
 
     parser.add_argument(
         "--socials-title",
-        default="Social",
+        default=_SITE_CONFIG_DEFAULTS["socials_title"],
         help="Title for the social media icons section in the sidebar (default: Social)",
     )
 
     parser.add_argument(
         "--links-title",
-        default="Links",
+        default=_SITE_CONFIG_DEFAULTS["links_title"],
         help="Title for the links section in the sidebar (default: Links)",
     )
 

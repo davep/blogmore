@@ -387,18 +387,18 @@ class TestFontAwesomeOptimizerInGenerator:
     def test_socials_uses_custom_title(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:
-        """Test that the socials section uses socials_title from sidebar config."""
+        """Test that the socials section uses socials_title from SiteConfig."""
         from blogmore.generator import SiteGenerator
 
         sidebar_config = {
             "socials": [{"site": "github", "url": "https://github.com/example"}],
-            "socials_title": "Follow Me",
         }
         generator = SiteGenerator(
             site_config=SiteConfig(
                 content_dir=posts_dir,
                 output_dir=temp_output_dir,
                 sidebar_config=sidebar_config,
+                socials_title="Follow Me",
             )
         )
 

@@ -17,7 +17,7 @@ from blogmore.config import (
 from blogmore.generator import SiteGenerator
 from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
-from blogmore.site_config import SiteConfig
+from blogmore.site_config import SiteConfig, site_config_defaults
 
 
 def main() -> int:
@@ -52,14 +52,6 @@ def main() -> int:
     except ValueError as e:
         print(f"Error: Invalid configuration file: {e}", file=sys.stderr)
         return 1
-
-    # Apply socials_title from args (CLI overrides config file value)
-    if hasattr(args, "socials_title"):
-        sidebar_config["socials_title"] = args.socials_title
-
-    # Apply links_title from args (CLI overrides config file value)
-    if hasattr(args, "links_title"):
-        sidebar_config["links_title"] = args.links_title
 
     # Normalize site_keywords: CLI provides a string, config provides a list or string
     site_keywords = normalize_site_keywords(getattr(args, "site_keywords", None))
@@ -106,6 +98,8 @@ def main() -> int:
         minify_html=args.minify_html,
         with_read_time=args.with_read_time,
         include_drafts=args.include_drafts,
+        socials_title=args.socials_title,
+        links_title=args.links_title,
         **config_only_kwargs,
     )
 
@@ -236,38 +230,22 @@ def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
     Returns:
         Dictionary of argument names to values that were explicitly set
     """
-    # Define defaults for each argument
-    defaults = {
-        "site_title": "My Blog",
-        "site_subtitle": "",
-        "site_description": "",
-        "site_keywords": None,
-        "site_url": "",
-        "output": Path("output"),
-        "templates": None,
-        "include_drafts": False,
-        "posts_per_feed": 20,
-        "extra_stylesheets": None,
-        "port": 8000,
-        "no_watch": False,
-        "content_dir": None,
-        "default_author": None,
-        "clean_first": False,
-        "branch": "gh-pages",
-        "remote": "origin",
-        "icon_source": None,
-        "with_search": False,
-        "with_sitemap": False,
-        "with_stats": False,
-        "with_calendar": False,
-        "with_graph": False,
-        "minify_css": False,
-        "minify_js": False,
-        "minify_html": False,
-        "with_read_time": False,
-        "socials_title": "Social",
-        "links_title": "Links",
-    }
+    # Use SiteConfig as the single source of truth for site-config field defaults.
+    defaults: dict[str, Any] = site_config_defaults()
+    # SiteConfig uses templates_dir but the CLI arg is named templates.
+    defaults["templates"] = defaults.pop("templates_dir")
+    # SiteConfig.output_dir is a required field with no default; the CLI arg
+    # output defaults to Path("output").
+    defaults["output"] = Path("output")
+    # CLI-only defaults that have no SiteConfig equivalent.
+    defaults.update(
+        {
+            "port": 8000,
+            "no_watch": False,
+            "branch": "gh-pages",
+            "remote": "origin",
+        }
+    )
 
     overrides: dict[str, Any] = {}
 
