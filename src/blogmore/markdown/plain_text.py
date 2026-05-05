@@ -76,7 +76,7 @@ def _make_markdown_instance() -> markdown.Markdown:
     )
 
 
-class _AllTextExtractor(HTMLParser):
+class TextExtractor(HTMLParser):
     """HTML parser that accumulates all visible text nodes.
 
     Unlike the first-paragraph extractor, this parser simply collects every
@@ -108,24 +108,23 @@ class _AllTextExtractor(HTMLParser):
         return re.sub(r"\s+", " ", "".join(self._chunks)).strip()
 
 
-class _TextWithoutCodeExtractor(HTMLParser):
+class TextSansCodeExtractor(TextExtractor):
     """HTML parser that accumulates text nodes, skipping fenced code blocks.
 
-    Fenced code blocks render as ``<pre><code>…</code></pre>`` in HTML.  This
-    extractor suppresses all text inside any ``<pre>`` element so that code
-    block content is not included in the output.  Inline code (``<code>``
-    elements *not* wrapped in ``<pre>``) is still captured because inline code
+    Fenced code blocks render as `<pre><code>…</code></pre>` in HTML. This
+    extractor suppresses all text inside any `<pre>` element so that code
+    block content is not included in the output. Inline code (`<code>`
+    elements *not* wrapped in `<pre>`) is still captured because inline code
     snippets are readable words.
     """
 
     def __init__(self) -> None:
         """Initialise the extractor."""
-        super().__init__(convert_charrefs=True)
-        self._chunks: list[str] = []
-        self._pre_depth: int = 0
+        super().__init__()
+        self._pre_depth = 0
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        """Track entry into ``<pre>`` elements.
+        """Track entry into `<pre>` elements.
 
         Args:
             tag: The HTML tag name (lower-cased).
@@ -135,7 +134,7 @@ class _TextWithoutCodeExtractor(HTMLParser):
             self._pre_depth += 1
 
     def handle_endtag(self, tag: str) -> None:
-        """Track exit from ``<pre>`` elements.
+        """Track exit from `<pre>` elements.
 
         Args:
             tag: The HTML tag name (lower-cased).
@@ -150,17 +149,7 @@ class _TextWithoutCodeExtractor(HTMLParser):
             data: Text content from the current HTML node.
         """
         if self._pre_depth == 0:
-            self._chunks.append(data)
-
-    @property
-    def text(self) -> str:
-        """Return accumulated text (excluding code blocks) with whitespace collapsed.
-
-        Returns:
-            Plain-text content with all whitespace runs normalised to a
-            single space and leading/trailing whitespace removed.
-        """
-        return re.sub(r"\s+", " ", "".join(self._chunks)).strip()
+            super().handle_data(data)
 
 
 def markdown_to_plain_text(text: str, *, exclude_code_blocks: bool = False) -> str:
@@ -186,11 +175,8 @@ def markdown_to_plain_text(text: str, *, exclude_code_blocks: bool = False) -> s
     """
     if not text.strip():
         return ""
-    html = _make_markdown_instance().convert(text)
-    extractor: _AllTextExtractor | _TextWithoutCodeExtractor = (
-        _TextWithoutCodeExtractor() if exclude_code_blocks else _AllTextExtractor()
-    )
-    extractor.feed(html)
+    extractor = TextSansCodeExtractor() if exclude_code_blocks else TextExtractor()
+    extractor.feed(_make_markdown_instance().convert(text))
     return extractor.text
 
 
