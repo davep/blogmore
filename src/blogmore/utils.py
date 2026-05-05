@@ -2,6 +2,8 @@
 
 import re
 
+from blogmore.markdown.plain_text import markdown_to_plain_text
+
 
 def strip_markdown(content: str) -> str:
     """Remove common Markdown and HTML formatting from content.
@@ -36,6 +38,10 @@ def strip_markdown(content: str) -> str:
 def count_words(content: str) -> int:
     """Count the number of words in the given content.
 
+    Converts the Markdown content to plain text using the proper Markdown
+    parser (excluding fenced code blocks, which are not readable prose)
+    before splitting on whitespace.
+
     Args:
         content: The text content to analyse (may include Markdown/HTML).
 
@@ -48,7 +54,15 @@ def count_words(content: str) -> int:
         >>> count_words("word " * 10)
         10
     """
-    return len([word for word in strip_markdown(content).split() if word])
+    return len(
+        [
+            word
+            for word in markdown_to_plain_text(
+                content, exclude_code_blocks=True
+            ).split()
+            if word
+        ]
+    )
 
 
 def calculate_reading_time(content: str, words_per_minute: int = 200) -> int:

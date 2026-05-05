@@ -4,7 +4,6 @@
 # Application imports.
 from blogmore.markdown.plain_text import markdown_to_plain_text
 
-
 class TestMarkdownToPlainText:
     """Tests for markdown_to_plain_text."""
 
@@ -127,3 +126,50 @@ class TestMarkdownToPlainText:
         assert "bold" in result
         assert "code" in result
         assert "link text" in result
+
+
+class TestMarkdownToPlainTextExcludeCodeBlocks:
+    """Tests for `markdown_to_plain_text` with `exclude_code_blocks=True`."""
+
+    def test_fenced_code_block_content_excluded(self) -> None:
+        """Content inside a fenced code block is omitted from the output."""
+        content = "Before.\n\n```python\ndef secret(): pass\n```\n\nAfter."
+        result = markdown_to_plain_text(content, exclude_code_blocks=True)
+        assert "Before." in result
+        assert "After." in result
+        assert "secret" not in result
+        assert "def" not in result
+
+    def test_inline_code_content_preserved(self) -> None:
+        """Inline code text is *not* excluded even with `exclude_code_blocks=True`."""
+        result = markdown_to_plain_text(
+            "Use `foo()` to call it.", exclude_code_blocks=True
+        )
+        assert "foo()" in result
+
+    def test_text_outside_code_block_preserved(self) -> None:
+        """Prose surrounding a fenced code block is fully preserved."""
+        content = "Hello world.\n\n```\nignored\n```\n\nGoodbye."
+        result = markdown_to_plain_text(content, exclude_code_blocks=True)
+        assert "Hello world." in result
+        assert "Goodbye." in result
+
+    def test_multiple_fenced_code_blocks_excluded(self) -> None:
+        """Content from multiple fenced code blocks is excluded."""
+        content = "First.\n\n```\nblock one\n```\n\nMiddle.\n\n```\nblock two\n```\n\nLast."
+        result = markdown_to_plain_text(content, exclude_code_blocks=True)
+        assert "First." in result
+        assert "Middle." in result
+        assert "Last." in result
+        assert "block one" not in result
+        assert "block two" not in result
+
+    def test_empty_string_exclude_code_blocks(self) -> None:
+        """An empty string still returns an empty string."""
+        assert markdown_to_plain_text("", exclude_code_blocks=True) == ""
+
+    def test_default_includes_code_block_content(self) -> None:
+        """Without `exclude_code_blocks`, fenced code block content *is* included."""
+        content = "```python\nprint('hello')\n```"
+        result = markdown_to_plain_text(content)
+        assert "print" in result

@@ -118,9 +118,9 @@ class TestCalculateReadingTime:
         assert calculate_reading_time(content) == 1
 
     def test_calculate_reading_time_with_inline_code(self) -> None:
-        """Test that inline code is removed."""
+        """Test that inline code text is included in the word count."""
         content = "Use the `calculate_reading_time` function to get the time."
-        # Should count: "Use the function to get the time" = 7 words
+        # Inline code text is preserved; all words contribute to the count
         assert calculate_reading_time(content) == 1
 
     def test_calculate_reading_time_with_images(self) -> None:

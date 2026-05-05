@@ -1,5 +1,16 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Word count and reading time calculations now use the proper Markdown-to-text
+  converter (`blogmore.markdown.plain_text`) rather than a regex-based
+  approximation.  Fenced code blocks are excluded from these counts (inline
+  code is still included).  The `markdown_to_plain_text` function gains an
+  `exclude_code_blocks` keyword argument to support this.
+  ([#449](https://github.com/davep/blogmore/pull/449))
+
 ## v2.19.0
 
 **Released: 2026-05-04**
