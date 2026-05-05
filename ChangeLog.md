@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Word count and reading time calculations now use the proper
+  Markdown-to-text converter rather than a regex-based approximation. Fenced
+  code blocks are excluded from these counts (inline code is still
+  included). ([#455](https://github.com/davep/blogmore/pull/455))
+
 ## v2.19.0
 
 **Released: 2026-05-04**

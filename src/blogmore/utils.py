@@ -2,39 +2,15 @@
 
 import re
 
-
-def strip_markdown(content: str) -> str:
-    """Remove common Markdown and HTML formatting from content.
-
-    Args:
-        content: The text content to clean up.
-
-    Returns:
-        The cleaned text with formatting removed.
-
-    Note:
-        This is *not* a full Markdown to plain text converter. It handles
-        common formatting characters and structures, but may not cover all
-        edge cases or extensions. The main goal is to remove formatting
-        characters that would interfere with things like word counting,
-        while preserving the actual text content.
-    """
-    # Remove code blocks
-    content = re.sub(r"```[\s\S]*?```", "", content)
-    # Remove markdown images: ![alt](url) -> ""
-    content = re.sub(r"!\[([^\]]*)\]\([^\)]+\)", "", content)
-    # Remove markdown links but keep the text: [text](url) -> text
-    content = re.sub(r"\[([^\]]*)\]\([^\)]+\)", r"\1", content)
-    # Remove HTML tags
-    content = re.sub(r"<[^>]+>", "", content)
-    # Remove markdown formatting characters
-    content = re.sub(r"[*_~`#-]", " ", content)
-    # Collapse multiple spaces into one.
-    return re.sub(r"\s+", " ", content).strip()
+from blogmore.markdown.plain_text import markdown_to_plain_text
 
 
 def count_words(content: str) -> int:
     """Count the number of words in the given content.
+
+    Converts the Markdown content to plain text using the proper Markdown
+    parser (excluding fenced code blocks, which are not readable prose)
+    before splitting on whitespace.
 
     Args:
         content: The text content to analyse (may include Markdown/HTML).
@@ -48,7 +24,15 @@ def count_words(content: str) -> int:
         >>> count_words("word " * 10)
         10
     """
-    return len([word for word in strip_markdown(content).split() if word])
+    return len(
+        [
+            word
+            for word in re.findall(
+                r"\w+", markdown_to_plain_text(content, exclude_code_blocks=True)
+            )
+            if word
+        ]
+    )
 
 
 def calculate_reading_time(content: str, words_per_minute: int = 200) -> int:

@@ -76,7 +76,7 @@ def _make_markdown_instance() -> markdown.Markdown:
     )
 
 
-class _AllTextExtractor(HTMLParser):
+class TextExtractor(HTMLParser):
     """HTML parser that accumulates all visible text nodes.
 
     Unlike the first-paragraph extractor, this parser simply collects every
@@ -108,7 +108,51 @@ class _AllTextExtractor(HTMLParser):
         return re.sub(r"\s+", " ", "".join(self._chunks)).strip()
 
 
-def markdown_to_plain_text(text: str) -> str:
+class TextSansCodeExtractor(TextExtractor):
+    """HTML parser that accumulates text nodes, skipping fenced code blocks.
+
+    Fenced code blocks render as `<pre><code>…</code></pre>` in HTML. This
+    extractor suppresses all text inside any `<pre>` element so that code
+    block content is not included in the output. Inline code (`<code>`
+    elements *not* wrapped in `<pre>`) is still captured because inline code
+    snippets are readable words.
+    """
+
+    def __init__(self) -> None:
+        """Initialise the extractor."""
+        super().__init__()
+        self._pre_depth = 0
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        """Track entry into `<pre>` elements.
+
+        Args:
+            tag: The HTML tag name (lower-cased).
+            attrs: List of ``(name, value)`` attribute pairs for the tag.
+        """
+        if tag == "pre":
+            self._pre_depth += 1
+
+    def handle_endtag(self, tag: str) -> None:
+        """Track exit from `<pre>` elements.
+
+        Args:
+            tag: The HTML tag name (lower-cased).
+        """
+        if tag == "pre" and self._pre_depth > 0:
+            self._pre_depth -= 1
+
+    def handle_data(self, data: str) -> None:
+        """Accumulate a character-data node when not inside a ``<pre>`` element.
+
+        Args:
+            data: Text content from the current HTML node.
+        """
+        if self._pre_depth == 0:
+            super().handle_data(data)
+
+
+def markdown_to_plain_text(text: str, *, exclude_code_blocks: bool = False) -> str:
     """Convert a Markdown string to clean plain text.
 
     Runs the input through Python-Markdown (with all BlogMore extensions and
@@ -120,6 +164,10 @@ def markdown_to_plain_text(text: str) -> str:
 
     Args:
         text: Raw Markdown text to convert.
+        exclude_code_blocks: When `True`, the content of fenced code blocks
+            (rendered as ``<pre><code>…</code></pre>``) is omitted from the
+            output.  Inline code snippets (``<code>`` not wrapped in
+            ``<pre>``) are still included.  Defaults to `False`.
 
     Returns:
         Plain-text representation with whitespace collapsed to single spaces,
@@ -127,9 +175,8 @@ def markdown_to_plain_text(text: str) -> str:
     """
     if not text.strip():
         return ""
-    html = _make_markdown_instance().convert(text)
-    extractor = _AllTextExtractor()
-    extractor.feed(html)
+    extractor = TextSansCodeExtractor() if exclude_code_blocks else TextExtractor()
+    extractor.feed(_make_markdown_instance().convert(text))
     return extractor.text
 
 
