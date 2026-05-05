@@ -58,7 +58,9 @@ class TestFontAwesomeConstants:
 
     def test_cdn_brands_woff2_url_derived_from_webfonts_base(self) -> None:
         """Test that the brands WOFF2 URL is derived from the webfonts base URL."""
-        assert FONTAWESOME_CDN_BRANDS_WOFF2_URL.startswith(FONTAWESOME_CDN_WEBFONTS_BASE)
+        assert FONTAWESOME_CDN_BRANDS_WOFF2_URL.startswith(
+            FONTAWESOME_CDN_WEBFONTS_BASE
+        )
         assert FONTAWESOME_CDN_BRANDS_WOFF2_URL.endswith(".woff2")
 
 
@@ -271,7 +273,7 @@ class TestFontAwesomeOptimizerInGenerator:
             )
         )
 
-        with patch("blogmore.generator._assets.FontAwesomeOptimizer") as mock_cls:
+        with patch("blogmore.generator.assets.FontAwesomeOptimizer") as mock_cls:
             generator.generate()
 
         # Optimizer should not have been constructed at all
@@ -565,6 +567,6 @@ class TestFontAwesomeOptimizerInGenerator:
 
         plain_size = (plain_output / "static" / "fontawesome.css").stat().st_size
         minified_size = (
-            minified_output / "static" / "fontawesome.min.css"
-        ).stat().st_size
+            (minified_output / "static" / "fontawesome.min.css").stat().st_size
+        )
         assert minified_size < plain_size

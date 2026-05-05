@@ -1,6 +1,4 @@
-"""Mixin providing template-context and URL-helper methods for
-[`SiteGenerator`][blogmore.generator.site.SiteGenerator].
-"""
+"""Template-context and URL-helper methods for the site generator."""
 
 from __future__ import annotations
 
@@ -8,9 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from blogmore import __version__
 from blogmore.clean_url import make_url_clean
-from blogmore.fontawesome import (
-    FONTAWESOME_CDN_BRANDS_WOFF2_URL,
-)
+from blogmore.fontawesome import FONTAWESOME_CDN_BRANDS_WOFF2_URL
 from blogmore.generator.constants import (
     ARCHIVE_CSS_FILENAME,
     CALENDAR_CSS_FILENAME,
@@ -31,25 +27,42 @@ from blogmore.generator.utils import minified_filename
 from blogmore.pagination_path import resolve_pagination_page_path
 
 if TYPE_CHECKING:
-    from blogmore.generator._protocol import GeneratorProtocol
+    from blogmore.site_config import SiteConfig
 
 
-class ContextMixin:
-    """Mixin that builds template contexts and resolves configured page URLs.
+class ContextBuilder:
+    """Builds template contexts and resolves configured page URLs."""
 
-    This mixin is intended to be composed into
-    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
-    """
+    def __init__(
+        self,
+        site_config: SiteConfig,
+        cache_bust_token: str = "",
+        favicon_url: str | None = None,
+        has_platform_icons: bool = False,
+        fontawesome_css_url: str = "",
+    ) -> None:
+        """Initialize the context builder.
 
-    def _with_cache_bust(self: GeneratorProtocol, url: str) -> str:
+        Args:
+            site_config: The site configuration.
+            cache_bust_token: Token used for URL cache-busting.
+            favicon_url: URL for the site favicon.
+            has_platform_icons: Whether generated platform icons exist.
+            fontawesome_css_url: URL for the FontAwesome stylesheet.
+        """
+        self.site_config = site_config
+        self.cache_bust_token = cache_bust_token
+        self.favicon_url = favicon_url
+        self.has_platform_icons = has_platform_icons
+        self.fontawesome_css_url = fontawesome_css_url
+
+    def with_cache_bust(self, url: str) -> str:
         """Return a URL with a cache-busting query parameter appended.
 
         External URLs (i.e. those that start with ``http://`` or ``https://``)
         are returned unchanged.  Local URLs (starting with ``/``) have
         ``?v=<token>`` appended so that browsers re-fetch them when the site is
-        regenerated.  If no cache-busting token has been set (e.g. before
-        [`generate`][blogmore.generator.site.SiteGenerator.generate] is called)
-        the URL is returned as-is.
+        regenerated.
 
         Args:
             url: The URL to process.
@@ -59,14 +72,14 @@ class ContextMixin:
             original URL if it is external or the token has not been set.
         """
         if (
-            not self._cache_bust_token
+            not self.cache_bust_token
             or not url
             or url.startswith(("http://", "https://"))
         ):
             return url
-        return f"{url}?v={self._cache_bust_token}"
+        return f"{url}?v={self.cache_bust_token}"
 
-    def _get_configured_url(self: GeneratorProtocol, path_field_name: str) -> str:
+    def get_configured_url(self, path_field_name: str) -> str:
         """Return the URL path for a configured page, derived from a config field.
 
         Strips any leading slash from the config value, prepends a fresh
@@ -86,64 +99,64 @@ class ContextMixin:
             url = make_url_clean(url)
         return url
 
-    def _get_search_url(self: GeneratorProtocol) -> str:
+    def get_search_url(self) -> str:
         """Return the URL path for the configured search page.
 
         Returns:
             The URL path for the search page, always starting with ``/``.
         """
-        return self._get_configured_url("search_path")
+        return self.get_configured_url("search_path")
 
-    def _get_archive_url(self: GeneratorProtocol) -> str:
+    def get_archive_url(self) -> str:
         """Return the URL path for the configured archive page.
 
         Returns:
             The URL path for the archive page, always starting with ``/``.
         """
-        return self._get_configured_url("archive_path")
+        return self.get_configured_url("archive_path")
 
-    def _get_tags_url(self: GeneratorProtocol) -> str:
+    def get_tags_url(self) -> str:
         """Return the URL path for the configured tags overview page.
 
         Returns:
             The URL path for the tags page, always starting with ``/``.
         """
-        return self._get_configured_url("tags_path")
+        return self.get_configured_url("tags_path")
 
-    def _get_categories_url(self: GeneratorProtocol) -> str:
+    def get_categories_url(self) -> str:
         """Return the URL path for the configured categories overview page.
 
         Returns:
             The URL path for the categories page, always starting with ``/``.
         """
-        return self._get_configured_url("categories_path")
+        return self.get_configured_url("categories_path")
 
-    def _get_stats_url(self: GeneratorProtocol) -> str:
+    def get_stats_url(self) -> str:
         """Return the URL path for the configured statistics page.
 
         Returns:
             The URL path for the statistics page, always starting with ``/``.
         """
-        return self._get_configured_url("stats_path")
+        return self.get_configured_url("stats_path")
 
-    def _get_calendar_url(self: GeneratorProtocol) -> str:
+    def get_calendar_url(self) -> str:
         """Return the URL path for the configured calendar page.
 
         Returns:
             The URL path for the calendar page, always starting with ``/``.
         """
-        return self._get_configured_url("calendar_path")
+        return self.get_configured_url("calendar_path")
 
-    def _get_graph_url(self: GeneratorProtocol) -> str:
+    def get_graph_url(self) -> str:
         """Return the URL path for the configured graph page.
 
         Returns:
             The URL path for the graph page, always starting with ``/``.
         """
-        return self._get_configured_url("graph_path")
+        return self.get_configured_url("graph_path")
 
-    def _get_asset_url(
-        self: GeneratorProtocol,
+    def get_asset_url(
+        self,
         regular: str,
         minify: bool,
         *,
@@ -158,7 +171,7 @@ class ContextMixin:
             regular: Filename for the non-minified asset (e.g. ``"style.css"``).
             minify: When ``True``, the minified filename is used.
             cache_bust: When ``True`` (the default), the URL is passed through
-                [`_with_cache_bust`][blogmore.generator._context.ContextMixin._with_cache_bust]
+                [`with_cache_bust`][blogmore.generator.context.ContextBuilder.with_cache_bust]
                 so that browsers re-fetch the file after each build.
 
         Returns:
@@ -167,9 +180,9 @@ class ContextMixin:
         """
         name = minified_filename(regular) if minify else regular
         url = f"/static/{name}"
-        return self._with_cache_bust(url) if cache_bust else url
+        return self.with_cache_bust(url) if cache_bust else url
 
-    def _get_global_context(self: GeneratorProtocol) -> dict[str, Any]:
+    def get_global_context(self) -> dict[str, Any]:
         """Get the global context available to all templates.
 
         Returns:
@@ -186,73 +199,73 @@ class ContextMixin:
             "site_url": self.site_config.site_url,
             "tag_dir": TAG_DIR,
             "category_dir": CATEGORY_DIR,
-            "favicon_url": self._detect_favicon(),
-            "has_platform_icons": self._detect_generated_icons(),
+            "favicon_url": self.favicon_url,
+            "has_platform_icons": self.has_platform_icons,
             "blogmore_version": __version__,
             "with_search": self.site_config.with_search,
-            "search_url": self._get_search_url(),
-            "archive_url": self._get_archive_url(),
-            "tags_url": self._get_tags_url(),
-            "categories_url": self._get_categories_url(),
+            "search_url": self.get_search_url(),
+            "archive_url": self.get_archive_url(),
+            "tags_url": self.get_tags_url(),
+            "categories_url": self.get_categories_url(),
             "with_stats": self.site_config.with_stats,
-            "stats_url": self._get_stats_url(),
+            "stats_url": self.get_stats_url(),
             "with_calendar": self.site_config.with_calendar,
             "forward_calendar": self.site_config.forward_calendar,
-            "calendar_url": self._get_calendar_url(),
+            "calendar_url": self.get_calendar_url(),
             "with_graph": self.site_config.with_graph,
-            "graph_url": self._get_graph_url(),
+            "graph_url": self.get_graph_url(),
             "with_read_time": self.site_config.with_read_time,
             "with_backlinks": self.site_config.with_backlinks,
             "backlinks_title": self.site_config.backlinks_title,
             "with_advert": self.site_config.with_advert,
             "default_author": self.site_config.default_author,
             "extra_head_tags": self.site_config.head,
-            "fontawesome_css_url": self._with_cache_bust(self._fontawesome_css_url),
+            "fontawesome_css_url": self.with_cache_bust(self.fontawesome_css_url),
             "fontawesome_woff2_url": FONTAWESOME_CDN_BRANDS_WOFF2_URL,
-            "styles_css_url": self._get_asset_url(
+            "styles_css_url": self.get_asset_url(
                 CSS_FILENAME, self.site_config.minify_css
             ),
-            "search_css_url": self._get_asset_url(
+            "search_css_url": self.get_asset_url(
                 SEARCH_CSS_FILENAME,
                 self.site_config.minify_css,
             ),
-            "stats_css_url": self._get_asset_url(
+            "stats_css_url": self.get_asset_url(
                 STATS_CSS_FILENAME,
                 self.site_config.minify_css,
             ),
-            "archive_css_url": self._get_asset_url(
+            "archive_css_url": self.get_asset_url(
                 ARCHIVE_CSS_FILENAME,
                 self.site_config.minify_css,
             ),
-            "tag_cloud_css_url": self._get_asset_url(
+            "tag_cloud_css_url": self.get_asset_url(
                 TAG_CLOUD_CSS_FILENAME,
                 self.site_config.minify_css,
             ),
-            "calendar_css_url": self._get_asset_url(
+            "calendar_css_url": self.get_asset_url(
                 CALENDAR_CSS_FILENAME,
                 self.site_config.minify_css,
             ),
-            "graph_css_url": self._get_asset_url(
+            "graph_css_url": self.get_asset_url(
                 GRAPH_CSS_FILENAME,
                 self.site_config.minify_css,
             ),
-            "code_css_url": self._get_asset_url(
+            "code_css_url": self.get_asset_url(
                 CODE_CSS_FILENAME,
                 self.site_config.minify_css,
             ),
-            "theme_js_url": self._get_asset_url(
+            "theme_js_url": self.get_asset_url(
                 THEME_JS_FILENAME,
                 self.site_config.minify_js,
             ),
-            "search_js_url": self._get_asset_url(
+            "search_js_url": self.get_asset_url(
                 SEARCH_JS_FILENAME,
                 self.site_config.minify_js,
             ),
-            "codeblocks_js_url": self._get_asset_url(
+            "codeblocks_js_url": self.get_asset_url(
                 CODEBLOCKS_JS_FILENAME,
                 self.site_config.minify_js,
             ),
-            "graph_js_url": self._get_asset_url(
+            "graph_js_url": self.get_asset_url(
                 GRAPH_JS_FILENAME,
                 self.site_config.minify_js,
             ),
@@ -264,6 +277,3 @@ class ContextMixin:
         context["socials_title"] = self.site_config.socials_title
         context["links_title"] = self.site_config.links_title
         return context
-
-
-### _context.py ends here

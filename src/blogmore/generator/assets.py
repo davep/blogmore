@@ -1,6 +1,4 @@
-"""Mixin providing icon generation and static/extras file copying for
-[`SiteGenerator`][blogmore.generator.site.SiteGenerator].
-"""
+"""Asset management and static file processing for the site generator."""
 
 from __future__ import annotations
 
@@ -10,36 +8,47 @@ from importlib.resources import files
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+import rcssmin  # type: ignore[import-untyped]
+import rjsmin  # type: ignore[import-untyped]
+
+from blogmore.code_styles import build_code_css
 from blogmore.fontawesome import (
     FONTAWESOME_CDN_CSS_URL,
     FONTAWESOME_LOCAL_CSS_MINIFIED_PATH,
     FONTAWESOME_LOCAL_CSS_PATH,
     FontAwesomeOptimizer,
 )
-from blogmore.generator._minify import MinifyMixin
 from blogmore.generator.constants import (
-    _PAGE_SPECIFIC_CSS,
+    CODE_CSS_FILENAME,
     CODEBLOCKS_JS_FILENAME,
     CSS_FILENAME,
     GRAPH_JS_FILENAME,
+    PAGE_SPECIFIC_CSS,
     SEARCH_JS_FILENAME,
     THEME_JS_FILENAME,
 )
+from blogmore.generator.utils import minified_filename
 from blogmore.icons import IconGenerator, detect_source_icon
 
 if TYPE_CHECKING:
-    from blogmore.generator._protocol import GeneratorProtocol
+    from blogmore.site_config import SiteConfig
 
 
-class AssetsMixin(MinifyMixin):
-    """Mixin that manages icon generation and static file copying.
+class AssetManager:
+    """Manages icon generation, static assets, and extras for the site generator."""
 
-    This mixin is intended to be composed into
-    [`SiteGenerator`][blogmore.generator.site.SiteGenerator].
-    """
+    def __init__(self, site_config: SiteConfig) -> None:
+        """Initialize the asset manager.
+
+        Args:
+            site_config: The site configuration.
+        """
+        self.site_config = site_config
+        self.fontawesome_css_url: str = FONTAWESOME_CDN_CSS_URL
+        self.extras_html_paths: frozenset[str] = frozenset()
 
     @property
-    def _content_dir(self: GeneratorProtocol) -> Path:
+    def _content_dir(self) -> Path:
         """Return the content directory as a ``Path``, guaranteed non-``None``.
 
         Returns:
@@ -48,7 +57,7 @@ class AssetsMixin(MinifyMixin):
         assert self.site_config.content_dir is not None
         return self.site_config.content_dir
 
-    def _detect_favicon(self: GeneratorProtocol) -> str | None:
+    def detect_favicon(self) -> str | None:
         """Detect if a favicon file exists in the icons or extras directory.
 
         Checks for favicon files with common extensions in priority order.
@@ -81,7 +90,7 @@ class AssetsMixin(MinifyMixin):
 
         return None
 
-    def _detect_generated_icons(self: GeneratorProtocol) -> bool:
+    def detect_generated_icons(self) -> bool:
         """Detect if generated platform icons exist in the icons directory.
 
         Returns:
@@ -95,7 +104,7 @@ class AssetsMixin(MinifyMixin):
         apple_icon_path = icons_dir / "apple-touch-icon.png"
         return apple_icon_path.is_file()
 
-    def _generate_icons(self: GeneratorProtocol) -> None:
+    def generate_icons(self) -> None:
         """Generate icons from a source image if present."""
         extras_dir = self._content_dir / "extras"
 
@@ -125,12 +134,12 @@ class AssetsMixin(MinifyMixin):
             else:
                 print("Warning: No icons were generated")
 
-    def _prepare_fontawesome_css(self: GeneratorProtocol) -> str | None:
+    def prepare_fontawesome_css(self) -> str | None:
         """Determine the FontAwesome CSS URL and optionally build optimised CSS.
 
         Extracts the social icon names from the sidebar configuration and
         attempts to fetch the FontAwesome metadata from GitHub to build a
-        minimal CSS file.  Updates ``self._fontawesome_css_url`` with the URL
+        minimal CSS file.  Updates ``self.fontawesome_css_url`` with the URL
         that every rendered page will reference.
 
         Returns:
@@ -141,7 +150,7 @@ class AssetsMixin(MinifyMixin):
         socials: list[Any] = self.site_config.sidebar_config.get("socials", [])
         if not socials:
             # No social icons — no FontAwesome CSS needed at all.
-            self._fontawesome_css_url = ""
+            self.fontawesome_css_url = ""
             return None
 
         icon_names = [
@@ -156,18 +165,137 @@ class AssetsMixin(MinifyMixin):
         except (urllib.error.URLError, ValueError, OSError) as error:
             print(f"Warning: Could not fetch FontAwesome metadata: {error}")
             print("Falling back to full FontAwesome CDN stylesheet.")
-            self._fontawesome_css_url = FONTAWESOME_CDN_CSS_URL
+            self.fontawesome_css_url = FONTAWESOME_CDN_CSS_URL
             return None
 
         print("Optimizing FontAwesome CSS...")
-        self._fontawesome_css_url = (
+        self.fontawesome_css_url = (
             FONTAWESOME_LOCAL_CSS_MINIFIED_PATH
             if self.site_config.minify_css
             else FONTAWESOME_LOCAL_CSS_PATH
         )
         return optimizer.build_css(metadata)
 
-    def _copy_static_assets(self: GeneratorProtocol) -> None:
+    def _get_asset_source(self, filename: str) -> str | None:
+        """Read the text content of a static asset, preferring custom over bundled.
+
+        Looks first in the custom templates directory (``templates_dir/static/``)
+        when one is configured, then falls back to the package's bundled templates.
+        Returns ``None`` and emits a warning if the asset cannot be found.
+
+        Args:
+            filename: The asset filename to look up (e.g. ``"style.css"``).
+
+        Returns:
+            The text content of the asset, or ``None`` if it could not be read.
+        """
+        if self.site_config.templates_dir is not None:
+            custom_path = self.site_config.templates_dir / "static" / filename
+            if custom_path.is_file():
+                return custom_path.read_text(encoding="utf-8")
+
+        try:
+            bundled = files("blogmore").joinpath("templates", "static", filename)
+            return bundled.read_text(encoding="utf-8")
+        except Exception as e:
+            print(f"Warning: Could not read bundled {filename} for minification: {e}")
+            return None
+
+    def _minify_one_css(
+        self,
+        output_static: Path,
+        source_filename: str,
+    ) -> None:
+        """Read one source CSS file, minify it, and write the minified output.
+
+        The source CSS is read from the custom templates directory (if
+        available) or from the bundled templates.  The minified output filename
+        is derived from *source_filename* via
+        [`minified_filename`][blogmore.generator.utils.minified_filename] and written
+        to ``output_static/<minified_name>``.
+
+        Args:
+            output_static: Path to the output static directory.
+            source_filename: Source CSS filename (e.g. ``style.css``).
+        """
+        css_source = self._get_asset_source(source_filename)
+        if css_source is None:
+            return
+
+        minified_name = minified_filename(source_filename)
+        minified = rcssmin.cssmin(css_source)
+        output_path = output_static / minified_name
+        output_path.write_text(minified, encoding="utf-8")
+        print(f"Generated minified CSS as {minified_name}")
+
+    def _write_minified_css(self, output_static: Path) -> None:
+        """Minify all CSS files and write them to the output static directory.
+
+        Minifies the main stylesheet (``style.css`` → ``style.min.css``) and
+        each of the page-specific stylesheets (``search.css``, ``stats.css``,
+        ``archive.css``, ``tag-cloud.css``).  The source CSS for each file is
+        read from the custom templates directory (if configured) or from the
+        bundled templates.
+
+        Args:
+            output_static: Path to the output static directory.
+        """
+        self._minify_one_css(output_static, CSS_FILENAME)
+        for source_filename in PAGE_SPECIFIC_CSS:
+            self._minify_one_css(output_static, source_filename)
+
+    def _write_code_css(self, output_static: Path) -> None:
+        """Generate and write the code syntax highlighting CSS file.
+
+        Builds a ``code.css`` (or ``code.min.css`` when ``minify_css`` is
+        enabled) from the Pygments styles configured in ``light_mode_code_style``
+        and ``dark_mode_code_style``.  The file is always regenerated from the
+        configured styles, even when the default styles are in use, so that the
+        output is self-contained and does not depend on any hardcoded CSS rules
+        in the main stylesheet.
+
+        Args:
+            output_static: Path to the output static directory.
+        """
+        css_content = build_code_css(
+            self.site_config.light_mode_code_style,
+            self.site_config.dark_mode_code_style,
+        )
+        if self.site_config.minify_css:
+            minified = rcssmin.cssmin(css_content)
+            code_css_min = minified_filename(CODE_CSS_FILENAME)
+            output_path = output_static / code_css_min
+            output_path.write_text(minified, encoding="utf-8")
+            print(f"Generated minified code CSS as {code_css_min}")
+        else:
+            output_path = output_static / CODE_CSS_FILENAME
+            output_path.write_text(css_content, encoding="utf-8")
+            print(f"Generated code CSS as {CODE_CSS_FILENAME}")
+
+    def _write_minified_js(self, output_static: Path, js_filename: str) -> None:
+        """Read a source JavaScript file, minify it, and write it with the minified name.
+
+        The source JS is read from the custom templates directory (if
+        available) or from the bundled templates.  The minified output filename
+        is derived from *js_filename* via
+        [`minified_filename`][blogmore.generator.utils.minified_filename] and written
+        to ``output_static/<minified_name>``.
+
+        Args:
+            output_static: Path to the output static directory.
+            js_filename: The original JavaScript filename (e.g. ``theme.js``).
+        """
+        js_source = self._get_asset_source(js_filename)
+        if js_source is None:
+            return
+
+        js_min = minified_filename(js_filename)
+        minified = rjsmin.jsmin(js_source)
+        output_path = output_static / js_min
+        output_path.write_text(minified, encoding="utf-8")
+        print(f"Generated minified JS as {js_min}")
+
+    def copy_static_assets(self) -> None:
         """Copy static assets (CSS, JS, images) to output directory.
 
         When ``minify_css`` is enabled, ``style.css`` and all page-specific
@@ -181,7 +309,7 @@ class AssetsMixin(MinifyMixin):
         output_static = self.site_config.output_dir / "static"
 
         # Pre-compute set of CSS source filenames to skip when minifying.
-        _css_source_filenames = {CSS_FILENAME} | set(_PAGE_SPECIFIC_CSS)
+        _css_source_filenames = {CSS_FILENAME} | set(PAGE_SPECIFIC_CSS)
 
         # Clear output static directory if it exists
         if output_static.exists():
@@ -297,16 +425,40 @@ class AssetsMixin(MinifyMixin):
             if self.site_config.with_graph:
                 self._write_minified_js(output_static, GRAPH_JS_FILENAME)
 
-    def _copy_extras(self: GeneratorProtocol) -> None:
+    def write_fontawesome_css(self, css_content: str) -> None:
+        """Write the optimised FontAwesome CSS file to the static directory.
+
+        Must be called *after* [`copy_static_assets`][blogmore.generator.assets.AssetManager.copy_static_assets]
+        so the file is not overwritten.  When ``minify_css`` is enabled the
+        content is minified and written as ``fontawesome.min.css``; otherwise
+        it is written as ``fontawesome.css``.
+
+        Args:
+            css_content: CSS text to write.
+        """
+        static_dir = self.site_config.output_dir / "static"
+        static_dir.mkdir(parents=True, exist_ok=True)
+        if self.site_config.minify_css:
+            minified = rcssmin.cssmin(css_content)
+            fa_min = minified_filename("fontawesome.css")
+            css_path = static_dir / fa_min
+            css_path.write_text(minified, encoding="utf-8")
+            print(f"Generated minified FontAwesome CSS as {fa_min}")
+        else:
+            css_path = static_dir / "fontawesome.css"
+            css_path.write_text(css_content, encoding="utf-8")
+            print("Generated optimized FontAwesome CSS")
+
+    def copy_extras(self) -> None:
         """Copy extra files from the extras directory to the output directory.
 
         Files in the extras directory are copied to the output root, preserving
         directory structure relative to the extras directory. If a file would
         override an existing file, it is allowed but a message is printed.
 
-        After copying, ``self._extras_html_paths`` is updated with the relative
+        After copying, ``self.extras_html_paths`` is updated with the relative
         paths (forward-slash strings) of every HTML file that was copied.  This
-        is used by ``_generate_sitemap()`` to exclude those files from the
+        is used by the sitemap generator to exclude those files from the
         sitemap, since they are not pages generated by BlogMore.
         """
         extras_dir = self._content_dir / "extras"
@@ -356,7 +508,7 @@ class AssetsMixin(MinifyMixin):
                     failed_count += 1
                     continue
 
-        self._extras_html_paths = frozenset(extras_html_paths)
+        self.extras_html_paths = frozenset(extras_html_paths)
 
         if extras_count > 0:
             print(f"Copied {extras_count} extra file(s) from {extras_dir}")
@@ -364,6 +516,3 @@ class AssetsMixin(MinifyMixin):
             print(f"Overrode {override_count} existing file(s)")
         if failed_count > 0:
             print(f"Warning: Failed to copy {failed_count} extra file(s)")
-
-
-### _assets.py ends here

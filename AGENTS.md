@@ -33,41 +33,32 @@ All source lives in `src/blogmore/`. Key modules and their responsibilities:
 | `utils.py` | Shared utility helpers |
 
 The `generator/` sub-package (`src/blogmore/generator/`) breaks the site
-generator into focused modules and mixin classes:
+generator into focused modules and component classes:
 
 | Module | Responsibility |
 |---|---|
-| `generator/constants.py` | Filename constants, `TAG_DIR`, `CATEGORY_DIR`, `_PAGE_SPECIFIC_CSS` |
+| `generator/constants.py` | Filename constants, `TAG_DIR`, `CATEGORY_DIR`, `PAGE_SPECIFIC_CSS` |
 | `generator/utils.py` | `minified_filename`, `paginate_posts` |
-| `generator/_protocol.py` | `GeneratorProtocol` — defines the combined interface of all mixins for type safety |
-| `generator/_grouping.py` | `GroupingMixin` — post grouping by tag/category; word-cloud font-size interpolation |
-| `generator/_context.py` | `ContextMixin` — global template context, asset URL helpers, cache-busting |
-| `generator/_paths.py` | `PathsMixin` — pagination paths, canonical URLs, output path resolution, sidebar filtering |
-| `generator/_minify.py` | `MinifyMixin` — HTML/CSS/JS writing and minification |
-| `generator/_assets.py` | `AssetsMixin` (extends `MinifyMixin`) — icons, FontAwesome CSS, static file copying, extras |
-| `generator/_date_archives.py` | `DateArchivesMixin` — year/month/day archive page generation |
-| `generator/_listing.py` | `ListingMixin` (extends `DateArchivesMixin`) — tag and category paginated listings |
-| `generator/_optional_pages.py` | `OptionalPagesMixin` — feeds, search, stats, calendar, graph, sitemap |
-| `generator/_pages.py` | `PagesMixin` (extends `OptionalPagesMixin`) — core page generation (post, static page, index, archive) |
-| `generator/site.py` | `SiteGenerator.__init__` and `generate()` orchestration |
-| `generator/__init__.py` | Backward-compatible re-exports (`from blogmore.generator import SiteGenerator` unchanged) |
+| `generator/grouping.py` | Post grouping by tag/category; word-cloud font-size interpolation |
+| `generator/paths.py` | Pagination paths, canonical URLs, output path resolution, sidebar filtering |
+| `generator/html.py` | HTML writing and minification |
+| `generator/assets.py` | `AssetManager` — icons, FontAwesome CSS, static file copying, extras, CSS/JS minification |
+| `generator/context.py` | `ContextBuilder` — global template context, asset URL helpers, cache-busting |
+| `generator/pages.py` | `PageGenerator` — core page generation (post, static page, index, archive) |
+| `generator/listings.py` | `ListingGenerator` — date archives and tag/category paginated listings |
+| `generator/features.py` | `FeatureGenerator` — feeds, search, stats, calendar, graph, sitemap |
+| `generator/site.py` | `SiteGenerator` — top-level orchestration |
+| `generator/__init__.py` | Backward-compatible re-exports |
 
-`SiteGenerator` composes all mixin classes:
+`SiteGenerator` composes these components:
 
 ```
-MinifyMixin
-  └── AssetsMixin          (adds icons, file copying)
-
-DateArchivesMixin
-  └── ListingMixin         (adds tag/category listings)
-
-OptionalPagesMixin
-  └── PagesMixin           (adds core post/page/index/archive)
-
-SiteGenerator(
-    AssetsMixin, ContextMixin, GroupingMixin,
-    ListingMixin, PagesMixin, PathsMixin
-)
+SiteGenerator
+  ├── AssetManager
+  ├── ContextBuilder
+  ├── PageGenerator
+  ├── ListingGenerator
+  └── FeatureGenerator
 ```
 
 The `markdown/` sub-package (`src/blogmore/markdown/`) groups all custom
@@ -95,13 +86,6 @@ appropriately-named module rather than growing an existing large file.
 ## Code style
 
 - Always write full type hints that pass `mypy` in strict mode.
-- When writing methods in `src/blogmore/generator/` mixins, always type `self`
-  as [`GeneratorProtocol`][blogmore.generator._protocol.GeneratorProtocol].
-  This provides type-safe access to shared attributes (`site_config`,
-  `renderer`) and methods defined in other mixins without requiring circular
-  imports or redundant class-level declarations. Always use
-  `from __future__ import annotations` and the `if TYPE_CHECKING:` idiom for
-  this.
 - If a third-party library lacks type hints, search for a companion type-stub
   package (e.g. `types-*`) before adding `# type: ignore` comments.
 - Always generate full Google-style docstrings for every module, class,
