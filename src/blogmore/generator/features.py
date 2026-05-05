@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Final
 
 from blogmore.backlinks import Backlink
 from blogmore.calendar import CalendarYear, build_calendar
@@ -27,6 +27,9 @@ if TYPE_CHECKING:
 class FeatureGenerator:
     """Generates optional-feature pages (feeds, search, stats, calendar, graph)."""
 
+    POSTS_PER_FEED: Final[int] = 20
+    """The number of posts to include in each feed page."""
+
     def __init__(
         self,
         site_config: SiteConfig,
@@ -43,9 +46,6 @@ class FeatureGenerator:
         self.site_config = site_config
         self.renderer = renderer
         self.context_builder = context_builder
-
-        # Feed constants - posts per feed
-        self.POSTS_PER_FEED = 20
 
     def generate_feeds(self, posts: list[Post]) -> None:
         """Generate RSS and Atom feeds.
