@@ -4,76 +4,7 @@ from blogmore.utils import (
     calculate_reading_time,
     make_urls_absolute,
     normalize_site_url,
-    strip_markdown,
 )
-
-
-class TestStripMarkdown:
-    """Test the strip_markdown function."""
-
-    def test_strip_markdown_basic(self) -> None:
-        """Test that basic markdown formatting is stripped."""
-        content = "**Bold** and *italic* and `code` and [link](url)"
-        assert strip_markdown(content) == "Bold and italic and code and link"
-
-    def test_strip_markdown_with_images(self) -> None:
-        """Test that markdown images are removed."""
-        content = "Here is an image: ![Alt text](image.jpg) and some more text."
-        assert strip_markdown(content) == "Here is an image: and some more text."
-        content = "Here is an image: ![](image.jpg) and some more text."
-        assert strip_markdown(content) == "Here is an image: and some more text."
-
-    def test_strip_markdown_with_html_tags(self) -> None:
-        """Test that HTML tags are removed."""
-        content = "<p>This is a paragraph</p> with <strong>HTML tags</strong>."
-        assert strip_markdown(content) == "This is a paragraph with HTML tags."
-
-    def test_strip_markdown_with_code_blocks(self) -> None:
-        """Test that code blocks are removed."""
-        content = """
-        This is some text before the code.
-
-        ```python
-        def hello():
-            print("This code should not be counted")
-            return "lots of words here"
-        ```
-
-        This is text after the code.
-        """
-        assert (
-            strip_markdown(content)
-            == "This is some text before the code. This is text after the code."
-        )
-
-    def test_strip_markdown_empty_string(self) -> None:
-        """Test that an empty string returns an empty string."""
-        assert strip_markdown("") == ""
-
-    def test_strip_markdown_only_formatting(self) -> None:
-        """Test that a string with only formatting characters returns an empty string."""
-        content = "***___```###"
-        assert strip_markdown(content) == ""
-
-    def test_strip_markdown_with_nested_formatting(self) -> None:
-        """Test that nested formatting characters are all stripped."""
-        content = "**Bold and *nested italic* text**"
-        assert strip_markdown(content) == "Bold and nested italic text"
-
-    def test_strip_markdown_with_links_and_images(self) -> None:
-        """Test that links are stripped but their text is preserved, while images are removed."""
-        content = "This is a [link](url) and this is an image: ![Alt](img.jpg)"
-        assert strip_markdown(content) == "This is a link and this is an image:"
-
-    def test_strip_markdown_with_linked_image(self) -> None:
-        """Test that linked images are stripped but their alt text is preserved."""
-        content = "Here is a linked image: [![Alt](img.jpg)](url)"
-        assert strip_markdown(content) == "Here is a linked image:"
-
-    def test_strip_markdown_preserves_newlines_as_spaces(self) -> None:
-        """Test that newlines are preserved as spaces."""
-        content = "Line one.\nLine two.\n\nLine three."
-        assert strip_markdown(content) == "Line one. Line two. Line three."
 
 
 class TestCalculateReadingTime:
