@@ -27,9 +27,9 @@ def count_words(content: str) -> int:
     return len(
         [
             word
-            for word in markdown_to_plain_text(
-                content, exclude_code_blocks=True
-            ).split()
+            for word in re.findall(
+                r"\w+", markdown_to_plain_text(content, exclude_code_blocks=True)
+            )
             if word
         ]
     )
