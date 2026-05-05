@@ -6,7 +6,7 @@ import datetime as dt
 from collections import defaultdict
 from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Final
 
 from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
 from blogmore.generator.grouping import (
@@ -33,6 +33,13 @@ if TYPE_CHECKING:
 class ListingGenerator:
     """Generates paginated listing pages for archives, tags, and categories."""
 
+    POSTS_PER_PAGE_TAG: Final[int] = 10
+    """The number of posts to show per page on tag listing pages."""
+    POSTS_PER_PAGE_CATEGORY: Final[int] = 10
+    """The number of posts to show per page on category listing pages."""
+    POSTS_PER_PAGE_ARCHIVE: Final[int] = 10
+    """The number of posts to show per page on date archive listing pages."""
+
     def __init__(
         self,
         site_config: SiteConfig,
@@ -49,11 +56,6 @@ class ListingGenerator:
         self.site_config = site_config
         self.renderer = renderer
         self.context_builder = context_builder
-
-        # Pagination constants - posts per page for each index type
-        self.POSTS_PER_PAGE_TAG = 10
-        self.POSTS_PER_PAGE_CATEGORY = 10
-        self.POSTS_PER_PAGE_ARCHIVE = 10
 
     def generate_paginated_listing(
         self,

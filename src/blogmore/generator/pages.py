@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Final
 
 from blogmore.backlinks import Backlink
 from blogmore.clean_url import make_url_clean
@@ -27,6 +27,9 @@ if TYPE_CHECKING:
 class PageGenerator:
     """Generates each type of HTML page written to the output directory."""
 
+    POSTS_PER_PAGE_INDEX: Final[int] = 10
+    """The number of posts to show per page on the main index page."""
+
     def __init__(
         self,
         site_config: SiteConfig,
@@ -43,9 +46,6 @@ class PageGenerator:
         self.site_config = site_config
         self.renderer = renderer
         self.context_builder = context_builder
-
-        # Pagination constants - posts per page for the main index
-        self.POSTS_PER_PAGE_INDEX = 10
 
     def generate_post_page(
         self,
