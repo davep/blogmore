@@ -34,8 +34,11 @@ class ListingGenerator:
     """Generates paginated listing pages for archives, tags, and categories."""
 
     POSTS_PER_PAGE_TAG: Final[int] = 10
+    """The number of posts to show per page on tag listing pages."""
     POSTS_PER_PAGE_CATEGORY: Final[int] = 10
+    """The number of posts to show per page on category listing pages."""
     POSTS_PER_PAGE_ARCHIVE: Final[int] = 10
+    """The number of posts to show per page on date archive listing pages."""
 
     def __init__(
         self,
