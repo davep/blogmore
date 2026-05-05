@@ -124,9 +124,7 @@ class _TextWithoutCodeExtractor(HTMLParser):
         self._chunks: list[str] = []
         self._pre_depth: int = 0
 
-    def handle_starttag(
-        self, tag: str, attrs: list[tuple[str, str | None]]
-    ) -> None:
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         """Track entry into ``<pre>`` elements.
 
         Args:
@@ -165,9 +163,7 @@ class _TextWithoutCodeExtractor(HTMLParser):
         return re.sub(r"\s+", " ", "".join(self._chunks)).strip()
 
 
-def markdown_to_plain_text(
-    text: str, *, exclude_code_blocks: bool = False
-) -> str:
+def markdown_to_plain_text(text: str, *, exclude_code_blocks: bool = False) -> str:
     """Convert a Markdown string to clean plain text.
 
     Runs the input through Python-Markdown (with all BlogMore extensions and
