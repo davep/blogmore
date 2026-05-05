@@ -24,47 +24,45 @@ All source lives in `src/blogmore/`. Key modules and their responsibilities:
 | `content_path.py` | Shared path-resolution utilities for content output paths (used by page_path and post_path) |
 | `clean_url.py` | Clean URL transformation utilities (removes index.html from URLs when enabled) |
 | `page_path.py` | Page path resolution for configurable output file paths |
+| `backlinks.py` | Internal link analysis and backlink map generation |
+| `calendar.py` | Calendar grid calculation and data structures |
+| `graph.py` | Post relationship graph data generation (JSON) |
+| `stats.py` | Blog statistics computation (word counts, top tags, etc.) |
+| `comment_invite.py` | mailto: URL generation for "Invite comments" links |
+| `code_styles.py` | Pygments-based CSS generation for code blocks |
 | `utils.py` | Shared utility helpers |
 
 The `generator/` sub-package (`src/blogmore/generator/`) breaks the site
-generator into focused modules and mixin classes:
+generator into focused modules and component classes:
 
 | Module | Responsibility |
 |---|---|
-| `generator/constants.py` | Filename constants, `TAG_DIR`, `CATEGORY_DIR`, `_PAGE_SPECIFIC_CSS` |
+| `generator/constants.py` | Filename constants, `TAG_DIR`, `CATEGORY_DIR`, `PAGE_SPECIFIC_CSS` |
 | `generator/utils.py` | `minified_filename`, `paginate_posts` |
-| `generator/_grouping.py` | `GroupingMixin` — post grouping by tag/category; word-cloud font-size interpolation |
-| `generator/_context.py` | `ContextMixin` — global template context, asset URL helpers, cache-busting |
-| `generator/_paths.py` | `PathsMixin` — pagination paths, canonical URLs, output path resolution, sidebar filtering |
-| `generator/_minify.py` | `MinifyMixin` — HTML/CSS/JS writing and minification |
-| `generator/_assets.py` | `AssetsMixin` (extends `MinifyMixin`) — icons, FontAwesome CSS, static file copying, extras |
-| `generator/_date_archives.py` | `DateArchivesMixin` — year/month/day archive page generation |
-| `generator/_listing.py` | `ListingMixin` (extends `DateArchivesMixin`) — tag and category paginated listings |
-| `generator/_optional_pages.py` | `OptionalPagesMixin` — feeds, search, stats, calendar, graph, sitemap |
-| `generator/_pages.py` | `PagesMixin` (extends `OptionalPagesMixin`) — core page generation (post, static page, index, archive) |
-| `generator/site.py` | `SiteGenerator.__init__` and `generate()` orchestration |
-| `generator/__init__.py` | Backward-compatible re-exports (`from blogmore.generator import SiteGenerator` unchanged) |
+| `generator/grouping.py` | Post grouping by tag/category; word-cloud font-size interpolation |
+| `generator/paths.py` | Pagination paths, canonical URLs, output path resolution, sidebar filtering |
+| `generator/html.py` | HTML writing and minification |
+| `generator/assets.py` | `AssetManager` — icons, FontAwesome CSS, static file copying, extras, CSS/JS minification |
+| `generator/context.py` | `ContextBuilder` — global template context, asset URL helpers, cache-busting |
+| `generator/pages.py` | `PageGenerator` — core page generation (post, static page, index, archive) |
+| `generator/listings.py` | `ListingGenerator` — date archives and tag/category paginated listings |
+| `generator/features.py` | `FeatureGenerator` — feeds, search, stats, calendar, graph, sitemap |
+| `generator/site.py` | `SiteGenerator` — top-level orchestration |
+| `generator/__init__.py` | Backward-compatible re-exports |
 
-`SiteGenerator` composes all mixin classes:
+`SiteGenerator` composes these components:
 
 ```
-MinifyMixin
-  └── AssetsMixin          (adds icons, file copying)
-
-DateArchivesMixin
-  └── ListingMixin         (adds tag/category listings)
-
-OptionalPagesMixin
-  └── PagesMixin           (adds core post/page/index/archive)
-
-SiteGenerator(
-    AssetsMixin, ContextMixin, GroupingMixin,
-    ListingMixin, PagesMixin, PathsMixin
-)
+SiteGenerator
+  ├── AssetManager
+  ├── ContextBuilder
+  ├── PageGenerator
+  ├── ListingGenerator
+  └── FeatureGenerator
 ```
 
 The `markdown/` sub-package (`src/blogmore/markdown/`) groups all custom
-Markdown extensions:
+Markdown extensions and utility modules:
 
 | Module | Responsibility |
 |---|---|
@@ -72,9 +70,12 @@ Markdown extensions:
 | `markdown/external_links.py` | Markdown extension: opens external links in a new tab |
 | `markdown/heading_anchors.py` | Markdown extension: hover anchor links on headings |
 | `markdown/strikethrough.py` | Markdown extension: `~~strikethrough~~` syntax |
+| `markdown/plain_text.py` | Markdown-to-plain-text conversion; **single source of truth for the custom extension set** |
+| `markdown/first_paragraph.py` | Logic for extracting the first meaningful paragraph as plain text |
 
 Any new Markdown extensions must be added as a new module inside
-`src/blogmore/markdown/` and registered in `parser.py`.
+`src/blogmore/markdown/`, registered in `create_custom_extensions` in
+`markdown/plain_text.py`, and imported in `parser.py`.
 
 Templates live in `src/blogmore/templates/`; the stylesheet is
 `src/blogmore/templates/static/style.css`.

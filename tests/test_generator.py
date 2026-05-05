@@ -7,11 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from blogmore.generator import (
-    SiteGenerator,
-    minified_filename,
-    paginate_posts,
-)
+from blogmore.generator import SiteGenerator
+from blogmore.generator.assets import AssetManager
 from blogmore.generator.constants import (
     ARCHIVE_CSS_FILENAME,
     CALENDAR_CSS_FILENAME,
@@ -21,6 +18,12 @@ from blogmore.generator.constants import (
     STATS_CSS_FILENAME,
     TAG_CLOUD_CSS_FILENAME,
 )
+from blogmore.generator.context import ContextBuilder
+from blogmore.generator.paths import (
+    resolve_post_output_paths,
+    resolve_sidebar_pages,
+)
+from blogmore.generator.utils import minified_filename, paginate_posts
 from blogmore.parser import (
     CUSTOM_404_HTML,
     CUSTOM_404_MARKDOWN,
@@ -141,7 +144,7 @@ class TestSiteGenerator:
             )
         )
 
-        result = generator._resolve_sidebar_pages(pages)
+        result = resolve_sidebar_pages(generator.site_config, pages)
         assert result == pages
 
     def test_resolve_sidebar_pages_empty_list(
@@ -158,7 +161,7 @@ class TestSiteGenerator:
             )
         )
 
-        result = generator._resolve_sidebar_pages(pages)
+        result = resolve_sidebar_pages(generator.site_config, pages)
         assert result == pages
 
     def test_resolve_sidebar_pages_filters_to_listed_slugs(
@@ -181,7 +184,7 @@ class TestSiteGenerator:
             )
         )
 
-        result = generator._resolve_sidebar_pages(pages)
+        result = resolve_sidebar_pages(generator.site_config, pages)
         assert result == [page2]
 
     def test_resolve_sidebar_pages_respects_order(
@@ -204,7 +207,7 @@ class TestSiteGenerator:
             )
         )
 
-        result = generator._resolve_sidebar_pages(pages)
+        result = resolve_sidebar_pages(generator.site_config, pages)
         assert result == [page2, sample_page]
 
     def test_resolve_sidebar_pages_ignores_unknown_slugs(
@@ -221,7 +224,7 @@ class TestSiteGenerator:
             )
         )
 
-        result = generator._resolve_sidebar_pages(pages)
+        result = resolve_sidebar_pages(generator.site_config, pages)
         assert result == [sample_page]
 
     def test_init(self, posts_dir: Path, temp_output_dir: Path) -> None:
@@ -831,7 +834,7 @@ class TestSiteGenerator:
         )
 
         # Test the _detect_favicon method
-        assert generator._detect_favicon() == "/favicon.ico"
+        assert AssetManager(generator.site_config).detect_favicon() == "/favicon.ico"
 
     def test_detect_favicon_png(self, tmp_path: Path, temp_output_dir: Path) -> None:
         """Test detecting favicon.png file."""
@@ -846,7 +849,7 @@ class TestSiteGenerator:
             site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
         )
 
-        assert generator._detect_favicon() == "/favicon.png"
+        assert AssetManager(generator.site_config).detect_favicon() == "/favicon.png"
 
     def test_detect_favicon_svg(self, tmp_path: Path, temp_output_dir: Path) -> None:
         """Test detecting favicon.svg file."""
@@ -861,7 +864,7 @@ class TestSiteGenerator:
             site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
         )
 
-        assert generator._detect_favicon() == "/favicon.svg"
+        assert AssetManager(generator.site_config).detect_favicon() == "/favicon.svg"
 
     def test_detect_favicon_no_extras_dir(
         self, tmp_path: Path, temp_output_dir: Path
@@ -874,7 +877,7 @@ class TestSiteGenerator:
             site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
         )
 
-        assert generator._detect_favicon() is None
+        assert AssetManager(generator.site_config).detect_favicon() is None
 
     def test_detect_favicon_no_favicon_file(
         self, tmp_path: Path, temp_output_dir: Path
@@ -891,7 +894,7 @@ class TestSiteGenerator:
             site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
         )
 
-        assert generator._detect_favicon() is None
+        assert AssetManager(generator.site_config).detect_favicon() is None
 
     def test_detect_favicon_priority(
         self, tmp_path: Path, temp_output_dir: Path
@@ -910,7 +913,7 @@ class TestSiteGenerator:
         )
 
         # .ico should be preferred (first in list)
-        assert generator._detect_favicon() == "/favicon.ico"
+        assert AssetManager(generator.site_config).detect_favicon() == "/favicon.ico"
 
     def test_favicon_in_generated_html(
         self, tmp_path: Path, temp_output_dir: Path
@@ -986,8 +989,7 @@ class TestSiteGenerator:
         generator = SiteGenerator(
             site_config=SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
         )
-
-        generator._generate_icons()
+        AssetManager(generator.site_config).generate_icons()
 
         # favicon.ico should exist in the icons subdirectory
         assert (temp_output_dir / "icons" / "favicon.ico").is_file()
@@ -1152,7 +1154,7 @@ class TestSiteGenerator:
                 output_dir=temp_output_dir,
             )
         )
-        generator._copy_extras()
+        AssetManager(generator.site_config).copy_extras()
 
         assert (
             temp_output_dir / "robots.txt"
@@ -1185,7 +1187,7 @@ class TestSiteGenerator:
                 output_dir=temp_output_dir,
             )
         )
-        generator._copy_extras()
+        AssetManager(generator.site_config).copy_extras()
 
         assert (temp_output_dir / "robots.txt").exists()
         assert (temp_output_dir / "images" / "splash.png").read_bytes() == b"\x89PNG"
@@ -1210,7 +1212,7 @@ class TestSiteGenerator:
             )
         )
         # Should not raise
-        generator._copy_extras()
+        AssetManager(generator.site_config).copy_extras()
 
     def test_copy_extras_overriding_existing_file(
         self, tmp_path: Path, temp_output_dir: Path, capsys: pytest.CaptureFixture[str]
@@ -1229,7 +1231,7 @@ class TestSiteGenerator:
                 output_dir=temp_output_dir,
             )
         )
-        generator._copy_extras()
+        AssetManager(generator.site_config).copy_extras()
 
         assert (temp_output_dir / "robots.txt").read_text() == "New content"
         captured = capsys.readouterr()
@@ -1249,7 +1251,7 @@ class TestSiteGenerator:
             )
         )
 
-        context = generator._get_global_context()
+        context = ContextBuilder(generator.site_config).get_global_context()
 
         assert "blogmore_version" in context
         assert context["blogmore_version"] == __version__
@@ -1265,7 +1267,7 @@ class TestSiteGenerator:
             )
         )
 
-        context = generator._get_global_context()
+        context = ContextBuilder(generator.site_config).get_global_context()
 
         assert "with_advert" in context
         assert context["with_advert"] is True
@@ -1282,7 +1284,7 @@ class TestSiteGenerator:
             )
         )
 
-        context = generator._get_global_context()
+        context = ContextBuilder(generator.site_config).get_global_context()
 
         assert context["with_advert"] is False
 
@@ -1298,7 +1300,7 @@ class TestSiteGenerator:
             )
         )
 
-        context = generator._get_global_context()
+        context = ContextBuilder(generator.site_config).get_global_context()
 
         assert context["site_description"] == "A great blog about things"
 
@@ -1577,7 +1579,7 @@ class TestSiteGenerator:
             )
         )
 
-        context = generator._get_global_context()
+        context = ContextBuilder(generator.site_config).get_global_context()
         assert context["site_keywords"] == keywords
 
     def test_site_keywords_none_in_global_context(
@@ -1588,7 +1590,7 @@ class TestSiteGenerator:
             site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
         )
 
-        context = generator._get_global_context()
+        context = ContextBuilder(generator.site_config).get_global_context()
         assert context["site_keywords"] is None
 
     def test_index_page_og_type_is_website(
@@ -3481,7 +3483,7 @@ class TestWithReadTime:
                 content_dir=posts_dir, output_dir=temp_output_dir, with_read_time=True
             )
         )
-        context = generator._get_global_context()
+        context = ContextBuilder(generator.site_config).get_global_context()
         assert context["with_read_time"] is True
 
     def test_with_read_time_false_in_global_context(
@@ -3493,7 +3495,7 @@ class TestWithReadTime:
                 content_dir=posts_dir, output_dir=temp_output_dir, with_read_time=False
             )
         )
-        context = generator._get_global_context()
+        context = ContextBuilder(generator.site_config).get_global_context()
         assert context["with_read_time"] is False
 
     def test_archive_page_has_table_of_contents_sidebar(
@@ -3876,7 +3878,7 @@ class TestPostPathConfiguration:
         posts = parser.parse_directory(posts_dir)
         posts.sort(key=post_sort_key, reverse=True)
 
-        generator._resolve_post_output_paths(posts)
+        resolve_post_output_paths(generator.site_config, posts)
 
         dated = [p for p in posts if p.date is not None]
         assert dated, "Test requires at least one dated post in fixtures"
@@ -4598,7 +4600,7 @@ class TestHeadTags:
             )
         )
 
-        context = generator._get_global_context()
+        context = ContextBuilder(generator.site_config).get_global_context()
 
         assert "extra_head_tags" in context
         assert context["extra_head_tags"] == head
@@ -4614,7 +4616,7 @@ class TestHeadTags:
             )
         )
 
-        context = generator._get_global_context()
+        context = ContextBuilder(generator.site_config).get_global_context()
 
         assert context["extra_head_tags"] == []
 

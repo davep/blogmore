@@ -18,7 +18,7 @@ SEARCH_JS_FILENAME = "search.js"
 CODEBLOCKS_JS_FILENAME = "codeblocks.js"
 
 # All page-specific CSS files (source filenames only).
-_PAGE_SPECIFIC_CSS: list[str] = [
+PAGE_SPECIFIC_CSS: list[str] = [
     SEARCH_CSS_FILENAME,
     STATS_CSS_FILENAME,
     ARCHIVE_CSS_FILENAME,
