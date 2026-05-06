@@ -8,6 +8,11 @@
   Markdown-to-text converter rather than a regex-based approximation. Fenced
   code blocks are excluded from these counts (inline code is still
   included). ([#455](https://github.com/davep/blogmore/pull/455))
+- Fixed a disparity on the stats page where the post listed as having the
+  shortest or longest reading time could differ from the post with the
+  fewest or most words. Reading time min/max are now derived from the
+  word-count min/max posts.
+  ([#457](https://github.com/davep/blogmore/pull/457))
 
 ## v2.19.0
 
