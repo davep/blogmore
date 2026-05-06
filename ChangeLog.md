@@ -4,6 +4,10 @@
 
 **Released: WiP**
 
+- Fixed a disparity on the stats page where the post listed as having the
+  shortest or longest reading time could differ from the post with the
+  fewest or most words. Reading time min/max are now derived from the
+  word-count min/max posts. ([#458](https://github.com/davep/blogmore/pull/458))
 - Word count and reading time calculations now use the proper
   Markdown-to-text converter rather than a regex-based approximation. Fenced
   code blocks are excluded from these counts (inline code is still

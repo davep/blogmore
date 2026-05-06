@@ -226,6 +226,30 @@ class TestComputeBlogStats:
         assert stats.min_word_count_post is short
         assert stats.max_word_count_post is long
 
+    def test_min_max_reading_time_posts_match_word_count_posts(self) -> None:
+        """Min and max reading time posts are the same as min and max word count posts.
+
+        Reading times are rounded to whole minutes, so several posts may share
+        the same reading time.  The reading time min/max must be derived from
+        the word-count min/max to ensure consistent attribution.
+        """
+        # 50 words → reading_time = max(1, round(50/200)) = 1 min  ← fewest words
+        # 199 words → reading_time = max(1, round(199/200)) = 1 min (same bucket)
+        # 400 words → reading_time = max(1, round(400/200)) = 2 min ← most words
+        fewest_words = self._make_post(
+            slug="fewest", title="Fewest", content="word " * 50
+        )
+        middle = self._make_post(slug="middle", title="Middle", content="word " * 199)
+        most_words = self._make_post(slug="most", title="Most", content="word " * 400)
+        # Present middle before fewest so the old independent-search approach
+        # would pick 'middle' as the min reading time post (also 1 min but
+        # encountered first), rather than the true minimum-word-count post.
+        stats = compute_blog_stats([middle, fewest_words, most_words])
+        assert stats.min_reading_time_post is fewest_words
+        assert stats.max_reading_time_post is most_words
+        assert stats.min_reading_time == fewest_words.reading_time
+        assert stats.max_reading_time == most_words.reading_time
+
     def test_blog_span_days_computed(self) -> None:
         """blog_span_days returns the difference between earliest and latest dates."""
         posts = [

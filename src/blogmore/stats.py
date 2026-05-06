@@ -538,12 +538,12 @@ def compute_blog_stats(
     if reading_times:
         total_time = sum(rt for _, rt in reading_times)
         stats.avg_reading_time = total_time / len(reading_times)
-        min_rt_post, min_rt = min(reading_times, key=lambda pair: pair[1])
-        max_rt_post, max_rt = max(reading_times, key=lambda pair: pair[1])
-        stats.min_reading_time = min_rt
-        stats.max_reading_time = max_rt
-        stats.min_reading_time_post = min_rt_post
-        stats.max_reading_time_post = max_rt_post
+        if stats.min_word_count_post is not None:
+            stats.min_reading_time_post = stats.min_word_count_post
+            stats.min_reading_time = stats.min_word_count_post.reading_time
+        if stats.max_word_count_post is not None:
+            stats.max_reading_time_post = stats.max_word_count_post
+            stats.max_reading_time = stats.max_word_count_post.reading_time
 
     # --- Tags and categories --------------------------------------------------
     all_tags: set[str] = set()
