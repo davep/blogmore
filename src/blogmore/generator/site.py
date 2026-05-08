@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import shutil
 import time
-from collections.abc import Generator
-from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
 from blogmore.backlinks import build_backlink_map
@@ -19,32 +17,13 @@ from blogmore.generator.paths import (
     resolve_post_output_paths,
     resolve_sidebar_pages,
 )
+from blogmore.generator.utils import timed_step
 from blogmore.parser import PostParser
 from blogmore.renderer import TemplateRenderer
 
 if TYPE_CHECKING:
     from blogmore.backlinks import Backlink
     from blogmore.site_config import SiteConfig
-
-
-@contextmanager
-def _timed_step(label: str) -> Generator[None, None, None]:
-    """Time a named generation step and print its wall-clock duration.
-
-    Prints `label` immediately (without a trailing newline) so the elapsed
-    time can be appended on the same line once the step finishes.
-
-    Args:
-        label: Human-readable description of the step, printed as it begins.
-
-    Yields:
-        Nothing — the caller performs the work inside the ``with`` block.
-    """
-    print(label, end="", flush=True)
-    start = time.monotonic()
-    yield
-    elapsed = time.monotonic() - start
-    print(f" [{elapsed:.2f}s]")
 
 
 class SiteGenerator:
@@ -99,7 +78,7 @@ class SiteGenerator:
         # Clean output directory if requested
         if self.site_config.clean_first and self.site_config.output_dir.exists():
             removal_warning = False
-            with _timed_step(
+            with timed_step(
                 f"Removing output directory: {self.site_config.output_dir}..."
             ):
                 try:
@@ -119,7 +98,7 @@ class SiteGenerator:
         pages = self.parser.parse_pages_directory(pages_dir)
         page_404 = self.parser.parse_404_page(pages_dir)
 
-        with _timed_step(f"Parsing posts from {content_dir}..."):
+        with timed_step(f"Parsing posts from {content_dir}..."):
             posts = self.parser.parse_directory(
                 content_dir,
                 include_drafts=self.site_config.include_drafts,
@@ -157,7 +136,7 @@ class SiteGenerator:
         # Build backlink map
         backlinks_map: dict[str, list[Backlink]] = {}
         if self.site_config.with_backlinks:
-            with _timed_step("Building backlink map..."):
+            with timed_step("Building backlink map..."):
                 backlinks_map = build_backlink_map(
                     posts,
                     site_url=self.site_config.site_url,
@@ -169,7 +148,7 @@ class SiteGenerator:
         feature_gen = FeatureGenerator(self.site_config, self.renderer, context_builder)
 
         # Generate individual post pages
-        with _timed_step("Generating post pages..."):
+        with timed_step("Generating post pages..."):
             generated_paths: set[str] = set()
             for post in posts:
                 output_path = post_output_paths[id(post)]
@@ -183,7 +162,7 @@ class SiteGenerator:
 
         # Generate static pages
         if pages:
-            with _timed_step("Generating static pages..."):
+            with timed_step("Generating static pages..."):
                 for page in pages:
                     page_gen.generate_page(
                         page, sidebar_pages, page_output_paths[id(page)]
@@ -191,40 +170,40 @@ class SiteGenerator:
 
         # Generate custom 404 page
         if page_404 is not None:
-            with _timed_step("Generating custom 404 page..."):
+            with timed_step("Generating custom 404 page..."):
                 page_gen.generate_404_page(page_404, sidebar_pages)
 
         # Generate core index/archive pages
-        with _timed_step("Generating index page..."):
+        with timed_step("Generating index page..."):
             page_gen.generate_index_page(posts, sidebar_pages)
-        with _timed_step("Generating archive page..."):
+        with timed_step("Generating archive page..."):
             page_gen.generate_archive_page(posts, sidebar_pages)
 
         # Generate listing pages
-        with _timed_step("Generating date-based archive pages..."):
+        with timed_step("Generating date-based archive pages..."):
             listing_gen.generate_date_archives(posts, sidebar_pages)
-        with _timed_step("Generating tag pages..."):
+        with timed_step("Generating tag pages..."):
             listing_gen.generate_tag_pages(posts, sidebar_pages)
-        with _timed_step("Generating tags overview page..."):
+        with timed_step("Generating tags overview page..."):
             listing_gen.generate_tags_page(posts, sidebar_pages)
-        with _timed_step("Generating category pages..."):
+        with timed_step("Generating category pages..."):
             listing_gen.generate_category_pages(posts, sidebar_pages)
-        with _timed_step("Generating categories overview page..."):
+        with timed_step("Generating categories overview page..."):
             listing_gen.generate_categories_page(posts, sidebar_pages)
 
         # Generate optional feature pages
-        with _timed_step("Generating RSS and Atom feeds..."):
+        with timed_step("Generating RSS and Atom feeds..."):
             feature_gen.generate_feeds(posts)
 
         if self.site_config.with_search:
-            with _timed_step("Generating search index and search page..."):
+            with timed_step("Generating search index and search page..."):
                 feature_gen.generate_search_index(posts)
                 feature_gen.generate_search_page(sidebar_pages)
         else:
             feature_gen.remove_stale_search_files()
 
         if self.site_config.with_stats:
-            with _timed_step("Generating blog statistics page..."):
+            with timed_step("Generating blog statistics page..."):
                 feature_gen.generate_stats_page(
                     posts,
                     sidebar_pages,
@@ -232,11 +211,11 @@ class SiteGenerator:
                 )
 
         if self.site_config.with_calendar:
-            with _timed_step("Generating calendar page..."):
+            with timed_step("Generating calendar page..."):
                 feature_gen.generate_calendar_page(posts, sidebar_pages)
 
         if self.site_config.with_graph:
-            with _timed_step("Generating graph page..."):
+            with timed_step("Generating graph page..."):
                 feature_gen.generate_graph_page(posts, sidebar_pages)
 
         # Finalize static assets & sitemap
@@ -246,7 +225,7 @@ class SiteGenerator:
         asset_manager.copy_extras()
 
         if self.site_config.with_sitemap:
-            with _timed_step("Generating XML sitemap..."):
+            with timed_step("Generating XML sitemap..."):
                 feature_gen.generate_sitemap(asset_manager.extras_html_paths)
 
         total_elapsed = time.monotonic() - generation_start
