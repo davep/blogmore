@@ -23,7 +23,7 @@ def timed_step(label: str) -> Generator[None, None, None]:
         label: Human-readable description of the step, printed as it begins.
 
     Yields:
-        Nothing — the caller performs the work inside the ``with`` block.
+        Nothing — the caller performs the work inside the `with` block.
     """
     print(label, end="", flush=True)
     start = time.monotonic()
