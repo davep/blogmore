@@ -442,6 +442,106 @@ class TestFontAwesomeOptimizerInGenerator:
         index_html = (temp_output_dir / "index.html").read_text()
         assert "<h2>Social</h2>" in index_html
 
+    def test_social_entry_uses_site_as_tooltip_when_title_absent(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a social entry uses the site name as tooltip when title is absent."""
+        from blogmore.generator import SiteGenerator
+
+        sidebar_config = {
+            "socials": [{"site": "github", "url": "https://github.com/example"}],
+        }
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                sidebar_config=sidebar_config,
+            )
+        )
+
+        with patch.object(
+            FontAwesomeOptimizer,
+            "fetch_icon_metadata",
+            return_value=STUB_METADATA,
+        ):
+            generator.generate()
+
+        index_html = (temp_output_dir / "index.html").read_text()
+        assert 'title="github"' in index_html
+        assert 'aria-label="github"' in index_html
+
+    def test_social_entry_uses_custom_title_as_tooltip(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that a social entry uses its title field as the tooltip when provided."""
+        from blogmore.generator import SiteGenerator
+
+        sidebar_config = {
+            "socials": [
+                {
+                    "site": "github",
+                    "url": "https://github.com/example",
+                    "title": "My GitHub profile",
+                }
+            ],
+        }
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                sidebar_config=sidebar_config,
+            )
+        )
+
+        with patch.object(
+            FontAwesomeOptimizer,
+            "fetch_icon_metadata",
+            return_value=STUB_METADATA,
+        ):
+            generator.generate()
+
+        index_html = (temp_output_dir / "index.html").read_text()
+        assert 'title="My GitHub profile"' in index_html
+        assert 'aria-label="My GitHub profile"' in index_html
+        assert 'title="github"' not in index_html
+
+    def test_social_entries_can_mix_titled_and_untitled(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that titled and untitled social entries coexist correctly."""
+        from blogmore.generator import SiteGenerator
+
+        sidebar_config = {
+            "socials": [
+                {
+                    "site": "github",
+                    "url": "https://github.com/example",
+                    "title": "My GitHub profile",
+                },
+                {"site": "mastodon", "url": "https://fosstodon.org/@example"},
+            ],
+        }
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                sidebar_config=sidebar_config,
+            )
+        )
+
+        with patch.object(
+            FontAwesomeOptimizer,
+            "fetch_icon_metadata",
+            return_value=STUB_METADATA,
+        ):
+            generator.generate()
+
+        index_html = (temp_output_dir / "index.html").read_text()
+        assert 'title="My GitHub profile"' in index_html
+        assert 'aria-label="My GitHub profile"' in index_html
+        assert 'title="mastodon"' in index_html
+        assert 'aria-label="mastodon"' in index_html
+
     def test_socials_with_minify_css_writes_min_css(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:

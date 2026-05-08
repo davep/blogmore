@@ -66,7 +66,7 @@ set in `blogmore.yaml`:
 | `site_logo` | `str` | Path to the site logo image. |
 | `links` | `list[LinkEntry]` | Sidebar link entries (`title`, `url`). |
 | `links_title` | `str` | Heading for the links section (default `"Links"`). |
-| `socials` | `list[SocialEntry]` | Social profile entries (`site`, `url`). |
+| `socials` | `list[SocialEntry]` | Social profile entries (`site`, `url`, optional `title`). |
 | `socials_title` | `str` | Heading for the socials section (default `"Social"`). |
 
 #### Pagination context

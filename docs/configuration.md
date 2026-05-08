@@ -1199,9 +1199,9 @@ Can also be set with the `--links-title` command-line option.
 
 #### `socials`
 
-Social media links displayed in the sidebar as icons. Each entry has a `site` (the social media platform) and `url`.
+Social media links displayed in the sidebar as icons. Each entry has a `site` (the social media platform) and `url`. An optional `title` can also be provided to customise the tooltip shown when hovering over the icon.
 
-**Type:** List of objects with `site` and `url` fields  
+**Type:** List of objects with `site`, `url`, and optional `title` fields  
 **Default:** None
 
 ```yaml
@@ -1210,9 +1210,12 @@ socials:
     url: https://github.com/davep
   - site: mastodon
     url: https://fosstodon.org/@davep
+    title: "Follow me on Mastodon"
   - site: twitter
     url: https://twitter.com/username
 ```
+
+When `title` is omitted the `site` name is used as the tooltip. When `title` is provided it is used as both the `title` attribute (tooltip) and the `aria-label` attribute on the icon link.
 
 **Supported platforms:** Any Font Awesome brand icon name works (e.g., `github`, `mastodon`, `twitter`, `linkedin`, `youtube`, `facebook`, `instagram`, `bluesky`, `threads`, `lastfm`, `steam`, etc.).
 
