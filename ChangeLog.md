@@ -13,6 +13,10 @@
   fewest or most words. Reading time min/max are now derived from the
   word-count min/max posts.
   ([#457](https://github.com/davep/blogmore/pull/457))
+- Added optional `title` field to `socials` entries. When provided it is
+  used as the tooltip (`title` attribute) and accessible label (`aria-label`)
+  for that social icon link; when omitted the `site` name continues to be
+  used. ([#459](https://github.com/davep/blogmore/pull/459))
 
 ## v2.19.0
 

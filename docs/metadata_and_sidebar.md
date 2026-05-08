@@ -234,6 +234,18 @@ The `site` value maps directly to a [Font Awesome brand icon](https://fontawesom
 
 `github`, `mastodon`, `bluesky`, `twitter`, `threads`, `linkedin`, `youtube`, `instagram`, `facebook`, `lastfm`, `steam`, and many more.
 
+You can also add an optional `title` to any entry to customise the tooltip (and accessible label) shown when hovering over that icon. When omitted, the `site` name is used as the tooltip:
+
+```yaml
+socials:
+  - site: github
+    url: https://github.com/davep
+    title: "My GitHub profile"
+  - site: mastodon
+    url: https://fosstodon.org/@davep
+    title: "Follow me on Mastodon"
+```
+
 To change the section title from the default "Social", use `socials_title`:
 
 ```yaml

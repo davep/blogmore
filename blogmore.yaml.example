@@ -300,6 +300,7 @@ posts_per_feed: 20
 #     url: https://github.com/username
 #   - site: lastfm
 #     url: https://www.last.fm/user/username
+#     title: "My Last.fm profile"  # Optional: customise the tooltip for this icon
 
 # Optional: Custom title for the socials section in sidebar (default: "Social")
 # socials_title: "Social"
