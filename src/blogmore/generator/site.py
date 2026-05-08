@@ -17,6 +17,7 @@ from blogmore.generator.paths import (
     resolve_post_output_paths,
     resolve_sidebar_pages,
 )
+from blogmore.generator.utils import timed_step
 from blogmore.parser import PostParser
 from blogmore.renderer import TemplateRenderer
 
@@ -53,6 +54,8 @@ class SiteGenerator:
         content_dir = self.site_config.content_dir
         assert content_dir is not None
 
+        generation_start = time.monotonic()
+
         # Mint a fresh cache-busting token for this generation.
         cache_bust_token = str(int(time.time()))
 
@@ -74,30 +77,33 @@ class SiteGenerator:
 
         # Clean output directory if requested
         if self.site_config.clean_first and self.site_config.output_dir.exists():
-            print(f"Removing output directory: {self.site_config.output_dir}")
-            try:
-                shutil.rmtree(self.site_config.output_dir)
-            except OSError:
-                time.sleep(0.1)
+            removal_warning = False
+            with timed_step(
+                f"Removing output directory: {self.site_config.output_dir}..."
+            ):
                 try:
                     shutil.rmtree(self.site_config.output_dir)
                 except OSError:
-                    shutil.rmtree(self.site_config.output_dir, ignore_errors=True)
-                    print(
-                        "Warning: Some files could not be removed from output directory"
-                    )
+                    time.sleep(0.1)
+                    try:
+                        shutil.rmtree(self.site_config.output_dir)
+                    except OSError:
+                        shutil.rmtree(self.site_config.output_dir, ignore_errors=True)
+                        removal_warning = True
+            if removal_warning:
+                print("Warning: Some files could not be removed from output directory")
 
         # Parse all pages & posts
         pages_dir = content_dir / "pages"
         pages = self.parser.parse_pages_directory(pages_dir)
         page_404 = self.parser.parse_404_page(pages_dir)
 
-        print(f"Parsing posts from {content_dir}...")
-        posts = self.parser.parse_directory(
-            content_dir,
-            include_drafts=self.site_config.include_drafts,
-            exclude_dirs=[pages_dir],
-        )
+        with timed_step(f"Parsing posts from {content_dir}..."):
+            posts = self.parser.parse_directory(
+                content_dir,
+                include_drafts=self.site_config.include_drafts,
+                exclude_dirs=[pages_dir],
+            )
         print(f"Found {len(posts)} posts")
 
         for post in posts:
@@ -130,11 +136,11 @@ class SiteGenerator:
         # Build backlink map
         backlinks_map: dict[str, list[Backlink]] = {}
         if self.site_config.with_backlinks:
-            print("Building backlink map...")
-            backlinks_map = build_backlink_map(
-                posts,
-                site_url=self.site_config.site_url,
-            )
+            with timed_step("Building backlink map..."):
+                backlinks_map = build_backlink_map(
+                    posts,
+                    site_url=self.site_config.site_url,
+                )
 
         # Instantiate specialized generators
         page_gen = PageGenerator(self.site_config, self.renderer, context_builder)
@@ -142,73 +148,75 @@ class SiteGenerator:
         feature_gen = FeatureGenerator(self.site_config, self.renderer, context_builder)
 
         # Generate individual post pages
-        print("Generating post pages...")
-        generated_paths: set[str] = set()
-        for post in posts:
-            output_path = post_output_paths[id(post)]
-            path_key = str(output_path)
-            if path_key in generated_paths:
-                continue
-            generated_paths.add(path_key)
-            page_gen.generate_post_page(
-                post, posts, sidebar_pages, output_path, backlinks_map
-            )
+        with timed_step("Generating post pages..."):
+            generated_paths: set[str] = set()
+            for post in posts:
+                output_path = post_output_paths[id(post)]
+                path_key = str(output_path)
+                if path_key in generated_paths:
+                    continue
+                generated_paths.add(path_key)
+                page_gen.generate_post_page(
+                    post, posts, sidebar_pages, output_path, backlinks_map
+                )
 
         # Generate static pages
         if pages:
-            print("Generating static pages...")
-            for page in pages:
-                page_gen.generate_page(page, sidebar_pages, page_output_paths[id(page)])
+            with timed_step("Generating static pages..."):
+                for page in pages:
+                    page_gen.generate_page(
+                        page, sidebar_pages, page_output_paths[id(page)]
+                    )
 
         # Generate custom 404 page
         if page_404 is not None:
-            print("Generating custom 404 page...")
-            page_gen.generate_404_page(page_404, sidebar_pages)
+            with timed_step("Generating custom 404 page..."):
+                page_gen.generate_404_page(page_404, sidebar_pages)
 
         # Generate core index/archive pages
-        print("Generating index page...")
-        page_gen.generate_index_page(posts, sidebar_pages)
-        print("Generating archive page...")
-        page_gen.generate_archive_page(posts, sidebar_pages)
+        with timed_step("Generating index page..."):
+            page_gen.generate_index_page(posts, sidebar_pages)
+        with timed_step("Generating archive page..."):
+            page_gen.generate_archive_page(posts, sidebar_pages)
 
         # Generate listing pages
-        print("Generating date-based archive pages...")
-        listing_gen.generate_date_archives(posts, sidebar_pages)
-        print("Generating tag pages...")
-        listing_gen.generate_tag_pages(posts, sidebar_pages)
-        print("Generating tags overview page...")
-        listing_gen.generate_tags_page(posts, sidebar_pages)
-        print("Generating category pages...")
-        listing_gen.generate_category_pages(posts, sidebar_pages)
-        print("Generating categories overview page...")
-        listing_gen.generate_categories_page(posts, sidebar_pages)
+        with timed_step("Generating date-based archive pages..."):
+            listing_gen.generate_date_archives(posts, sidebar_pages)
+        with timed_step("Generating tag pages..."):
+            listing_gen.generate_tag_pages(posts, sidebar_pages)
+        with timed_step("Generating tags overview page..."):
+            listing_gen.generate_tags_page(posts, sidebar_pages)
+        with timed_step("Generating category pages..."):
+            listing_gen.generate_category_pages(posts, sidebar_pages)
+        with timed_step("Generating categories overview page..."):
+            listing_gen.generate_categories_page(posts, sidebar_pages)
 
         # Generate optional feature pages
-        print("Generating RSS and Atom feeds...")
-        feature_gen.generate_feeds(posts)
+        with timed_step("Generating RSS and Atom feeds..."):
+            feature_gen.generate_feeds(posts)
 
         if self.site_config.with_search:
-            print("Generating search index and search page...")
-            feature_gen.generate_search_index(posts)
-            feature_gen.generate_search_page(sidebar_pages)
+            with timed_step("Generating search index and search page..."):
+                feature_gen.generate_search_index(posts)
+                feature_gen.generate_search_page(sidebar_pages)
         else:
             feature_gen.remove_stale_search_files()
 
         if self.site_config.with_stats:
-            print("Generating blog statistics page...")
-            feature_gen.generate_stats_page(
-                posts,
-                sidebar_pages,
-                backlinks_map if self.site_config.with_backlinks else None,
-            )
+            with timed_step("Generating blog statistics page..."):
+                feature_gen.generate_stats_page(
+                    posts,
+                    sidebar_pages,
+                    backlinks_map if self.site_config.with_backlinks else None,
+                )
 
         if self.site_config.with_calendar:
-            print("Generating calendar page...")
-            feature_gen.generate_calendar_page(posts, sidebar_pages)
+            with timed_step("Generating calendar page..."):
+                feature_gen.generate_calendar_page(posts, sidebar_pages)
 
         if self.site_config.with_graph:
-            print("Generating graph page...")
-            feature_gen.generate_graph_page(posts, sidebar_pages)
+            with timed_step("Generating graph page..."):
+                feature_gen.generate_graph_page(posts, sidebar_pages)
 
         # Finalize static assets & sitemap
         asset_manager.copy_static_assets()
@@ -217,7 +225,11 @@ class SiteGenerator:
         asset_manager.copy_extras()
 
         if self.site_config.with_sitemap:
-            print("Generating XML sitemap...")
-            feature_gen.generate_sitemap(asset_manager.extras_html_paths)
+            with timed_step("Generating XML sitemap..."):
+                feature_gen.generate_sitemap(asset_manager.extras_html_paths)
 
-        print(f"Site generation complete! Output: {self.site_config.output_dir}")
+        total_elapsed = time.monotonic() - generation_start
+        print(
+            f"Site generation complete! Output: {self.site_config.output_dir}"
+            f" [{total_elapsed:.2f}s total]"
+        )

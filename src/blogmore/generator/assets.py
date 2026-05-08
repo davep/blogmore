@@ -27,7 +27,7 @@ from blogmore.generator.constants import (
     SEARCH_JS_FILENAME,
     THEME_JS_FILENAME,
 )
-from blogmore.generator.utils import minified_filename
+from blogmore.generator.utils import minified_filename, timed_step
 from blogmore.icons import IconGenerator, detect_source_icon
 
 if TYPE_CHECKING:
@@ -113,12 +113,12 @@ class AssetManager:
 
         if source_icon:
             print(f"Found source icon: {source_icon.name}")
-            print("Generating favicon and Apple touch icons...")
 
             # Generate to /icons subdirectory
             icons_output_dir = self.site_config.output_dir / "icons"
             generator = IconGenerator(source_icon, icons_output_dir)
-            generated = generator.generate_all()
+            with timed_step("Generating favicon and Apple touch icons..."):
+                generated = generator.generate_all()
 
             if generated:
                 print(f"Generated {len(generated)} icon file(s):")
@@ -161,20 +161,21 @@ class AssetManager:
         optimizer = FontAwesomeOptimizer(icon_names)
 
         try:
-            metadata = optimizer.fetch_icon_metadata()
+            with timed_step("Downloading FontAwesome metadata..."):
+                metadata = optimizer.fetch_icon_metadata()
         except (urllib.error.URLError, ValueError, OSError) as error:
             print(f"Warning: Could not fetch FontAwesome metadata: {error}")
             print("Falling back to full FontAwesome CDN stylesheet.")
             self.fontawesome_css_url = FONTAWESOME_CDN_CSS_URL
             return None
 
-        print("Optimizing FontAwesome CSS...")
         self.fontawesome_css_url = (
             FONTAWESOME_LOCAL_CSS_MINIFIED_PATH
             if self.site_config.minify_css
             else FONTAWESOME_LOCAL_CSS_PATH
         )
-        return optimizer.build_css(metadata)
+        with timed_step("Optimizing FontAwesome CSS..."):
+            return optimizer.build_css(metadata)
 
     def _get_asset_source(self, filename: str) -> str | None:
         """Read the text content of a static asset, preferring custom over bundled.
@@ -318,55 +319,55 @@ class AssetManager:
 
         # First, copy bundled static assets
         try:
-            # Get bundled static directory
-            bundled_static = files("blogmore").joinpath("templates", "static")
-            if bundled_static.is_dir():
-                for item in bundled_static.iterdir():
-                    if item.is_file():
-                        # Only copy search.js when search is enabled
-                        if (
-                            item.name == SEARCH_JS_FILENAME
-                            and not self.site_config.with_search
-                        ):
-                            continue
-                        # Only copy graph.js when graph is enabled
-                        if (
-                            item.name == GRAPH_JS_FILENAME
-                            and not self.site_config.with_graph
-                        ):
-                            continue
-                        # When minifying CSS, skip all source CSS files
-                        if (
-                            item.name in _css_source_filenames
-                            and self.site_config.minify_css
-                        ):
-                            continue
-                        # When minifying JS, skip original JS files
-                        if (
-                            item.name == THEME_JS_FILENAME
-                            and self.site_config.minify_js
-                        ):
-                            continue
-                        if (
-                            item.name == SEARCH_JS_FILENAME
-                            and self.site_config.minify_js
-                        ):
-                            continue
-                        if (
-                            item.name == CODEBLOCKS_JS_FILENAME
-                            and self.site_config.minify_js
-                        ):
-                            continue
-                        if (
-                            item.name == GRAPH_JS_FILENAME
-                            and self.site_config.minify_js
-                        ):
-                            continue
-                        # Read content and write to output
-                        content = item.read_bytes()
-                        output_file = output_static / item.name
-                        output_file.write_bytes(content)
-                print("Copied bundled static assets")
+            with timed_step("Copying bundled static assets..."):
+                # Get bundled static directory
+                bundled_static = files("blogmore").joinpath("templates", "static")
+                if bundled_static.is_dir():
+                    for item in bundled_static.iterdir():
+                        if item.is_file():
+                            # Only copy search.js when search is enabled
+                            if (
+                                item.name == SEARCH_JS_FILENAME
+                                and not self.site_config.with_search
+                            ):
+                                continue
+                            # Only copy graph.js when graph is enabled
+                            if (
+                                item.name == GRAPH_JS_FILENAME
+                                and not self.site_config.with_graph
+                            ):
+                                continue
+                            # When minifying CSS, skip all source CSS files
+                            if (
+                                item.name in _css_source_filenames
+                                and self.site_config.minify_css
+                            ):
+                                continue
+                            # When minifying JS, skip original JS files
+                            if (
+                                item.name == THEME_JS_FILENAME
+                                and self.site_config.minify_js
+                            ):
+                                continue
+                            if (
+                                item.name == SEARCH_JS_FILENAME
+                                and self.site_config.minify_js
+                            ):
+                                continue
+                            if (
+                                item.name == CODEBLOCKS_JS_FILENAME
+                                and self.site_config.minify_js
+                            ):
+                                continue
+                            if (
+                                item.name == GRAPH_JS_FILENAME
+                                and self.site_config.minify_js
+                            ):
+                                continue
+                            # Read content and write to output
+                            content = item.read_bytes()
+                            output_file = output_static / item.name
+                            output_file.write_bytes(content)
         except Exception as e:
             print(f"Warning: Could not copy bundled static assets: {e}")
 

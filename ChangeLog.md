@@ -17,6 +17,9 @@
   used as the tooltip (`title` attribute) and accessible label (`aria-label`)
   for that social icon link; when omitted the `site` name continues to be
   used. ([#459](https://github.com/davep/blogmore/pull/459))
+- Each step printed during site generation now shows its wall-clock
+  duration, and the final completion message includes the total elapsed
+  time. ([#461](https://github.com/davep/blogmore/pull/461))
 
 ## v2.19.0
 
