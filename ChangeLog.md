@@ -6,6 +6,10 @@
 
 - Each step printed during `blogmore build` now shows its wall-clock
   duration, and the final completion message includes the total elapsed time.
+  Asset operations (icon generation, FontAwesome metadata download, CSS
+  optimisation, and static asset copying) are also now timed.  The
+  `timed_step` context manager is promoted to a shared generator utility
+  (`blogmore.generator.utils.timed_step`) so any generator module can use it.
   ([#462](https://github.com/davep/blogmore/pull/462))
 - Word count and reading time calculations now use the proper
   Markdown-to-text converter rather than a regex-based approximation. Fenced
