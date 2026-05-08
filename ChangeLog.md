@@ -4,9 +4,6 @@
 
 **Released: WiP**
 
-- Each step printed during `blogmore build` now shows its wall-clock
-  duration, and the final completion message includes the total elapsed time.
-  ([#462](https://github.com/davep/blogmore/pull/462))
 - Word count and reading time calculations now use the proper
   Markdown-to-text converter rather than a regex-based approximation. Fenced
   code blocks are excluded from these counts (inline code is still
@@ -20,6 +17,9 @@
   used as the tooltip (`title` attribute) and accessible label (`aria-label`)
   for that social icon link; when omitted the `site` name continues to be
   used. ([#459](https://github.com/davep/blogmore/pull/459))
+- Each step printed during site generation now shows its wall-clock
+  duration, and the final completion message includes the total elapsed
+  time. ([#461](https://github.com/davep/blogmore/pull/461))
 
 ## v2.19.0
 
