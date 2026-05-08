@@ -6,9 +6,7 @@ compatibility for existing imports.
 """
 
 from blogmore.generator.site import SiteGenerator
-from blogmore.generator.utils import timed_step
 
 __all__ = [
     "SiteGenerator",
-    "timed_step",
 ]
