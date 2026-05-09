@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.20.0
 
-**Released: WiP**
+**Released: 2026-05-09**
 
 - Word count and reading time calculations now use the proper
   Markdown-to-text converter rather than a regex-based approximation. Fenced
