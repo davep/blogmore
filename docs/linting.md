@@ -44,6 +44,19 @@ The linter reports a warning if any post has a `date` or `modified` date set in 
 ### External Links
 The linter does **not** check external links (links starting with `http://` or `https://` that point outside your site domain). This is to keep the linting process fast and avoid dependencies on an internet connection.
 
+## Ignoring Specific Links
+
+Sometimes you may have internal-looking links that are actually valid but point to resources not managed by BlogMore (for example, files handled by your web server or another application). You can tell the linter to ignore these links by adding them to your configuration file:
+
+```yaml
+linting:
+  ignore:
+    - /external-resource/
+    - /dynamic-app/login.html
+```
+
+Any URL in this list will be treated by the linter as if it exists on disk, suppressing any "non-existent internal path" errors for that URL.
+
 ## Example Output
 
 When errors are found, the linter will report them with the file path and line content (if applicable):

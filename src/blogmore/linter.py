@@ -241,6 +241,10 @@ class Linter:
         if self.site_config.with_sitemap:
             valid_urls.add("/sitemap.xml")
 
+        # Ignored URLs from config
+        if self.site_config.linting_ignore:
+            valid_urls.update(self.site_config.linting_ignore)
+
         # Extras
         extras_dir = content_dir / "extras"
         if extras_dir.exists():

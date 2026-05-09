@@ -70,6 +70,7 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
         "light_mode_code_style",
         "dark_mode_code_style",
         "read_time_wpm",
+        "linting_ignore",
     }
 )
 
@@ -572,5 +573,26 @@ def parse_site_config_from_dict(
             kwargs["read_time_wpm"] = raw_wpm
     else:
         kwargs["read_time_wpm"] = 200
+
+    # --- linting_ignore (YAML key: "linting: ignore") ------------------------
+    raw_linting = config.get("linting")
+    if isinstance(raw_linting, dict):
+        raw_ignore = raw_linting.get("ignore")
+        if raw_ignore is None:
+            kwargs["linting_ignore"] = []
+        elif isinstance(raw_ignore, str):
+            kwargs["linting_ignore"] = [raw_ignore]
+        elif isinstance(raw_ignore, list) and all(
+            isinstance(item, str) for item in raw_ignore
+        ):
+            kwargs["linting_ignore"] = raw_ignore
+        else:
+            errors.append(
+                "linting: ignore in the configuration file must be a string "
+                "or a list of strings; ignoring value"
+            )
+            kwargs["linting_ignore"] = []
+    else:
+        kwargs["linting_ignore"] = []
 
     return kwargs, errors

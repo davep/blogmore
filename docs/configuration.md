@@ -1249,6 +1249,31 @@ pages:
 
 If `pages` is omitted entirely, or set to an empty list, all pages are shown (the default behaviour).
 
+### Linting Options
+
+#### `linting: ignore`
+
+A list of internal URLs that the linter should ignore when checking for broken links. These URLs will be treated as if they exist, even if no corresponding post, page, or extra file is found.
+
+This is useful for:
+- Links to resources handled by your web server or a separate application.
+- Internal-looking links that are actually handled by external scripts or redirection.
+- Avoiding false positives for complex clean URL configurations.
+
+Each entry should be a root-relative path (starting with `/`).
+
+**Type:** List of strings (paths)  
+**Default:** *(empty)*
+
+```yaml
+linting:
+  ignore:
+    - /external-resource/
+    - /dynamic-app/login.html
+```
+
+This is a **configuration file only** option — it cannot be set on the command line.
+
 ### Serve Command Options
 
 Options specific to the `serve` command. These are only used when running `blogmore serve`.

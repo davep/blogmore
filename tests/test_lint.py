@@ -161,6 +161,27 @@ Content
         result = lint_site(site_config)
         assert result == 0
 
+    def test_lint_ignored_links(self, tmp_path: Path, temp_output_dir: Path) -> None:
+        """Test that ignored links are treated as valid."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "post.md").write_text("""---
+title: Post
+date: 2024-01-01
+---
+[Ignored Link](/ignored-path/)
+""")
+
+        site_config = SiteConfig(
+            content_dir=content_dir,
+            output_dir=temp_output_dir,
+            linting_ignore=["/ignored-path/"],
+        )
+
+        result = lint_site(site_config)
+        assert result == 0
+
     def test_lint_malformed_frontmatter(
         self, tmp_path: Path, temp_output_dir: Path
     ) -> None:
