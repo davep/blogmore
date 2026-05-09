@@ -15,6 +15,9 @@ from blogmore.config import (
     parse_site_config_from_dict,
 )
 from blogmore.generator import SiteGenerator
+from blogmore.linter import IssueKind, LintResult, lint_site
+from blogmore.page_path import DEFAULT_PAGE_PATH
+from blogmore.post_path import DEFAULT_POST_PATH
 from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
 from blogmore.site_config import SiteConfig, site_config_defaults
@@ -52,6 +55,10 @@ def main() -> int:
     except ValueError as e:
         print(f"Error: Invalid configuration file: {e}", file=sys.stderr)
         return 1
+
+    # Handle lint command early — it does not need a full SiteConfig.
+    if args.command in ("lint", "check"):
+        return _run_lint(args, config)
 
     # Normalize site_keywords: CLI provides a string, config provides a list or string
     site_keywords = normalize_site_keywords(getattr(args, "site_keywords", None))
@@ -261,6 +268,103 @@ def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
             overrides[arg_name] = arg_value
 
     return overrides
+
+
+def _run_lint(args: argparse.Namespace, config: dict[str, Any]) -> int:
+    """Run the lint command against the content directory.
+
+    Validates all posts and pages for frontmatter errors, broken internal
+    links, future dates, and missing image assets.  Prints each issue to
+    standard output and returns a non-zero exit code if any issues are found.
+
+    Args:
+        args: Parsed command-line arguments for the lint command.
+        config: Loaded configuration dictionary (from the YAML config file).
+
+    Returns:
+        0 if no issues were found, 1 otherwise.
+    """
+    # Resolve content_dir from CLI argument or config file.
+    content_dir: Path | None = args.content_dir
+    if content_dir is None:
+        raw_dir = config.get("content_dir")
+        if raw_dir is not None:
+            content_dir = Path(str(raw_dir)).expanduser()
+
+    if content_dir is None:
+        print(
+            "Error: content_dir is required. "
+            "Specify it on the command line or in the config file.",
+            file=sys.stderr,
+        )
+        return 1
+
+    if not content_dir.exists():
+        print(f"Error: Content directory not found: {content_dir}", file=sys.stderr)
+        return 1
+
+    # Resolve site_url: CLI flag wins; fall back to config file value.
+    site_url: str = args.site_url
+    if not site_url:
+        site_url = str(config.get("site_url", ""))
+
+    # Resolve post_path, page_path, and clean_urls from the config file.
+    post_path_template: str = str(config.get("post_path", DEFAULT_POST_PATH))
+    page_path_template: str = str(config.get("page_path", DEFAULT_PAGE_PATH))
+    clean_urls: bool = bool(config.get("clean_urls", False))
+
+    include_drafts: bool = bool(args.include_drafts)
+
+    print(f"Linting content in: {content_dir}")
+    print()
+
+    result = lint_site(
+        content_dir=content_dir,
+        site_url=site_url,
+        include_drafts=include_drafts,
+        post_path_template=post_path_template,
+        page_path_template=page_path_template,
+        clean_urls=clean_urls,
+    )
+
+    _print_lint_result(result)
+
+    if result.has_issues:
+        return 1
+    return 0
+
+
+def _print_lint_result(result: LintResult) -> None:
+    """Print a human-readable summary of lint issues to standard output.
+
+    Groups issues by kind and prints each with the source file path.  When
+    no issues are found, prints a short confirmation message.
+
+    Args:
+        result: The lint result to display.
+    """
+    _KIND_LABELS: dict[IssueKind, str] = {
+        IssueKind.FRONTMATTER_ERROR: "Frontmatter error",
+        IssueKind.BROKEN_INTERNAL_LINK: "Broken internal link",
+        IssueKind.FUTURE_DATE: "Future date",
+        IssueKind.MISSING_IMAGE: "Missing image",
+    }
+
+    if not result.has_issues:
+        print("No issues found. ✓")
+        return
+
+    for issue in result.issues:
+        label = _KIND_LABELS.get(issue.kind, str(issue.kind))
+        print(f"[{label}] {issue.source_path}")
+        # Indent multi-line messages for readability.
+        for line in issue.message.splitlines():
+            print(f"  {line}")
+        print()
+
+    count = result.issue_count
+    noun = "issue" if count == 1 else "issues"
+    print(f"{count} {noun} found.")
 
 
 if __name__ == "__main__":

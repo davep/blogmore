@@ -277,6 +277,40 @@ def create_parser() -> argparse.ArgumentParser:
 
     add_common_arguments(publish_parser)
 
+    # Lint command with check as alias
+    lint_parser = subparsers.add_parser(
+        "lint",
+        help="Check posts and pages for common issues without building the site",
+        aliases=["check"],
+    )
+
+    lint_parser.add_argument(
+        "content_dir",
+        type=Path,
+        nargs="?",
+        help="Directory containing markdown blog posts",
+    )
+
+    lint_parser.add_argument(
+        "-c",
+        "--config",
+        type=Path,
+        default=None,
+        help="Path to configuration file (default: searches for blogmore.yaml or blogmore.yml)",
+    )
+
+    lint_parser.add_argument(
+        "--site-url",
+        default=_SITE_CONFIG_DEFAULTS["site_url"],
+        help="Base URL of the site — used to identify internal links (optional)",
+    )
+
+    lint_parser.add_argument(
+        "--include-drafts",
+        action="store_true",
+        help="Include posts marked as drafts in the lint run",
+    )
+
     parser.add_argument(
         "--version",
         action="version",

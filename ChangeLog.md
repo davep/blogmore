@@ -1,5 +1,15 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added a `blogmore lint` command (alias: `blogmore check`) that scans
+  posts and pages for common issues without building the site: frontmatter
+  parse errors, broken internal links, future `date` / `modified` values,
+  and internal image links with no corresponding file in `extras/`.
+  ([#464](https://github.com/davep/blogmore/pull/464))
+
 ## v2.20.0
 
 **Released: 2026-05-09**

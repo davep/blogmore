@@ -10,10 +10,11 @@ blogmore <command> [arguments] [options]
 
 ## Commands
 
-BlogMore provides three main commands:
+BlogMore provides four main commands:
 
 - **`build`** - Generate the static site
 - **`serve`** - Generate and serve the site locally with auto-reload
+- **`lint`** - Check posts and pages for common issues without building
 - **`publish`** - Build and publish the site to a git branch
 
 ### Command Aliases
@@ -22,6 +23,7 @@ Several commands have aliases for convenience:
 
 - `build`, `generate`, `gen` - All equivalent
 - `serve`, `test` - Both start the development server
+- `lint`, `check` - Both run the linter
 
 ## Global Options
 
@@ -401,6 +403,78 @@ blogmore serve posts/ \
   --include-drafts
 ```
 
+## Lint Command
+
+Check posts and pages for common issues without generating the site.
+See the [Linting](linting.md) guide for a full description of the checks
+performed.
+
+### Synopsis
+
+```bash
+blogmore lint <content_dir> [options]
+blogmore check <content_dir> [options]
+```
+
+### Arguments
+
+**`content_dir`** (optional if specified in config file)
+: Directory containing your Markdown blog posts.
+
+```bash
+blogmore lint posts/
+```
+
+### Lint-Specific Options
+
+#### `-c, --config <path>`
+
+Path to a configuration file.  When provided, `post_path`, `page_path`, and
+`clean_urls` are read from the file so that URL checks match what the build
+would produce.
+
+```bash
+blogmore lint posts/ --config my-blog.yaml
+```
+
+#### `--site-url <url>`
+
+Base URL of the site.  When provided, full URLs that point back to this site
+are treated as internal links.
+
+```bash
+blogmore lint posts/ --site-url https://example.com
+```
+
+#### `--include-drafts`
+
+Include posts marked as `draft: true` in the lint run.  By default, draft
+posts are skipped.
+
+```bash
+blogmore lint posts/ --include-drafts
+```
+
+### Examples
+
+Lint the content directory with settings from the default config file:
+
+```bash
+blogmore lint posts/
+```
+
+Lint including draft posts:
+
+```bash
+blogmore lint posts/ --include-drafts
+```
+
+Integrate into a CI pipeline before building:
+
+```bash
+blogmore lint posts/ && blogmore build posts/
+```
+
 ## Publish Command
 
 Build your site and publish it to a git branch, typically for GitHub Pages.
@@ -550,6 +624,7 @@ Display help for a specific command:
 ```bash
 blogmore build --help
 blogmore serve --help
+blogmore lint --help
 blogmore publish --help
 ```
 
@@ -563,6 +638,9 @@ blogmore serve posts/ --include-drafts
 
 # Write and edit posts...
 # Browser automatically refreshes on save
+
+# Lint before publishing
+blogmore lint posts/
 
 # When ready to publish
 blogmore publish posts/
@@ -597,4 +675,5 @@ blogmore build --config work-blog.yaml
 ## See Also
 
 - [Configuration](configuration.md) - Detailed configuration file documentation
+- [Linting](linting.md) - Checking content for issues with `blogmore lint`
 - [Getting Started](setting_up_your_blog.md) - Tutorial for creating your first blog
