@@ -280,7 +280,7 @@ class TestFutureDates:
         content_dir = _make_content_dir(
             tmp_path,
             {
-                "nodatep.md": "---\ntitle: No Date Post\n---\nContent.",
+                "no-date-post.md": "---\ntitle: No Date Post\n---\nContent.",
             },
         )
         result = lint_site(content_dir)
@@ -291,7 +291,7 @@ class TestFutureDates:
         content_dir = _make_content_dir(
             tmp_path,
             {
-                "fp.md": "---\ntitle: Future\ndate: 2099-12-31\n---\nContent.",
+                "future-post.md": "---\ntitle: Future\ndate: 2099-12-31\n---\nContent.",
             },
         )
         result = lint_site(content_dir)
