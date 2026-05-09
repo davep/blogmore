@@ -120,6 +120,42 @@ class LintResult:
 
 
 ##############################################################################
+def _is_relative_path(raw_url: str) -> bool:
+    """Return `True` if *raw_url* is a bare relative path.
+
+    A bare relative path is a URL that:
+
+    - Does not start with ``/`` (not root-relative).
+    - Does not start with ``#`` (not a same-page fragment anchor).
+    - Does not contain ``://`` (not a full URL such as ``https://``).
+    - Does not look like a URI scheme (e.g. ``mailto:``, ``tel:``) — detected
+      by the presence of ``:`` before the first ``/``.
+
+    Such paths resolve relative to the current page's URL in a browser,
+    which almost always produces broken links in a static-site context where
+    the content file's location does not match the output URL.
+
+    Args:
+        raw_url: The raw URL string as extracted from Markdown source.
+
+    Returns:
+        `True` if *raw_url* is a bare relative path, `False` otherwise.
+    """
+    url = raw_url.strip().split("#")[0].split("?")[0]
+    if not url:
+        return False
+    if url.startswith("/") or url.startswith("#"):
+        return False
+    if "://" in url:
+        return False
+    # Reject URI schemes such as mailto:, tel:, javascript: — these have a
+    # colon before the first slash (or have no slash at all).
+    slash_pos = url.find("/")
+    colon_pos = url.find(":")
+    return not (colon_pos >= 0 and (slash_pos < 0 or colon_pos < slash_pos))
+
+
+##############################################################################
 def _find_regular_links(content: str) -> list[str]:
     """Extract all non-image internal-link candidate URLs from Markdown content.
 
@@ -505,7 +541,10 @@ class SiteLinter:
 
         Each internal link (root-relative or pointing back to `site_url`) is
         normalised and compared against *known_urls*.  Links to external
-        domains, fragment-only links, and relative links are silently ignored.
+        domains and fragment-only links are silently ignored.  Bare relative
+        links (e.g. ``2016/08/page.html``) are always reported as broken
+        because they resolve relative to the page's URL in a browser and
+        almost always produce a broken URL in a static-site context.
 
         Args:
             source_path: Path to the content file being checked.
@@ -519,6 +558,20 @@ class SiteLinter:
         for raw_url in _find_regular_links(content):
             path = _to_path(raw_url, self.site_url)
             if path is None:
+                # Bare relative paths (e.g. ``2016/08/page.html``) are never
+                # valid in a static site — they resolve relative to the
+                # current page URL and almost always produce a broken URL.
+                if _is_relative_path(raw_url):
+                    issues.append(
+                        LintIssue(
+                            source_path=source_path,
+                            kind=IssueKind.BROKEN_INTERNAL_LINK,
+                            message=(
+                                f"Relative link {raw_url!r} — "
+                                f"use a root-relative path starting with '/'"
+                            ),
+                        )
+                    )
                 continue
             normalised = _normalize_url_path(path)
             if normalised not in known_urls:

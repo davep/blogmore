@@ -1012,4 +1012,100 @@ class TestImageUrlDecoding:
         assert not any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
 
 
+##############################################################################
+# Relative link detection tests.
+
+
+class TestRelativeLinkDetection:
+    """Bare relative links are flagged as broken internal links."""
+
+    def test_relative_link_is_reported(self, tmp_path: Path) -> None:
+        """A bare relative link (no leading /) is flagged as a broken link."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [this page](2016/08/10/virgin_east_coast_12.html)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        issues = [i for i in result.issues if i.kind == IssueKind.BROKEN_INTERNAL_LINK]
+        assert len(issues) == 1
+        assert "2016/08/10/virgin_east_coast_12.html" in issues[0].message
+
+    def test_root_relative_link_not_flagged_as_relative(self, tmp_path: Path) -> None:
+        """A root-relative link (starting with /) is not reported as a relative link."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "Go [home](/)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_fragment_only_link_not_flagged(self, tmp_path: Path) -> None:
+        """A fragment-only link (#anchor) is not reported."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [section](#intro)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_mailto_link_not_flagged(self, tmp_path: Path) -> None:
+        """A mailto: link is not reported as a relative link."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "Email [me](mailto:foo@example.com)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_external_link_not_flagged(self, tmp_path: Path) -> None:
+        """An external https:// link is not reported as a relative link."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [GitHub](https://github.com)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_relative_link_message_suggests_root_relative(self, tmp_path: Path) -> None:
+        """The issue message for a relative link tells the user to use a root-relative path."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [this](old/page.html)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        issues = [i for i in result.issues if i.kind == IssueKind.BROKEN_INTERNAL_LINK]
+        assert issues
+        assert "'/'" in issues[0].message
+
+
 ### test_linter.py ends here
