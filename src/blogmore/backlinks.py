@@ -175,10 +175,11 @@ def _extract_link_url(raw_url: str) -> str:
     url = raw_url.strip()
     if not url:
         return raw_url
-    # Split on the first run of whitespace.  If what follows looks like a
-    # Markdown title attribute (starts with a recognised delimiter) the first
-    # token is the URL.  Otherwise the full string is the URL so that literal
-    # spaces in filenames are not silently truncated.
+    # Split on the first run of any whitespace (None means "any whitespace").
+    # If what follows looks like a Markdown title attribute (starts with a
+    # recognised delimiter) the first token is the URL.  Otherwise the full
+    # string is the URL so that literal spaces in filenames are not silently
+    # truncated.
     parts = url.split(None, 1)
     if len(parts) == 2:
         rest = parts[1].lstrip()
