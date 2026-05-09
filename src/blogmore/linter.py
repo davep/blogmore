@@ -156,9 +156,19 @@ class Linter:
         resolve_post_output_paths(self.site_config, posts)
         resolve_page_output_paths(self.site_config, pages)
 
-        # 2. Check for future dates
+        # 2. Check for future dates and missing metadata
         now = dt.datetime.now(dt.UTC)
         for post in posts:
+            # Check for missing/empty basic metadata
+            if not post.title or not post.title.strip():
+                self.report_warning("Post has no title", post.path)
+            if not post.category or not post.category.strip():
+                self.report_warning("Post has no category", post.path)
+            if not post.tags:
+                self.report_warning("Post has no tags", post.path)
+            if not post.date:
+                self.report_warning("Post has no date", post.path)
+
             if post.date:
                 post_date = post.date
                 if post_date.tzinfo is None:
@@ -168,7 +178,21 @@ class Linter:
                         f"Post date is in the future: {post.date}", post.path
                     )
 
-            if post.modified_date:
+                if post.modified_date:
+                    mod_date = post.modified_date
+                    if mod_date.tzinfo is None:
+                        mod_date = mod_date.replace(tzinfo=dt.UTC)
+                    if mod_date > now:
+                        self.report_warning(
+                            f"Post modified date is in the future: {post.modified_date}",
+                            post.path,
+                        )
+                    if mod_date < post_date:
+                        self.report_warning(
+                            f"Post modified date ({post.modified_date}) is earlier than post date ({post.date})",
+                            post.path,
+                        )
+            elif post.modified_date:
                 mod_date = post.modified_date
                 if mod_date.tzinfo is None:
                     mod_date = mod_date.replace(tzinfo=dt.UTC)

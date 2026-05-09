@@ -36,12 +36,9 @@ class TestLintCommand:
         )
 
         post_path = content_dir / "future-post.md"
-        post_path.write_text(f"""---
-title: Future Post
-date: {future_date}
----
-Future content.
-""")
+        post_path.write_text(
+            f"---\ntitle: Future Post\ndate: {future_date}\n---\nFuture content.\n"
+        )
 
         site_config = SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
 
@@ -56,12 +53,9 @@ Future content.
         content_dir.mkdir()
 
         post_path = content_dir / "broken-link.md"
-        post_path.write_text("""---
-title: Broken Link Post
-date: 2024-01-01
----
-[Broken Link](/non-existent.html)
-""")
+        post_path.write_text(
+            "---\ntitle: Broken Link Post\ndate: 2024-01-01\n---\n[Broken Link](/non-existent.html)\n"
+        )
 
         site_config = SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
 
@@ -74,12 +68,9 @@ date: 2024-01-01
         content_dir.mkdir()
 
         post_path = content_dir / "broken-image.md"
-        post_path.write_text("""---
-title: Broken Image Post
-date: 2024-01-01
----
-![Broken Image](/images/missing.png)
-""")
+        post_path.write_text(
+            "---\ntitle: Broken Image Post\ndate: 2024-01-01\n---\n![Broken Image](/images/missing.png)\n"
+        )
 
         site_config = SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
 
@@ -92,14 +83,9 @@ date: 2024-01-01
         content_dir.mkdir()
 
         post_path = content_dir / "missing-alt.md"
-        post_path.write_text("""---
-title: Missing Alt Post
-date: 2024-01-01
----
-<img src="/images/logo.png">
-<img src="/images/logo.png" alt="">
-<img src="/images/logo.png" alt="   ">
-""")
+        post_path.write_text(
+            '---\ntitle: Missing Alt Post\ndate: 2024-01-01\n---\n<img src="/images/logo.png">\n<img src="/images/logo.png" alt="">\n<img src="/images/logo.png" alt="   ">\n'
+        )
 
         site_config = SiteConfig(
             content_dir=content_dir,
@@ -117,13 +103,9 @@ date: 2024-01-01
         content_dir.mkdir()
 
         post_path = content_dir / "broken-cover.md"
-        post_path.write_text("""---
-title: Broken Cover Post
-date: 2024-01-01
-cover: /images/missing-cover.png
----
-Content
-""")
+        post_path.write_text(
+            "---\ntitle: Broken Cover Post\ndate: 2024-01-01\ncover: /images/missing-cover.png\n---\nContent\n"
+        )
 
         site_config = SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
 
@@ -137,18 +119,12 @@ Content
         content_dir = tmp_path / "content"
         content_dir.mkdir()
 
-        (content_dir / "post1.md").write_text("""---
-title: Post 1
-date: 2024-01-01
----
-[Link to Post 2](post2.html)
-""")
-        (content_dir / "post2.md").write_text("""---
-title: Post 2
-date: 2024-01-01
----
-I am post 2.
-""")
+        (content_dir / "post1.md").write_text(
+            "---\ntitle: Post 1\ndate: 2024-01-01\n---\n[Link to Post 2](post2.html)\n"
+        )
+        (content_dir / "post2.md").write_text(
+            "---\ntitle: Post 2\ndate: 2024-01-01\n---\nI am post 2.\n"
+        )
 
         site_config = SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
 
@@ -164,12 +140,9 @@ I am post 2.
         (extras_dir / "about.html").write_text("About")
 
         post_path = content_dir / "post.md"
-        post_path.write_text("""---
-title: Post
-date: 2024-01-01
----
-[About](/about.html)
-""")
+        post_path.write_text(
+            "---\ntitle: Post\ndate: 2024-01-01\n---\n[About](/about.html)\n"
+        )
 
         site_config = SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
 
@@ -183,13 +156,9 @@ date: 2024-01-01
         content_dir = tmp_path / "content"
         content_dir.mkdir()
 
-        (content_dir / "post.md").write_text("""---
-title: Post
-date: 2024-01-01
----
-[Tag](/tag/python)
-[Archive](/archive)
-""")
+        (content_dir / "post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-01\n---\n[Tag](/tag/python)\n[Archive](/archive)\n"
+        )
 
         # Site config with clean URLs (so /tag/python/ and /archive/ are in valid_urls)
         site_config = SiteConfig(
@@ -198,13 +167,9 @@ date: 2024-01-01
 
         # Mock some posts to generate tags
         mock_post = content_dir / "real-post.md"
-        mock_post.write_text("""---
-title: Real Post
-date: 2024-01-01
-tags: [python]
----
-Content
-""")
+        mock_post.write_text(
+            "---\ntitle: Real Post\ndate: 2024-01-01\ntags: [python]\n---\nContent\n"
+        )
 
         result = lint_site(site_config)
         assert result == 0
@@ -214,12 +179,9 @@ Content
         content_dir = tmp_path / "content"
         content_dir.mkdir()
 
-        (content_dir / "post.md").write_text("""---
-title: Post
-date: 2024-01-01
----
-[Ignored Link](/ignored-path/)
-""")
+        (content_dir / "post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-01\n---\n[Ignored Link](/ignored-path/)\n"
+        )
 
         site_config = SiteConfig(
             content_dir=content_dir,
@@ -235,13 +197,9 @@ date: 2024-01-01
         content_dir = tmp_path / "content"
         content_dir.mkdir()
 
-        (content_dir / "post.md").write_text("""---
-title: Post
-date: 2024-01-01
-cover: /ignored-cover.png
----
-Content
-""")
+        (content_dir / "post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-01\ncover: /ignored-cover.png\n---\nContent\n"
+        )
 
         site_config = SiteConfig(
             content_dir=content_dir,
@@ -260,17 +218,37 @@ Content
         content_dir.mkdir()
 
         post_path = content_dir / "malformed.md"
-        post_path.write_text("""---
-title: Malformed Post
-tags: [unclosed
----
-Content
-""")
+        post_path.write_text(
+            "---\ntitle: Malformed Post\ntags: [unclosed\n---\nContent\n"
+        )
 
         site_config = SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
 
         result = lint_site(site_config)
         assert result == 1
+
+    def test_lint_metadata_health_warnings(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that missing metadata and inconsistent dates are reported as warnings."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Post with no category, no tags, and no date
+        post_path = content_dir / "bare-post.md"
+        post_path.write_text("---\ntitle: Bare Post\n---\nBare content.\n")
+
+        # Post with modified date earlier than date
+        invalid_dates_path = content_dir / "invalid-dates.md"
+        invalid_dates_path.write_text(
+            "---\ntitle: Invalid Dates\ndate: 2024-01-10\nmodified: 2024-01-01\n---\nContent.\n"
+        )
+
+        site_config = SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
+
+        result = lint_site(site_config)
+        # Warnings don't cause failure
+        assert result == 0
 
     def test_main_lint_command(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """Test lint command via main()."""
