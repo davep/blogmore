@@ -403,9 +403,10 @@ class SiteLinter:
 
         Includes URLs for posts, static pages, the main index, the archive,
         tags and categories overview pages, individual tag and category listing
-        pages, date-archive pages (year, month, day), and any optional feature
+        pages, date-archive pages (year, month, day), any optional feature
         pages that are enabled in the configuration (search, stats, calendar,
-        graph).
+        graph), and every file that would be copied verbatim from the
+        ``extras/`` directory.
 
         Each URL is normalised via
         [`_normalize_url_path`][blogmore.backlinks._normalize_url_path]
@@ -479,6 +480,17 @@ class SiteLinter:
             safe_category = sanitize_for_url(category_lower)
             known.add(f"/{FEEDS_DIR}/{safe_category}.rss.xml")
             known.add(f"/{FEEDS_DIR}/{safe_category}.atom.xml")
+
+        # Extras files — every file under extras/ is copied verbatim to the
+        # site root during a build, so links to those files are always valid.
+        extras_dir = self.content_dir / "extras"
+        if extras_dir.is_dir():
+            for extra_file in extras_dir.rglob("*"):
+                if extra_file.is_file():
+                    relative = extra_file.relative_to(extras_dir)
+                    # Use forward slashes regardless of the host OS.
+                    url = "/" + "/".join(relative.parts)
+                    known.add(url)
 
         return known
 

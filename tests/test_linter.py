@@ -822,6 +822,87 @@ class TestKnownUrlCoverage:
 
 
 ##############################################################################
+# Extras-file link target tests.
+
+
+class TestExtrasFileLinkTargets:
+    """Links to files in extras/ are recognised as valid link targets."""
+
+    def test_link_to_extras_file_not_reported(self, tmp_path: Path) -> None:
+        """A link to a file that would be copied from extras/ is not flagged."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [the image](/attachments/2023/10/01/contributions.png)."
+                ),
+            },
+        )
+        extras_dir = content_dir / "extras" / "attachments" / "2023" / "10" / "01"
+        extras_dir.mkdir(parents=True)
+        (extras_dir / "contributions.png").write_bytes(b"PNG")
+
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_extras_file_with_fragment_not_reported(
+        self, tmp_path: Path
+    ) -> None:
+        """A link to an extras file that includes a fragment anchor is not flagged."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [img](/attachments/2024/04/17/pispy-in-action.gif#centre)."
+                ),
+            },
+        )
+        extras_dir = content_dir / "extras" / "attachments" / "2024" / "04" / "17"
+        extras_dir.mkdir(parents=True)
+        (extras_dir / "pispy-in-action.gif").write_bytes(b"GIF")
+
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_missing_extras_file_still_reported(self, tmp_path: Path) -> None:
+        """A link to an extras path that does not exist is still flagged."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [img](/attachments/no-such-file.png)."
+                ),
+            },
+        )
+        # extras/ dir exists but the linked file does not.
+        (content_dir / "extras").mkdir()
+
+        result = lint_site(content_dir)
+        assert any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_extras_file_with_spaces_in_name_recognised(self, tmp_path: Path) -> None:
+        """A link to an extras file whose name contains spaces is not flagged."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [the image](/attachments/Screen Shot 2015-06-19.png)."
+                ),
+            },
+        )
+        extras_dir = content_dir / "extras" / "attachments"
+        extras_dir.mkdir(parents=True)
+        (extras_dir / "Screen Shot 2015-06-19.png").write_bytes(b"PNG")
+
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+
+##############################################################################
 # Image URL-decoding tests.
 
 
