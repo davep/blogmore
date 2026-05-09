@@ -18,6 +18,7 @@ from urllib.parse import unquote
 # Local imports.
 from blogmore.backlinks import _extract_link_url, _normalize_url_path, _to_path
 from blogmore.clean_url import make_url_clean
+from blogmore.feeds import FEEDS_DIR
 from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
 from blogmore.generator.grouping import group_posts_by_category, group_posts_by_tag
 from blogmore.page_path import resolve_page_path
@@ -473,11 +474,11 @@ class SiteLinter:
 
         # Feed files — always generated alongside the posts.
         known.add("/feed.xml")
-        known.add("/feeds/all.atom.xml")
+        known.add(f"/{FEEDS_DIR}/all.atom.xml")
         for category_lower in posts_by_category:
             safe_category = sanitize_for_url(category_lower)
-            known.add(f"/feeds/{safe_category}.rss.xml")
-            known.add(f"/feeds/{safe_category}.atom.xml")
+            known.add(f"/{FEEDS_DIR}/{safe_category}.rss.xml")
+            known.add(f"/{FEEDS_DIR}/{safe_category}.atom.xml")
 
         return known
 
@@ -603,7 +604,7 @@ class SiteLinter:
                 continue
             # URL-decode so that percent-encoded filenames (e.g. %20 → space)
             # resolve to the actual file on disk.
-            relative = unquote(path.lstrip("/"))
+            relative = unquote(path.lstrip("/"), encoding="utf-8")
             candidate = extras_dir / relative
             if not candidate.is_file():
                 issues.append(

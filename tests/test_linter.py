@@ -828,7 +828,7 @@ class TestKnownUrlCoverage:
 class TestImageUrlDecoding:
     """Linter handles percent-encoded filenames in image links."""
 
-    def test_percent_encoded_space_matches_file_with_space(self, tmp_path: Path) -> None:
+    def test_percent_encoded_space_matches_file(self, tmp_path: Path) -> None:
         """An image URL with %20 matches a file whose name contains a space."""
         content_dir = _make_content_dir(
             tmp_path,
