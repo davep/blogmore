@@ -10,6 +10,7 @@ nav:
       - writing_a_post.md
       - writing_a_page.md
       - metadata_and_sidebar.md
+      - linting.md
       - building.md
       - templates.md
       - theming.md

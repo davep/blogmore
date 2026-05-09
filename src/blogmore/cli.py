@@ -277,6 +277,22 @@ def create_parser() -> argparse.ArgumentParser:
 
     add_common_arguments(publish_parser)
 
+    # Lint command (alias check)
+    lint_parser = subparsers.add_parser(
+        "lint",
+        help="Check the site for common issues (broken links, malformed frontmatter, etc.)",
+        aliases=["check"],
+    )
+
+    lint_parser.add_argument(
+        "content_dir",
+        type=Path,
+        nargs="?",
+        help="Directory containing markdown blog posts",
+    )
+
+    add_common_arguments(lint_parser)
+
     parser.add_argument(
         "--version",
         action="version",
