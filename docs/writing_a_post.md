@@ -341,3 +341,25 @@ fragment, where the address can be copied from the browser's location bar.
 
 The anchor appears and disappears with a smooth fade and does not affect the
 layout of the page in any way.
+
+### Markdown inside HTML tags
+
+By default, Markdown inside raw HTML blocks is left as-is and is not processed
+further. If you want Markdown to be parsed inside an HTML element, add
+`markdown="1"` to the opening tag:
+
+```markdown
+<div markdown="1">
+*This text will be italic* and **this will be bold**.
+</div>
+```
+
+```markdown
+<center markdown="1">
+*This centered text will be italic* and **this will be bold**.
+</center>
+```
+
+Without `markdown="1"`, any Markdown inside the HTML tag is passed through
+verbatim and will not be rendered. With the attribute present, the content is
+treated as normal Markdown and all the usual formatting rules apply.

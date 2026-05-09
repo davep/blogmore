@@ -321,6 +321,7 @@ class PostParser:
                 "attr_list",
                 "fenced_code",
                 "codehilite",
+                "md_in_html",
                 "tables",
                 "toc",
                 "footnotes",

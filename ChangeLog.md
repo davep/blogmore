@@ -20,6 +20,9 @@
 - Each step printed during site generation now shows its wall-clock
   duration, and the final completion message includes the total elapsed
   time. ([#461](https://github.com/davep/blogmore/pull/461))
+- Enabled the `md_in_html` Markdown extension so that Markdown syntax inside
+  HTML tags is rendered when the tag carries the `markdown="1"` attribute.
+  ([#463](https://github.com/davep/blogmore/pull/463))
 
 ## v2.19.0
 
