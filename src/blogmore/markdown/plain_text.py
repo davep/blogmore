@@ -73,7 +73,7 @@ def _make_markdown_instance() -> markdown.Markdown:
             "tables",
             "footnotes",
             *create_custom_extensions(),
-        ]
+        ],
     )
 
 
