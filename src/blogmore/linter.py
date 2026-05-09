@@ -314,6 +314,11 @@ class Linter:
                 path_only += "/"
 
         if path_only not in valid_urls:
+            # Try with or without trailing slash
+            alt_path = path_only[:-1] if path_only.endswith("/") else path_only + "/"
+            if alt_path in valid_urls:
+                return
+
             link_type = "Image" if is_image else "Link"
             self.report_error(
                 f"{link_type} points to non-existent internal path: {href} (resolved to {path_only})",

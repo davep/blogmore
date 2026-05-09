@@ -5,8 +5,6 @@ import sys
 from pathlib import Path
 from unittest.mock import patch
 
-import pytest
-
 from blogmore.__main__ import main
 from blogmore.linter import lint_site
 from blogmore.site_config import SiteConfig
@@ -126,6 +124,39 @@ date: 2024-01-01
 """)
 
         site_config = SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
+
+        result = lint_site(site_config)
+        assert result == 0
+
+    def test_lint_trailing_slash_insensitivity(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that links are valid regardless of trailing slash."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "post.md").write_text("""---
+title: Post
+date: 2024-01-01
+---
+[Tag](/tag/python)
+[Archive](/archive)
+""")
+
+        # Site config with clean URLs (so /tag/python/ and /archive/ are in valid_urls)
+        site_config = SiteConfig(
+            content_dir=content_dir, output_dir=temp_output_dir, clean_urls=True
+        )
+
+        # Mock some posts to generate tags
+        mock_post = content_dir / "real-post.md"
+        mock_post.write_text("""---
+title: Real Post
+date: 2024-01-01
+tags: [python]
+---
+Content
+""")
 
         result = lint_site(site_config)
         assert result == 0
