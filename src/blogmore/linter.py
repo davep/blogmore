@@ -125,11 +125,11 @@ def _is_relative_path(raw_url: str) -> bool:
 
     A bare relative path is a URL that:
 
-    - Does not start with ``/`` (not root-relative).
-    - Does not start with ``#`` (not a same-page fragment anchor).
-    - Does not contain ``://`` (not a full URL such as ``https://``).
-    - Does not look like a URI scheme (e.g. ``mailto:``, ``tel:``) — detected
-      by the presence of ``:`` before the first ``/``.
+    - Does not start with `/` (not root-relative).
+    - Does not start with `#` (not a same-page fragment anchor).
+    - Does not contain `://` (not a full URL such as `https://`).
+    - Does not look like a URI scheme (e.g. `mailto:`, `tel:`) — detected
+      by the presence of `:` before the first `/`.
 
     Such paths resolve relative to the current page's URL in a browser,
     which almost always produces broken links in a static-site context where
@@ -141,7 +141,9 @@ def _is_relative_path(raw_url: str) -> bool:
     Returns:
         `True` if *raw_url* is a bare relative path, `False` otherwise.
     """
-    url = raw_url.strip().split("#")[0].split("?")[0]
+    # Strip fragment and query string before classification.
+    without_fragment = raw_url.strip().split("#")[0]
+    url = without_fragment.split("?")[0]
     if not url:
         return False
     if url.startswith("/") or url.startswith("#"):
