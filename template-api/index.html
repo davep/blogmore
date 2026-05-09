@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.39">
+      <meta name="generator" content="zensical-0.0.40">
     
     
       
@@ -32,7 +32,7 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.1e981d71.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.fba56155.min.css">
       
         
           
@@ -56,7 +56,7 @@
       
     
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    <script>__md_scope=new URL("..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
       
 
@@ -353,8 +353,7 @@
   <span class="md-ellipsis">
     
   
-    BlogMore
-  
+  BlogMore
 
     
   </span>
@@ -375,8 +374,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    BlogMore
-  
+  BlogMore
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
@@ -397,8 +395,7 @@
   <span class="md-ellipsis">
     
   
-    Setting Up Your Blog
-  
+  Setting Up Your Blog
 
     
   </span>
@@ -425,8 +422,7 @@
   <span class="md-ellipsis">
     
   
-    Writing a Post
-  
+  Writing a Post
 
     
   </span>
@@ -453,8 +449,7 @@
   <span class="md-ellipsis">
     
   
-    Writing a Page
-  
+  Writing a Page
 
     
   </span>
@@ -481,8 +476,7 @@
   <span class="md-ellipsis">
     
   
-    Metadata and Sidebar
-  
+  Metadata and Sidebar
 
     
   </span>
@@ -509,8 +503,7 @@
   <span class="md-ellipsis">
     
   
-    Building and Publishing
-  
+  Building and Publishing
 
     
   </span>
@@ -537,8 +530,7 @@
   <span class="md-ellipsis">
     
   
-    Templates
-  
+  Templates
 
     
   </span>
@@ -565,8 +557,7 @@
   <span class="md-ellipsis">
     
   
-    Theming
-  
+  Theming
 
     
   </span>
@@ -602,8 +593,7 @@
   <span class="md-ellipsis">
     
   
-    Template API reference
-  
+  Template API reference
 
     
   </span>
@@ -620,8 +610,7 @@
   <span class="md-ellipsis">
     
   
-    Template API reference
-  
+  Template API reference
 
     
   </span>
@@ -969,8 +958,7 @@
   <span class="md-ellipsis">
     
   
-    Command Line Reference
-  
+  Command Line Reference
 
     
   </span>
@@ -997,8 +985,7 @@
   <span class="md-ellipsis">
     
   
-    Configuration
-  
+  Configuration
 
     
   </span>
@@ -1032,8 +1019,7 @@
   <span class="md-ellipsis">
     
   
-    Change Log
-  
+  Change Log
 
     
   </span>
@@ -1059,8 +1045,7 @@
   <span class="md-ellipsis">
     
   
-    License
-  
+  License
 
     
   </span>
@@ -1676,7 +1661,7 @@ set in <code>blogmore.yaml</code>:</p>
 <tr>
 <td><code>socials</code></td>
 <td><code>list[SocialEntry]</code></td>
-<td>Social profile entries (<code>site</code>, <code>url</code>).</td>
+<td>Social profile entries (<code>site</code>, <code>url</code>, optional <code>title</code>).</td>
 </tr>
 <tr>
 <td><code>socials_title</code></td>

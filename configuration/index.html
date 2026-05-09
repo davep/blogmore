@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.39">
+      <meta name="generator" content="zensical-0.0.40">
     
     
       
@@ -32,7 +32,7 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.1e981d71.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.fba56155.min.css">
       
         
           
@@ -56,7 +56,7 @@
       
     
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    <script>__md_scope=new URL("..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
       
 
@@ -353,8 +353,7 @@
   <span class="md-ellipsis">
     
   
-    BlogMore
-  
+  BlogMore
 
     
   </span>
@@ -375,8 +374,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    BlogMore
-  
+  BlogMore
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
@@ -397,8 +395,7 @@
   <span class="md-ellipsis">
     
   
-    Setting Up Your Blog
-  
+  Setting Up Your Blog
 
     
   </span>
@@ -425,8 +422,7 @@
   <span class="md-ellipsis">
     
   
-    Writing a Post
-  
+  Writing a Post
 
     
   </span>
@@ -453,8 +449,7 @@
   <span class="md-ellipsis">
     
   
-    Writing a Page
-  
+  Writing a Page
 
     
   </span>
@@ -481,8 +476,7 @@
   <span class="md-ellipsis">
     
   
-    Metadata and Sidebar
-  
+  Metadata and Sidebar
 
     
   </span>
@@ -509,8 +503,7 @@
   <span class="md-ellipsis">
     
   
-    Building and Publishing
-  
+  Building and Publishing
 
     
   </span>
@@ -537,8 +530,7 @@
   <span class="md-ellipsis">
     
   
-    Templates
-  
+  Templates
 
     
   </span>
@@ -565,8 +557,7 @@
   <span class="md-ellipsis">
     
   
-    Theming
-  
+  Theming
 
     
   </span>
@@ -593,8 +584,7 @@
   <span class="md-ellipsis">
     
   
-    Template API reference
-  
+  Template API reference
 
     
   </span>
@@ -621,8 +611,7 @@
   <span class="md-ellipsis">
     
   
-    Command Line Reference
-  
+  Command Line Reference
 
     
   </span>
@@ -658,8 +647,7 @@
   <span class="md-ellipsis">
     
   
-    Configuration
-  
+  Configuration
 
     
   </span>
@@ -676,8 +664,7 @@
   <span class="md-ellipsis">
     
   
-    Configuration
-  
+  Configuration
 
     
   </span>
@@ -2092,8 +2079,7 @@
   <span class="md-ellipsis">
     
   
-    Change Log
-  
+  Change Log
 
     
   </span>
@@ -2119,8 +2105,7 @@
   <span class="md-ellipsis">
     
   
-    License
-  
+  License
 
     
   </span>
@@ -4349,17 +4334,19 @@ for example to add complex scripts or conditionally include tags — use
 </code></pre></div>
 <p>Can also be set with the <code>--links-title</code> command-line option.</p>
 <h4 id="socials"><code>socials</code></h4>
-<p>Social media links displayed in the sidebar as icons. Each entry has a <code>site</code> (the social media platform) and <code>url</code>.</p>
-<p><strong>Type:</strong> List of objects with <code>site</code> and <code>url</code> fields<br />
+<p>Social media links displayed in the sidebar as icons. Each entry has a <code>site</code> (the social media platform) and <code>url</code>. An optional <code>title</code> can also be provided to customise the tooltip shown when hovering over the icon.</p>
+<p><strong>Type:</strong> List of objects with <code>site</code>, <code>url</code>, and optional <code>title</code> fields<br />
 <strong>Default:</strong> None</p>
 <div class="highlight"><pre><span></span><code><span class="nt">socials</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">site</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github</span>
 <span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/davep</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">site</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mastodon</span>
 <span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://fosstodon.org/@davep</span>
+<span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Follow</span><span class="nv"> </span><span class="s">me</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">Mastodon&quot;</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">site</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">twitter</span>
 <span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://twitter.com/username</span>
 </code></pre></div>
+<p>When <code>title</code> is omitted the <code>site</code> name is used as the tooltip. When <code>title</code> is provided it is used as both the <code>title</code> attribute (tooltip) and the <code>aria-label</code> attribute on the icon link.</p>
 <p><strong>Supported platforms:</strong> Any Font Awesome brand icon name works (e.g., <code>github</code>, <code>mastodon</code>, <code>twitter</code>, <code>linkedin</code>, <code>youtube</code>, <code>facebook</code>, <code>instagram</code>, <code>bluesky</code>, <code>threads</code>, <code>lastfm</code>, <code>steam</code>, etc.).</p>
 <h4 id="socials_title"><code>socials_title</code></h4>
 <p>Override the title displayed above the social media icons section in the sidebar. By default the section is labelled "Social".</p>
