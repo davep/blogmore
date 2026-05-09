@@ -20,29 +20,26 @@ If `content_dir` is not provided, BlogMore will use the directory specified in y
 
 ## What is Checked?
 
-The linter currently performs the following checks:
+The linter categorizes its findings into **Errors** and **Warnings**.
 
-### Malformed Frontmatter
-It ensures that all posts and pages have valid YAML frontmatter. If a file cannot be parsed due to a syntax error in the frontmatter, it will be reported as an error.
+### Errors
 
-### Broken Internal Links
-The linter scans the generated HTML of your posts and pages and identifies any links that point to non-existent internal paths. This includes:
-- Links to other posts or pages.
-- Links to category and tag pages.
-- Links to date-based archive pages.
-- Links to special site pages (search, stats, calendar, etc.).
-- Links to files in your `extras/` directory.
+Errors represent critical issues that will likely result in a broken site or a failed build. The `lint` command will return a non-zero exit code if any errors are found.
 
-The linter takes your `clean_urls` setting and any custom path templates (`post_path`, `page_path`, etc.) into account when resolving links.
+*   **Malformed Frontmatter**: Ensures all posts and pages have valid YAML frontmatter. If a file cannot be parsed, it is reported as an error.
+*   **Broken Internal Links**: Scans the generated HTML for links to non-existent internal paths (other posts, pages, categories, tags, archives, site features like search, or files in `extras/`).
+*   **Broken Image Links**: Checks that all `<img>` sources resolve to valid internal paths or files in your `extras/` directory.
+*   **Broken Cover Images**: Specifically verifies that the `cover` property in your post or page frontmatter points to a valid resource.
 
-### Broken Image Links
-Similar to internal links, the linter checks that all images used in your posts and pages resolve to valid internal paths or files in your `extras/` directory.
+### Warnings
 
-### Future Dates
-The linter reports a warning if any post has a `date` or `modified` date set in the future. This helps you catch accidental future dates that might cause posts to not appear as expected.
+Warnings represent organizational or quality issues that won't break the build but might lead to a suboptimal blog experience. Warnings do **not** cause the `lint` command to fail.
 
-### External Links
-The linter does **not** check external links (links starting with `http://` or `https://` that point outside your site domain). This is to keep the linting process fast and avoid dependencies on an internet connection.
+*   **Missing Metadata**: Warns if a post is missing a **Title**, **Category**, **Tags**, or a **Date**.
+*   **Future Dates**: Reports if a post's `date` or `modified` date is set in the future.
+*   **Inconsistent Dates**: Flags cases where a post's `modified` date is earlier than its original publication `date`.
+*   **Missing Alt Text**: Reports any inline images that are missing an `alt` attribute, or have an empty/whitespace-only `alt` attribute (e.g., `![]()`).
+*   **External Links**: The linter does **not** check external links (starting with `http://` or `https://`) to ensure the process remains fast and offline-capable.
 
 ## Ignoring Specific Links
 
@@ -59,13 +56,16 @@ Any URL in this list will be treated by the linter as if it exists on disk, supp
 
 ## Example Output
 
-When errors are found, the linter will report them with the file path and line content (if applicable):
+When issues are found, the linter will report them with the file path (relative to your content directory):
 
 ```text
 Linting site in ./content...
-ERROR: ./content/posts/my-post.md: Link points to non-existent internal path: /non-existent-page.html (resolved to /non-existent-page.html)
-WARNING: ./content/posts/future-post.md: Post date is in the future: 2026-12-25 00:00:00
-Linting complete: 1 error(s), 1 warning(s).
+ERROR: posts/my-post.md: Link points to non-existent internal path: /non-existent-page.html (resolved to /non-existent-page.html)
+ERROR: posts/welcome.md: Cover image points to non-existent internal path: /images/missing.png (resolved to /images/missing.png)
+WARNING: posts/future-post.md: Post date is in the future: 2026-12-25 00:00:00
+WARNING: posts/draft-post.md: Post has no category
+WARNING: posts/image-post.md: Image is missing alt text: /attachments/logo.png
+Linting complete: 2 error(s), 3 warning(s).
 ```
 
 The `lint` command will exit with a non-zero status code if any errors are found, making it suitable for use in CI/CD pipelines.
