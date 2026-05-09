@@ -356,8 +356,7 @@ further. If you want Markdown to be parsed inside an HTML element, add
 
 ```markdown
 <center markdown="1">
-*(Yes, the tin was once mine and was once full; the early 90s were a
-different time)*
+*This centered text will be italic* and **this will be bold**.
 </center>
 ```
 
