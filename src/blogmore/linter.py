@@ -287,11 +287,24 @@ class Linter:
             for src in images:
                 self._check_link(src, item, valid_urls, is_image=True)
 
+            # Check cover image if present
+            if item.metadata and "cover" in item.metadata:
+                cover = item.metadata["cover"]
+                if isinstance(cover, str):
+                    self._check_link(
+                        cover, item, valid_urls, is_image=True, is_cover=True
+                    )
+
         print(f"Linting complete: {self.errors} error(s), {self.warnings} warning(s).")
         return 1 if self.errors > 0 else 0
 
     def _check_link(
-        self, href: str, item: Any, valid_urls: set[str], is_image: bool = False
+        self,
+        href: str,
+        item: Any,
+        valid_urls: set[str],
+        is_image: bool = False,
+        is_cover: bool = False,
     ) -> None:
         """Check a single link or image source."""
         # Skip empty or external links
@@ -323,7 +336,13 @@ class Linter:
             if alt_path in valid_urls:
                 return
 
-            link_type = "Image" if is_image else "Link"
+            if is_cover:
+                link_type = "Cover image"
+            elif is_image:
+                link_type = "Image"
+            else:
+                link_type = "Link"
+
             self.report_error(
                 f"{link_type} points to non-existent internal path: {href} (resolved to {path_only})",
                 item.path,

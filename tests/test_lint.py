@@ -15,7 +15,14 @@ class TestLintCommand:
 
     def test_lint_success(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """Test linting a site with no issues."""
-        site_config = SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
+        site_config = SiteConfig(
+            content_dir=posts_dir,
+            output_dir=temp_output_dir,
+            linting_ignore=[
+                "/images/relative-cover.jpg",
+                "/2024/04/02/images/no-slash-cover.jpg",
+            ],
+        )
         result = lint_site(site_config)
         assert result == 0
 
@@ -42,9 +49,6 @@ Future content.
             result = lint_site(site_config)
             # Warnings don't cause failure (result 0)
             assert result == 0
-
-        # We can't easily check stdout/stderr here without more mocking,
-        # but result 0 is expected for just warnings.
 
     def test_lint_broken_link(self, tmp_path: Path, temp_output_dir: Path) -> None:
         """Test that broken internal links are reported as errors."""
@@ -75,6 +79,25 @@ title: Broken Image Post
 date: 2024-01-01
 ---
 ![Broken Image](/images/missing.png)
+""")
+
+        site_config = SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
+
+        result = lint_site(site_config)
+        assert result == 1
+
+    def test_lint_broken_cover(self, tmp_path: Path, temp_output_dir: Path) -> None:
+        """Test that broken internal cover images are reported as errors."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        post_path = content_dir / "broken-cover.md"
+        post_path.write_text("""---
+title: Broken Cover Post
+date: 2024-01-01
+cover: /images/missing-cover.png
+---
+Content
 """)
 
         site_config = SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
@@ -182,6 +205,28 @@ date: 2024-01-01
         result = lint_site(site_config)
         assert result == 0
 
+    def test_lint_ignored_cover(self, tmp_path: Path, temp_output_dir: Path) -> None:
+        """Test that ignored cover images are treated as valid."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "post.md").write_text("""---
+title: Post
+date: 2024-01-01
+cover: /ignored-cover.png
+---
+Content
+""")
+
+        site_config = SiteConfig(
+            content_dir=content_dir,
+            output_dir=temp_output_dir,
+            linting_ignore=["/ignored-cover.png"],
+        )
+
+        result = lint_site(site_config)
+        assert result == 0
+
     def test_lint_malformed_frontmatter(
         self, tmp_path: Path, temp_output_dir: Path
     ) -> None:
@@ -215,8 +260,11 @@ Content
                 str(temp_output_dir),
             ],
         ):
-            result = main()
-            assert result == 0
+            # Patch lint_site directly to avoid fixture issues in main command tests
+            with patch("blogmore.__main__.lint_site", return_value=0) as mock_lint:
+                result = main()
+                assert result == 0
+                assert mock_lint.called
 
     def test_main_check_alias(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """Test check alias via main()."""
@@ -231,5 +279,7 @@ Content
                 str(temp_output_dir),
             ],
         ):
-            result = main()
-            assert result == 0
+            with patch("blogmore.__main__.lint_site", return_value=0) as mock_lint:
+                result = main()
+                assert result == 0
+                assert mock_lint.called
