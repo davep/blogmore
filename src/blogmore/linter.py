@@ -12,14 +12,27 @@ import re
 from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
+from urllib.parse import unquote
 
 ##############################################################################
 # Local imports.
 from blogmore.backlinks import _extract_link_url, _normalize_url_path, _to_path
 from blogmore.clean_url import make_url_clean
+from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
+from blogmore.generator.grouping import group_posts_by_category, group_posts_by_tag
 from blogmore.page_path import resolve_page_path
-from blogmore.parser import Page, Post, PostParser, post_sort_key
+from blogmore.pagination_path import DEFAULT_PAGE_1_PATH
+from blogmore.parser import Page, Post, PostParser, post_sort_key, sanitize_for_url
 from blogmore.post_path import resolve_post_path
+from blogmore.site_config import (
+    DEFAULT_ARCHIVE_PATH,
+    DEFAULT_CALENDAR_PATH,
+    DEFAULT_CATEGORIES_PATH,
+    DEFAULT_GRAPH_PATH,
+    DEFAULT_SEARCH_PATH,
+    DEFAULT_STATS_PATH,
+    DEFAULT_TAGS_PATH,
+)
 
 ##############################################################################
 # Compiled regular expressions.
@@ -238,6 +251,18 @@ class SiteLinter:
         post_path_template: str = "{year}/{month}/{day}/{slug}.html",
         page_path_template: str = "{slug}.html",
         clean_urls: bool = False,
+        archive_path: str = DEFAULT_ARCHIVE_PATH,
+        tags_path: str = DEFAULT_TAGS_PATH,
+        categories_path: str = DEFAULT_CATEGORIES_PATH,
+        search_path: str = DEFAULT_SEARCH_PATH,
+        stats_path: str = DEFAULT_STATS_PATH,
+        calendar_path: str = DEFAULT_CALENDAR_PATH,
+        graph_path: str = DEFAULT_GRAPH_PATH,
+        page_1_path: str = DEFAULT_PAGE_1_PATH,
+        with_search: bool = False,
+        with_stats: bool = False,
+        with_calendar: bool = False,
+        with_graph: bool = False,
     ) -> None:
         """Initialise the linter with site configuration parameters.
 
@@ -257,6 +282,20 @@ class SiteLinter:
                 configuration.
             clean_urls: Whether the site uses clean URLs (strips
                 ``index.html`` from URLs).
+            archive_path: Path (relative to the output root) of the
+                archive page.  Used to build the known URL set.
+            tags_path: Path of the tags overview page.
+            categories_path: Path of the categories overview page.
+            search_path: Path of the search page.
+            stats_path: Path of the statistics page.
+            calendar_path: Path of the calendar page.
+            graph_path: Path of the graph page.
+            page_1_path: Pagination path template for the first page of
+                a listing.  Used to derive the main index URL.
+            with_search: Whether the search page is generated.
+            with_stats: Whether the statistics page is generated.
+            with_calendar: Whether the calendar page is generated.
+            with_graph: Whether the graph page is generated.
         """
         self.content_dir = content_dir
         self.site_url = site_url
@@ -264,6 +303,18 @@ class SiteLinter:
         self.post_path_template = post_path_template
         self.page_path_template = page_path_template
         self.clean_urls = clean_urls
+        self.archive_path = archive_path
+        self.tags_path = tags_path
+        self.categories_path = categories_path
+        self.search_path = search_path
+        self.stats_path = stats_path
+        self.calendar_path = calendar_path
+        self.graph_path = graph_path
+        self.page_1_path = page_1_path
+        self.with_search = with_search
+        self.with_stats = with_stats
+        self.with_calendar = with_calendar
+        self.with_graph = with_graph
 
     # ------------------------------------------------------------------
     def _parse_all(
@@ -320,12 +371,40 @@ class SiteLinter:
         return posts, pages, issues
 
     # ------------------------------------------------------------------
+    def _make_configured_url(self, path: str) -> str:
+        """Build the root-relative URL for a configured page path.
+
+        Mirrors the logic used by
+        [`ContextBuilder.get_configured_url`][blogmore.generator.context.ContextBuilder.get_configured_url]:
+        strips any leading slash from *path*, prepends a fresh ``/``, and
+        optionally applies [`make_url_clean`][blogmore.clean_url.make_url_clean]
+        when ``clean_urls`` is enabled.
+
+        Args:
+            path: A path string from the site configuration (e.g.
+                ``"archive.html"`` or ``"archive/index.html"``).
+
+        Returns:
+            The root-relative URL for the page, always starting with ``/``.
+        """
+        url = "/" + path.lstrip("/")
+        if self.clean_urls:
+            url = make_url_clean(url)
+        return url
+
+    # ------------------------------------------------------------------
     def _build_known_url_set(
         self,
         posts: list[Post],
         pages: list[Page],
     ) -> set[str]:
-        """Build a set of normalised known URLs from all posts and pages.
+        """Build a set of normalised known URLs from all generated content.
+
+        Includes URLs for posts, static pages, the main index, the archive,
+        tags and categories overview pages, individual tag and category listing
+        pages, date-archive pages (year, month, day), and any optional feature
+        pages that are enabled in the configuration (search, stats, calendar,
+        graph).
 
         Each URL is normalised via
         [`_normalize_url_path`][blogmore.backlinks._normalize_url_path]
@@ -340,12 +419,66 @@ class SiteLinter:
             A set of normalised URL strings.
         """
         known: set[str] = set()
+
+        # Posts and static pages.
         for post in posts:
             url = _post_url(post, self.post_path_template, self.clean_urls)
             known.add(_normalize_url_path(url))
         for page in pages:
             url = _page_url(page, self.page_path_template, self.clean_urls)
             known.add(_normalize_url_path(url))
+
+        # Main index — "/" and "/index.html" both normalise to the empty string.
+        known.add("")
+
+        # Archive, tags overview, and categories overview pages — always
+        # generated whenever there are posts / tags / categories.
+        known.add(_normalize_url_path(self._make_configured_url(self.archive_path)))
+        known.add(_normalize_url_path(self._make_configured_url(self.tags_path)))
+        known.add(_normalize_url_path(self._make_configured_url(self.categories_path)))
+
+        # Optional feature pages — only included when the feature is enabled.
+        if self.with_search:
+            known.add(_normalize_url_path(self._make_configured_url(self.search_path)))
+        if self.with_stats:
+            known.add(_normalize_url_path(self._make_configured_url(self.stats_path)))
+        if self.with_calendar:
+            known.add(
+                _normalize_url_path(self._make_configured_url(self.calendar_path))
+            )
+        if self.with_graph:
+            known.add(_normalize_url_path(self._make_configured_url(self.graph_path)))
+
+        # Individual tag pages — /tag/{safe_tag}/
+        posts_by_tag = group_posts_by_tag(posts)
+        for tag_lower in posts_by_tag:
+            safe_tag = sanitize_for_url(tag_lower)
+            known.add(_normalize_url_path(f"/{TAG_DIR}/{safe_tag}"))
+
+        # Individual category pages — /category/{safe_category}/
+        posts_by_category = group_posts_by_category(posts)
+        for category_lower in posts_by_category:
+            safe_category = sanitize_for_url(category_lower)
+            known.add(_normalize_url_path(f"/{CATEGORY_DIR}/{safe_category}"))
+
+        # Date archive pages — /{year}/, /{year}/{month}/, /{year}/{month}/{day}/
+        for post in posts:
+            if post.date is not None:
+                year = post.date.year
+                month = post.date.month
+                day = post.date.day
+                known.add(_normalize_url_path(f"/{year}"))
+                known.add(_normalize_url_path(f"/{year}/{month:02d}"))
+                known.add(_normalize_url_path(f"/{year}/{month:02d}/{day:02d}"))
+
+        # Feed files — always generated alongside the posts.
+        known.add("/feed.xml")
+        known.add("/feeds/all.atom.xml")
+        for category_lower in posts_by_category:
+            safe_category = sanitize_for_url(category_lower)
+            known.add(f"/feeds/{safe_category}.rss.xml")
+            known.add(f"/feeds/{safe_category}.atom.xml")
+
         return known
 
     # ------------------------------------------------------------------
@@ -449,8 +582,9 @@ class SiteLinter:
 
         Only internal image links (root-relative paths and full URLs pointing
         back to this site) are checked.  External image links are ignored.
-        The check strips the leading `/` from the URL and looks for the
-        resulting relative path inside *extras_dir*.
+        The check strips the leading `/` from the URL, URL-decodes the result
+        (so that ``%20`` maps to a space, etc.), and looks for the resulting
+        relative path inside *extras_dir*.
 
         Args:
             source_path: Path to the content file being checked.
@@ -467,8 +601,9 @@ class SiteLinter:
             if path is None:
                 # External image — skip.
                 continue
-            # Strip leading '/' and resolve to extras_dir.
-            relative = path.lstrip("/")
+            # URL-decode so that percent-encoded filenames (e.g. %20 → space)
+            # resolve to the actual file on disk.
+            relative = unquote(path.lstrip("/"))
             candidate = extras_dir / relative
             if not candidate.is_file():
                 issues.append(
@@ -532,6 +667,18 @@ def lint_site(
     post_path_template: str = "{year}/{month}/{day}/{slug}.html",
     page_path_template: str = "{slug}.html",
     clean_urls: bool = False,
+    archive_path: str = DEFAULT_ARCHIVE_PATH,
+    tags_path: str = DEFAULT_TAGS_PATH,
+    categories_path: str = DEFAULT_CATEGORIES_PATH,
+    search_path: str = DEFAULT_SEARCH_PATH,
+    stats_path: str = DEFAULT_STATS_PATH,
+    calendar_path: str = DEFAULT_CALENDAR_PATH,
+    graph_path: str = DEFAULT_GRAPH_PATH,
+    page_1_path: str = DEFAULT_PAGE_1_PATH,
+    with_search: bool = False,
+    with_stats: bool = False,
+    with_calendar: bool = False,
+    with_graph: bool = False,
 ) -> LintResult:
     """Lint all posts and pages in *content_dir* and return the result.
 
@@ -550,6 +697,18 @@ def lint_site(
         page_path_template: The `page_path` format string from the site
             configuration.
         clean_urls: Whether the site uses clean URLs.
+        archive_path: Path of the archive page relative to the output root.
+        tags_path: Path of the tags overview page.
+        categories_path: Path of the categories overview page.
+        search_path: Path of the search page.
+        stats_path: Path of the statistics page.
+        calendar_path: Path of the calendar page.
+        graph_path: Path of the graph page.
+        page_1_path: Pagination path template for the first page of a listing.
+        with_search: Whether the search page is generated.
+        with_stats: Whether the statistics page is generated.
+        with_calendar: Whether the calendar page is generated.
+        with_graph: Whether the graph page is generated.
 
     Returns:
         A [`LintResult`][blogmore.linter.LintResult] containing all issues found.
@@ -561,6 +720,18 @@ def lint_site(
         post_path_template=post_path_template,
         page_path_template=page_path_template,
         clean_urls=clean_urls,
+        archive_path=archive_path,
+        tags_path=tags_path,
+        categories_path=categories_path,
+        search_path=search_path,
+        stats_path=stats_path,
+        calendar_path=calendar_path,
+        graph_path=graph_path,
+        page_1_path=page_1_path,
+        with_search=with_search,
+        with_stats=with_stats,
+        with_calendar=with_calendar,
+        with_graph=with_graph,
     )
     return linter.lint()
 

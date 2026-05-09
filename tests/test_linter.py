@@ -603,4 +603,264 @@ class TestLintSite:
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
 
+##############################################################################
+# Known-URL coverage for generator-created pages.
+
+
+class TestKnownUrlCoverage:
+    """Linter recognises URLs for all pages the generator would create."""
+
+    def test_link_to_archive_not_reported(self, tmp_path: Path) -> None:
+        """A link to the archive page is not flagged as broken."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [archive](/archive.html)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_tags_page_not_reported(self, tmp_path: Path) -> None:
+        """A link to the tags overview page is not flagged as broken."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [tags](/tags.html)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_categories_page_not_reported(self, tmp_path: Path) -> None:
+        """A link to the categories overview page is not flagged as broken."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [categories](/categories.html)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_stats_page_with_feature_enabled(self, tmp_path: Path) -> None:
+        """A link to the stats page is valid when `with_stats=True`."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [stats](/stats.html)."
+                ),
+            },
+        )
+        result = lint_site(content_dir, with_stats=True)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_stats_page_without_feature_flagged(self, tmp_path: Path) -> None:
+        """A link to the stats page is broken when `with_stats=False`."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [stats](/stats.html)."
+                ),
+            },
+        )
+        result = lint_site(content_dir, with_stats=False)
+        assert any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_calendar_page_with_feature_enabled(self, tmp_path: Path) -> None:
+        """A link to the calendar page is valid when `with_calendar=True`."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [calendar](/calendar.html)."
+                ),
+            },
+        )
+        result = lint_site(content_dir, with_calendar=True)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_graph_page_with_feature_enabled(self, tmp_path: Path) -> None:
+        """A link to the graph page is valid when `with_graph=True`."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [graph](/graph.html)."
+                ),
+            },
+        )
+        result = lint_site(content_dir, with_graph=True)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_search_page_with_feature_enabled(self, tmp_path: Path) -> None:
+        """A link to the search page is valid when `with_search=True`."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "See [search](/search.html)."
+                ),
+            },
+        )
+        result = lint_site(content_dir, with_search=True)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_individual_tag_page_not_reported(self, tmp_path: Path) -> None:
+        """A link to a tag's listing page is not flagged as broken."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\ntags:\n  - Python\n---\n"
+                    "See [python tag](/tag/python)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_individual_category_page_not_reported(self, tmp_path: Path) -> None:
+        """A link to a category's listing page is not flagged as broken."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\ncategory: News\n---\n"
+                    "See [news](/category/news)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_year_archive_not_reported(self, tmp_path: Path) -> None:
+        """A link to a year's archive page is not flagged as broken."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-03-10\n---\n"
+                    "See [2024 posts](/2024/)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_month_archive_not_reported(self, tmp_path: Path) -> None:
+        """A link to a month archive page is not flagged as broken."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-03-10\n---\n"
+                    "See [March 2024](/2024/03/)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_day_archive_not_reported(self, tmp_path: Path) -> None:
+        """A link to a day archive page is not flagged as broken."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-03-10\n---\n"
+                    "See [10 March 2024](/2024/03/10/)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_root_index_not_reported(self, tmp_path: Path) -> None:
+        """A link to the site root `/` is not flagged as broken."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "Go [home](/)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+    def test_link_to_main_feed_not_reported(self, tmp_path: Path) -> None:
+        """A link to the main RSS feed is not flagged as broken."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "Subscribe via [RSS](/feed.xml)."
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
+
+
+##############################################################################
+# Image URL-decoding tests.
+
+
+class TestImageUrlDecoding:
+    """Linter handles percent-encoded filenames in image links."""
+
+    def test_percent_encoded_space_matches_file_with_space(self, tmp_path: Path) -> None:
+        """An image URL with %20 matches a file whose name contains a space."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "![photo](/images/my%20photo.png)"
+                ),
+            },
+        )
+        extras_dir = content_dir / "extras" / "images"
+        extras_dir.mkdir(parents=True)
+        (extras_dir / "my photo.png").write_bytes(b"PNG")
+
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
+
+    def test_missing_percent_encoded_image_still_reported(
+        self, tmp_path: Path
+    ) -> None:
+        """A %20-encoded image URL with no matching file is still reported as missing."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "![photo](/images/no%20such%20file.png)"
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
+
+
 ### test_linter.py ends here

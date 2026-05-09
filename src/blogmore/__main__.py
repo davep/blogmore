@@ -17,10 +17,21 @@ from blogmore.config import (
 from blogmore.generator import SiteGenerator
 from blogmore.linter import IssueKind, LintResult, lint_site
 from blogmore.page_path import DEFAULT_PAGE_PATH
+from blogmore.pagination_path import DEFAULT_PAGE_1_PATH
 from blogmore.post_path import DEFAULT_POST_PATH
 from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
-from blogmore.site_config import SiteConfig, site_config_defaults
+from blogmore.site_config import (
+    DEFAULT_ARCHIVE_PATH,
+    DEFAULT_CALENDAR_PATH,
+    DEFAULT_CATEGORIES_PATH,
+    DEFAULT_GRAPH_PATH,
+    DEFAULT_SEARCH_PATH,
+    DEFAULT_STATS_PATH,
+    DEFAULT_TAGS_PATH,
+    SiteConfig,
+    site_config_defaults,
+)
 
 
 def main() -> int:
@@ -308,10 +319,26 @@ def _run_lint(args: argparse.Namespace, config: dict[str, Any]) -> int:
     if not site_url:
         site_url = str(config.get("site_url", ""))
 
-    # Resolve post_path, page_path, and clean_urls from the config file.
+    # Resolve path templates and URL options from the config file.
     post_path_template: str = str(config.get("post_path", DEFAULT_POST_PATH))
     page_path_template: str = str(config.get("page_path", DEFAULT_PAGE_PATH))
     clean_urls: bool = bool(config.get("clean_urls", False))
+
+    # Resolve configured page paths.
+    archive_path: str = str(config.get("archive_path", DEFAULT_ARCHIVE_PATH))
+    tags_path: str = str(config.get("tags_path", DEFAULT_TAGS_PATH))
+    categories_path: str = str(config.get("categories_path", DEFAULT_CATEGORIES_PATH))
+    search_path: str = str(config.get("search_path", DEFAULT_SEARCH_PATH))
+    stats_path: str = str(config.get("stats_path", DEFAULT_STATS_PATH))
+    calendar_path: str = str(config.get("calendar_path", DEFAULT_CALENDAR_PATH))
+    graph_path: str = str(config.get("graph_path", DEFAULT_GRAPH_PATH))
+    page_1_path: str = str(config.get("page_1_path", DEFAULT_PAGE_1_PATH))
+
+    # Resolve optional feature flags.
+    with_search: bool = bool(config.get("with_search", False))
+    with_stats: bool = bool(config.get("with_stats", False))
+    with_calendar: bool = bool(config.get("with_calendar", False))
+    with_graph: bool = bool(config.get("with_graph", False))
 
     include_drafts: bool = bool(args.include_drafts)
 
@@ -325,6 +352,18 @@ def _run_lint(args: argparse.Namespace, config: dict[str, Any]) -> int:
         post_path_template=post_path_template,
         page_path_template=page_path_template,
         clean_urls=clean_urls,
+        archive_path=archive_path,
+        tags_path=tags_path,
+        categories_path=categories_path,
+        search_path=search_path,
+        stats_path=stats_path,
+        calendar_path=calendar_path,
+        graph_path=graph_path,
+        page_1_path=page_1_path,
+        with_search=with_search,
+        with_stats=with_stats,
+        with_calendar=with_calendar,
+        with_graph=with_graph,
     )
 
     _print_lint_result(result)
