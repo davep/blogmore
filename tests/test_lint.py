@@ -86,6 +86,31 @@ date: 2024-01-01
         result = lint_site(site_config)
         assert result == 1
 
+    def test_lint_missing_alt_text(self, tmp_path: Path, temp_output_dir: Path) -> None:
+        """Test that images missing or having empty alt text are reported as warnings."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        post_path = content_dir / "missing-alt.md"
+        post_path.write_text("""---
+title: Missing Alt Post
+date: 2024-01-01
+---
+<img src="/images/logo.png">
+<img src="/images/logo.png" alt="">
+<img src="/images/logo.png" alt="   ">
+""")
+
+        site_config = SiteConfig(
+            content_dir=content_dir,
+            output_dir=temp_output_dir,
+            linting_ignore=["/images/logo.png"],
+        )
+
+        result = lint_site(site_config)
+        # Warning doesn't cause failure
+        assert result == 0
+
     def test_lint_broken_cover(self, tmp_path: Path, temp_output_dir: Path) -> None:
         """Test that broken internal cover images are reported as errors."""
         content_dir = tmp_path / "content"

@@ -278,14 +278,26 @@ class Linter:
             html = item.html_content
             # Extract <a> hrefs
             links = re.findall(r'<a\s+(?:[^>]*?\s+)?href=["\']([^"\']*)["\']', html)
-            # Extract <img> srcs
-            images = re.findall(r'<img\s+(?:[^>]*?\s+)?src=["\']([^"\']*)["\']', html)
+            # Find <img> tags to check for src and alt
+            img_tags = re.findall(r"<img\s+[^>]*>", html)
 
             for href in links:
                 self._check_link(href, item, valid_urls)
 
-            for src in images:
-                self._check_link(src, item, valid_urls, is_image=True)
+            for img_tag in img_tags:
+                src_match = re.search(r'src=["\']([^"\']*)["\']', img_tag)
+                alt_match = re.search(r'alt=["\']([^"\']*)["\']', img_tag)
+
+                if src_match:
+                    src = src_match.group(1)
+                    self._check_link(src, item, valid_urls, is_image=True)
+
+                if not alt_match or not alt_match.group(1).strip():
+                    img_identifier = src_match.group(1) if src_match else img_tag
+                    self.report_warning(
+                        f"Image is missing alt text: {img_identifier}",
+                        item.path,
+                    )
 
             # Check cover image if present
             if item.metadata and "cover" in item.metadata:
