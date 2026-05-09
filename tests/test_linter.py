@@ -862,5 +862,73 @@ class TestImageUrlDecoding:
         result = lint_site(content_dir)
         assert any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
 
+    def test_literal_space_in_filename_matches_file(self, tmp_path: Path) -> None:
+        """An image URL with a literal space matches a file whose name contains a space."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "![screenshot](/attachments/Screen Shot 2015-06-19.png)"
+                ),
+            },
+        )
+        extras_dir = content_dir / "extras" / "attachments"
+        extras_dir.mkdir(parents=True)
+        (extras_dir / "Screen Shot 2015-06-19.png").write_bytes(b"PNG")
+
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
+
+    def test_literal_space_with_fragment_matches_file(self, tmp_path: Path) -> None:
+        """An image URL with a literal space and a fragment still resolves to the correct file."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "![screenshot](/attachments/Screenshot 2015-06-19 at 09.03.58.png#centre)"
+                ),
+            },
+        )
+        extras_dir = content_dir / "extras" / "attachments"
+        extras_dir.mkdir(parents=True)
+        (extras_dir / "Screenshot 2015-06-19 at 09.03.58.png").write_bytes(b"PNG")
+
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
+
+    def test_missing_literal_space_image_still_reported(self, tmp_path: Path) -> None:
+        """An image URL with a literal space whose file does not exist is still reported."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    "---\ntitle: Post\ndate: 2024-01-01\n---\n"
+                    "![screenshot](/attachments/No Such File.png)"
+                ),
+            },
+        )
+        result = lint_site(content_dir)
+        assert any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
+
+    def test_image_title_attribute_not_treated_as_url(self, tmp_path: Path) -> None:
+        """A Markdown image title (`![alt](/url "title")`) does not include the title in the URL."""
+        content_dir = _make_content_dir(
+            tmp_path,
+            {
+                "post.md": (
+                    '---\ntitle: Post\ndate: 2024-01-01\n---\n'
+                    '![photo](/images/photo.png "My photo")'
+                ),
+            },
+        )
+        extras_dir = content_dir / "extras" / "images"
+        extras_dir.mkdir(parents=True)
+        (extras_dir / "photo.png").write_bytes(b"PNG")
+
+        result = lint_site(content_dir)
+        assert not any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
+
 
 ### test_linter.py ends here

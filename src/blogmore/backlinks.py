@@ -157,18 +157,34 @@ def _extract_snippet(
 def _extract_link_url(raw_url: str) -> str:
     """Extract only the URL portion from a raw link target.
 
-    Strips an optional title attribute (text in quotes or parentheses
-    following a space after the URL) from a link target string such as
-    ``/foo.html "My Title"``.
+    Strips an optional title attribute from a link target string such as
+    ``/foo.html "My Title"``.  A title attribute is recognised by the fact
+    that the first non-whitespace character following the separating whitespace
+    is a Markdown title delimiter (``"``, ``'``, or ``(``).  When no such
+    delimiter is found the entire string is returned, which correctly preserves
+    literal spaces that form part of the filename (e.g.
+    ``/images/my photo.png``).
 
     Args:
-        raw_url: The raw URL string as captured from Markdown source.
+        raw_url: The raw URL string as captured from Markdown source, which
+            may include an optional title attribute.
 
     Returns:
         The URL with any title attribute removed.
     """
-    # A title may follow the URL after whitespace: url "title" or url 'title'
-    return raw_url.split()[0] if raw_url.strip() else raw_url
+    url = raw_url.strip()
+    if not url:
+        return raw_url
+    # Split on the first run of whitespace.  If what follows looks like a
+    # Markdown title attribute (starts with a recognised delimiter) the first
+    # token is the URL.  Otherwise the full string is the URL so that literal
+    # spaces in filenames are not silently truncated.
+    parts = url.split(None, 1)
+    if len(parts) == 2:
+        rest = parts[1].lstrip()
+        if rest and rest[0] in ('"', "'", "("):
+            return parts[0]
+    return url
 
 
 def _find_links(content: str) -> list[tuple[str, int, int, str]]:
