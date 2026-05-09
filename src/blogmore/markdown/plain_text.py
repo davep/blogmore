@@ -69,10 +69,11 @@ def _make_markdown_instance() -> markdown.Markdown:
     return markdown.Markdown(
         extensions=[
             "fenced_code",
+            "md_in_html",
             "tables",
             "footnotes",
             *create_custom_extensions(),
-        ],
+        ]
     )
 
 

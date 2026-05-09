@@ -31,6 +31,7 @@ def _make_extraction_markdown() -> markdown.Markdown:
     return markdown.Markdown(
         extensions=[
             "fenced_code",
+            "md_in_html",
             "tables",
             "footnotes",
             *create_custom_extensions(),

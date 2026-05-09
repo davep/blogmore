@@ -4,6 +4,9 @@
 
 **Released: WiP**
 
+- Enabled the `md_in_html` Markdown extension so that Markdown syntax inside
+  HTML tags is rendered when the tag carries the `markdown="1"` attribute.
+  ([#463](https://github.com/davep/blogmore/pull/463))
 - Word count and reading time calculations now use the proper
   Markdown-to-text converter rather than a regex-based approximation. Fenced
   code blocks are excluded from these counts (inline code is still

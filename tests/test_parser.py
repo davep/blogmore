@@ -240,6 +240,38 @@ class TestExtractFirstParagraph:
         assert extract_first_paragraph(content) == "First real paragraph."
 
 
+class TestMarkdownInHtml:
+    """Tests for the md_in_html extension in PostParser."""
+
+    def _make_parser(self) -> PostParser:
+        """Create a PostParser instance.
+
+        Returns:
+            A configured PostParser instance.
+        """
+        return PostParser()
+
+    def test_markdown_inside_html_with_attribute(self) -> None:
+        """Markdown inside an HTML tag is rendered when markdown="1" is set."""
+        parser = self._make_parser()
+        html = parser.markdown.convert('<div markdown="1">\n*italic*\n</div>')
+        assert "<em>italic</em>" in html
+
+    def test_italic_inside_center_tag(self) -> None:
+        """Italic Markdown inside a center tag is rendered with markdown="1"."""
+        parser = self._make_parser()
+        content = '<center markdown="1">\n*(a note)*\n</center>'
+        html = parser.markdown.convert(content)
+        assert "<em>" in html
+        assert "a note" in html
+
+    def test_markdown_without_attribute_not_rendered(self) -> None:
+        """Markdown inside an HTML tag is not rendered without markdown="1"."""
+        parser = self._make_parser()
+        html = parser.markdown.convert("<div>\n*italic*\n</div>")
+        assert "<em>" not in html
+        assert "*italic*" in html
+
 
 class TestPost:
     """Test the Post dataclass."""
