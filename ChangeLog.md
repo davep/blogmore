@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added a `lint` command (with `check` as an alias) that performs various
+  checks of the content of the site, looking for things like broken internal
+  links or malformed front matter.
+  ([#467](https://github.com/davep/blogmore/pull/467))
+
 ## v2.20.0
 
 **Released: 2026-05-09**
