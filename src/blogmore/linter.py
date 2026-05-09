@@ -42,6 +42,15 @@ class Linter:
             parsed = urlparse(site_config.site_url)
             self.site_domain = parsed.netloc.lower()
 
+    def _get_report_path(self, path: Path | None) -> Path | str | None:
+        """Convert a path to a relative path for reporting, if possible."""
+        if path and self.site_config.content_dir:
+            try:
+                return path.relative_to(self.site_config.content_dir)
+            except ValueError:
+                pass
+        return path
+
     def report_error(self, message: str, path: Path | None = None) -> None:
         """Report an error.
 
@@ -49,7 +58,8 @@ class Linter:
             message: The error message.
             path: Optional path to the file with the error.
         """
-        prefix = f"{path}: " if path else ""
+        report_path = self._get_report_path(path)
+        prefix = f"{report_path}: " if report_path else ""
         print(f"ERROR: {prefix}{message}", file=sys.stderr)
         self.errors += 1
 
@@ -60,7 +70,8 @@ class Linter:
             message: The warning message.
             path: Optional path to the file with the warning.
         """
-        prefix = f"{path}: " if path else ""
+        report_path = self._get_report_path(path)
+        prefix = f"{report_path}: " if report_path else ""
         print(f"WARNING: {prefix}{message}", file=sys.stderr)
         self.warnings += 1
 
