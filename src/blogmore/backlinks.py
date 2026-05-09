@@ -10,7 +10,6 @@ are called, so users pay no cost for a feature they do not use.
 
 ##############################################################################
 # Python imports.
-import re
 from dataclasses import dataclass
 
 ##############################################################################
@@ -19,6 +18,11 @@ from markupsafe import Markup
 
 ##############################################################################
 # Local imports.
+from blogmore.markdown.link_patterns import (
+    INLINE_ALL_LINK_RE,
+    LINK_DEF_RE,
+    REF_ALL_LINK_RE,
+)
 from blogmore.markdown.plain_text import markdown_to_plain_text
 from blogmore.parser import Post
 
@@ -32,25 +36,6 @@ _SNIPPET_CONTEXT_CHARS: int = 100
 # plain-text conversion.  The string is chosen to be extremely unlikely to
 # appear in any real blog post.
 _BACKLINK_MARKER: str = "BKLINK8f3a2b19_BKLINK"
-
-##############################################################################
-# Compiled regular expressions for Markdown link detection.
-
-# Inline links: [link text](url) or [link text](url "optional title")
-# The URL portion allows one level of balanced parentheses so that paths such
-# as /2016/11/15/seen_by_davep_(the_return).html are captured in full.
-# The atomic group (?>...) prevents catastrophic backtracking when the regex
-# engine encounters a long run of characters without a matching closing ")"
-# (Python 3.11+ feature; this codebase targets 3.12+).
-_INLINE_LINK_RE: re.Pattern[str] = re.compile(
-    r"\[([^\]]*)\]\(((?>[^()]+|\([^()]*\))*)\)"
-)
-
-# Reference-style link definitions: [id]: url  (at the start of any line)
-_LINK_DEF_RE: re.Pattern[str] = re.compile(r"^\[([^\]]+)\]:\s+(\S+)", re.MULTILINE)
-
-# Reference-style links: [text][ref] or [text][] (implicit ref = text)
-_REF_LINK_RE: re.Pattern[str] = re.compile(r"\[([^\]]+)\]\[([^\]]*)\]")
 
 
 @dataclass
@@ -154,7 +139,7 @@ def _extract_snippet(
     return escaped
 
 
-def _extract_link_url(raw_url: str) -> str:
+def extract_link_url(raw_url: str) -> str:
     """Extract only the URL portion from a raw link target.
 
     Strips an optional title attribute from a link target string such as
@@ -209,17 +194,17 @@ def _find_links(content: str) -> list[tuple[str, int, int, str]]:
 
     # Collect reference link definitions first.
     refs: dict[str, str] = {}
-    for definition in _LINK_DEF_RE.finditer(content):
+    for definition in LINK_DEF_RE.finditer(content):
         refs[definition.group(1).lower()] = definition.group(2).strip()
 
     # Inline links: [text](url)
-    for match in _INLINE_LINK_RE.finditer(content):
-        url = _extract_link_url(match.group(2))
+    for match in INLINE_ALL_LINK_RE.finditer(content):
+        url = extract_link_url(match.group(2))
         if url:
             results.append((url, match.start(), match.end(), match.group(1)))
 
     # Reference-style links: [text][ref] or [text][]
-    for match in _REF_LINK_RE.finditer(content):
+    for match in REF_ALL_LINK_RE.finditer(content):
         ref_id = match.group(2).lower() or match.group(1).lower()
         url = refs.get(ref_id, "")
         if url:
@@ -228,7 +213,7 @@ def _find_links(content: str) -> list[tuple[str, int, int, str]]:
     return results
 
 
-def _normalize_url_path(url: str) -> str:
+def normalize_url_path(url: str) -> str:
     """Normalise a URL path for comparison by removing `index.html`, `.html`, and trailing slashes.
 
     Produces a canonical form that can be compared regardless of whether
@@ -249,7 +234,7 @@ def _normalize_url_path(url: str) -> str:
     return url
 
 
-def _to_path(url: str, site_url: str) -> str | None:
+def to_path(url: str, site_url: str) -> str | None:
     """Convert a link URL to a root-relative path.
 
     Handles absolute paths (``/path``), full URLs (``https://example.com/path``),
@@ -320,7 +305,7 @@ def build_backlink_map(
     # Build a normalised-URL → Post mapping so we can look up targets quickly.
     normalized_to_post: dict[str, Post] = {}
     for post in posts:
-        normalized_to_post[_normalize_url_path(post.url)] = post
+        normalized_to_post[normalize_url_path(post.url)] = post
 
     # Initialise a list for every post (even those with no backlinks).
     backlinks: dict[str, list[Backlink]] = {post.url: [] for post in posts}
@@ -329,10 +314,10 @@ def build_backlink_map(
         for raw_url, match_start, match_end, link_text in _find_links(
             source_post.content
         ):
-            path = _to_path(raw_url, site_url)
+            path = to_path(raw_url, site_url)
             if path is None:
                 continue
-            normalized = _normalize_url_path(path)
+            normalized = normalize_url_path(path)
             target_post = normalized_to_post.get(normalized)
             if target_post is None or target_post is source_post:
                 continue

@@ -4,6 +4,7 @@
 # Standard-library imports.
 import datetime as dt
 from pathlib import Path
+from typing import Any
 
 ##############################################################################
 # Third-party imports.
@@ -20,6 +21,7 @@ from blogmore.linter import (
     _find_regular_links,
     lint_site,
 )
+from blogmore.site_config import SiteConfig
 
 
 ##############################################################################
@@ -64,8 +66,26 @@ def _make_page(tmp_path: Path, content_dir: Path, name: str, body: str) -> Path:
     return page_path
 
 
-##############################################################################
-# _find_regular_links tests.
+def _make_site_config(content_dir: Path, **kwargs: Any) -> SiteConfig:
+    """Create a minimal [`SiteConfig`][blogmore.site_config.SiteConfig] for testing.
+
+    Sets `output_dir` to a dummy path inside `content_dir`; the linter never
+    writes to the output directory so this value is not significant.
+
+    Args:
+        content_dir: The content directory to lint.
+        **kwargs: Additional keyword arguments forwarded directly to
+            [`SiteConfig`][blogmore.site_config.SiteConfig].
+
+    Returns:
+        A [`SiteConfig`][blogmore.site_config.SiteConfig] suitable for passing to
+        [`lint_site`][blogmore.linter.lint_site] in tests.
+    """
+    return SiteConfig(
+        content_dir=content_dir,
+        output_dir=content_dir / "_output",
+        **kwargs,
+    )
 
 
 class TestFindRegularLinks:
@@ -177,7 +197,7 @@ class TestFrontmatterErrors:
                 "post.md": "---\ndate: 2024-01-15\n---\nContent without a title.",
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert result.has_issues
         assert any(i.kind == IssueKind.FRONTMATTER_ERROR for i in result.issues)
 
@@ -189,7 +209,7 @@ class TestFrontmatterErrors:
                 "post.md": "---\ntitle: Valid Post\ndate: 2024-01-15\n---\nContent.",
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.FRONTMATTER_ERROR for i in result.issues)
 
     def test_malformed_yaml_reported(self, tmp_path: Path) -> None:
@@ -200,7 +220,7 @@ class TestFrontmatterErrors:
                 "post.md": "---\ntitle: My Post: the sequel\n---\nContent.",
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert any(i.kind == IssueKind.FRONTMATTER_ERROR for i in result.issues)
 
     def test_page_missing_title_reported(self, tmp_path: Path) -> None:
@@ -212,7 +232,7 @@ class TestFrontmatterErrors:
             "about.md",
             "---\ndescription: No title here\n---\nPage content.",
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert any(i.kind == IssueKind.FRONTMATTER_ERROR for i in result.issues)
 
     def test_source_path_recorded(self, tmp_path: Path) -> None:
@@ -223,7 +243,7 @@ class TestFrontmatterErrors:
                 "broken.md": "---\ndate: 2024-01-01\n---\nNo title.",
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         frontmatter_issues = [
             i for i in result.issues if i.kind == IssueKind.FRONTMATTER_ERROR
         ]
@@ -246,7 +266,7 @@ class TestFutureDates:
                 "future.md": "---\ntitle: Future Post\ndate: 2099-12-31\n---\nContent.",
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert any(i.kind == IssueKind.FUTURE_DATE for i in result.issues)
 
     def test_future_modified_reported(self, tmp_path: Path) -> None:
@@ -259,7 +279,7 @@ class TestFutureDates:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         future_issues = [i for i in result.issues if i.kind == IssueKind.FUTURE_DATE]
         assert future_issues
         assert "modified" in future_issues[0].message
@@ -272,7 +292,7 @@ class TestFutureDates:
                 "old.md": "---\ntitle: Old Post\ndate: 2000-01-01\n---\nContent.",
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.FUTURE_DATE for i in result.issues)
 
     def test_no_date_not_reported(self, tmp_path: Path) -> None:
@@ -283,7 +303,7 @@ class TestFutureDates:
                 "no-date-post.md": "---\ntitle: No Date Post\n---\nContent.",
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.FUTURE_DATE for i in result.issues)
 
     def test_future_date_message_includes_date(self, tmp_path: Path) -> None:
@@ -294,7 +314,7 @@ class TestFutureDates:
                 "future-post.md": "---\ntitle: Future\ndate: 2099-12-31\n---\nContent.",
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         future_issues = [i for i in result.issues if i.kind == IssueKind.FUTURE_DATE]
         assert future_issues
         assert "2099" in future_issues[0].message
@@ -318,7 +338,7 @@ class TestBrokenInternalLinks:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_valid_internal_link_not_reported(self, tmp_path: Path) -> None:
@@ -335,7 +355,7 @@ class TestBrokenInternalLinks:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_external_link_not_reported(self, tmp_path: Path) -> None:
@@ -349,7 +369,7 @@ class TestBrokenInternalLinks:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_page_valid(self, tmp_path: Path) -> None:
@@ -364,7 +384,7 @@ class TestBrokenInternalLinks:
             },
         )
         _make_page(tmp_path, content_dir, "about.md", "---\ntitle: About\n---\nAbout.")
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_broken_link_message_contains_url(self, tmp_path: Path) -> None:
@@ -378,7 +398,7 @@ class TestBrokenInternalLinks:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         link_issues = [
             i for i in result.issues if i.kind == IssueKind.BROKEN_INTERNAL_LINK
         ]
@@ -398,9 +418,11 @@ class TestBrokenInternalLinks:
             },
         )
         result = lint_site(
-            content_dir,
-            post_path_template="{slug}/index.html",
-            clean_urls=True,
+            _make_site_config(
+                content_dir,
+                post_path="{slug}/index.html",
+                clean_urls=True,
+            )
         )
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
@@ -416,7 +438,7 @@ class TestBrokenInternalLinks:
                 ),
             },
         )
-        result = lint_site(content_dir, site_url="https://example.com")
+        result = lint_site(_make_site_config(content_dir, site_url="https://example.com")))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
 
@@ -438,7 +460,7 @@ class TestMissingImages:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
 
     def test_present_image_not_reported(self, tmp_path: Path) -> None:
@@ -457,7 +479,7 @@ class TestMissingImages:
         extras_dir.mkdir(parents=True)
         (extras_dir / "present.png").write_bytes(b"PNG")
 
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
 
     def test_external_image_not_reported(self, tmp_path: Path) -> None:
@@ -471,7 +493,7 @@ class TestMissingImages:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
 
     def test_missing_image_message_contains_url(self, tmp_path: Path) -> None:
@@ -485,7 +507,7 @@ class TestMissingImages:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         image_issues = [i for i in result.issues if i.kind == IssueKind.MISSING_IMAGE]
         assert image_issues
         assert "/img/missing.jpg" in image_issues[0].message
@@ -499,7 +521,7 @@ class TestMissingImages:
             "about.md",
             "---\ntitle: About\n---\n![missing](/no-image.png)",
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
 
 
@@ -520,7 +542,7 @@ class TestDraftHandling:
                 ),
             },
         )
-        result = lint_site(content_dir, include_drafts=False)
+        result = lint_site(_make_site_config(content_dir, include_drafts=False))
         # Future date in draft should not be reported when drafts are excluded.
         assert not any(i.kind == IssueKind.FUTURE_DATE for i in result.issues)
 
@@ -534,7 +556,7 @@ class TestDraftHandling:
                 ),
             },
         )
-        result = lint_site(content_dir, include_drafts=True)
+        result = lint_site(_make_site_config(content_dir, include_drafts=True))
         assert any(i.kind == IssueKind.FUTURE_DATE for i in result.issues)
 
 
@@ -553,7 +575,7 @@ class TestLintSite:
                 "post.md": "---\ntitle: Good Post\ndate: 2024-01-01\n---\nAll good.",
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not result.has_issues
 
     def test_missing_content_dir_raises(self) -> None:
@@ -562,7 +584,12 @@ class TestLintSite:
         The linter gracefully handles a missing content directory by returning
         an empty result (no issues) rather than raising an exception.
         """
-        linter = SiteLinter(content_dir=Path("/nonexistent/path"))
+        linter = SiteLinter(
+            SiteConfig(
+                content_dir=Path("/nonexistent/path"),
+                output_dir=Path("output"),
+            )
+        )
         result = linter.lint()
         assert not result.has_issues
 
@@ -577,7 +604,7 @@ class TestLintSite:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         kinds = {i.kind for i in result.issues}
         assert IssueKind.FUTURE_DATE in kinds
         assert IssueKind.BROKEN_INTERNAL_LINK in kinds
@@ -597,8 +624,10 @@ class TestLintSite:
         )
         # With the custom template the target URL is /posts/target.html.
         result = lint_site(
-            content_dir,
-            post_path_template="posts/{slug}.html",
+            _make_site_config(
+                content_dir,
+                post_path="posts/{slug}.html",
+            )
         )
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
@@ -621,7 +650,7 @@ class TestKnownUrlCoverage:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_tags_page_not_reported(self, tmp_path: Path) -> None:
@@ -635,7 +664,7 @@ class TestKnownUrlCoverage:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_categories_page_not_reported(self, tmp_path: Path) -> None:
@@ -649,7 +678,7 @@ class TestKnownUrlCoverage:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_stats_page_with_feature_enabled(self, tmp_path: Path) -> None:
@@ -663,7 +692,7 @@ class TestKnownUrlCoverage:
                 ),
             },
         )
-        result = lint_site(content_dir, with_stats=True)
+        result = lint_site(_make_site_config(content_dir, with_stats=True))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_stats_page_without_feature_flagged(self, tmp_path: Path) -> None:
@@ -677,7 +706,7 @@ class TestKnownUrlCoverage:
                 ),
             },
         )
-        result = lint_site(content_dir, with_stats=False)
+        result = lint_site(_make_site_config(content_dir, with_stats=False))
         assert any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_calendar_page_with_feature_enabled(self, tmp_path: Path) -> None:
@@ -691,7 +720,7 @@ class TestKnownUrlCoverage:
                 ),
             },
         )
-        result = lint_site(content_dir, with_calendar=True)
+        result = lint_site(_make_site_config(content_dir, with_calendar=True))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_graph_page_with_feature_enabled(self, tmp_path: Path) -> None:
@@ -705,7 +734,7 @@ class TestKnownUrlCoverage:
                 ),
             },
         )
-        result = lint_site(content_dir, with_graph=True)
+        result = lint_site(_make_site_config(content_dir, with_graph=True))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_search_page_with_feature_enabled(self, tmp_path: Path) -> None:
@@ -719,7 +748,7 @@ class TestKnownUrlCoverage:
                 ),
             },
         )
-        result = lint_site(content_dir, with_search=True)
+        result = lint_site(_make_site_config(content_dir, with_search=True))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_individual_tag_page_not_reported(self, tmp_path: Path) -> None:
@@ -733,7 +762,7 @@ class TestKnownUrlCoverage:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_individual_category_page_not_reported(self, tmp_path: Path) -> None:
@@ -747,7 +776,7 @@ class TestKnownUrlCoverage:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_year_archive_not_reported(self, tmp_path: Path) -> None:
@@ -761,7 +790,7 @@ class TestKnownUrlCoverage:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_month_archive_not_reported(self, tmp_path: Path) -> None:
@@ -775,7 +804,7 @@ class TestKnownUrlCoverage:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_day_archive_not_reported(self, tmp_path: Path) -> None:
@@ -789,7 +818,7 @@ class TestKnownUrlCoverage:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_root_index_not_reported(self, tmp_path: Path) -> None:
@@ -803,7 +832,7 @@ class TestKnownUrlCoverage:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_main_feed_not_reported(self, tmp_path: Path) -> None:
@@ -817,7 +846,7 @@ class TestKnownUrlCoverage:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
 
@@ -843,7 +872,7 @@ class TestExtrasFileLinkTargets:
         extras_dir.mkdir(parents=True)
         (extras_dir / "contributions.png").write_bytes(b"PNG")
 
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_extras_file_with_fragment_not_reported(
@@ -863,7 +892,7 @@ class TestExtrasFileLinkTargets:
         extras_dir.mkdir(parents=True)
         (extras_dir / "pispy-in-action.gif").write_bytes(b"GIF")
 
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_link_to_missing_extras_file_still_reported(self, tmp_path: Path) -> None:
@@ -880,7 +909,7 @@ class TestExtrasFileLinkTargets:
         # extras/ dir exists but the linked file does not.
         (content_dir / "extras").mkdir()
 
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_extras_file_with_spaces_in_name_recognised(self, tmp_path: Path) -> None:
@@ -898,7 +927,7 @@ class TestExtrasFileLinkTargets:
         extras_dir.mkdir(parents=True)
         (extras_dir / "Screen Shot 2015-06-19.png").write_bytes(b"PNG")
 
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
 
@@ -924,7 +953,7 @@ class TestImageUrlDecoding:
         extras_dir.mkdir(parents=True)
         (extras_dir / "my photo.png").write_bytes(b"PNG")
 
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
 
     def test_missing_percent_encoded_image_still_reported(
@@ -940,7 +969,7 @@ class TestImageUrlDecoding:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
 
     def test_literal_space_in_filename_matches_file(self, tmp_path: Path) -> None:
@@ -958,7 +987,7 @@ class TestImageUrlDecoding:
         extras_dir.mkdir(parents=True)
         (extras_dir / "Screen Shot 2015-06-19.png").write_bytes(b"PNG")
 
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
 
     def test_literal_space_with_fragment_matches_file(self, tmp_path: Path) -> None:
@@ -976,7 +1005,7 @@ class TestImageUrlDecoding:
         extras_dir.mkdir(parents=True)
         (extras_dir / "Screenshot 2015-06-19 at 09.03.58.png").write_bytes(b"PNG")
 
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
 
     def test_missing_literal_space_image_still_reported(self, tmp_path: Path) -> None:
@@ -990,7 +1019,7 @@ class TestImageUrlDecoding:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
 
     def test_image_title_attribute_not_treated_as_url(self, tmp_path: Path) -> None:
@@ -1008,7 +1037,7 @@ class TestImageUrlDecoding:
         extras_dir.mkdir(parents=True)
         (extras_dir / "photo.png").write_bytes(b"PNG")
 
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.MISSING_IMAGE for i in result.issues)
 
 
@@ -1030,7 +1059,7 @@ class TestRelativeLinkDetection:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         issues = [i for i in result.issues if i.kind == IssueKind.BROKEN_INTERNAL_LINK]
         assert len(issues) == 1
         assert "2016/08/10/virgin_east_coast_12.html" in issues[0].message
@@ -1046,7 +1075,7 @@ class TestRelativeLinkDetection:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_fragment_only_link_not_flagged(self, tmp_path: Path) -> None:
@@ -1060,7 +1089,7 @@ class TestRelativeLinkDetection:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_mailto_link_not_flagged(self, tmp_path: Path) -> None:
@@ -1074,7 +1103,7 @@ class TestRelativeLinkDetection:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_external_link_not_flagged(self, tmp_path: Path) -> None:
@@ -1088,7 +1117,7 @@ class TestRelativeLinkDetection:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         assert not any(i.kind == IssueKind.BROKEN_INTERNAL_LINK for i in result.issues)
 
     def test_relative_link_message_suggests_root_relative(self, tmp_path: Path) -> None:
@@ -1102,7 +1131,7 @@ class TestRelativeLinkDetection:
                 ),
             },
         )
-        result = lint_site(content_dir)
+        result = lint_site(_make_site_config(content_dir))
         issues = [i for i in result.issues if i.kind == IssueKind.BROKEN_INTERNAL_LINK]
         assert issues
         assert "'/'" in issues[0].message

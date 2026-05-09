@@ -16,19 +16,9 @@ from blogmore.config import (
 )
 from blogmore.generator import SiteGenerator
 from blogmore.linter import IssueKind, LintResult, lint_site
-from blogmore.page_path import DEFAULT_PAGE_PATH
-from blogmore.pagination_path import DEFAULT_PAGE_1_PATH
-from blogmore.post_path import DEFAULT_POST_PATH
 from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
 from blogmore.site_config import (
-    DEFAULT_ARCHIVE_PATH,
-    DEFAULT_CALENDAR_PATH,
-    DEFAULT_CATEGORIES_PATH,
-    DEFAULT_GRAPH_PATH,
-    DEFAULT_SEARCH_PATH,
-    DEFAULT_STATS_PATH,
-    DEFAULT_TAGS_PATH,
     SiteConfig,
     site_config_defaults,
 )
@@ -66,10 +56,6 @@ def main() -> int:
     except ValueError as e:
         print(f"Error: Invalid configuration file: {e}", file=sys.stderr)
         return 1
-
-    # Handle lint command early — it does not need a full SiteConfig.
-    if args.command in ("lint", "check"):
-        return _run_lint(args, config)
 
     # Normalize site_keywords: CLI provides a string, config provides a list or string
     site_keywords = normalize_site_keywords(getattr(args, "site_keywords", None))
@@ -120,6 +106,10 @@ def main() -> int:
         links_title=args.links_title,
         **config_only_kwargs,
     )
+
+    # Handle lint command using the fully built site configuration.
+    if args.command in ("lint", "check"):
+        return _run_lint(site_config)
 
     # Handle serve command
     if args.command in ("serve", "test"):
@@ -281,7 +271,7 @@ def _extract_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
     return overrides
 
 
-def _run_lint(args: argparse.Namespace, config: dict[str, Any]) -> int:
+def _run_lint(site_config: SiteConfig) -> int:
     """Run the lint command against the content directory.
 
     Validates all posts and pages for frontmatter errors, broken internal
@@ -289,20 +279,12 @@ def _run_lint(args: argparse.Namespace, config: dict[str, Any]) -> int:
     standard output and returns a non-zero exit code if any issues are found.
 
     Args:
-        args: Parsed command-line arguments for the lint command.
-        config: Loaded configuration dictionary (from the YAML config file).
+        site_config: The fully resolved site configuration.
 
     Returns:
         0 if no issues were found, 1 otherwise.
     """
-    # Resolve content_dir from CLI argument or config file.
-    content_dir: Path | None = args.content_dir
-    if content_dir is None:
-        raw_dir = config.get("content_dir")
-        if raw_dir is not None:
-            content_dir = Path(str(raw_dir)).expanduser()
-
-    if content_dir is None:
+    if site_config.content_dir is None:
         print(
             "Error: content_dir is required. "
             "Specify it on the command line or in the config file.",
@@ -310,67 +292,21 @@ def _run_lint(args: argparse.Namespace, config: dict[str, Any]) -> int:
         )
         return 1
 
-    if not content_dir.exists():
-        print(f"Error: Content directory not found: {content_dir}", file=sys.stderr)
+    if not site_config.content_dir.exists():
+        print(
+            f"Error: Content directory not found: {site_config.content_dir}",
+            file=sys.stderr,
+        )
         return 1
 
-    # Resolve site_url: CLI flag wins; fall back to config file value.
-    site_url: str = args.site_url
-    if not site_url:
-        site_url = str(config.get("site_url", ""))
-
-    # Resolve path templates and URL options from the config file.
-    post_path_template: str = str(config.get("post_path", DEFAULT_POST_PATH))
-    page_path_template: str = str(config.get("page_path", DEFAULT_PAGE_PATH))
-    clean_urls: bool = bool(config.get("clean_urls", False))
-
-    # Resolve configured page paths.
-    archive_path: str = str(config.get("archive_path", DEFAULT_ARCHIVE_PATH))
-    tags_path: str = str(config.get("tags_path", DEFAULT_TAGS_PATH))
-    categories_path: str = str(config.get("categories_path", DEFAULT_CATEGORIES_PATH))
-    search_path: str = str(config.get("search_path", DEFAULT_SEARCH_PATH))
-    stats_path: str = str(config.get("stats_path", DEFAULT_STATS_PATH))
-    calendar_path: str = str(config.get("calendar_path", DEFAULT_CALENDAR_PATH))
-    graph_path: str = str(config.get("graph_path", DEFAULT_GRAPH_PATH))
-    page_1_path: str = str(config.get("page_1_path", DEFAULT_PAGE_1_PATH))
-
-    # Resolve optional feature flags.
-    with_search: bool = bool(config.get("with_search", False))
-    with_stats: bool = bool(config.get("with_stats", False))
-    with_calendar: bool = bool(config.get("with_calendar", False))
-    with_graph: bool = bool(config.get("with_graph", False))
-
-    include_drafts: bool = bool(args.include_drafts)
-
-    print(f"Linting content in: {content_dir}")
+    print(f"Linting content in: {site_config.content_dir}")
     print()
 
-    result = lint_site(
-        content_dir=content_dir,
-        site_url=site_url,
-        include_drafts=include_drafts,
-        post_path_template=post_path_template,
-        page_path_template=page_path_template,
-        clean_urls=clean_urls,
-        archive_path=archive_path,
-        tags_path=tags_path,
-        categories_path=categories_path,
-        search_path=search_path,
-        stats_path=stats_path,
-        calendar_path=calendar_path,
-        graph_path=graph_path,
-        page_1_path=page_1_path,
-        with_search=with_search,
-        with_stats=with_stats,
-        with_calendar=with_calendar,
-        with_graph=with_graph,
-    )
+    result = lint_site(site_config)
 
     _print_lint_result(result)
 
-    if result.has_issues:
-        return 1
-    return 0
+    return 1 if result.has_issues else 0
 
 
 def _print_lint_result(result: LintResult) -> None:
