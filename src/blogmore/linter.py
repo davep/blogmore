@@ -158,7 +158,13 @@ class Linter:
 
         # 2. Check for future dates and missing metadata
         now = dt.datetime.now(dt.UTC)
+        titles_seen: dict[str, list[Path]] = {}
+
         for post in posts:
+            # Track titles for duplicate detection
+            if post.title:
+                titles_seen.setdefault(post.title, []).append(post.path)
+
             # Check for missing/empty basic metadata
             if not post.title or not post.title.strip():
                 self.report_warning("Post has no title", post.path)
@@ -200,6 +206,15 @@ class Linter:
                     self.report_warning(
                         f"Post modified date is in the future: {post.modified_date}",
                         post.path,
+                    )
+
+        # Report duplicate titles
+        for title, paths in titles_seen.items():
+            if len(paths) > 1:
+                for path in paths:
+                    self.report_warning(
+                        f"Duplicate post title '{title}' found in multiple files",
+                        path,
                     )
 
         # 3. Build set of valid internal URLs

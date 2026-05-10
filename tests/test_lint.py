@@ -322,6 +322,24 @@ class TestLintCommand:
         # Warnings don't cause failure
         assert result == 0
 
+    def test_lint_duplicate_titles(self, tmp_path: Path, temp_output_dir: Path) -> None:
+        """Test that duplicate post titles are reported as warnings."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "post1.md").write_text(
+            "---\ntitle: Duplicate Title\ndate: 2024-01-01\n---\nContent 1\n"
+        )
+        (content_dir / "post2.md").write_text(
+            "---\ntitle: Duplicate Title\ndate: 2024-01-02\n---\nContent 2\n"
+        )
+
+        site_config = SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
+
+        result = lint_site(site_config)
+        # Warnings don't cause failure
+        assert result == 0
+
     def test_main_lint_command(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """Test lint command via main()."""
         with patch.object(

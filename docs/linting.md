@@ -38,6 +38,7 @@ Warnings represent organizational or quality issues that won't break the build b
 *   **Missing Metadata**: Warns if a post is missing a **Title**, **Category**, **Tags**, or a **Date**.
 *   **Future Dates**: Reports if a post's `date` or `modified` date is set in the future.
 *   **Inconsistent Dates**: Flags cases where a post's `modified` date is earlier than its original publication `date`.
+*   **Duplicate Titles**: Warns if two or more posts share the exact same title.
 *   **Missing Alt Text**: Reports any inline images that are missing an `alt` attribute, or have an empty/whitespace-only `alt` attribute (e.g., `![]()`).
 *   **Clean URL Suggestions**: If `clean_urls` is enabled, warns if internal links point explicitly to `index.html` (e.g., `[Home](/index.html)`) and suggests the cleaner alternative.
 *   **Local Absolute Links**: Warns if internal links use the full `site_url` (e.g., `https://mysite.com/path/`) instead of a root-relative path (`/path/`). This improves content portability.
@@ -66,6 +67,7 @@ ERROR: posts/my-post.md: Link points to non-existent internal path: /non-existen
 ERROR: posts/welcome.md: Cover image points to non-existent internal path: /images/missing.png (resolved to /images/missing.png)
 WARNING: posts/future-post.md: Post date is in the future: 2026-12-25 00:00:00
 WARNING: posts/draft-post.md: Post has no category
+WARNING: posts/duplicate-title-1.md: Duplicate post title 'Hello World' found in multiple files
 WARNING: posts/image-post.md: Image is missing alt text: /attachments/logo.png
 WARNING: posts/about.md: Link points to explicit 'index.html' while clean_urls is enabled: /index.html (consider using /)
 WARNING: posts/contact.md: Link uses absolute URL for local site: https://mysite.com/contact/ (consider using root-relative link: /contact/)
