@@ -463,5 +463,4 @@ def lint_site(site_config: SiteConfig) -> int:
     Returns:
         0 if no errors, 1 if errors were found.
     """
-    linter = Linter(site_config)
-    return linter.lint()
+    return Linter(site_config).lint()
