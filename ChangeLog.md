@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.21.0
 
-**Released: WiP**
+**Released: 2026-05-10**
 
 - Added a `lint` command (with `check` as an alias) that performs various
   checks of the content of the site, looking for things like broken internal
