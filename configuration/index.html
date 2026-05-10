@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.40">
+      <meta name="generator" content="zensical-0.0.41">
     
     
       
@@ -197,6 +197,37 @@
   
   
     
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
     
       <li class="md-tabs__item md-tabs__item--active">
         <a href="./.." class="md-tabs__link">
@@ -306,6 +337,8 @@
       
         
           
+        
+      
         
       
         
@@ -477,6 +510,33 @@
     
   
   Metadata and Sidebar
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../linting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Linting
 
     
   </span>
@@ -1822,6 +1882,34 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         <code>pages</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linting-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Linting Options
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Linting Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linting-ignore" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>linting: ignore</code>
       </span>
     </span>
   </a>
@@ -3302,6 +3390,34 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#linting-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Linting Options
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Linting Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linting-ignore" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>linting: ignore</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#serve-command-options" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -4366,6 +4482,22 @@ for example to add complex scripts or conditionally include tags — use
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colophon</span>
 </code></pre></div>
 <p>If <code>pages</code> is omitted entirely, or set to an empty list, all pages are shown (the default behaviour).</p>
+<h3 id="linting-options">Linting Options</h3>
+<h4 id="linting-ignore"><code>linting: ignore</code></h4>
+<p>A list of internal URLs that the linter should ignore when checking for broken links. These URLs will be treated as if they exist, even if no corresponding post, page, or extra file is found.</p>
+<p>This is useful for:
+- Links to resources handled by your web server or a separate application.
+- Internal-looking links that are actually handled by external scripts or redirection.
+- Avoiding false positives for complex clean URL configurations.</p>
+<p>Each entry should be a root-relative path (starting with <code>/</code>).</p>
+<p><strong>Type:</strong> List of strings (paths)<br />
+<strong>Default:</strong> <em>(empty)</em></p>
+<div class="highlight"><pre><span></span><code><span class="nt">linting</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ignore</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/external-resource/</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/dynamic-app/login.html</span>
+</code></pre></div>
+<p>This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
 <h3 id="serve-command-options">Serve Command Options</h3>
 <p>Options specific to the <code>serve</code> command. These are only used when running <code>blogmore serve</code>.</p>
 <h4 id="port"><code>port</code></h4>
