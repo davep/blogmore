@@ -193,6 +193,59 @@ class TestLintCommand:
         result = lint_site(site_config)
         assert result == 0
 
+    def test_lint_absolute_local_link(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that absolute links to the local site are flagged as warnings."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-01\n---\n[About](https://mysite.com/about.html)\n"
+        )
+
+        site_config = SiteConfig(
+            content_dir=content_dir,
+            output_dir=temp_output_dir,
+            site_url="https://mysite.com",
+        )
+
+        # Mock about.html existing in extras
+        extras_dir = content_dir / "extras"
+        extras_dir.mkdir()
+        (extras_dir / "about.html").write_text("About")
+
+        # Should warn about absolute URL
+        result = lint_site(site_config)
+        assert result == 0
+
+    def test_lint_ignored_absolute_local_link(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that ignored absolute links to the local site do NOT warn."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-01\n---\n[About](https://mysite.com/about.html)\n"
+        )
+
+        site_config = SiteConfig(
+            content_dir=content_dir,
+            output_dir=temp_output_dir,
+            site_url="https://mysite.com",
+            linting_ignore=["/about.html"],
+        )
+
+        # Mock about.html existing
+        extras_dir = content_dir / "extras"
+        extras_dir.mkdir()
+        (extras_dir / "about.html").write_text("About")
+
+        # Should NOT warn because it's ignored
+        result = lint_site(site_config)
+        assert result == 0
+
     def test_lint_ignored_links(self, tmp_path: Path, temp_output_dir: Path) -> None:
         """Test that ignored links are treated as valid."""
         content_dir = tmp_path / "content"

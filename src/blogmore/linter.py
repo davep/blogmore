@@ -354,8 +354,32 @@ class Linter:
         is_cover: bool = False,
     ) -> None:
         """Check a single link or image source."""
-        # Skip empty or external links
-        if not href or self._is_external_link(href):
+        # Skip empty
+        if not href:
+            return
+
+        # Check for absolute links to the local site
+        if self.site_config.site_url and href.startswith(self.site_config.site_url):
+            parsed_href = urlparse(href)
+            path_part = parsed_href.path or "/"
+
+            # Check if this specific path is ignored
+            is_ignored = path_part in self.site_config.linting_ignore
+            if not is_ignored:
+                alt_path = (
+                    path_part[:-1] if path_part.endswith("/") else path_part + "/"
+                )
+                is_ignored = alt_path in self.site_config.linting_ignore
+
+            if not is_ignored:
+                self.report_warning(
+                    f"Link uses absolute URL for local site: {href} "
+                    f"(consider using root-relative link: {path_part})",
+                    item.path,
+                )
+
+        # Skip external links
+        if self._is_external_link(href):
             return
 
         # Skip fragments

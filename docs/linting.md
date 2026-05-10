@@ -40,6 +40,7 @@ Warnings represent organizational or quality issues that won't break the build b
 *   **Inconsistent Dates**: Flags cases where a post's `modified` date is earlier than its original publication `date`.
 *   **Missing Alt Text**: Reports any inline images that are missing an `alt` attribute, or have an empty/whitespace-only `alt` attribute (e.g., `![]()`).
 *   **Clean URL Suggestions**: If `clean_urls` is enabled, warns if internal links point explicitly to `index.html` (e.g., `[Home](/index.html)`) and suggests the cleaner alternative.
+*   **Local Absolute Links**: Warns if internal links use the full `site_url` (e.g., `https://mysite.com/path/`) instead of a root-relative path (`/path/`). This improves content portability.
 *   **External Links**: The linter does **not** check external links (starting with `http://` or `https://`) to ensure the process remains fast and offline-capable.
 
 ## Ignoring Specific Links
@@ -67,7 +68,8 @@ WARNING: posts/future-post.md: Post date is in the future: 2026-12-25 00:00:00
 WARNING: posts/draft-post.md: Post has no category
 WARNING: posts/image-post.md: Image is missing alt text: /attachments/logo.png
 WARNING: posts/about.md: Link points to explicit 'index.html' while clean_urls is enabled: /index.html (consider using /)
-Linting complete: 2 error(s), 4 warning(s).
+WARNING: posts/contact.md: Link uses absolute URL for local site: https://mysite.com/contact/ (consider using root-relative link: /contact/)
+Linting complete: 2 error(s), 5 warning(s).
 ```
 
 The `lint` command will exit with a non-zero status code if any errors are found, making it suitable for use in CI/CD pipelines.
