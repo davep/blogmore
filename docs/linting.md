@@ -30,6 +30,9 @@ Errors represent critical issues that will likely result in a broken site or a f
 *   **Broken Internal Links**: Scans the generated HTML for links to non-existent internal paths (other posts, pages, categories, tags, archives, site features like search, or files in `extras/`).
 *   **Broken Image Links**: Checks that all `<img>` sources resolve to valid internal paths or files in your `extras/` directory.
 *   **Broken Cover Images**: Specifically verifies that the `cover` property in your post or page frontmatter points to a valid resource.
+*   **Configuration Integrity**: Ensures your site configuration is healthy:
+    *   Verifies that all page slugs listed in `sidebar_pages` actually exist.
+    *   Checks that all internal-looking URLs in your `links:` and `socials:` configuration point to valid targets.
 
 ### Warnings
 
@@ -63,6 +66,8 @@ When issues are found, the linter will report them with the file path (relative 
 
 ```text
 Linting site in ./content...
+ERROR: Sidebar (sidebar_pages) references non-existent page slug: broken-slug
+ERROR: Sidebar links link points to non-existent internal path: /missing.html (resolved to /missing.html)
 ERROR: posts/my-post.md: Link points to non-existent internal path: /non-existent-page.html (resolved to /non-existent-page.html)
 ERROR: posts/welcome.md: Cover image points to non-existent internal path: /images/missing.png (resolved to /images/missing.png)
 WARNING: posts/future-post.md: Post date is in the future: 2026-12-25 00:00:00
@@ -71,7 +76,7 @@ WARNING: posts/duplicate-title-1.md: Duplicate post title 'Hello World' found in
 WARNING: posts/image-post.md: Image is missing alt text: /attachments/logo.png
 WARNING: posts/about.md: Link points to explicit 'index.html' while clean_urls is enabled: /index.html (consider using /)
 WARNING: posts/contact.md: Link uses absolute URL for local site: https://mysite.com/contact/ (consider using root-relative link: /contact/)
-Linting complete: 2 error(s), 5 warning(s).
+Linting complete: 4 error(s), 5 warning(s).
 ```
 
 The `lint` command will exit with a non-zero status code if any errors are found, making it suitable for use in CI/CD pipelines.

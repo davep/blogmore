@@ -340,6 +340,38 @@ class TestLintCommand:
         # Warnings don't cause failure
         assert result == 0
 
+    def test_lint_sidebar_pages_error(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that non-existent sidebar pages are reported as errors."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        site_config = SiteConfig(
+            content_dir=content_dir,
+            output_dir=temp_output_dir,
+            sidebar_pages=["non-existent"],
+        )
+
+        result = lint_site(site_config)
+        assert result == 1
+
+    def test_lint_sidebar_links_error(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that broken sidebar links are reported as errors."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        site_config = SiteConfig(
+            content_dir=content_dir,
+            output_dir=temp_output_dir,
+            sidebar_config={"links": [{"title": "Broken", "url": "/missing.html"}]},
+        )
+
+        result = lint_site(site_config)
+        assert result == 1
+
     def test_main_lint_command(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """Test lint command via main()."""
         with patch.object(
