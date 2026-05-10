@@ -243,14 +243,19 @@ class Linter:
                         valid_urls.add("/" + rel.parent.as_posix() + "/")
 
         # Static assets (bundled and custom)
+        # We'll just assume /static/* is mostly valid if it exists in templates or bundled
+        # but let's be a bit more specific for common ones.
         valid_urls.add("/static/style.css")
         valid_urls.add("/static/theme.js")
+        # ... and others from ContextBuilder
         for _key, value in cb.get_global_context().items():
             if isinstance(value, str) and value.startswith("/static/"):
+                # Remove cache bust token for matching
                 url = value.split("?")[0]
                 valid_urls.add(url)
 
         # 3. Check configuration integrity (Sidebar, links, etc.)
+        # sidebar_pages slugs must exist
         page_slugs = {p.slug for p in pages}
         if self.site_config.sidebar_pages:
             for slug in self.site_config.sidebar_pages:
@@ -259,24 +264,29 @@ class Linter:
                         f"Sidebar (sidebar_pages) references non-existent page slug: {slug}"
                     )
 
+        # links and socials in sidebar_config
         sidebar = self.site_config.sidebar_config
         for link_type in ("links", "socials"):
             if link_type in sidebar and isinstance(sidebar[link_type], list):
                 for item_dict in sidebar[link_type]:
                     if not isinstance(item_dict, dict):
                         continue
-                    url = item_dict.get("url")
-                    if url:
-                        self._check_config_link(url, f"Sidebar {link_type}", valid_urls)
+                    sidebar_url = item_dict.get("url")
+                    if isinstance(sidebar_url, str):
+                        self._check_config_link(
+                            sidebar_url, f"Sidebar {link_type}", valid_urls
+                        )
 
         # 4. Check for future dates and missing metadata
         now = dt.datetime.now(dt.UTC)
         titles_seen: dict[str, list[Path]] = {}
 
         for post in posts:
+            # Track titles for duplicate detection
             if post.title:
                 titles_seen.setdefault(post.title, []).append(post.path)
 
+            # Check for missing/empty basic metadata
             if not post.title or not post.title.strip():
                 self.report_warning("Post has no title", post.path)
             if not post.category or not post.category.strip():
@@ -319,11 +329,13 @@ class Linter:
                         post.path,
                     )
 
+        # Report duplicate titles
         for title, paths in titles_seen.items():
             if len(paths) > 1:
                 for path in paths:
                     self.report_warning(
-                        f"Duplicate post title '{title}' found in multiple files", path
+                        f"Duplicate post title '{title}' found in multiple files",
+                        path,
                     )
 
         if not posts and not pages:
@@ -337,7 +349,9 @@ class Linter:
 
         for item, _type in all_items:
             html = item.html_content
+            # Extract <a> hrefs
             links = re.findall(r'<a\s+(?:[^>]*?\s+)?href=["\']([^"\']*)["\']', html)
+            # Find <img> tags to check for src and alt
             img_tags = re.findall(r"<img\s+[^>]*>", html)
 
             for href in links:
@@ -358,6 +372,7 @@ class Linter:
                         item.path,
                     )
 
+            # Check cover image if present
             if item.metadata and "cover" in item.metadata:
                 cover = item.metadata["cover"]
                 if isinstance(cover, str):
@@ -372,21 +387,28 @@ class Linter:
         self, href: str, location: str, valid_urls: set[str]
     ) -> None:
         """Check a single link from the site configuration."""
+        # Specialized check for config links (base_url is /)
         if not href or self._is_external_link(href):
             return
+
         if href.startswith("#"):
             return
+
         resolved = urljoin("/", href)
         parsed_resolved = urlparse(resolved)
         path_only = parsed_resolved.path
+
         if self.site_config.clean_urls and path_only.endswith("/index.html"):
             path_only = path_only[:-10]
             if not path_only.endswith("/"):
                 path_only += "/"
+
         if path_only not in valid_urls:
+            # Try with or without trailing slash
             alt_path = path_only[:-1] if path_only.endswith("/") else path_only + "/"
             if alt_path in valid_urls:
                 return
+
             self.report_error(
                 f"{location} link points to non-existent internal path: {href} (resolved to {path_only})"
             )
@@ -400,31 +422,48 @@ class Linter:
         is_cover: bool = False,
     ) -> None:
         """Check a single link or image source."""
+        # Skip empty
         if not href:
             return
+
+        # Check for absolute links to the local site
         if self.site_config.site_url and href.startswith(self.site_config.site_url):
             parsed_href = urlparse(href)
             path_part = parsed_href.path or "/"
+
+            # Check if this specific path is ignored
             is_ignored = path_part in self.site_config.linting_ignore
             if not is_ignored:
                 alt_path = (
                     path_part[:-1] if path_part.endswith("/") else path_part + "/"
                 )
                 is_ignored = alt_path in self.site_config.linting_ignore
+
             if not is_ignored:
                 self.report_warning(
                     f"Link uses absolute URL for local site: {href} "
                     f"(consider using root-relative link: {path_part})",
                     item.path,
                 )
+
+        # Skip external links
         if self._is_external_link(href):
             return
+
+        # Skip fragments
         if href.startswith("#"):
             return
+
+        # Resolve relative link
+        # item.url is something like /2024/01/01/my-post/ or /about.html
         base_url = item.url
         resolved = urljoin(base_url, href)
+
+        # Remove query params and fragments from resolved URL
         parsed_resolved = urlparse(resolved)
         path_only = parsed_resolved.path
+
+        # Suggest clean URLs if enabled and index.html is used
         if self.site_config.clean_urls and path_only.endswith("/index.html"):
             clean_suggestion = path_only[:-10]
             if not clean_suggestion.endswith("/"):
@@ -434,20 +473,26 @@ class Linter:
                 f"{href} (consider using {clean_suggestion})",
                 item.path,
             )
+
+        # Normalization: if clean_urls is enabled, /some/path/index.html should be /some/path/
         if self.site_config.clean_urls and path_only.endswith("/index.html"):
-            path_only = path_only[:-10]
+            path_only = path_only[:-10]  # Remove index.html
             if not path_only.endswith("/"):
                 path_only += "/"
+
         if path_only not in valid_urls:
+            # Try with or without trailing slash
             alt_path = path_only[:-1] if path_only.endswith("/") else path_only + "/"
             if alt_path in valid_urls:
                 return
+
             if is_cover:
                 link_type = "Cover image"
             elif is_image:
                 link_type = "Image"
             else:
                 link_type = "Link"
+
             self.report_error(
                 f"{link_type} points to non-existent internal path: {href} (resolved to {path_only})",
                 item.path,
