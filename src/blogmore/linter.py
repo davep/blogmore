@@ -371,6 +371,17 @@ class Linter:
         parsed_resolved = urlparse(resolved)
         path_only = parsed_resolved.path
 
+        # Suggest clean URLs if enabled and index.html is used
+        if self.site_config.clean_urls and path_only.endswith("/index.html"):
+            clean_suggestion = path_only[:-10]
+            if not clean_suggestion.endswith("/"):
+                clean_suggestion += "/"
+            self.report_warning(
+                f"Link points to explicit 'index.html' while clean_urls is enabled: "
+                f"{href} (consider using {clean_suggestion})",
+                item.path,
+            )
+
         # Normalization: if clean_urls is enabled, /some/path/index.html should be /some/path/
         if self.site_config.clean_urls and path_only.endswith("/index.html"):
             path_only = path_only[:-10]  # Remove index.html

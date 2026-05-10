@@ -174,6 +174,25 @@ class TestLintCommand:
         result = lint_site(site_config)
         assert result == 0
 
+    def test_lint_clean_url_suggestion(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that explicit index.html is suggested as a clean URL."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        (content_dir / "post.md").write_text(
+            "---\ntitle: Post\ndate: 2024-01-01\n---\n[Home](/index.html)\n"
+        )
+
+        site_config = SiteConfig(
+            content_dir=content_dir, output_dir=temp_output_dir, clean_urls=True
+        )
+
+        # This should report a warning but result in 0
+        result = lint_site(site_config)
+        assert result == 0
+
     def test_lint_ignored_links(self, tmp_path: Path, temp_output_dir: Path) -> None:
         """Test that ignored links are treated as valid."""
         content_dir = tmp_path / "content"
