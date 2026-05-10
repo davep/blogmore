@@ -15,6 +15,7 @@ from blogmore.config import (
     parse_site_config_from_dict,
 )
 from blogmore.generator import SiteGenerator
+from blogmore.linter import lint_site
 from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
 from blogmore.site_config import SiteConfig, site_config_defaults
@@ -194,6 +195,31 @@ def main() -> int:
             return 0
         except PublishError as e:
             print(f"Error publishing site: {e}", file=sys.stderr)
+            return 1
+
+    # Handle lint command
+    if args.command in ("lint", "check"):
+        # Validate that content_dir is provided
+        if args.content_dir is None:
+            print(
+                "Error: content_dir is required. Specify it on the command line or in the config file.",
+                file=sys.stderr,
+            )
+            return 1
+
+        # Validate inputs
+        if not args.content_dir.exists():
+            print(
+                f"Error: Content directory not found: {args.content_dir}",
+                file=sys.stderr,
+            )
+            return 1
+
+        # Run the linter
+        try:
+            return lint_site(site_config=site_config)
+        except Exception as e:
+            print(f"Error linting site: {e}", file=sys.stderr)
             return 1
 
     return 0

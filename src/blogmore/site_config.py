@@ -432,6 +432,17 @@ class SiteConfig:
     command line.
     """
 
+    linting_ignore: list[str] = field(default_factory=list)
+    """Optional list of internal URLs to ignore during linting.
+
+    Each entry should be a root-relative path (e.g. ``"/foo/"``) that the
+    linter should treat as valid even if no corresponding post, page, or
+    extra file exists.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Empty by default.
+    """
+
     head: list[dict[str, Any]] = field(default_factory=list)
     """Extra ``<head>`` tags to inject into every generated page.
 
