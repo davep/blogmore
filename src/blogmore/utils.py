@@ -1,8 +1,30 @@
 """Utility functions for blogmore."""
 
+import os
 import re
+import sys
+from pathlib import Path
 
 from blogmore.markdown.plain_text import markdown_to_plain_text
+
+
+def get_user_cache_dir() -> Path:
+    """Return the platform-specific user cache directory for blogmore.
+
+    On Windows, this uses %LOCALAPPDATA%. On all other platforms (Unix/macOS),
+    it follows the XDG Base Directory Specification (~/.cache).
+
+    Returns:
+        A Path object pointing to the user's cache directory for blogmore.
+    """
+    if sys.platform == "win32":
+        # Windows: %LOCALAPPDATA%\blogmore\cache
+        base = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local"))
+        return base / "blogmore" / "cache"
+
+    # Unix-like (Linux, macOS, etc.): ~/.cache/blogmore or $XDG_CACHE_HOME/blogmore
+    base = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache"))
+    return base / "blogmore"
 
 
 def count_words(content: str) -> int:
