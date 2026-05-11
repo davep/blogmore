@@ -411,7 +411,7 @@ class TestTemplateRenderer:
             path=Path("test.md"),
             title="Test Post",
             content="![Image](cover.jpg)\n\nThis is the first paragraph with some **bold** text.\n\nThis is the second paragraph.",
-            html_content="<p>Test content</p>",
+            html_content='<p><img src="cover.jpg" alt="Image"></p><p>This is the first paragraph with some <strong>bold</strong> text.</p><p>This is the second paragraph.</p>',
             date=dt.datetime(2024, 3, 1, 10, 0, 0, tzinfo=dt.UTC),
             metadata={},
         )
@@ -730,9 +730,7 @@ class TestTemplateRenderer:
 
         assert '<meta property="og:title" content="Test Blog - A testing blog">' in html
 
-    def test_render_archive_og_title_no_archive_title(
-        self, sample_post: Post
-    ) -> None:
+    def test_render_archive_og_title_no_archive_title(self, sample_post: Post) -> None:
         """Test that the archive page includes og:title when no archive_title is set."""
         renderer = TemplateRenderer()
         html = renderer.render_archive(
@@ -823,10 +821,10 @@ class TestTemplateRenderer:
         # Should have numbered page links
         assert 'class="pagination-link pagination-number' in html
         # Current page should be marked
-        assert 'pagination-current' in html
+        assert "pagination-current" in html
         # Should have prev and next links
-        assert 'pagination-prev' in html
-        assert 'pagination-next' in html
+        assert "pagination-prev" in html
+        assert "pagination-next" in html
 
     def test_render_index_pagination_appears_at_top_and_bottom(
         self, sample_post: Post
@@ -922,7 +920,7 @@ class TestTemplateRenderer:
         )
 
         # Should have ellipsis between non-adjacent page groups
-        assert 'pagination-ellipsis' in html
+        assert "pagination-ellipsis" in html
 
     def test_render_tag_page_pagination_appears_at_top_and_bottom(
         self, sample_post: Post
@@ -996,9 +994,7 @@ class TestTemplateRenderer:
         assert 'href="/tags/python/index.html"' in html  # page 1 URL
         assert 'href="/tags/python/page/3.html"' in html  # page 3 URL
 
-    def test_render_category_page_pagination_page_url(
-        self, sample_post: Post
-    ) -> None:
+    def test_render_category_page_pagination_page_url(self, sample_post: Post) -> None:
         """Test that category page pagination uses the correct URL pattern."""
         renderer = TemplateRenderer()
         page_urls = [
@@ -1171,9 +1167,7 @@ class TestTemplateRenderer:
             base_path="/2024/01",
         )
 
-        assert (
-            '<meta property="og:title" content="January 2024 - Test Blog">' in html
-        )
+        assert '<meta property="og:title" content="January 2024 - Test Blog">' in html
         assert '<meta name="description" content="A great blog">' in html
 
     def test_listing_meta_tags_omit_description_when_absent(
@@ -1208,7 +1202,10 @@ class TestTemplateRenderer:
         )
 
         assert '<meta property="og:type" content="website">' in html
-        assert '<meta property="og:url" content="https://example.com/tags/python/">' in html
+        assert (
+            '<meta property="og:url" content="https://example.com/tags/python/">'
+            in html
+        )
         assert '<meta property="og:site_name" content="Test Blog">' in html
         assert (
             '<meta property="og:image" content="https://example.com/icons/android-chrome-512x512.png">'
@@ -1276,9 +1273,7 @@ class TestTemplateRenderer:
             in html
         )
         assert '<meta name="twitter:card" content="summary_large_image">' in html
-        assert (
-            '<meta name="twitter:title" content="January 2024 - Test Blog">' in html
-        )
+        assert '<meta name="twitter:title" content="January 2024 - Test Blog">' in html
 
     def test_listing_meta_tags_full_social_graph_on_tags_page(self) -> None:
         """Test that the tags cloud page includes full social graph meta tags."""
@@ -1315,9 +1310,7 @@ class TestTemplateRenderer:
             canonical_url="https://example.com/categories/",
         )
 
-        assert (
-            '<meta property="og:title" content="All Categories - Test Blog">' in html
-        )
+        assert '<meta property="og:title" content="All Categories - Test Blog">' in html
         assert '<meta property="og:type" content="website">' in html
         assert (
             '<meta property="og:url" content="https://example.com/categories/">' in html
@@ -1434,9 +1427,7 @@ class TestTemplateRenderer:
         assert '<meta name="twitter:card" content="summary_large_image">' in html
         assert '<meta name="twitter:title" content="Graph - Test Blog">' in html
 
-    def test_listing_meta_tags_og_image_from_site_logo(
-        self, sample_post: Post
-    ) -> None:
+    def test_listing_meta_tags_og_image_from_site_logo(self, sample_post: Post) -> None:
         """Test that listing pages use site_logo as og:image when no platform icons exist."""
         renderer = TemplateRenderer()
         html = renderer.render_tag_page(
@@ -1490,9 +1481,7 @@ class TestTemplateRenderer:
 
         assert '<meta property="og:url"' not in html
 
-    def test_draft_post_page_has_emoji_and_class(
-        self, sample_draft_post: Post
-    ) -> None:
+    def test_draft_post_page_has_emoji_and_class(self, sample_draft_post: Post) -> None:
         """Test that a draft post page shows the 🚧 emoji and draft-post class."""
         renderer = TemplateRenderer()
         html = renderer.render_post(sample_draft_post, site_title="Test Blog")
@@ -1500,9 +1489,7 @@ class TestTemplateRenderer:
         assert "🚧" in html
         assert "draft-post" in html
 
-    def test_non_draft_post_page_has_no_emoji_or_class(
-        self, sample_post: Post
-    ) -> None:
+    def test_non_draft_post_page_has_no_emoji_or_class(self, sample_post: Post) -> None:
         """Test that a non-draft post page does not show the 🚧 emoji or draft-post class."""
         renderer = TemplateRenderer()
         html = renderer.render_post(sample_post, site_title="Test Blog")

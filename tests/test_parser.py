@@ -4,16 +4,38 @@ import datetime as dt
 import re
 from pathlib import Path
 
+import markdown
 import pytest
 
+from blogmore.markdown.first_paragraph import extract_first_paragraph_from_html
+from blogmore.markdown.plain_text import create_custom_extensions
 from blogmore.parser import (
     Page,
     Post,
     PostParser,
-    extract_first_paragraph,
     remove_date_prefix,
     sanitize_for_url,
 )
+
+##############################################################################
+# Helpers.
+
+
+def _extract_p(content: str) -> str:
+    """Test helper to extract the first paragraph from Markdown content.
+
+    This replaces the removed blogmore.markdown.first_paragraph.extract_first_paragraph.
+    """
+    md = markdown.Markdown(
+        extensions=[
+            "fenced_code",
+            "md_in_html",
+            "tables",
+            "footnotes",
+            *create_custom_extensions(),
+        ],
+    )
+    return extract_first_paragraph_from_html(md.convert(content))
 
 
 class TestSanitizeForUrl:
@@ -69,69 +91,63 @@ class TestRemoveDatePrefix:
 
 
 class TestExtractFirstParagraph:
-    """Test the extract_first_paragraph function."""
+    """Test the first paragraph extraction logic."""
 
     def test_extract_simple_paragraph(self) -> None:
         """Test extracting a simple paragraph."""
         content = "This is the first paragraph.\n\nThis is the second paragraph."
-        assert extract_first_paragraph(content) == "This is the first paragraph."
+        assert _extract_p(content) == "This is the first paragraph."
 
     def test_extract_multiline_paragraph(self) -> None:
         """Test extracting a paragraph that spans multiple lines."""
         content = (
             "This is the first line.\nThis is the second line.\n\nSecond paragraph."
         )
-        assert (
-            extract_first_paragraph(content)
-            == "This is the first line. This is the second line."
-        )
+        assert _extract_p(content) == "This is the first line. This is the second line."
 
     def test_skip_image_markdown(self) -> None:
         """Test that markdown images are skipped."""
         content = "![Alt text](image.jpg)\n\nThis is the first paragraph."
-        assert extract_first_paragraph(content) == "This is the first paragraph."
+        assert _extract_p(content) == "This is the first paragraph."
 
     def test_skip_image_html(self) -> None:
         """Test that HTML img tags are skipped."""
         content = '<img src="image.jpg">\n\nThis is the first paragraph.'
-        assert extract_first_paragraph(content) == "This is the first paragraph."
+        assert _extract_p(content) == "This is the first paragraph."
 
     def test_skip_heading(self) -> None:
         """Test that headings are skipped."""
         content = "# Main Heading\n\nThis is the first paragraph."
-        assert extract_first_paragraph(content) == "This is the first paragraph."
+        assert _extract_p(content) == "This is the first paragraph."
 
     def test_remove_markdown_formatting(self) -> None:
         """Test that markdown formatting is removed."""
         content = "This is **bold** and *italic* and `code` and [link](url)."
-        assert (
-            extract_first_paragraph(content)
-            == "This is bold and italic and code and link."
-        )
+        assert _extract_p(content) == "This is bold and italic and code and link."
 
     def test_stop_at_heading(self) -> None:
         """Test that extraction stops at a heading after paragraph."""
         content = "First paragraph.\n\n## Second Heading\n\nSecond paragraph."
-        assert extract_first_paragraph(content) == "First paragraph."
+        assert _extract_p(content) == "First paragraph."
 
     def test_empty_content(self) -> None:
         """Test with empty content."""
-        assert extract_first_paragraph("") == ""
+        assert _extract_p("") == ""
 
     def test_only_images(self) -> None:
         """Test with only images."""
         content = "![Image 1](img1.jpg)\n![Image 2](img2.jpg)"
-        assert extract_first_paragraph(content) == ""
+        assert _extract_p(content) == ""
 
     def test_paragraph_after_multiple_images(self) -> None:
         """Test extracting paragraph after multiple images."""
         content = "![Image 1](img1.jpg)\n![Image 2](img2.jpg)\n\nFirst paragraph here."
-        assert extract_first_paragraph(content) == "First paragraph here."
+        assert _extract_p(content) == "First paragraph here."
 
     def test_skip_linked_image(self) -> None:
         """Test that a markdown image wrapped in a link is skipped."""
         content = "[![Alt text](image.jpg)](https://example.com/)\n\nThis is the first paragraph."
-        assert extract_first_paragraph(content) == "This is the first paragraph."
+        assert _extract_p(content) == "This is the first paragraph."
 
     def test_paragraph_after_linked_image(self) -> None:
         """Test extracting paragraph after a linked image (image that is also a link)."""
@@ -139,22 +155,24 @@ class TestExtractFirstParagraph:
             "[![Banner](/img/banner.png)](https://example.com/)\n\n"
             "I've just released v1.1.0 of my app."
         )
-        assert extract_first_paragraph(content) == "I've just released v1.1.0 of my app."
+        assert _extract_p(content) == "I've just released v1.1.0 of my app."
 
     def test_code_block_stops_extraction(self) -> None:
         """Test that code blocks stop extraction if we have content."""
         content = "First paragraph.\n\n```python\ncode here\n```"
-        assert extract_first_paragraph(content) == "First paragraph."
+        assert _extract_p(content) == "First paragraph."
 
     def test_remove_reference_style_link_with_ref(self) -> None:
         """Test that reference-style links [text][ref] are stripped to text."""
-        content = "When [Dave][davep] Pearson wrote this.\n\n[davep]: https://example.com/"
-        assert extract_first_paragraph(content) == "When Dave Pearson wrote this."
+        content = (
+            "When [Dave][davep] Pearson wrote this.\n\n[davep]: https://example.com/"
+        )
+        assert _extract_p(content) == "When Dave Pearson wrote this."
 
     def test_remove_reference_style_link_empty_ref(self) -> None:
         """Test that empty-ref reference links [text][] are stripped to text."""
         content = "He [announced][] a new tool.\n\n[announced]: https://example.com/"
-        assert extract_first_paragraph(content) == "He announced a new tool."
+        assert _extract_p(content) == "He announced a new tool."
 
     def test_remove_reference_style_links_mixed(self) -> None:
         """Test stripping both inline and reference-style links in the same paragraph."""
@@ -164,7 +182,7 @@ class TestExtractFirstParagraph:
             "[davep]: https://blog.davep.org/\n"
             "[announced]: https://blog.davep.org/2026/02/19/a-new-engine.html"
         )
-        assert extract_first_paragraph(content) == (
+        assert _extract_p(content) == (
             "When Dave Pearson quietly announced a Python static site "
             "generator, I felt obliged to check it out."
         )
@@ -177,27 +195,27 @@ class TestExtractFirstParagraph:
         behaviour.
         """
         content = "See the [documentation] for details."
-        assert extract_first_paragraph(content) == "See the [documentation] for details."
+        assert _extract_p(content) == "See the [documentation] for details."
 
     def test_skip_reference_link_definition_lines(self) -> None:
         """Test that reference link definition lines are skipped entirely."""
         content = "[ref]: https://example.com/\n\nFirst real paragraph."
-        assert extract_first_paragraph(content) == "First real paragraph."
+        assert _extract_p(content) == "First real paragraph."
 
     def test_remove_strikethrough(self) -> None:
         """Test that strikethrough markup ~~text~~ is stripped to text."""
         content = "This is ~~deleted~~ text."
-        assert extract_first_paragraph(content) == "This is deleted text."
+        assert _extract_p(content) == "This is deleted text."
 
     def test_remove_underscore_bold(self) -> None:
         """Test that __bold__ underscore markup is stripped to text."""
         content = "This is __bold__ text."
-        assert extract_first_paragraph(content) == "This is bold text."
+        assert _extract_p(content) == "This is bold text."
 
     def test_remove_underscore_italic(self) -> None:
         """Test that _italic_ underscore markup is stripped to text."""
         content = "This is _italic_ text."
-        assert extract_first_paragraph(content) == "This is italic text."
+        assert _extract_p(content) == "This is italic text."
 
     def test_remove_all_markup_combined(self) -> None:
         """Test that all markup types are stripped in a single paragraph.
@@ -212,7 +230,7 @@ class TestExtractFirstParagraph:
             "This is **bold**, _italic_, ~~struck~~, `code`, "
             "[inline](url), [ref-link][ref], and [empty][]."
         )
-        assert extract_first_paragraph(content) == (
+        assert _extract_p(content) == (
             "This is bold, italic, struck, code, inline, [ref-link][ref], and [empty][]."
         )
 
@@ -223,21 +241,19 @@ class TestExtractFirstParagraph:
         BlogMore AdmonitionsExtension, so they are not treated as a paragraph.
         """
         content = (
-            "> [!NOTE]\n"
-            "> This is a note.\n\n"
-            "This is the first real paragraph."
+            "> [!NOTE]\n" "> This is a note.\n\n" "This is the first real paragraph."
         )
-        assert extract_first_paragraph(content) == "This is the first real paragraph."
+        assert _extract_p(content) == "This is the first real paragraph."
 
     def test_skip_admonition_only_content(self) -> None:
         """Test that content consisting only of an admonition returns empty string."""
         content = "> [!TIP]\n> Only an admonition here."
-        assert extract_first_paragraph(content) == ""
+        assert _extract_p(content) == ""
 
     def test_blockquote_skipped_finds_next_paragraph(self) -> None:
         """Test that blockquote content is not returned as the first paragraph."""
         content = "> A blockquote.\n\nFirst real paragraph."
-        assert extract_first_paragraph(content) == "First real paragraph."
+        assert _extract_p(content) == "First real paragraph."
 
 
 class TestMarkdownInHtml:
@@ -378,7 +394,6 @@ class TestPost:
         result = post.sorted_tag_pairs()
         assert [display for display, _ in result] == ["alpha", "Beta", "Gamma"]
 
-
         """Test that description from metadata is used when present."""
         post = Post(
             path=Path("test.md"),
@@ -395,7 +410,7 @@ class TestPost:
             path=Path("test.md"),
             title="Test",
             content="This is the first paragraph.\n\nThis is the second paragraph.",
-            html_content="<p>Test</p>",
+            html_content="<p>This is the first paragraph.</p><p>This is the second paragraph.</p>",
             metadata={},
         )
         assert post.description == "This is the first paragraph."
@@ -406,7 +421,7 @@ class TestPost:
             path=Path("test.md"),
             title="Test",
             content="First paragraph here.\n\nSecond paragraph.",
-            html_content="<p>Test</p>",
+            html_content="<p>First paragraph here.</p><p>Second paragraph.</p>",
             metadata=None,
         )
         assert post.description == "First paragraph here."
@@ -417,7 +432,7 @@ class TestPost:
             path=Path("test.md"),
             title="Test",
             content="![Image](img.jpg)\n\nThis is the first paragraph.",
-            html_content="<p>Test</p>",
+            html_content='<p><img src="img.jpg" alt="Image"></p><p>This is the first paragraph.</p>',
             metadata={},
         )
         assert post.description == "This is the first paragraph."
@@ -448,16 +463,16 @@ class TestPost:
         """Test reading time calculation with markdown content."""
         content = """
         # Heading
-        
+
         This is a **bold** paragraph with *italic* text and `code`.
-        
+
         Here is a [link](https://example.com) and some more text.
-        
+
         ```python
         def hello():
             print("This code should not be counted")
         ```
-        
+
         And some final thoughts.
         """
         post = Post(
@@ -598,7 +613,7 @@ class TestPage:
             path=Path("test.md"),
             title="Test",
             content="This is the first paragraph.\n\nThis is the second paragraph.",
-            html_content="<p>Test</p>",
+            html_content="<p>This is the first paragraph.</p><p>This is the second paragraph.</p>",
             metadata={},
         )
         assert page.description == "This is the first paragraph."
@@ -687,28 +702,18 @@ class TestPostParser:
         parser = PostParser()
         post_file = tmp_path / "plus-one-title.md"
         post_file.write_text(
-            "---\n"
-            "title: +1\n"
-            "date: 2024-01-01\n"
-            "---\n"
-            "Content"
+            "---\n" "title: +1\n" "date: 2024-01-01\n" "---\n" "Content"
         )
 
         with pytest.raises(ValueError, match="'title' in frontmatter must be a string"):
             parser.parse_file(post_file)
 
-    def test_parse_file_non_string_title_error_cites_file(
-        self, tmp_path: Path
-    ) -> None:
+    def test_parse_file_non_string_title_error_cites_file(self, tmp_path: Path) -> None:
         """Test that the non-string title error message includes the filename."""
         parser = PostParser()
         post_file = tmp_path / "bad-title.md"
         post_file.write_text(
-            "---\n"
-            "title: +1\n"
-            "date: 2024-01-01\n"
-            "---\n"
-            "Content"
+            "---\n" "title: +1\n" "date: 2024-01-01\n" "---\n" "Content"
         )
 
         with pytest.raises(ValueError) as exc_info:
@@ -787,12 +792,12 @@ class TestPostParser:
             "Content"
         )
 
-        with pytest.raises(ValueError, match="'tags' in frontmatter must be a string or list"):
+        with pytest.raises(
+            ValueError, match="'tags' in frontmatter must be a string or list"
+        ):
             parser.parse_file(post_file)
 
-    def test_parse_file_bare_scalar_tag_error_cites_file(
-        self, tmp_path: Path
-    ) -> None:
+    def test_parse_file_bare_scalar_tag_error_cites_file(self, tmp_path: Path) -> None:
         """Test that the bare-scalar tags error message includes the filename."""
         parser = PostParser()
         post_file = tmp_path / "bare-scalar-tags-2.md"
@@ -812,9 +817,7 @@ class TestPostParser:
         assert str(post_file) in error_message
         assert "Fix" in error_message
 
-    def test_parse_file_bare_tags_entry_yields_no_tags(
-        self, tmp_path: Path
-    ) -> None:
+    def test_parse_file_bare_tags_entry_yields_no_tags(self, tmp_path: Path) -> None:
         """Test that a bare ``tags:`` frontmatter entry produces an empty tag list.
 
         A bare ``tags:`` with no associated value is parsed by YAML as ``None``.
@@ -883,9 +886,7 @@ class TestPostParser:
 
         # Create a post in the root content directory
         post_file = tmp_path / "my-post.md"
-        post_file.write_text(
-            "---\ntitle: Regular Post\ndate: 2024-01-01\n---\nContent"
-        )
+        post_file.write_text("---\ntitle: Regular Post\ndate: 2024-01-01\n---\nContent")
 
         # Create a page in the pages subdirectory (should be excluded)
         pages_subdir = tmp_path / "pages"
@@ -939,12 +940,7 @@ class TestPostParser:
         """
         parser = PostParser()
         page_file = tmp_path / "bad-title-page.md"
-        page_file.write_text(
-            "---\n"
-            "title: +1\n"
-            "---\n"
-            "Content"
-        )
+        page_file.write_text("---\n" "title: +1\n" "---\n" "Content")
 
         with pytest.raises(ValueError, match="'title' in frontmatter must be a string"):
             parser.parse_page(page_file)
@@ -1047,8 +1043,8 @@ class TestPostParser:
 title: Test Links
 ---
 
-This post has [an external link](https://external.com) and 
-[an internal link](/posts/my-post) and 
+This post has [an external link](https://external.com) and
+[an internal link](/posts/my-post) and
 [an anchor link](#section).
 """)
         post = parser.parse_file(post_file)
@@ -1103,7 +1099,7 @@ This post has [an external link](https://external.com) and
 title: Test Links
 ---
 
-This post has [an external link](https://external.com) and 
+This post has [an external link](https://external.com) and
 [a relative link](/posts/my-post).
 """)
         post = parser.parse_file(post_file)
