@@ -11,6 +11,7 @@
   backlinks. ([#470](https://github.com/davep/blogmore/pull/470))
 - Reduced the amount of Markdown parsing done when extracting various stats
   and metadata from posts.
+  ([#471](https://github.com/davep/blogmore/pull/471))
 
 ## v2.21.0
 
