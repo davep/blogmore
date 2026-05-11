@@ -8,7 +8,7 @@
   every time a site is built.
   ([#469](https://github.com/davep/blogmore/pull/469))
 - Reduced the amount of Markdown parsing down when calculating the
-  backlinks.
+  backlinks. ([#470](https://github.com/davep/blogmore/pull/470))
 
 ## v2.21.0
 
