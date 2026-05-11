@@ -12,13 +12,9 @@ import frontmatter  # type: ignore[import-untyped]
 import markdown
 import yaml
 from dateutil import parser as dateutil_parser
-from markupsafe import Markup
 from pygments.formatters import HtmlFormatter
 
-from blogmore.markdown.first_paragraph import (
-    extract_first_paragraph,
-    extract_first_paragraph_from_html,
-)
+from blogmore.markdown.first_paragraph import extract_first_paragraph_from_html
 from blogmore.markdown.plain_text import create_custom_extensions
 from blogmore.utils import calculate_reading_time
 
