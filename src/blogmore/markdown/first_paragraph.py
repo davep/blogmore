@@ -10,33 +10,7 @@ images.
 import re
 from html.parser import HTMLParser
 
-import markdown
-
-from blogmore.markdown.plain_text import create_custom_extensions
-
-__all__ = ["extract_first_paragraph"]
-
-
-def _make_extraction_markdown() -> markdown.Markdown:
-    """Create a Markdown instance configured for first-paragraph text extraction.
-
-    Includes all BlogMore custom extensions and the standard extensions needed
-    to correctly identify paragraph boundaries.  Intentionally omits
-    presentation-only extensions such as [`codehilite`][markdown.extensions.codehilite]
-    and [`toc`][markdown.extensions.toc] that are not required for plain-text extraction.
-
-    Returns:
-        A fresh, configured ``markdown.Markdown`` instance.
-    """
-    return markdown.Markdown(
-        extensions=[
-            "fenced_code",
-            "md_in_html",
-            "tables",
-            "footnotes",
-            *create_custom_extensions(),
-        ],
-    )
+__all__ = ["extract_first_paragraph_from_html"]
 
 
 class _FirstParagraphExtractor(HTMLParser):
@@ -155,27 +129,6 @@ class _FirstParagraphExtractor(HTMLParser):
             found.
         """
         return self._result
-
-
-def extract_first_paragraph(content: str) -> str:
-    """Extract the first paragraph from markdown content as plain text.
-
-    Converts the markdown to HTML using all BlogMore extensions, then finds
-    the first top-level ``<p>`` element that contains actual text.  Paragraphs
-    that consist solely of images are skipped.
-
-    Args:
-        content: The markdown content to extract from.
-
-    Returns:
-        The first paragraph as plain text, or an empty string if none is found.
-    """
-    if not content.strip():
-        return ""
-    html_content = _make_extraction_markdown().convert(content)
-    extractor = _FirstParagraphExtractor()
-    extractor.feed(html_content)
-    return extractor.result
 
 
 def extract_first_paragraph_from_html(html_content: str) -> str:
