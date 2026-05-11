@@ -15,7 +15,7 @@ from markupsafe import Markup
 # Application imports.
 from blogmore.backlinks import (
     Backlink,
-    _extract_snippet,
+    _extract_snippets,
     _find_links,
     _normalize_url_path,
     _to_path,
@@ -25,6 +25,16 @@ from blogmore.parser import Post
 
 ##############################################################################
 # Helpers.
+
+
+def _extract_single_snippet(
+    content: str, start: int, end: int, link_text: str = ""
+) -> Markup:
+    """Helper to test extraction for a single link using the new _extract_snippets logic."""
+    # Create a dummy target post for the internal call
+    dummy_post = _make_post("dummy", "", "/dummy.html")
+    results = _extract_snippets(content, [(start, end, link_text, dummy_post)])
+    return results[0][1] if results else Markup("")
 
 
 def _make_post(
@@ -72,7 +82,7 @@ class TestExtractSnippetBlockStripping:
         content = "Before [link](/post.html) after.\n\n> This is a blockquote."
         m = re.search(r"\[link\]\(/post\.html\)", content)
         assert m is not None
-        snippet = _extract_snippet(content, m.start(), m.end())
+        snippet = _extract_single_snippet(content, m.start(), m.end())
         assert ">" not in snippet
 
     def test_fenced_code_backticks_not_in_snippet(self) -> None:
@@ -80,7 +90,7 @@ class TestExtractSnippetBlockStripping:
         content = "See [link](/post.html).\n\n```python\nprint('hi')\n```\n"
         m = re.search(r"\[link\]\(/post\.html\)", content)
         assert m is not None
-        snippet = _extract_snippet(content, m.start(), m.end())
+        snippet = _extract_single_snippet(content, m.start(), m.end())
         assert "```" not in snippet
 
     def test_heading_hash_not_in_snippet(self) -> None:
@@ -88,7 +98,7 @@ class TestExtractSnippetBlockStripping:
         content = "## Introduction\n\nSee [link](/post.html) for more."
         m = re.search(r"\[link\]\(/post\.html\)", content)
         assert m is not None
-        snippet = _extract_snippet(content, m.start(), m.end())
+        snippet = _extract_single_snippet(content, m.start(), m.end())
         assert "#" not in snippet
 
     def test_fenced_code_block_opening_before_window_not_in_snippet(self) -> None:
@@ -105,7 +115,7 @@ class TestExtractSnippetBlockStripping:
         content = preamble + code_block + link_sentence
         m = re.search(r"\[the link\]\(/post\.html\)", content)
         assert m is not None
-        snippet = _extract_snippet(content, m.start(), m.end(), "the link")
+        snippet = _extract_single_snippet(content, m.start(), m.end(), "the link")
         # The raw fenced-code fence markers must not appear in the snippet.
         assert "```" not in snippet
         assert "```diff" not in snippet
@@ -286,7 +296,7 @@ class TestExtractSnippet:
         content = "Hello [world](/foo.html) end."
         m = re.search(r"\[world\]\(/foo\.html\)", content)
         assert m is not None
-        snippet = _extract_snippet(content, m.start(), m.end(), "world")
+        snippet = _extract_single_snippet(content, m.start(), m.end(), "world")
         # No ellipsis — content is short.
         assert "Hello" in snippet
         assert "world" in snippet
@@ -298,7 +308,7 @@ class TestExtractSnippet:
         content = f"{prefix} [link](/foo.html) end"
         m = re.search(r"\[link\]\(/foo\.html\)", content)
         assert m is not None
-        snippet = _extract_snippet(content, m.start(), m.end())
+        snippet = _extract_single_snippet(content, m.start(), m.end())
         assert snippet.startswith("…")
 
     def test_long_suffix_adds_ellipsis(self) -> None:
@@ -307,7 +317,7 @@ class TestExtractSnippet:
         content = f"start [link](/foo.html) {suffix}"
         m = re.search(r"\[link\]\(/foo\.html\)", content)
         assert m is not None
-        snippet = _extract_snippet(content, m.start(), m.end())
+        snippet = _extract_single_snippet(content, m.start(), m.end())
         assert snippet.endswith("…")
 
     def test_link_text_appears_in_snippet(self) -> None:
@@ -315,7 +325,9 @@ class TestExtractSnippet:
         content = "See [interesting article](/post.html) for more."
         m = re.search(r"\[interesting article\]\(/post\.html\)", content)
         assert m is not None
-        snippet = _extract_snippet(content, m.start(), m.end(), "interesting article")
+        snippet = _extract_single_snippet(
+            content, m.start(), m.end(), "interesting article"
+        )
         assert "interesting article" in snippet
         assert "/post.html" not in snippet
 
@@ -324,7 +336,7 @@ class TestExtractSnippet:
         content = "See [the article](/post.html) for more."
         m = re.search(r"\[the article\]\(/post\.html\)", content)
         assert m is not None
-        snippet = _extract_snippet(content, m.start(), m.end(), "the article")
+        snippet = _extract_single_snippet(content, m.start(), m.end(), "the article")
         assert isinstance(snippet, Markup)
         assert '<strong class="backlink-link-text">the article</strong>' in snippet
 
@@ -343,7 +355,7 @@ class TestExtractSnippet:
         )
         m = re.search(r"\[more\]\(/2026/03/20/post\.html\)", content)
         assert m is not None
-        snippet = _extract_snippet(content, m.start(), m.end(), "more")
+        snippet = _extract_single_snippet(content, m.start(), m.end(), "more")
         assert isinstance(snippet, Markup)
         # The highlighted <strong> must wrap the standalone "more" that was the
         # link text, not the "more" embedded inside "blogmore.el".
@@ -358,7 +370,7 @@ class TestExtractSnippet:
         content = "Hello [world](/foo.html) end."
         m = re.search(r"\[world\]\(/foo\.html\)", content)
         assert m is not None
-        snippet = _extract_snippet(content, m.start(), m.end())
+        snippet = _extract_single_snippet(content, m.start(), m.end())
         assert isinstance(snippet, Markup)
 
 
