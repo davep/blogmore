@@ -13,7 +13,7 @@
   and metadata from posts.
   ([#471](https://github.com/davep/blogmore/pull/471))
 - Removed the need to re-parse the Markdown when calculating word counts and
-  reading times.
+  reading times. ([#472](https://github.com/davep/blogmore/pull/472))
 
 ## v2.21.0
 
