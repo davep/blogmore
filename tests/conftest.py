@@ -2,10 +2,27 @@
 
 import datetime as dt
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
 from blogmore.parser import Page, Post
+
+
+@pytest.fixture(autouse=True)
+def mock_user_cache_dir(tmp_path: Path):
+    """Automatically mock the user cache directory for all tests.
+
+    This prevents tests from ever touching the real user's cache directory
+    on the filesystem.
+    """
+    test_cache = tmp_path / "blogmore_test_cache"
+    test_cache.mkdir(parents=True, exist_ok=True)
+    with (
+        patch("blogmore.utils.get_user_cache_dir", return_value=test_cache),
+        patch("blogmore.fontawesome.get_user_cache_dir", return_value=test_cache),
+    ):
+        yield test_cache
 
 
 @pytest.fixture
