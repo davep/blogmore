@@ -373,6 +373,71 @@ class TestExtractSnippet:
         snippet = _extract_single_snippet(content, m.start(), m.end())
         assert isinstance(snippet, Markup)
 
+    def test_multiple_links_in_snippet_no_marker_leakage(self) -> None:
+        """Other markers in a snippet window are replaced by their plain-text link text."""
+        content = (
+            "First [Link 1](/1.html) then [Link 2](/2.html) "
+            "then [Link 3](/3.html) then more."
+        )
+        post1 = _make_post("post1", "Post 1", "/1.html")
+        post2 = _make_post("post2", "Post 2", "/2.html")
+        post3 = _make_post("post3", "Post 3", "/3.html")
+
+        # Find all link positions
+        link1_m = re.search(r"\[Link 1\]\(/1\.html\)", content)
+        link2_m = re.search(r"\[Link 2\]\(/2\.html\)", content)
+        link3_m = re.search(r"\[Link 3\]\(/3\.html\)", content)
+        assert link1_m and link2_m and link3_m
+
+        link_data = [
+            (link1_m.start(), link1_m.end(), "Link 1", post1),
+            (link2_m.start(), link2_m.end(), "Link 2", post2),
+            (link3_m.start(), link3_m.end(), "Link 3", post3),
+        ]
+
+        results = _extract_snippets(content, link_data)
+
+        # Snippet for link 2
+        snippet2 = results[1][1]
+        # Link 2 itself must be highlighted
+        assert '<strong class="backlink-link-text">Link 2</strong>' in snippet2
+        # Link 1 and Link 3 are nearby and their markers must be replaced
+        # by their plain-text versions.
+        assert "Link 1" in snippet2
+        assert "Link 3" in snippet2
+        # No raw BKLINK markers should remain
+        assert "BKLINK" not in str(snippet2)
+
+    def test_marker_at_context_boundary_is_snapped_out(self) -> None:
+        """A marker that would be truncated at a context boundary is snapped out of the snippet."""
+        # _SNIPPET_CONTEXT_CHARS is 100.
+        # Link 1 is the main link.
+        # Link 2 is placed so its marker would be partially inside the 100-char window.
+        padding = "a" * 95
+        content = f"[Link 1](/1.html) {padding} [Link 2](/2.html)"
+
+        post1 = _make_post("post1", "Post 1", "/1.html")
+        post2 = _make_post("post2", "Post 2", "/2.html")
+
+        link1_m = re.search(r"\[Link 1\]\(/1\.html\)", content)
+        link2_m = re.search(r"\[Link 2\]\(/2\.html\)", content)
+        assert link1_m and link2_m
+
+        link_data = [
+            (link1_m.start(), link1_m.end(), "Link 1", post1),
+            (link2_m.start(), link2_m.end(), "Link 2", post2),
+        ]
+
+        results = _extract_snippets(content, link_data)
+        # Results are in reverse order of position (matches sorted_links)
+        # Link 1 (start 0) is index 1.
+        snippet1 = str(results[1][1])
+
+        # Because context_end is snapped to ms_start when it falls inside a marker,
+        # the truncated Link 2 marker is excluded.
+        assert "Link 2" not in snippet1
+        assert "BKLINK" not in snippet1
+
 
 ##############################################################################
 # build_backlink_map tests.

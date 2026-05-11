@@ -95,12 +95,25 @@ def _extract_snippets(
         marker = f"{_BACKLINK_MARKER_PREFIX}{i}_"
         marked_content = marked_content[:start] + marker + marked_content[end:]
 
+    # Pre-calculate the plain-text representation of every link's text.
+    # This allows us to replace secondary markers in snippets without
+    # redundant Markdown parses.
+    plain_link_texts = [
+        markdown_to_plain_text(lt) if lt else "" for _, _, lt, _ in sorted_links
+    ]
+
     # Convert the entire marked document to plain text in one pass
     plain_full = markdown_to_plain_text(marked_content)
 
+    # Locate the spans of all markers in the plain text. We will use these
+    # to "snap" the context window boundaries so that we never extract
+    # a partial marker.
+    marker_pattern = re.escape(_BACKLINK_MARKER_PREFIX) + r"\d+_"
+    marker_spans = [m.span() for m in re.finditer(marker_pattern, plain_full)]
+
     results: list[tuple[Post, Markup]] = []
     # Process links in original sorted order (which corresponds to markers 0, 1, 2...)
-    for i, (_, _, link_text, target_post) in enumerate(sorted_links):
+    for i, (_, _, _, target_post) in enumerate(sorted_links):
         marker = f"{_BACKLINK_MARKER_PREFIX}{i}_"
         marker_pos = plain_full.find(marker)
         if marker_pos == -1:
@@ -109,6 +122,18 @@ def _extract_snippets(
         marker_end_pos = marker_pos + len(marker)
         context_start = max(0, marker_pos - _SNIPPET_CONTEXT_CHARS)
         context_end = min(len(plain_full), marker_end_pos + _SNIPPET_CONTEXT_CHARS)
+
+        # Snap boundaries to avoid cutting through any marker.
+        for ms_start, ms_end in marker_spans:
+            if ms_start < context_start < ms_end:
+                # context_start is inside a marker; snap to the end of it
+                # to exclude the partial marker from the snippet.
+                context_start = ms_end
+            if ms_start < context_end < ms_end:
+                # context_end is inside a marker; snap to the start of it
+                # to exclude the partial marker from the snippet.
+                context_end = ms_start
+
         excerpt = plain_full[context_start:context_end]
 
         prefix = "…" if context_start > 0 else ""
@@ -117,8 +142,9 @@ def _extract_snippets(
         # HTML-escape the whole plain-text snippet.
         escaped: Markup = Markup.escape(f"{prefix}{excerpt}{suffix}")
 
-        # Replace the marker with the highlighted link text.
-        plain_link_text = markdown_to_plain_text(link_text) if link_text else ""
+        # 1. Replace the "main" marker (the one for this backlink) with the
+        # highlighted link text.
+        plain_link_text = plain_link_texts[i]
         if plain_link_text:
             escaped_link_text = Markup.escape(plain_link_text)
             highlighted = Markup(
@@ -127,6 +153,15 @@ def _extract_snippets(
             escaped = Markup(escaped.replace(marker, highlighted, 1))
         else:
             escaped = Markup(escaped.replace(marker, Markup(""), 1))
+
+        # 2. Replace any other markers that fell into this excerpt window
+        # with their plain-text link text.
+        def _replace_secondary(match: re.Match[str]) -> str:
+            other_index = int(match.group(1))
+            return str(Markup.escape(plain_link_texts[other_index]))
+
+        secondary_pattern = re.escape(_BACKLINK_MARKER_PREFIX) + r"(\d+)_"
+        escaped = Markup(re.sub(secondary_pattern, _replace_secondary, str(escaped)))
 
         results.append((target_post, escaped))
 
