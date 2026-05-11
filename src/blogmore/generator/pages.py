@@ -54,16 +54,20 @@ class PageGenerator:
         pages: list[Page],
         output_path: Path,
         backlinks_map: dict[str, list[Backlink]] | None = None,
+        navigation: dict[int, tuple[Post | None, Post | None]] | None = None,
     ) -> None:
         """Generate a single post page.
 
         Args:
             post: The post to generate a page for.
-            all_posts: All posts (sorted newest first), used for prev/next navigation.
+            all_posts: All posts (sorted newest first), used for global context.
             pages: All static pages, passed to the template context.
             output_path: The pre-resolved absolute output file path for this post.
             backlinks_map: Optional mapping from post URL to list of Backlink
                 objects, built when ``with_backlinks`` is enabled.
+            navigation: Optional mapping from post object ID to its
+                (previous_post, next_post) tuple. When provided, this is used for
+                O(1) navigation lookup.
         """
         context = self.context_builder.get_global_context()
         context["all_posts"] = all_posts
@@ -83,22 +87,27 @@ class PageGenerator:
         )
 
         # Find previous and next posts in chronological order
-        try:
-            current_index = all_posts.index(post)
-            # Previous post is older (higher index)
-            context["prev_post"] = (
-                all_posts[current_index + 1]
-                if current_index + 1 < len(all_posts)
-                else None
-            )
-            # Next post is newer (lower index)
-            context["next_post"] = (
-                all_posts[current_index - 1] if current_index > 0 else None
-            )
-        except ValueError:
-            # Post not in list, no navigation
-            context["prev_post"] = None
-            context["next_post"] = None
+        if navigation is not None:
+            prev_post, next_post = navigation.get(id(post), (None, None))
+            context["prev_post"] = prev_post
+            context["next_post"] = next_post
+        else:
+            try:
+                current_index = all_posts.index(post)
+                # Previous post is older (higher index)
+                context["prev_post"] = (
+                    all_posts[current_index + 1]
+                    if current_index + 1 < len(all_posts)
+                    else None
+                )
+                # Next post is newer (lower index)
+                context["next_post"] = (
+                    all_posts[current_index - 1] if current_index > 0 else None
+                )
+            except ValueError:
+                # Post not in list, no navigation
+                context["prev_post"] = None
+                context["next_post"] = None
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
         # When clean URLs are enabled, post.url already has index.html stripped;

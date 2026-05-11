@@ -23,6 +23,7 @@ from blogmore.renderer import TemplateRenderer
 
 if TYPE_CHECKING:
     from blogmore.backlinks import Backlink
+    from blogmore.parser import Post
     from blogmore.site_config import SiteConfig
 
 
@@ -142,6 +143,16 @@ class SiteGenerator:
                     site_url=self.site_config.site_url,
                 )
 
+        # Pre-calculate navigation mapping for O(1) lookup during page generation
+        num_posts = len(posts)
+        navigation: dict[int, tuple[Post | None, Post | None]] = {
+            id(post): (
+                posts[i + 1] if i + 1 < num_posts else None,
+                posts[i - 1] if i > 0 else None,
+            )
+            for i, post in enumerate(posts)
+        }
+
         # Instantiate specialized generators
         page_gen = PageGenerator(self.site_config, self.renderer, context_builder)
         listing_gen = ListingGenerator(self.site_config, self.renderer, context_builder)
@@ -157,7 +168,7 @@ class SiteGenerator:
                     continue
                 generated_paths.add(path_key)
                 page_gen.generate_post_page(
-                    post, posts, sidebar_pages, output_path, backlinks_map
+                    post, posts, sidebar_pages, output_path, backlinks_map, navigation
                 )
 
         # Generate static pages

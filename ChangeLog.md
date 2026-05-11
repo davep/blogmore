@@ -14,6 +14,7 @@
   ([#471](https://github.com/davep/blogmore/pull/471))
 - Removed the need to re-parse the Markdown when calculating word counts and
   reading times. ([#472](https://github.com/davep/blogmore/pull/472))
+- Optimised the calculation of previous/next post lookups.
 
 ## v2.21.0
 
