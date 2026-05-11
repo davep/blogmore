@@ -1,95 +1,118 @@
 """Unit tests for the utils module."""
 
 from blogmore.utils import (
-    calculate_reading_time,
+    calculate_reading_time_from_html,
+    count_words_from_html,
     make_urls_absolute,
     normalize_site_url,
 )
 
 
 class TestCalculateReadingTime:
-    """Test the calculate_reading_time function."""
+    """Test the calculate_reading_time_from_html function."""
 
     def test_calculate_reading_time_short_text(self) -> None:
         """Test that short text returns at least 1 minute."""
-        assert calculate_reading_time("Hello world") == 1
+        assert calculate_reading_time_from_html("<p>Hello world</p>") == 1
 
     def test_calculate_reading_time_medium_text(self) -> None:
         """Test calculating reading time for medium text."""
         # 400 words at 200 WPM = 2 minutes
-        content = " ".join(["word"] * 400)
-        assert calculate_reading_time(content) == 2
+        content = "<p>" + " ".join(["word"] * 400) + "</p>"
+        assert calculate_reading_time_from_html(content) == 2
 
     def test_calculate_reading_time_long_text(self) -> None:
         """Test calculating reading time for longer text."""
         # 1000 words at 200 WPM = 5 minutes
-        content = " ".join(["word"] * 1000)
-        assert calculate_reading_time(content) == 5
+        content = "<p>" + " ".join(["word"] * 1000) + "</p>"
+        assert calculate_reading_time_from_html(content) == 5
 
-    def test_calculate_reading_time_with_markdown_formatting(self) -> None:
-        """Test that markdown formatting is stripped before counting."""
-        content = "**Bold text** and *italic text* and `code` and [link text](url)"
+    def test_calculate_reading_time_with_html_formatting(self) -> None:
+        """Test that HTML formatting is stripped before counting."""
+        content = "<p><strong>Bold text</strong> and <em>italic text</em> and <code>code</code> and <a href='url'>link text</a></p>"
         # Should count: Bold text and italic text and code and link text = 10 words
-        assert calculate_reading_time(content) == 1
+        assert calculate_reading_time_from_html(content) == 1
 
     def test_calculate_reading_time_with_code_blocks(self) -> None:
         """Test that code blocks are removed before counting."""
         content = """
-        This is some text before the code.
-
-        ```python
+        <p>This is some text before the code.</p>
+        <pre><code class="language-python">
         def hello():
             print("This code should not be counted")
             return "lots of words here"
-        ```
-
-        This is text after the code.
+        </code></pre>
+        <p>This is text after the code.</p>
         """
         # Should count: "This is some text before the code" (7) + "This is text after the code" (6) = 13 words
-        assert calculate_reading_time(content) == 1
+        assert calculate_reading_time_from_html(content) == 1
 
     def test_calculate_reading_time_with_inline_code(self) -> None:
         """Test that inline code text is included in the word count."""
-        content = "Use the `calculate_reading_time` function to get the time."
+        content = "<p>Use the <code>calculate_reading_time</code> function to get the time.</p>"
         # Inline code text is preserved; all words contribute to the count
-        assert calculate_reading_time(content) == 1
+        assert calculate_reading_time_from_html(content) == 1
 
     def test_calculate_reading_time_with_images(self) -> None:
-        """Test that markdown images are ignored."""
-        content = "Here is an image: ![Alt text](image.jpg) and some more text."
+        """Test that HTML images are ignored."""
+        content = "<p>Here is an image: <img src='image.jpg' alt='Alt text'> and some more text.</p>"
         # Should count: "Here is an image and some more text" = 8 words
-        assert calculate_reading_time(content) == 1
+        assert calculate_reading_time_from_html(content) == 1
 
     def test_calculate_reading_time_with_html_tags(self) -> None:
         """Test that HTML tags are removed."""
         content = "<p>This is a paragraph</p> with <strong>HTML tags</strong>."
         # Should count: "This is a paragraph with HTML tags" = 7 words
-        assert calculate_reading_time(content) == 1
+        assert calculate_reading_time_from_html(content) == 1
 
     def test_calculate_reading_time_custom_wpm(self) -> None:
         """Test using a custom words per minute rate."""
         # 200 words at 100 WPM = 2 minutes
-        content = " ".join(["word"] * 200)
-        assert calculate_reading_time(content, words_per_minute=100) == 2
+        content = "<p>" + " ".join(["word"] * 200) + "</p>"
+        assert calculate_reading_time_from_html(content, words_per_minute=100) == 2
 
     def test_calculate_reading_time_rounding(self) -> None:
         """Test that reading time rounds to nearest minute."""
         # 250 words at 200 WPM = 1.25 minutes, should round to 1
-        content = " ".join(["word"] * 250)
-        assert calculate_reading_time(content) == 1
+        content = "<p>" + " ".join(["word"] * 250) + "</p>"
+        assert calculate_reading_time_from_html(content) == 1
 
         # 350 words at 200 WPM = 1.75 minutes, should round to 2
-        content = " ".join(["word"] * 350)
-        assert calculate_reading_time(content) == 2
+        content = "<p>" + " ".join(["word"] * 350) + "</p>"
+        assert calculate_reading_time_from_html(content) == 2
 
     def test_calculate_reading_time_empty_string(self) -> None:
         """Test that empty content returns 1 minute."""
-        assert calculate_reading_time("") == 1
+        assert calculate_reading_time_from_html("") == 1
 
-    def test_calculate_reading_time_only_formatting(self) -> None:
-        """Test content with only formatting characters."""
-        content = "***___```###"
-        assert calculate_reading_time(content) == 1
+    def test_calculate_reading_time_only_tags(self) -> None:
+        """Test content with only HTML tags."""
+        content = "<div><span></span></div>"
+        assert calculate_reading_time_from_html(content) == 1
+
+
+class TestCountWordsFromHtml:
+    """Test the count_words_from_html function."""
+
+    def test_count_words_simple(self) -> None:
+        """Test counting words in simple HTML."""
+        assert count_words_from_html("<p>Hello world</p>") == 2
+
+    def test_count_words_with_code_blocks(self) -> None:
+        """Test that code blocks are excluded from word count."""
+        content = """
+        <p>Prose here.</p>
+        <pre><code>
+        ignored code block
+        </code></pre>
+        <p>More prose.</p>
+        """
+        assert count_words_from_html(content) == 4
+
+    def test_count_words_with_inline_code(self) -> None:
+        """Test that inline code is included in word count."""
+        content = "<p>Prose with <code>inline code</code>.</p>"
+        assert count_words_from_html(content) == 4
 
 
 class TestNormalizeSiteUrl:

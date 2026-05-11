@@ -12,6 +12,8 @@
 - Reduced the amount of Markdown parsing done when extracting various stats
   and metadata from posts.
   ([#471](https://github.com/davep/blogmore/pull/471))
+- Removed the need to re-parse the Markdown when calculating word counts and
+  reading times.
 
 ## v2.21.0
 

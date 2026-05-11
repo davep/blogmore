@@ -16,7 +16,7 @@ from pygments.formatters import HtmlFormatter
 
 from blogmore.markdown.first_paragraph import extract_first_paragraph_from_html
 from blogmore.markdown.plain_text import create_custom_extensions
-from blogmore.utils import calculate_reading_time
+from blogmore.utils import calculate_reading_time_from_html
 
 _DATE_FORMATS = [
     "%Y-%m-%d %H:%M:%S %z",
@@ -207,7 +207,9 @@ class Post:
         Returns:
             Estimated reading time in minutes (minimum 1 minute)
         """
-        return calculate_reading_time(self.content, self.words_per_minute)
+        return calculate_reading_time_from_html(
+            self.html_content, self.words_per_minute
+        )
 
     @property
     def modified_date(self) -> dt.datetime | None:

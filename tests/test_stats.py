@@ -87,11 +87,13 @@ class TestComputeBlogStats:
         slug: str = "test",
         title: str = "Test",
         content: str = "Hello world.",
-        html_content: str = "<p>Hello world.</p>",
+        html_content: str | None = None,
         date: dt.datetime | None = None,
         tags: list[str] | None = None,
         category: str | None = None,
     ) -> Post:
+        if html_content is None:
+            html_content = f"<p>{content}</p>"
         return Post(
             path=Path(f"{slug}.md"),
             title=title,
