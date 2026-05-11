@@ -170,7 +170,7 @@ class TestFontAwesomeOptimizerBuildCss:
 class TestFontAwesomeOptimizerFetchIconMetadata:
     """Test FontAwesomeOptimizer.fetch_icon_metadata."""
 
-    def test_fetch_returns_dict_on_success(self) -> None:
+    def test_fetch_returns_dict_on_success(self, tmp_path: Path) -> None:
         """Test that fetch_icon_metadata returns a dict when the request succeeds."""
         import json
 
@@ -181,24 +181,26 @@ class TestFontAwesomeOptimizerFetchIconMetadata:
         mock_cm.__enter__.return_value = mock_response
         mock_cm.__exit__.return_value = False
 
-        with patch("urllib.request.urlopen", return_value=mock_cm):
-            optimizer = FontAwesomeOptimizer(["github"])
-            result = optimizer.fetch_icon_metadata()
+        with patch("blogmore.fontawesome.get_user_cache_dir", return_value=tmp_path):
+            with patch("urllib.request.urlopen", return_value=mock_cm):
+                optimizer = FontAwesomeOptimizer(["github"])
+                result = optimizer.fetch_icon_metadata()
 
         assert isinstance(result, dict)
         assert "github" in result
 
-    def test_fetch_raises_on_network_error(self) -> None:
+    def test_fetch_raises_on_network_error(self, tmp_path: Path) -> None:
         """Test that fetch_icon_metadata propagates URL errors."""
         import urllib.error
 
-        with patch(
-            "urllib.request.urlopen",
-            side_effect=urllib.error.URLError("network error"),
-        ):
-            optimizer = FontAwesomeOptimizer(["github"])
-            with pytest.raises(urllib.error.URLError):
-                optimizer.fetch_icon_metadata()
+        with patch("blogmore.fontawesome.get_user_cache_dir", return_value=tmp_path):
+            with patch(
+                "urllib.request.urlopen",
+                side_effect=urllib.error.URLError("network error"),
+            ):
+                optimizer = FontAwesomeOptimizer(["github"])
+                with pytest.raises(urllib.error.URLError):
+                    optimizer.fetch_icon_metadata()
 
 
 class TestFontAwesomeOptimizerGenerate:

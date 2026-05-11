@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- The FontAwesome metadata is now cached, saving the need to download it
+  every time a site is built.
+  ([#469](https://github.com/davep/blogmore/pull/469))
+
 ## v2.21.0
 
 **Released: 2026-05-10**

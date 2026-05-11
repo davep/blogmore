@@ -11,6 +11,8 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
+from blogmore.utils import get_user_cache_dir
+
 # FontAwesome version targeted by this optimizer
 FONTAWESOME_VERSION = "6.5.1"
 
@@ -72,7 +74,11 @@ class FontAwesomeOptimizer:
         self.icon_names = icon_names
 
     def fetch_icon_metadata(self) -> dict[str, Any]:
-        """Fetch FontAwesome icon metadata from GitHub.
+        """Fetch FontAwesome icon metadata with local caching.
+
+        Attempts to load metadata from a local cache file first. If the file
+        does not exist or is corrupt, it fetches the metadata from GitHub
+        and updates the cache.
 
         Returns:
             Dictionary mapping icon name to its metadata (including the
@@ -80,11 +86,34 @@ class FontAwesomeOptimizer:
 
         Raises:
             urllib.error.URLError: If the metadata cannot be fetched from
-                GitHub.
+                GitHub and no cache is available.
             ValueError: If the response cannot be parsed as JSON.
         """
+        cache_dir = get_user_cache_dir()
+        cache_file = cache_dir / f"fa-metadata-{FONTAWESOME_VERSION}.json"
+
+        # Try to load from cache first
+        if cache_file.exists():
+            try:
+                return dict(json.loads(cache_file.read_text(encoding="utf-8")))
+            except (json.JSONDecodeError, OSError):
+                # If cache is corrupt, we'll fall through to network fetch
+                pass
+
+        # Network fetch
         with urllib.request.urlopen(FONTAWESOME_METADATA_URL) as response:
-            return dict(json.loads(response.read().decode("utf-8")))
+            content = response.read().decode("utf-8")
+
+        # Update cache
+        try:
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            cache_file.write_text(content, encoding="utf-8")
+        except OSError:
+            # If we can't write the cache, we still return the fetched data
+            # to avoid failing the build.
+            pass
+
+        return dict(json.loads(content))
 
     def build_css(self, metadata: dict[str, Any]) -> str:
         """Build a minimal CSS string for only the requested brand icons.
