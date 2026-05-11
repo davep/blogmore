@@ -2,6 +2,7 @@
 
 import datetime as dt
 import re
+import threading
 from collections.abc import Generator
 from dataclasses import dataclass, field
 from functools import cached_property
@@ -310,6 +311,11 @@ class Page:
         return extract_first_paragraph_from_html(self.html_content)
 
 
+# Thread-local storage for Markdown instances to ensure thread-safety while
+# allowing for instance reuse via .reset().
+_thread_local = threading.local()
+
+
 class PostParser:
     """Parse markdown files with frontmatter into Post objects."""
 
@@ -319,29 +325,53 @@ class PostParser:
         Args:
             site_url: Optional base URL of the site for determining internal vs external links
         """
-        self.markdown = markdown.Markdown(
-            extensions=[
-                "attr_list",
-                "fenced_code",
-                "codehilite",
-                "md_in_html",
-                "tables",
-                "toc",
-                "footnotes",
-                *create_custom_extensions(site_url=site_url or ""),
-            ],
-            extension_configs={
-                "codehilite": {
-                    "css_class": "highlight",
-                    "guess_lang": False,
-                    "use_pygments": True,
-                    "pygments_formatter": _LangAwareHtmlFormatter,
-                },
-                "footnotes": {
-                    "UNIQUE_IDS": True,
-                },
-            },
-        )
+        self.site_url = site_url or ""
+
+    @property
+    def markdown(self) -> markdown.Markdown:
+        """Get the thread-local Markdown instance for this parser.
+
+        Returns:
+            A configured `markdown.Markdown` instance.
+        """
+        # We include the site_url in the key to ensure that the cached instance
+        # is correctly configured for the current site.  Specifically:
+        #
+        # 1. ExternalLinksExtension is configured with the site_url to
+        #    distinguish internal from external links.
+        # 2. In 'serve' mode, if the user changes the site_url in their
+        #    config, the parser is re-created; using the URL in the key
+        #    ensures we rotate to a fresh, correctly-configured instance.
+        cache_key = f"markdown_{self.site_url}"
+        if not hasattr(_thread_local, cache_key):
+            setattr(
+                _thread_local,
+                cache_key,
+                markdown.Markdown(
+                    extensions=[
+                        "attr_list",
+                        "fenced_code",
+                        "codehilite",
+                        "md_in_html",
+                        "tables",
+                        "toc",
+                        "footnotes",
+                        *create_custom_extensions(site_url=self.site_url),
+                    ],
+                    extension_configs={
+                        "codehilite": {
+                            "css_class": "highlight",
+                            "guess_lang": False,
+                            "use_pygments": True,
+                            "pygments_formatter": _LangAwareHtmlFormatter,
+                        },
+                        "footnotes": {
+                            "UNIQUE_IDS": True,
+                        },
+                    },
+                ),
+            )
+        return getattr(_thread_local, cache_key)  # type: ignore[no-any-return]
 
     def _load_frontmatter(
         self, path: Path, content_type: str = "file"
@@ -465,10 +495,10 @@ class PostParser:
         draft = post_data.get("draft", False)
 
         # Convert markdown to HTML
-        html_content = self.markdown.convert(post_data.content)
-
-        # Reset markdown parser for next use
-        self.markdown.reset()
+        try:
+            html_content = self.markdown.convert(post_data.content)
+        finally:
+            self.markdown.reset()
 
         return Post(
             path=path,
@@ -553,10 +583,10 @@ class PostParser:
             )
 
         # Convert markdown to HTML
-        html_content = self.markdown.convert(page_data.content)
-
-        # Reset markdown parser for next use
-        self.markdown.reset()
+        try:
+            html_content = self.markdown.convert(page_data.content)
+        finally:
+            self.markdown.reset()
 
         return Page(
             path=path,
