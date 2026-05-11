@@ -153,6 +153,31 @@ class TextSansCodeExtractor(TextExtractor):
             super().handle_data(data)
 
 
+def html_to_plain_text(html: str, *, exclude_code_blocks: bool = False) -> str:
+    """Convert an HTML string to clean plain text.
+
+    Strips all HTML tags and collapses whitespace. This is the counterpart
+    to `markdown_to_plain_text` for cases where the HTML is already available,
+    avoiding a redundant Markdown parse.
+
+    Args:
+        html: HTML text to convert.
+        exclude_code_blocks: When `True`, the content of fenced code blocks
+            (rendered as ``<pre><code>…</code></pre>``) is omitted from the
+            output.  Inline code snippets (``<code>`` not wrapped in
+            ``<pre>``) are still included.  Defaults to `False`.
+
+    Returns:
+        Plain-text representation with whitespace collapsed to single spaces,
+        or an empty string if *html* is blank.
+    """
+    if not html.strip():
+        return ""
+    extractor = TextSansCodeExtractor() if exclude_code_blocks else TextExtractor()
+    extractor.feed(html)
+    return extractor.text
+
+
 def markdown_to_plain_text(text: str, *, exclude_code_blocks: bool = False) -> str:
     """Convert a Markdown string to clean plain text.
 
@@ -176,9 +201,8 @@ def markdown_to_plain_text(text: str, *, exclude_code_blocks: bool = False) -> s
     """
     if not text.strip():
         return ""
-    extractor = TextSansCodeExtractor() if exclude_code_blocks else TextExtractor()
-    extractor.feed(_make_markdown_instance().convert(text))
-    return extractor.text
+    html = _make_markdown_instance().convert(text)
+    return html_to_plain_text(html, exclude_code_blocks=exclude_code_blocks)
 
 
 ### plain_text.py ends here

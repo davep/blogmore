@@ -5,7 +5,7 @@ import re
 import sys
 from pathlib import Path
 
-from blogmore.markdown.plain_text import markdown_to_plain_text
+from blogmore.markdown.plain_text import html_to_plain_text
 
 
 def get_user_cache_dir() -> Path:
@@ -27,53 +27,54 @@ def get_user_cache_dir() -> Path:
     return base / "blogmore"
 
 
-def count_words(content: str) -> int:
-    """Count the number of words in the given content.
+def count_words_from_html(html_content: str) -> int:
+    """Count the number of words in the given HTML content.
 
-    Converts the Markdown content to plain text using the proper Markdown
-    parser (excluding fenced code blocks, which are not readable prose)
-    before splitting on whitespace.
+    Strips HTML tags (excluding fenced code blocks, which are not readable
+    prose) before splitting on whitespace.
 
     Args:
-        content: The text content to analyse (may include Markdown/HTML).
+        html_content: The HTML content to analyse.
 
     Returns:
         The number of words in the content.
 
     Examples:
-        >>> count_words("Hello world")
+        >>> count_words_from_html("<p>Hello world</p>")
         2
-        >>> count_words("word " * 10)
+        >>> count_words_from_html("<p>word </p>" * 10)
         10
     """
     return len(
         [
             word
             for word in re.findall(
-                r"\w+", markdown_to_plain_text(content, exclude_code_blocks=True)
+                r"\w+", html_to_plain_text(html_content, exclude_code_blocks=True)
             )
             if word
         ]
     )
 
 
-def calculate_reading_time(content: str, words_per_minute: int = 200) -> int:
-    """Calculate the estimated reading time for content in whole minutes.
+def calculate_reading_time_from_html(
+    html_content: str, words_per_minute: int = 200
+) -> int:
+    """Calculate the estimated reading time for HTML content in whole minutes.
 
     Args:
-        content: The text content to analyse (can include markdown)
+        html_content: The HTML content to analyse.
         words_per_minute: Average reading speed (default: 200 WPM)
 
     Returns:
         Estimated reading time in whole minutes (minimum 1 minute).
 
     Examples:
-        >>> calculate_reading_time("Hello world")
+        >>> calculate_reading_time_from_html("<p>Hello world</p>")
         1
-        >>> calculate_reading_time("word " * 400)
+        >>> calculate_reading_time_from_html("<p>word </p>" * 400)
         2
     """
-    return max(1, round(count_words(content) / words_per_minute))
+    return max(1, round(count_words_from_html(html_content) / words_per_minute))
 
 
 def make_urls_absolute(html_content: str, base_url: str) -> str:

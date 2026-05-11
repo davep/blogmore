@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 # Local imports.
 from blogmore.backlinks import Backlink
 from blogmore.parser import Post
-from blogmore.utils import count_words
+from blogmore.utils import count_words_from_html
 
 
 @dataclass
@@ -522,7 +522,7 @@ def compute_blog_stats(
             stats.latest_post_date = _to_naive(stats.latest_post_date)
 
     # --- Word count and reading time -----------------------------------------
-    word_counts = [(post, count_words(post.content)) for post in posts]
+    word_counts = [(post, count_words_from_html(post.html_content)) for post in posts]
     reading_times = [(post, post.reading_time) for post in posts]
 
     if word_counts:
