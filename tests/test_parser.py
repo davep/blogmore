@@ -139,7 +139,9 @@ class TestExtractFirstParagraph:
             "[![Banner](/img/banner.png)](https://example.com/)\n\n"
             "I've just released v1.1.0 of my app."
         )
-        assert extract_first_paragraph(content) == "I've just released v1.1.0 of my app."
+        assert (
+            extract_first_paragraph(content) == "I've just released v1.1.0 of my app."
+        )
 
     def test_code_block_stops_extraction(self) -> None:
         """Test that code blocks stop extraction if we have content."""
@@ -148,7 +150,9 @@ class TestExtractFirstParagraph:
 
     def test_remove_reference_style_link_with_ref(self) -> None:
         """Test that reference-style links [text][ref] are stripped to text."""
-        content = "When [Dave][davep] Pearson wrote this.\n\n[davep]: https://example.com/"
+        content = (
+            "When [Dave][davep] Pearson wrote this.\n\n[davep]: https://example.com/"
+        )
         assert extract_first_paragraph(content) == "When Dave Pearson wrote this."
 
     def test_remove_reference_style_link_empty_ref(self) -> None:
@@ -177,7 +181,9 @@ class TestExtractFirstParagraph:
         behaviour.
         """
         content = "See the [documentation] for details."
-        assert extract_first_paragraph(content) == "See the [documentation] for details."
+        assert (
+            extract_first_paragraph(content) == "See the [documentation] for details."
+        )
 
     def test_skip_reference_link_definition_lines(self) -> None:
         """Test that reference link definition lines are skipped entirely."""
@@ -223,9 +229,7 @@ class TestExtractFirstParagraph:
         BlogMore AdmonitionsExtension, so they are not treated as a paragraph.
         """
         content = (
-            "> [!NOTE]\n"
-            "> This is a note.\n\n"
-            "This is the first real paragraph."
+            "> [!NOTE]\n" "> This is a note.\n\n" "This is the first real paragraph."
         )
         assert extract_first_paragraph(content) == "This is the first real paragraph."
 
@@ -378,7 +382,6 @@ class TestPost:
         result = post.sorted_tag_pairs()
         assert [display for display, _ in result] == ["alpha", "Beta", "Gamma"]
 
-
         """Test that description from metadata is used when present."""
         post = Post(
             path=Path("test.md"),
@@ -395,7 +398,7 @@ class TestPost:
             path=Path("test.md"),
             title="Test",
             content="This is the first paragraph.\n\nThis is the second paragraph.",
-            html_content="<p>Test</p>",
+            html_content="<p>This is the first paragraph.</p><p>This is the second paragraph.</p>",
             metadata={},
         )
         assert post.description == "This is the first paragraph."
@@ -406,7 +409,7 @@ class TestPost:
             path=Path("test.md"),
             title="Test",
             content="First paragraph here.\n\nSecond paragraph.",
-            html_content="<p>Test</p>",
+            html_content="<p>First paragraph here.</p><p>Second paragraph.</p>",
             metadata=None,
         )
         assert post.description == "First paragraph here."
@@ -417,7 +420,7 @@ class TestPost:
             path=Path("test.md"),
             title="Test",
             content="![Image](img.jpg)\n\nThis is the first paragraph.",
-            html_content="<p>Test</p>",
+            html_content='<p><img src="img.jpg" alt="Image"></p><p>This is the first paragraph.</p>',
             metadata={},
         )
         assert post.description == "This is the first paragraph."
@@ -598,7 +601,7 @@ class TestPage:
             path=Path("test.md"),
             title="Test",
             content="This is the first paragraph.\n\nThis is the second paragraph.",
-            html_content="<p>Test</p>",
+            html_content="<p>This is the first paragraph.</p><p>This is the second paragraph.</p>",
             metadata={},
         )
         assert page.description == "This is the first paragraph."
@@ -687,28 +690,18 @@ class TestPostParser:
         parser = PostParser()
         post_file = tmp_path / "plus-one-title.md"
         post_file.write_text(
-            "---\n"
-            "title: +1\n"
-            "date: 2024-01-01\n"
-            "---\n"
-            "Content"
+            "---\n" "title: +1\n" "date: 2024-01-01\n" "---\n" "Content"
         )
 
         with pytest.raises(ValueError, match="'title' in frontmatter must be a string"):
             parser.parse_file(post_file)
 
-    def test_parse_file_non_string_title_error_cites_file(
-        self, tmp_path: Path
-    ) -> None:
+    def test_parse_file_non_string_title_error_cites_file(self, tmp_path: Path) -> None:
         """Test that the non-string title error message includes the filename."""
         parser = PostParser()
         post_file = tmp_path / "bad-title.md"
         post_file.write_text(
-            "---\n"
-            "title: +1\n"
-            "date: 2024-01-01\n"
-            "---\n"
-            "Content"
+            "---\n" "title: +1\n" "date: 2024-01-01\n" "---\n" "Content"
         )
 
         with pytest.raises(ValueError) as exc_info:
@@ -787,12 +780,12 @@ class TestPostParser:
             "Content"
         )
 
-        with pytest.raises(ValueError, match="'tags' in frontmatter must be a string or list"):
+        with pytest.raises(
+            ValueError, match="'tags' in frontmatter must be a string or list"
+        ):
             parser.parse_file(post_file)
 
-    def test_parse_file_bare_scalar_tag_error_cites_file(
-        self, tmp_path: Path
-    ) -> None:
+    def test_parse_file_bare_scalar_tag_error_cites_file(self, tmp_path: Path) -> None:
         """Test that the bare-scalar tags error message includes the filename."""
         parser = PostParser()
         post_file = tmp_path / "bare-scalar-tags-2.md"
@@ -812,9 +805,7 @@ class TestPostParser:
         assert str(post_file) in error_message
         assert "Fix" in error_message
 
-    def test_parse_file_bare_tags_entry_yields_no_tags(
-        self, tmp_path: Path
-    ) -> None:
+    def test_parse_file_bare_tags_entry_yields_no_tags(self, tmp_path: Path) -> None:
         """Test that a bare ``tags:`` frontmatter entry produces an empty tag list.
 
         A bare ``tags:`` with no associated value is parsed by YAML as ``None``.
@@ -883,9 +874,7 @@ class TestPostParser:
 
         # Create a post in the root content directory
         post_file = tmp_path / "my-post.md"
-        post_file.write_text(
-            "---\ntitle: Regular Post\ndate: 2024-01-01\n---\nContent"
-        )
+        post_file.write_text("---\ntitle: Regular Post\ndate: 2024-01-01\n---\nContent")
 
         # Create a page in the pages subdirectory (should be excluded)
         pages_subdir = tmp_path / "pages"
@@ -939,12 +928,7 @@ class TestPostParser:
         """
         parser = PostParser()
         page_file = tmp_path / "bad-title-page.md"
-        page_file.write_text(
-            "---\n"
-            "title: +1\n"
-            "---\n"
-            "Content"
-        )
+        page_file.write_text("---\n" "title: +1\n" "---\n" "Content")
 
         with pytest.raises(ValueError, match="'title' in frontmatter must be a string"):
             parser.parse_page(page_file)

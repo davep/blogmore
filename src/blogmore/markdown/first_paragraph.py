@@ -176,3 +176,19 @@ def extract_first_paragraph(content: str) -> str:
     extractor = _FirstParagraphExtractor()
     extractor.feed(html_content)
     return extractor.result
+
+
+def extract_first_paragraph_from_html(html_content: str) -> str:
+    """Extract the first paragraph from HTML content as plain text.
+
+    Args:
+        html_content: The HTML content to extract from.
+
+    Returns:
+        The first paragraph as plain text, or an empty string if none is found.
+    """
+    if not html_content.strip():
+        return ""
+    extractor = _FirstParagraphExtractor()
+    extractor.feed(html_content)
+    return extractor.result

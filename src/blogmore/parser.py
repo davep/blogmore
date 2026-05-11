@@ -4,6 +4,7 @@ import datetime as dt
 import re
 from collections.abc import Generator
 from dataclasses import dataclass, field
+from functools import cached_property
 from pathlib import Path
 from typing import Any
 
@@ -11,9 +12,13 @@ import frontmatter  # type: ignore[import-untyped]
 import markdown
 import yaml
 from dateutil import parser as dateutil_parser
+from markupsafe import Markup
 from pygments.formatters import HtmlFormatter
 
-from blogmore.markdown.first_paragraph import extract_first_paragraph
+from blogmore.markdown.first_paragraph import (
+    extract_first_paragraph,
+    extract_first_paragraph_from_html,
+)
 from blogmore.markdown.plain_text import create_custom_extensions
 from blogmore.utils import calculate_reading_time
 
@@ -185,7 +190,7 @@ class Post:
         pairs = [(tag, sanitize_for_url(tag)) for tag in self.tags]
         return sorted(pairs, key=lambda pair: pair[0].casefold())
 
-    @property
+    @cached_property
     def description(self) -> str:
         """Get the description for the post.
 
@@ -197,9 +202,9 @@ class Post:
         """
         if self.metadata and self.metadata.get("description"):
             return str(self.metadata.get("description"))
-        return extract_first_paragraph(self.content)
+        return extract_first_paragraph_from_html(self.html_content)
 
-    @property
+    @cached_property
     def reading_time(self) -> int:
         """Calculate the estimated reading time for this post in whole minutes.
 
@@ -292,7 +297,7 @@ class Page:
             return self.url_path
         return f"/{self.slug}.html"
 
-    @property
+    @cached_property
     def description(self) -> str:
         """Get the description for the page.
 
@@ -304,7 +309,7 @@ class Page:
         """
         if self.metadata and self.metadata.get("description"):
             return str(self.metadata.get("description"))
-        return extract_first_paragraph(self.content)
+        return extract_first_paragraph_from_html(self.html_content)
 
 
 class PostParser:
