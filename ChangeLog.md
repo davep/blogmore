@@ -16,6 +16,7 @@
   reading times. ([#472](https://github.com/davep/blogmore/pull/472))
 - Optimised the calculation of previous/next post lookups.
   ([#474](https://github.com/davep/blogmore/pull/474))
+- Optimised the use and reuse of the Markdown parsing object.
 
 ## v2.21.0
 

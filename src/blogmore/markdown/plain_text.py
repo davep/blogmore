@@ -15,11 +15,10 @@ needs to render or strip BlogMore-flavoured Markdown.
 ##############################################################################
 # Python imports.
 import re
+import threading
 from html.parser import HTMLParser
 from typing import Any
 
-##############################################################################
-# Third-party imports.
 import markdown
 
 ##############################################################################
@@ -28,6 +27,10 @@ from blogmore.markdown.admonitions import AdmonitionsExtension
 from blogmore.markdown.external_links import ExternalLinksExtension
 from blogmore.markdown.heading_anchors import HeadingAnchorsExtension
 from blogmore.markdown.strikethrough import StrikethroughExtension
+
+# Thread-local storage for Markdown instances to ensure thread-safety while
+# allowing for instance reuse via .reset().
+_thread_local = threading.local()
 
 
 def create_custom_extensions(site_url: str = "") -> list[Any]:
@@ -55,26 +58,31 @@ def create_custom_extensions(site_url: str = "") -> list[Any]:
     ]
 
 
-def _make_markdown_instance() -> markdown.Markdown:
-    """Create a Markdown instance suitable for plain-text extraction.
+def get_plain_text_markdown_instance() -> markdown.Markdown:
+    """Get a thread-local Markdown instance suitable for plain-text extraction.
 
     Includes all BlogMore custom extensions and the standard extensions
     needed to correctly parse all block structures.  Intentionally omits
     presentation-only extensions (`codehilite`, `toc`) that are not
     required for text extraction.
 
+    The instance is cached in thread-local storage; the caller should call
+    `.reset()` on it before each use if it has been used previously.
+
     Returns:
-        A fresh, configured `markdown.Markdown` instance.
+        A configured `markdown.Markdown` instance.
     """
-    return markdown.Markdown(
-        extensions=[
-            "fenced_code",
-            "md_in_html",
-            "tables",
-            "footnotes",
-            *create_custom_extensions(),
-        ],
-    )
+    if not hasattr(_thread_local, "plain_text_markdown"):
+        _thread_local.plain_text_markdown = markdown.Markdown(
+            extensions=[
+                "fenced_code",
+                "md_in_html",
+                "tables",
+                "footnotes",
+                *create_custom_extensions(),
+            ],
+        )
+    return _thread_local.plain_text_markdown  # type: ignore[no-any-return]
 
 
 class TextExtractor(HTMLParser):
@@ -201,7 +209,9 @@ def markdown_to_plain_text(text: str, *, exclude_code_blocks: bool = False) -> s
     """
     if not text.strip():
         return ""
-    html = _make_markdown_instance().convert(text)
+    md = get_plain_text_markdown_instance()
+    md.reset()
+    html = md.convert(text)
     return html_to_plain_text(html, exclude_code_blocks=exclude_code_blocks)
 
 
