@@ -7,7 +7,7 @@ from collections.abc import Generator
 from dataclasses import dataclass, field
 from functools import cached_property
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import frontmatter  # type: ignore[import-untyped]
 import markdown
@@ -371,7 +371,7 @@ class PostParser:
                     },
                 ),
             )
-        return getattr(_thread_local, cache_key)  # type: ignore[no-any-return]
+        return cast(markdown.Markdown, getattr(_thread_local, cache_key))
 
     def _load_frontmatter(
         self, path: Path, content_type: str = "file"

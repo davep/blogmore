@@ -502,7 +502,11 @@ def compute_blog_stats(
                 return date.astimezone(dt.UTC).replace(tzinfo=None)
             return date
 
-        naive_dated = [(post, _to_naive(post.date)) for post in dated_posts]  # type: ignore[arg-type]
+        naive_dated = [
+            (post, _to_naive(post.date))
+            for post in dated_posts
+            if post.date is not None
+        ]
         earliest_pair = min(naive_dated, key=lambda pair: pair[1])
         latest_pair = max(naive_dated, key=lambda pair: pair[1])
         stats.earliest_post = earliest_pair[0]
