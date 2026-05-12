@@ -67,6 +67,8 @@ here](https://github.com/davep/davep.github.com)).
   any git branch)
 - **Live preview server** — local development server with automatic rebuilding
   on file changes
+- **Built-in linter** — check your site for broken internal links, missing
+  metadata, duplicate titles, and other common issues
 - **YAML configuration file** — keep all your settings in `blogmore.yaml`
   instead of repeating them on the command line
 

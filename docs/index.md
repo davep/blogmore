@@ -23,6 +23,7 @@ BlogMore focuses on simplicity and efficiency in creating blog-focused websites.
 - **Live preview server** - Local development server with automatic rebuilding on changes
 - **GitHub Pages integration** - Simple publishing workflow to GitHub Pages (or any git branch)
 - **Configurable** - Extensive configuration options via YAML config files or command-line arguments
+- **Built-in linter** - Check your site for broken internal links, missing metadata, duplicate titles, and other common issues
 - **Sidebar customisation** - Optional logo, custom links, and social media icons
 - **SEO optimisation** - Proper meta tags, Open Graph tags, and Twitter Card support
 - **Automatic icon generation** - Generate favicons and platform-specific icons (iOS, Android, Windows) from a single source image
