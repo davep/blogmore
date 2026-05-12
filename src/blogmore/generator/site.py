@@ -17,9 +17,9 @@ from blogmore.generator.paths import (
     resolve_post_output_paths,
     resolve_sidebar_pages,
 )
-from blogmore.generator.utils import timed_step
 from blogmore.parser import PostParser
 from blogmore.renderer import TemplateRenderer
+from blogmore.utils import timed_step
 
 if TYPE_CHECKING:
     from blogmore.backlinks import Backlink

@@ -18,6 +18,8 @@
   ([#474](https://github.com/davep/blogmore/pull/474))
 - Optimised the use and reuse of the Markdown parsing object.
   ([#475](https://github.com/davep/blogmore/pull/475))
+- Added some extra stats to the output of the linter.
+  ([#477](https://github.com/davep/blogmore/pull/477))
 
 ## v2.21.0
 

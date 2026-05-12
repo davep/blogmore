@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime as dt
 import re
 import sys
+import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urljoin, urlparse
@@ -111,6 +112,7 @@ class Linter:
         assert content_dir is not None
 
         print(f"Linting site in {content_dir}...")
+        start_time = time.monotonic()
 
         # 1. Parse all pages & posts
         pages_dir = content_dir / "pages"
@@ -278,6 +280,7 @@ class Linter:
                         )
 
         # 4. Check for future dates and missing metadata
+        # 5. Check links in posts and pages
         now = dt.datetime.now(dt.UTC)
         titles_seen: dict[str, list[Path]] = {}
 
@@ -342,7 +345,6 @@ class Linter:
             print("No posts or pages found to lint.")
             return 1 if self.errors > 0 else 0
 
-        # 5. Check links in posts and pages
         all_items = [(p, "post") for p in posts] + [(p, "page") for p in pages]
         if page_404:
             all_items.append((page_404, "page"))
@@ -380,7 +382,11 @@ class Linter:
                         cover, item, valid_urls, is_image=True, is_cover=True
                     )
 
-        print(f"Linting complete: {self.errors} error(s), {self.warnings} warning(s).")
+        elapsed = time.monotonic() - start_time
+        print(
+            f"Linting complete: {len(posts)} post(s), {len(pages)} page(s), "
+            f"{self.errors} error(s), {self.warnings} warning(s) [{elapsed:.2f}s]."
+        )
         return 1 if self.errors > 0 else 0
 
     def _check_config_link(

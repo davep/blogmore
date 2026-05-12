@@ -27,8 +27,9 @@ from blogmore.generator.constants import (
     SEARCH_JS_FILENAME,
     THEME_JS_FILENAME,
 )
-from blogmore.generator.utils import minified_filename, timed_step
+from blogmore.generator.utils import minified_filename
 from blogmore.icons import IconGenerator, detect_source_icon
+from blogmore.utils import timed_step
 
 if TYPE_CHECKING:
     from blogmore.site_config import SiteConfig

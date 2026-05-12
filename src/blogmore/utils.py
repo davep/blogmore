@@ -1,11 +1,42 @@
 """Utility functions for blogmore."""
 
+from __future__ import annotations
+
 import os
 import re
 import sys
+import time
+from collections.abc import Generator
+from contextlib import contextmanager
 from pathlib import Path
 
 from blogmore.markdown.plain_text import html_to_plain_text
+
+
+@contextmanager
+def timed_step(label: str) -> Generator[None, None, None]:
+    """Time a named generation step and print its wall-clock duration.
+
+    Prints `label` immediately (without a trailing newline) so the elapsed
+    time can be appended on the same line once the step finishes.  If the
+    step raises an exception a bare newline is emitted before re-raising, so
+    subsequent output always starts on a fresh line.
+
+    Args:
+        label: Human-readable description of the step, printed as it begins.
+
+    Yields:
+        Nothing — the caller performs the work inside the `with` block.
+    """
+    print(label, end="", flush=True)
+    start = time.monotonic()
+    try:
+        yield
+    except BaseException:
+        print()  # ensure subsequent output starts on a fresh line
+        raise
+    elapsed = time.monotonic() - start
+    print(f" [{elapsed:.2f}s]")
 
 
 def get_user_cache_dir() -> Path:
