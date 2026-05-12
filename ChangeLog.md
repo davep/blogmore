@@ -8,7 +8,8 @@
   every time a site is built.
   ([#469](https://github.com/davep/blogmore/pull/469))
 - Reduced the amount of Markdown parsing done when calculating the
-  backlinks. ([#470](https://github.com/davep/blogmore/pull/470))
+  backlinks. ([#470](https://github.com/davep/blogmore/pull/470) then
+  [#478](https://github.com/davep/blogmore/pull/478))
 - Reduced the amount of Markdown parsing done when extracting various stats
   and metadata from posts.
   ([#471](https://github.com/davep/blogmore/pull/471))

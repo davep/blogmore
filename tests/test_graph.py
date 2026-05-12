@@ -12,10 +12,12 @@ from blogmore.graph import (
     GraphData,
     build_graph_data,
 )
-from blogmore.parser import Post
+from blogmore.parser import Post, PostParser
 
 ##############################################################################
 # Helpers.
+
+_parser = PostParser()
 
 
 def _make_post(
@@ -43,11 +45,12 @@ def _make_post(
     Returns:
         A Post object suitable for graph tests.
     """
+    html_content = _parser.markdown.convert(content)
     post = Post(
         path=Path(f"{slug}.md"),
         title=title,
         content=content,
-        html_content=f"<p>{content}</p>",
+        html_content=html_content,
         tags=tags,
         category=category,
         date=date,
@@ -381,9 +384,13 @@ class TestBuildGraphData:
             _make_post("post-c", "C", "/c.html", tags=["python", "testing"]),
         ]
         graph = build_graph_data(posts)
-        tag_node = next(n for n in graph.nodes if n["type"] == "tag" and n["label"] == "python")
+        tag_node = next(
+            n for n in graph.nodes if n["type"] == "tag" and n["label"] == "python"
+        )
         assert tag_node["post_count"] == 3
-        testing_node = next(n for n in graph.nodes if n["type"] == "tag" and n["label"] == "testing")
+        testing_node = next(
+            n for n in graph.nodes if n["type"] == "tag" and n["label"] == "testing"
+        )
         assert testing_node["post_count"] == 1
 
     def test_category_node_has_post_count(self) -> None:
@@ -394,9 +401,13 @@ class TestBuildGraphData:
             _make_post("post-c", "C", "/c.html", category="News"),
         ]
         graph = build_graph_data(posts)
-        tech_node = next(n for n in graph.nodes if n["type"] == "category" and n["label"] == "Tech")
+        tech_node = next(
+            n for n in graph.nodes if n["type"] == "category" and n["label"] == "Tech"
+        )
         assert tech_node["post_count"] == 2
-        news_node = next(n for n in graph.nodes if n["type"] == "category" and n["label"] == "News")
+        news_node = next(
+            n for n in graph.nodes if n["type"] == "category" and n["label"] == "News"
+        )
         assert news_node["post_count"] == 1
 
     def test_link_fields_complete(self) -> None:

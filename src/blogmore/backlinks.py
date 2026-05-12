@@ -19,7 +19,7 @@ from markupsafe import Markup
 
 ##############################################################################
 # Local imports.
-from blogmore.markdown.plain_text import markdown_to_plain_text
+from blogmore.markdown.plain_text import html_to_plain_text
 from blogmore.parser import Post
 
 ##############################################################################
@@ -33,23 +33,13 @@ _SNIPPET_CONTEXT_CHARS: int = 100
 _BACKLINK_MARKER_PREFIX: str = "BKLINK8f3a2b19_"
 
 ##############################################################################
-# Compiled regular expressions for Markdown link detection.
-
-# Inline links: [link text](url) or [link text](url "optional title")
-# The URL portion allows one level of balanced parentheses so that paths such
-# as /2016/11/15/seen_by_davep_(the_return).html are captured in full.
-# The atomic group (?>...) prevents catastrophic backtracking when the regex
-# engine encounters a long run of characters without a matching closing ")"
-# (Python 3.11+ feature; this codebase targets 3.12+).
-_INLINE_LINK_RE: re.Pattern[str] = re.compile(
-    r"\[([^\]]*)\]\(((?>[^()]+|\([^()]*\))*)\)"
+# Compiled regular expression for HTML link detection.
+# Matches <a href="...">text</a>, capturing the URL and the link text.
+# The href attribute can be in any position within the opening tag and
+# can use either single or double quotes.
+_HTML_LINK_RE: re.Pattern[str] = re.compile(
+    r'<a\s+(?:[^>]*?\s+)?href=(["\'])(.*?)\1[^>]*?>(.*?)</a>', re.DOTALL
 )
-
-# Reference-style link definitions: [id]: url  (at the start of any line)
-_LINK_DEF_RE: re.Pattern[str] = re.compile(r"^\[([^\]]+)\]:\s+(\S+)", re.MULTILINE)
-
-# Reference-style links: [text][ref] or [text][] (implicit ref = text)
-_REF_LINK_RE: re.Pattern[str] = re.compile(r"\[([^\]]+)\]\[([^\]]*)\]")
 
 
 @dataclass
@@ -57,7 +47,7 @@ class Backlink:
     """A back-link reference from one post to another.
 
     Attributes:
-        source_post: The post whose Markdown content contains the link.
+        source_post: The post whose content contains the link.
         snippet: HTML-safe excerpt from the source post surrounding the
             link, with up to `_SNIPPET_CONTEXT_CHARS` characters of
             context on each side and an ellipsis (``…``) where the
@@ -71,14 +61,14 @@ class Backlink:
 
 
 def _extract_snippets(
-    content: str,
+    html_content: str,
     link_data: list[tuple[int, int, str, Post]],
 ) -> list[tuple[Post, Markup]]:
     """Extract HTML-safe snippets for multiple links in one pass.
 
     Args:
-        content: The raw Markdown source of the post.
-        link_data: List of (match_start, match_end, link_text, target_post) tuples.
+        html_content: The rendered HTML content of the post.
+        link_data: List of (match_start, match_end, link_html, target_post) tuples.
 
     Returns:
         List of (target_post, snippet_markup) tuples.
@@ -89,21 +79,22 @@ def _extract_snippets(
     # Sort links by start position in reverse to avoid shifting indices while inserting markers
     sorted_links = sorted(link_data, key=lambda x: x[0], reverse=True)
 
-    # Insert unique markers for each link
-    marked_content = content
+    # Insert unique markers for each link into the HTML
+    marked_html = html_content
     for i, (start, end, _, _) in enumerate(sorted_links):
         marker = f"{_BACKLINK_MARKER_PREFIX}{i}_"
-        marked_content = marked_content[:start] + marker + marked_content[end:]
+        marked_html = marked_html[:start] + marker + marked_html[end:]
 
     # Pre-calculate the plain-text representation of every link's text.
-    # This allows us to replace secondary markers in snippets without
-    # redundant Markdown parses.
+    # We use html_to_plain_text to strip any tags (like <em> or <code>)
+    # from the link text.
     plain_link_texts = [
-        markdown_to_plain_text(lt) if lt else "" for _, _, lt, _ in sorted_links
+        html_to_plain_text(lt) if lt else "" for _, _, lt, _ in sorted_links
     ]
 
-    # Convert the entire marked document to plain text in one pass
-    plain_full = markdown_to_plain_text(marked_content)
+    # Convert the entire marked document to plain text in one pass.
+    # This strips all remaining HTML tags while preserving our markers.
+    plain_full = html_to_plain_text(marked_html)
 
     # Locate the spans of all markers in the plain text. We will use these
     # to "snap" the context window boundaries so that we never extract
@@ -168,59 +159,24 @@ def _extract_snippets(
     return results
 
 
-def _extract_link_url(raw_url: str) -> str:
-    """Extract only the URL portion from a raw link target.
-
-    Strips an optional title attribute (text in quotes or parentheses
-    following a space after the URL) from a link target string such as
-    ``/foo.html "My Title"``.
+def _find_links(html_content: str) -> list[tuple[str, int, int, str]]:
+    """Find all hyperlinks in rendered HTML content.
 
     Args:
-        raw_url: The raw URL string as captured from Markdown source.
-
-    Returns:
-        The URL with any title attribute removed.
-    """
-    # A title may follow the URL after whitespace: url "title" or url 'title'
-    return raw_url.split()[0] if raw_url.strip() else raw_url
-
-
-def _find_links(content: str) -> list[tuple[str, int, int, str]]:
-    """Find all hyperlinks in Markdown source content.
-
-    Recognises inline links (``[text](url)``) and reference-style links
-    (``[text][ref]`` with a ``[ref]: url`` definition elsewhere in the
-    document).
-
-    Args:
-        content: Raw Markdown source to scan.
+        html_content: Rendered HTML content to scan.
 
     Returns:
         A list of ``(url, match_start, match_end, link_text)`` tuples.
         *match_start* and *match_end* are the character positions of the
-        full link syntax within *content* (useful for context extraction);
-        *link_text* is the display text of the link as written in the
-        Markdown source.
+        full ``<a>`` tag syntax within *html_content*; *link_text* is the
+        HTML content of the link.
     """
     results: list[tuple[str, int, int, str]] = []
 
-    # Collect reference link definitions first.
-    refs: dict[str, str] = {}
-    for definition in _LINK_DEF_RE.finditer(content):
-        refs[definition.group(1).lower()] = definition.group(2).strip()
-
-    # Inline links: [text](url)
-    for match in _INLINE_LINK_RE.finditer(content):
-        url = _extract_link_url(match.group(2))
+    for match in _HTML_LINK_RE.finditer(html_content):
+        url = match.group(2).strip()
         if url:
-            results.append((url, match.start(), match.end(), match.group(1)))
-
-    # Reference-style links: [text][ref] or [text][]
-    for match in _REF_LINK_RE.finditer(content):
-        ref_id = match.group(2).lower() or match.group(1).lower()
-        url = refs.get(ref_id, "")
-        if url:
-            results.append((url, match.start(), match.end(), match.group(1)))
+            results.append((url, match.start(), match.end(), match.group(3)))
 
     return results
 
@@ -254,7 +210,7 @@ def _to_path(url: str, site_url: str) -> str | None:
     links (``#section``) and relative links (``../path``) are also rejected.
 
     Args:
-        url: The raw URL from a Markdown link.
+        url: The raw URL from an HTML link.
         site_url: The site's base URL (e.g. ``https://example.com``), used
             to strip the domain from full URLs that point back to this site.
 
@@ -294,7 +250,7 @@ def build_backlink_map(
 ) -> dict[str, list[Backlink]]:
     """Build a mapping from post URL to the list of posts that link to it.
 
-    Scans the raw Markdown content of every post for internal links and
+    Scans the rendered HTML content of every post for internal links and
     records which posts link to which other posts.  Self-links are ignored.
     Links that resolve to pages (as opposed to posts) are automatically
     excluded because the mapping is built solely from `posts`.
@@ -325,7 +281,7 @@ def build_backlink_map(
     for source_post in posts:
         internal_links: list[tuple[int, int, str, Post]] = []
         for raw_url, match_start, match_end, link_text in _find_links(
-            source_post.content
+            source_post.html_content
         ):
             path = _to_path(raw_url, site_url)
             if path is None:
@@ -338,7 +294,7 @@ def build_backlink_map(
 
         if internal_links:
             for target_post, snippet in _extract_snippets(
-                source_post.content, internal_links
+                source_post.html_content, internal_links
             ):
                 backlinks[target_post.url].append(
                     Backlink(source_post=source_post, snippet=snippet)

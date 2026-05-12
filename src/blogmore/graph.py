@@ -190,7 +190,7 @@ def build_graph_data(
     # is needed here for graph edge construction.
     link_pairs: set[tuple[str, str]] = set()
     for source_post in posts:
-        for raw_url, _, _, _ in _find_links(source_post.content):
+        for raw_url, _, _, _ in _find_links(source_post.html_content):
             path = _to_path(raw_url, site_url)
             if path is None:
                 continue
