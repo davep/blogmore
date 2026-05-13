@@ -1,5 +1,12 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added a `cache` command to the CLI to show the cache location and clear
+  the cache directory. ([#482](https://github.com/davep/blogmore/pull/482))
+
 ## v2.22.0
 
 **Released: 2026-05-13**

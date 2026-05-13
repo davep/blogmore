@@ -1,6 +1,7 @@
 """Command-line interface for blogmore."""
 
 import argparse
+import shutil
 import sys
 from pathlib import Path
 from typing import Any
@@ -19,6 +20,7 @@ from blogmore.linter import lint_site
 from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
 from blogmore.site_config import SiteConfig, site_config_defaults
+from blogmore.utils import get_user_cache_dir
 
 
 def main() -> int:
@@ -35,6 +37,24 @@ def main() -> int:
         args.output = args.output.expanduser()
     if hasattr(args, "config") and args.config is not None:
         args.config = args.config.expanduser()
+
+    # Handle cache command
+    if args.command == "cache":
+        cache_dir = get_user_cache_dir()
+        if args.cache_command == "location":
+            print(cache_dir)
+            return 0
+        if args.cache_command == "clear":
+            if cache_dir.exists():
+                try:
+                    shutil.rmtree(cache_dir)
+                    print(f"Cache cleared: {cache_dir}")
+                except Exception as e:
+                    print(f"Error clearing cache: {e}", file=sys.stderr)
+                    return 1
+            else:
+                print(f"Cache directory does not exist: {cache_dir}")
+            return 0
 
     # Store the original CLI argument values before merging with config
     # This will be used to determine which CLI args should override config on reload

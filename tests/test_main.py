@@ -248,9 +248,9 @@ class TestContentChangeHandler:
         finally:
             handler._regeneration_lock.release()
 
-        assert generate_call_count == 0, (
-            "generate() should not be called when regeneration lock is held"
-        )
+        assert (
+            generate_call_count == 0
+        ), "generate() should not be called when regeneration lock is held"
 
 
 class TestQuietHTTPRequestHandler:
@@ -1105,9 +1105,9 @@ class TestConfigFileIntegration:
         ):
             result = main()
             assert result == 0
-            assert (temp_output_dir / "stats.html").exists(), (
-                "stats.html should be generated when with_stats: true is set in the config file"
-            )
+            assert (
+                temp_output_dir / "stats.html"
+            ).exists(), "stats.html should be generated when with_stats: true is set in the config file"
 
     def test_with_graph_flag_generates_graph_page(
         self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
@@ -1132,7 +1132,9 @@ class TestConfigFileIntegration:
         ):
             result = main()
             assert result == 0
-            assert (temp_output_dir / "graph.html").exists(), (
+            assert (
+                temp_output_dir / "graph.html"
+            ).exists(), (
                 "graph.html should be generated when --with-graph flag is passed"
             )
 
@@ -1161,9 +1163,9 @@ class TestConfigFileIntegration:
         ):
             result = main()
             assert result == 0
-            assert (temp_output_dir / "graph.html").exists(), (
-                "graph.html should be generated when with_graph: true is set in the config file"
-            )
+            assert (
+                temp_output_dir / "graph.html"
+            ).exists(), "graph.html should be generated when with_graph: true is set in the config file"
 
     def test_main_build_without_content_dir_fails(
         self, temp_output_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -1342,11 +1344,7 @@ class TestPagesConfigValidation:
             "---\ntitle: A Post\ndate: 2024-01-01\n---\n\nPost content."
         )
         config_file = tmp_path / "blogmore.yaml"
-        config_file.write_text(
-            f"output: {temp_output_dir}\n"
-            "pages:\n"
-            "  - about\n"
-        )
+        config_file.write_text(f"output: {temp_output_dir}\n" "pages:\n" "  - about\n")
 
         with patch.object(
             sys,
@@ -1394,11 +1392,7 @@ class TestPagesConfigValidation:
     ) -> None:
         """A non-string item inside ``pages`` causes main() to return 1."""
         config_file = tmp_path / "blogmore.yaml"
-        config_file.write_text(
-            f"output: {tmp_path / 'output'}\n"
-            "pages:\n"
-            "  - 42\n"
-        )
+        config_file.write_text(f"output: {tmp_path / 'output'}\n" "pages:\n" "  - 42\n")
 
         with patch.object(
             sys,
@@ -1426,10 +1420,7 @@ class TestPagesConfigValidation:
             "---\ntitle: A Post\ndate: 2024-01-01\n---\n\nPost content."
         )
         config_file = tmp_path / "blogmore.yaml"
-        config_file.write_text(
-            f"output: {temp_output_dir}\n"
-            "pages: []\n"
-        )
+        config_file.write_text(f"output: {temp_output_dir}\n" "pages: []\n")
 
         with patch.object(
             sys,
@@ -1464,8 +1455,7 @@ class TestPagePathConfigValidation:
         )
         config_file = tmp_path / "blogmore.yaml"
         config_file.write_text(
-            f"output: {temp_output_dir}\n"
-            'page_path: "{slug}/index.html"\n'
+            f"output: {temp_output_dir}\n" 'page_path: "{slug}/index.html"\n'
         )
 
         with patch.object(
@@ -1544,8 +1534,7 @@ class TestPagePathConfigValidation:
         )
         config_file = tmp_path / "blogmore.yaml"
         config_file.write_text(
-            f"output: {temp_output_dir}\n"
-            'page_path: "pages/{slug}/index.html"\n'
+            f"output: {temp_output_dir}\n" 'page_path: "pages/{slug}/index.html"\n'
         )
 
         with patch.object(
@@ -1602,7 +1591,9 @@ class TestPaginationPathConfigValidation:
         # Archive (year) page 1 uses page_1_path → 2024/page/1/index.html.
         assert (temp_output_dir / "2024" / "page" / "1" / "index.html").exists()
         # Tag page 1 uses page_1_path → tag/python/page/1/index.html.
-        assert (temp_output_dir / "tag" / "python" / "page" / "1" / "index.html").exists()
+        assert (
+            temp_output_dir / "tag" / "python" / "page" / "1" / "index.html"
+        ).exists()
 
     def test_page_n_path_from_config_is_applied(
         self,
@@ -1618,8 +1609,7 @@ class TestPaginationPathConfigValidation:
             )
         config_file = tmp_path / "blogmore.yaml"
         config_file.write_text(
-            f"output: {temp_output_dir}\n"
-            'page_n_path: "p{page}.html"\n'
+            f"output: {temp_output_dir}\n" 'page_n_path: "p{page}.html"\n'
         )
 
         with patch.object(
@@ -2429,7 +2419,11 @@ class TestConfigChangeHandler:
             assert generator.site_config.search_path == "/search/index.html"
 
     def test_invalid_search_path_not_html_warns_and_keeps_default(
-        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+        self,
+        posts_dir: Path,
+        temp_output_dir: Path,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
         """An invalid search_path (not ending in .html) warns and keeps the default."""
 
@@ -2469,7 +2463,11 @@ class TestConfigChangeHandler:
             assert "search_path" in captured.err
 
     def test_non_string_search_path_warns_and_keeps_default(
-        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+        self,
+        posts_dir: Path,
+        temp_output_dir: Path,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
         """A non-string search_path warns and keeps the default."""
 
@@ -2743,7 +2741,11 @@ class TestConfigChangeHandler:
             assert generator.site_config.archive_path == "/archive/index.html"
 
     def test_invalid_archive_path_not_html_warns_and_keeps_default(
-        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+        self,
+        posts_dir: Path,
+        temp_output_dir: Path,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
         """An invalid archive_path (not ending in .html) warns and keeps the default."""
 
@@ -2783,7 +2785,11 @@ class TestConfigChangeHandler:
             assert "archive_path" in captured.err
 
     def test_non_string_archive_path_warns_and_keeps_default(
-        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+        self,
+        posts_dir: Path,
+        temp_output_dir: Path,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
         """A non-string archive_path warns and keeps the default."""
 
@@ -2821,3 +2827,49 @@ class TestConfigChangeHandler:
             assert generator.site_config.archive_path == DEFAULT_ARCHIVE_PATH
             captured = capsys.readouterr()
             assert "archive_path" in captured.err
+
+
+class TestCacheCLI:
+    """Test the 'cache' CLI command."""
+
+    def test_cache_location(
+        self, capsys: pytest.CaptureFixture[str], tmp_path: Path
+    ) -> None:
+        """Test 'cache location' command."""
+        test_cache = tmp_path / "blogmore_test_cache"
+        with patch("blogmore.__main__.get_user_cache_dir", return_value=test_cache):
+            with patch.object(sys, "argv", ["blogmore", "cache", "location"]):
+                result = main()
+                assert result == 0
+                captured = capsys.readouterr()
+                assert str(test_cache) in captured.out
+
+    def test_cache_clear(
+        self, capsys: pytest.CaptureFixture[str], tmp_path: Path
+    ) -> None:
+        """Test 'cache clear' command."""
+        # Use a fresh temp directory for this test's cache
+        test_cache = tmp_path / "test_cache_to_clear"
+        test_cache.mkdir()
+        (test_cache / "some_file.json").write_text("{}")
+
+        with patch("blogmore.__main__.get_user_cache_dir", return_value=test_cache):
+            with patch.object(sys, "argv", ["blogmore", "cache", "clear"]):
+                result = main()
+                assert result == 0
+                captured = capsys.readouterr()
+                assert f"Cache cleared: {test_cache}" in captured.out
+                assert not test_cache.exists()
+
+    def test_cache_clear_nonexistent(
+        self, capsys: pytest.CaptureFixture[str], tmp_path: Path
+    ) -> None:
+        """Test 'cache clear' command when directory doesn't exist."""
+        test_cache = tmp_path / "nonexistent_cache"
+
+        with patch("blogmore.__main__.get_user_cache_dir", return_value=test_cache):
+            with patch.object(sys, "argv", ["blogmore", "cache", "clear"]):
+                result = main()
+                assert result == 0
+                captured = capsys.readouterr()
+                assert f"Cache directory does not exist: {test_cache}" in captured.out
