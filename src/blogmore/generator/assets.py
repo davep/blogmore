@@ -29,7 +29,7 @@ from blogmore.generator.constants import (
 )
 from blogmore.generator.utils import minified_filename
 from blogmore.icons import IconGenerator, detect_source_icon
-from blogmore.utils import timed_step
+from blogmore.utils import get_blog_cache_dir, timed_step
 
 if TYPE_CHECKING:
     from blogmore.site_config import SiteConfig
@@ -117,12 +117,16 @@ class AssetManager:
 
             # Generate to /icons subdirectory
             icons_output_dir = self.site_config.output_dir / "icons"
-            generator = IconGenerator(source_icon, icons_output_dir)
+            blog_cache_dir = get_blog_cache_dir(self._content_dir)
+            icon_cache_dir = blog_cache_dir / "icons"
+            generator = IconGenerator(
+                source_icon, icons_output_dir, cache_dir=icon_cache_dir
+            )
             with timed_step("Generating favicon and Apple touch icons..."):
                 generated = generator.generate_all()
 
             if generated:
-                print(f"Generated {len(generated)} icon file(s):")
+                print(f"  Generated {len(generated)} icon file(s):")
                 for icon_name in generated:
                     print(f"  - icons/{icon_name}")
 

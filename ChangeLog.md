@@ -6,6 +6,9 @@
 
 - Added a `cache` command to the CLI to show the cache location and clear
   the cache directory. ([#482](https://github.com/davep/blogmore/pull/482))
+- The generated favicons and platform icons are now cached per-blog, saving
+  the need to recreate them on every build unless the source image changes.
+  ([#483](https://github.com/davep/blogmore/pull/483))
 
 ## v2.22.0
 
