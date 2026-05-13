@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.22.0
 
-**Released: WiP**
+**Released: 2026-05-13**
 
 - The FontAwesome metadata is now cached, saving the need to download it
   every time a site is built.
