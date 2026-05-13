@@ -10,11 +10,13 @@ blogmore <command> [arguments] [options]
 
 ## Commands
 
-BlogMore provides three main commands:
+BlogMore provides several commands:
 
 - **`build`** - Generate the static site
 - **`serve`** - Generate and serve the site locally with auto-reload
 - **`publish`** - Build and publish the site to a git branch
+- **`lint`** - Check the site for common issues (broken links, etc.)
+- **`cache`** - Manage the BlogMore cache
 
 ### Command Aliases
 
@@ -502,6 +504,57 @@ blogmore publish posts/ \
 Publish to a different remote:
 ```bash
 blogmore publish posts/ --remote upstream --branch pages
+```
+
+## Lint Command
+
+Check your site content for common issues like broken internal links or malformed frontmatter.
+
+### Synopsis
+
+```bash
+blogmore lint [content_dir] [options]
+blogmore check [content_dir] [options]
+```
+
+### Arguments
+
+**`content_dir`** (optional)
+: Directory containing your Markdown blog posts.
+
+### Examples
+
+Check the site for issues:
+```bash
+blogmore lint posts/
+```
+
+## Cache Command
+
+Manage the BlogMore cache directory.
+
+### Synopsis
+
+```bash
+blogmore cache <subcommand>
+```
+
+### Subcommands
+
+#### `location`
+
+Show the absolute path to the BlogMore cache directory on your system.
+
+```bash
+blogmore cache location
+```
+
+#### `clear`
+
+Remove all files and directories from the BlogMore cache. This is useful if you want to force BlogMore to re-download cached metadata (like FontAwesome metadata).
+
+```bash
+blogmore cache clear
 ```
 
 ## Configuration File Priority

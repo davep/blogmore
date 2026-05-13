@@ -293,6 +293,28 @@ def create_parser() -> argparse.ArgumentParser:
 
     add_common_arguments(lint_parser)
 
+    # Cache command
+    cache_parser = subparsers.add_parser(
+        "cache",
+        help="Manage the blogmore cache",
+    )
+
+    cache_subparsers = cache_parser.add_subparsers(
+        dest="cache_command", help="Cache sub-command", required=True
+    )
+
+    # Cache location sub-command
+    cache_subparsers.add_parser(
+        "location",
+        help="Show the location of the cache directory",
+    )
+
+    # Cache clear sub-command
+    cache_subparsers.add_parser(
+        "clear",
+        help="Clear the cache directory",
+    )
+
     parser.add_argument(
         "--version",
         action="version",
