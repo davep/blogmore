@@ -779,6 +779,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v2220" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        v2.22.0
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v2210" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1480,6 +1491,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v2220" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        v2.22.0
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v2210" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -2125,6 +2147,27 @@
 
 
 <h1 id="blogmore-changelog">BlogMore ChangeLog</h1>
+<h2 id="v2220">v2.22.0</h2>
+<p><strong>Released: 2026-05-13</strong></p>
+<ul>
+<li>The FontAwesome metadata is now cached, saving the need to download it
+  every time a site is built.
+  (<a href="https://github.com/davep/blogmore/pull/469">#469</a>)</li>
+<li>Reduced the amount of Markdown parsing done when calculating the
+  backlinks. (<a href="https://github.com/davep/blogmore/pull/470">#470</a> then
+  <a href="https://github.com/davep/blogmore/pull/478">#478</a>)</li>
+<li>Reduced the amount of Markdown parsing done when extracting various stats
+  and metadata from posts.
+  (<a href="https://github.com/davep/blogmore/pull/471">#471</a>)</li>
+<li>Removed the need to re-parse the Markdown when calculating word counts and
+  reading times. (<a href="https://github.com/davep/blogmore/pull/472">#472</a>)</li>
+<li>Optimised the calculation of previous/next post lookups.
+  (<a href="https://github.com/davep/blogmore/pull/474">#474</a>)</li>
+<li>Optimised the use and reuse of the Markdown parsing object.
+  (<a href="https://github.com/davep/blogmore/pull/475">#475</a>)</li>
+<li>Added some extra stats to the output of the linter.
+  (<a href="https://github.com/davep/blogmore/pull/477">#477</a>)</li>
+</ul>
 <h2 id="v2210">v2.21.0</h2>
 <p><strong>Released: 2026-05-10</strong></p>
 <ul>
