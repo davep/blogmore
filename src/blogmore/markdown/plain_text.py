@@ -17,7 +17,7 @@ needs to render or strip BlogMore-flavoured Markdown.
 import re
 import threading
 from html.parser import HTMLParser
-from typing import Any
+from typing import Any, cast
 
 import markdown
 
@@ -82,7 +82,7 @@ def get_plain_text_markdown_instance() -> markdown.Markdown:
                 *create_custom_extensions(),
             ],
         )
-    return _thread_local.plain_text_markdown  # type: ignore[no-any-return]
+    return cast(markdown.Markdown, _thread_local.plain_text_markdown)
 
 
 class TextExtractor(HTMLParser):
