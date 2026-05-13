@@ -1,6 +1,7 @@
 """Icon generation from a single source image for blogmore."""
 
 import json
+import shutil
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
@@ -70,15 +71,19 @@ def detect_source_icon(
 class IconGenerator:
     """Generate favicon and platform-specific icons from a single source image."""
 
-    def __init__(self, source_image: Path, output_dir: Path) -> None:
+    def __init__(
+        self, source_image: Path, output_dir: Path, cache_dir: Path | None = None
+    ) -> None:
         """Initialize the icon generator.
 
         Args:
             source_image: Path to the source image file
             output_dir: Directory where icons will be written (should be /icons subdirectory)
+            cache_dir: Optional directory to cache generated icons (unique to the blog)
         """
         self.source_image = source_image
         self.output_dir = output_dir
+        self.cache_dir = cache_dir
 
     def generate_all(self) -> dict[str, Path]:
         """Generate all icon formats from the source image.
@@ -88,6 +93,17 @@ class IconGenerator:
         """
         # Create output directory
         self.output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Check cache if available
+        if self.cache_dir:
+            cached_icons = self._load_from_cache()
+            if cached_icons:
+                # Copy cached icons to output directory
+                for filename, cached_path in cached_icons.items():
+                    shutil.copy2(cached_path, self.output_dir / filename)
+                return {
+                    filename: self.output_dir / filename for filename in cached_icons
+                }
 
         # Open and validate source image
         try:
@@ -122,11 +138,90 @@ class IconGenerator:
                 if browserconfig_path:
                     generated["browserconfig.xml"] = browserconfig_path
 
+                # Save to cache if available
+                if self.cache_dir:
+                    self._save_to_cache(generated)
+
                 return generated
 
         except Exception as e:
             print(f"Error generating icons: {e}")
             return {}
+
+    def _load_from_cache(self) -> dict[str, Path] | None:
+        """Attempt to load icons from the cache.
+
+        Returns:
+            Dictionary of cached icons if valid, None otherwise.
+        """
+        if not self.cache_dir or not self.cache_dir.exists():
+            return None
+
+        cache_info_file = self.cache_dir / "cache_info.json"
+        if not cache_info_file.exists():
+            return None
+
+        try:
+            with open(cache_info_file) as f:
+                info = json.load(f)
+
+            # Check if source image has changed (name or mtime)
+            source_mtime = int(self.source_image.stat().st_mtime)
+            if (
+                info.get("source_name") != self.source_image.name
+                or info.get("source_mtime") != source_mtime
+            ):
+                return None
+
+            # Verify all expected files exist in cache
+            cached_files = info.get("files", [])
+            result = {}
+            for filename in cached_files:
+                cached_path = self.cache_dir / filename
+                if not cached_path.exists():
+                    return None
+                result[filename] = cached_path
+
+            return result
+        except Exception as e:
+            print(f"Exception in _load_from_cache: {e}")
+            import traceback
+
+            traceback.print_exc()
+            return None
+
+    def _save_to_cache(self, generated: dict[str, Path]) -> None:
+        """Save successfully generated icons to the cache.
+
+        Args:
+            generated: Dictionary of generated icons and their paths.
+        """
+        if not self.cache_dir:
+            return
+
+        try:
+            # Clear and recreate cache directory
+            if self.cache_dir.exists():
+                shutil.rmtree(self.cache_dir)
+            self.cache_dir.mkdir(parents=True, exist_ok=True)
+
+            # Copy generated files to cache
+            filenames = []
+            for filename, path in generated.items():
+                shutil.copy2(path, self.cache_dir / filename)
+                filenames.append(filename)
+
+            # Save cache info
+            info = {
+                "source_name": self.source_image.name,
+                "source_mtime": int(self.source_image.stat().st_mtime),
+                "files": filenames,
+            }
+            with open(self.cache_dir / "cache_info.json", "w") as f:
+                json.dump(info, f)
+
+        except Exception as e:
+            print(f"Warning: Failed to save icons to cache: {e}")
 
     def _generate_png_icons_batch(
         self,

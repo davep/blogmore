@@ -1,8 +1,13 @@
 """Unit tests for the icons module."""
 
+import json
+import os
+import shutil
+import time
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
 
+import pytest
 from PIL import Image
 
 from blogmore.icons import IconGenerator, detect_source_icon
@@ -331,3 +336,142 @@ class TestIconGenerator:
         # Check wide tile dimensions
         wide_tile = Image.open(output_dir / "mstile-310x150.png")
         assert wide_tile.size == (310, 150)
+
+
+class TestIconCaching:
+    """Test the icon caching functionality."""
+
+    def test_init_with_cache(self, tmp_path: Path) -> None:
+        """Test initializing IconGenerator with a cache directory."""
+        source_image = tmp_path / "icon.png"
+        output_dir = tmp_path / "icons"
+        cache_dir = tmp_path / "cache"
+
+        generator = IconGenerator(source_image, output_dir, cache_dir=cache_dir)
+
+        assert generator.cache_dir == cache_dir
+
+    def test_save_to_and_load_from_cache(self, tmp_path: Path) -> None:
+        """Test saving icons to cache and then loading them back."""
+        source_image = tmp_path / "icon.png"
+        img = Image.new("RGBA", (100, 100), (255, 0, 0, 255))
+        img.save(source_image)
+
+        output_dir = tmp_path / "icons"
+        output_dir.mkdir()
+        cache_dir = tmp_path / "cache"
+
+        # Create some "generated" files
+        generated = {}
+        for name in ["icon1.png", "icon2.png"]:
+            path = output_dir / name
+            path.touch()
+            generated[name] = path
+
+        generator = IconGenerator(source_image, output_dir, cache_dir=cache_dir)
+
+        # Save to cache
+        generator._save_to_cache(generated)
+        assert (cache_dir / "cache_info.json").exists()
+        assert (cache_dir / "icon1.png").exists()
+        assert (cache_dir / "icon2.png").exists()
+
+        # Load from cache
+        # Re-initialize to ensure it uses the cache
+        generator2 = IconGenerator(source_image, output_dir, cache_dir=cache_dir)
+        loaded = generator2._load_from_cache()
+        assert loaded is not None
+        assert set(loaded.keys()) == {"icon1.png", "icon2.png"}
+        assert all(path.parent == cache_dir for path in loaded.values())
+
+    def test_cache_invalidated_on_source_change(self, tmp_path: Path) -> None:
+        """Test that cache is invalidated if the source image's mtime changes."""
+        source_image = tmp_path / "icon.png"
+        img = Image.new("RGBA", (100, 100), (255, 0, 0, 255))
+        img.save(source_image)
+
+        # Fix mtime to a known value
+        mtime = int(time.time()) - 100
+        os.utime(source_image, (mtime, mtime))
+
+        output_dir = tmp_path / "icons"
+        output_dir.mkdir()
+        cache_dir = tmp_path / "cache"
+
+        generated = {"icon1.png": output_dir / "icon1.png"}
+        generated["icon1.png"].touch()
+
+        generator = IconGenerator(source_image, output_dir, cache_dir=cache_dir)
+        generator._save_to_cache(generated)
+
+        # Change source image mtime
+        new_mtime = mtime + 50
+        os.utime(source_image, (new_mtime, new_mtime))
+
+        # Loading from cache should now return None
+        assert generator._load_from_cache() is None
+
+    def test_cache_invalidated_on_source_name_change(self, tmp_path: Path) -> None:
+        """Test that cache is invalidated if the source image's name changes."""
+        source1 = tmp_path / "icon1.png"
+        source2 = tmp_path / "icon2.png"
+        img = Image.new("RGBA", (100, 100), (255, 0, 0, 255))
+        img.save(source1)
+        img.save(source2)
+
+        # Ensure mtimes are the same
+        mtime = int(time.time())
+        os.utime(source1, (mtime, mtime))
+        os.utime(source2, (mtime, mtime))
+
+        output_dir = tmp_path / "icons"
+        output_dir.mkdir()
+        cache_dir = tmp_path / "cache"
+
+        generator = IconGenerator(source1, output_dir, cache_dir=cache_dir)
+        generator._save_to_cache({"test.png": output_dir / "test.png"})
+        (output_dir / "test.png").touch()
+
+        # New generator with same cache but different source name
+        generator2 = IconGenerator(source2, output_dir, cache_dir=cache_dir)
+        assert generator2._load_from_cache() is None
+
+    @patch("blogmore.icons.shutil.copy2")
+    @patch("blogmore.icons.Image")
+    def test_generate_all_uses_cache(
+        self, mock_image: Mock, mock_copy: Mock, tmp_path: Path
+    ) -> None:
+        """Test that generate_all uses the cache if available and valid."""
+        source_image = tmp_path / "icon.png"
+        # Create the file so stat() works
+        source_image.touch()
+        mtime = int(source_image.stat().st_mtime)
+
+        output_dir = tmp_path / "icons"
+        cache_dir = tmp_path / "cache"
+
+        generator = IconGenerator(source_image, output_dir, cache_dir=cache_dir)
+
+        # Manually seed the cache
+        cache_dir.mkdir(parents=True)
+        (cache_dir / "icon1.png").touch()
+        with open(cache_dir / "cache_info.json", "w") as f:
+            json.dump(
+                {
+                    "source_name": "icon.png",
+                    "source_mtime": mtime,
+                    "files": ["icon1.png"],
+                },
+                f,
+            )
+
+        # Call generate_all
+        result = generator.generate_all()
+
+        assert "icon1.png" in result
+        # Verify it copied from cache rather than generating
+        assert any(
+            call[0][0] == cache_dir / "icon1.png" for call in mock_copy.call_args_list
+        )
+        # Verify Image.open was NOT called (meaning it didn't generate)
+        assert not mock_image.open.called
