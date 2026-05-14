@@ -9,6 +9,10 @@
 - The generated favicons and platform icons are now cached per-blog, saving
   the need to recreate them on every build unless the source image changes.
   ([#483](https://github.com/davep/blogmore/pull/483))
+- Added browser auto-reload to `serve` mode. Connected browsers now
+  automatically reload whenever the site is regenerated following a change
+  to content or configuration.
+  ([#487](https://github.com/davep/blogmore/pull/487))
 
 ## v2.22.0
 
