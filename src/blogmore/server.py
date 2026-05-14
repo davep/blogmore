@@ -171,16 +171,12 @@ class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
             try:
                 html_content = content.decode("utf-8")
-                if "</body>" in html_content:
-                    # Replace only the last occurrence
-                    parts = html_content.rpartition("</body>")
-                    injected = parts[0] + RELOAD_SCRIPT + "</body>" + parts[2]
-                elif "</html>" in html_content:
-                    # Replace only the last occurrence
-                    parts = html_content.rpartition("</html>")
-                    injected = parts[0] + RELOAD_SCRIPT + "</html>" + parts[2]
+                for tag_name in ("body", "html"):
+                    if (tag := f"</{tag_name}>") in html_content:
+                        before, _, after = html_content.rpartition(tag)
+                        injected = before + RELOAD_SCRIPT + tag + after
+                        break
                 else:
-                    # Likely minified or partial HTML, append to the end.
                     injected = html_content + RELOAD_SCRIPT
 
                 response_content = injected.encode()
