@@ -10,7 +10,7 @@ import sys
 import threading
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Final
 
 from watchdog.events import (
     FileClosedNoWriteEvent,
@@ -33,30 +33,33 @@ from blogmore.site_config import SiteConfig
 _reload_queues: list[queue.Queue[str]] = []
 _reload_lock = threading.Lock()
 
+RELOAD_ENDPOINT: Final[str] = "/_blogmore/reload"
+"""The endpoint used to handle reload events."""
+
+
+RELOAD_SCRIPT = f"""
+<script>
+(function() {{
+    const eventSource = new EventSource('{RELOAD_ENDPOINT}');
+    eventSource.onmessage = (event) => {{
+        if (event.data === 'reload') {{
+            console.log('BlogMore: Change detected, reloading...');
+            location.reload();
+        }}
+    }};
+    eventSource.onerror = () => {{
+        console.warn('BlogMore: Reload connection lost. Retrying...');
+    }};
+}})();
+</script>
+"""
+
 
 def _trigger_reload() -> None:
     """Signal all connected browsers to reload."""
     with _reload_lock:
         for reload_queue in _reload_queues:
             reload_queue.put("reload")
-
-
-RELOAD_SCRIPT = """
-<script>
-(function() {
-    const eventSource = new EventSource('/_blogmore/reload');
-    eventSource.onmessage = (event) => {
-        if (event.data === 'reload') {
-            console.log('BlogMore: Change detected, reloading...');
-            location.reload();
-        }
-    };
-    eventSource.onerror = () => {
-        console.warn('BlogMore: Reload connection lost. Retrying...');
-    };
-})();
-</script>
-"""
 
 
 class ReusingTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -88,7 +91,7 @@ class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     the response body for any 404 error, mirroring the behaviour of services
     such as GitHub Pages.
 
-    Also handles the `/_blogmore/reload` SSE endpoint and injects an auto-reload
+    Also handles the auto-reload SSE endpoint and injects an auto-reload
     script into all served HTML files when they are requested.
     """
 
@@ -108,7 +111,7 @@ class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self) -> None:
         """Handle a GET request, routing SSE or serving files."""
-        if self.path == "/_blogmore/reload":
+        if self.path == RELOAD_ENDPOINT:
             self._handle_reload_sse()
             return
 
