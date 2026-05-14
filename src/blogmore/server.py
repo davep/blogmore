@@ -175,16 +175,22 @@ class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                     injected = html_content.replace(
                         "</body>", f"{RELOAD_SCRIPT}</body>"
                     )
-                    response_content = injected.encode()
-                    response_body = io.BytesIO(response_content)
-                    self.send_response(200)
-                    self.send_header("Content-Type", "text/html; charset=utf-8")
-                    self.send_header("Content-Length", str(len(response_content)))
-                    self.send_header(
-                        "Last-Modified", self.date_time_string(time.time())
+                elif "</html>" in html_content:
+                    injected = html_content.replace(
+                        "</html>", f"{RELOAD_SCRIPT}</html>"
                     )
-                    self.end_headers()
-                    return response_body
+                else:
+                    # Likely minified or partial HTML, append to the end.
+                    injected = html_content + RELOAD_SCRIPT
+
+                response_content = injected.encode()
+                response_body = io.BytesIO(response_content)
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(response_content)))
+                self.send_header("Last-Modified", self.date_time_string(time.time()))
+                self.end_headers()
+                return response_body
             except UnicodeDecodeError:
                 pass
         except OSError:
