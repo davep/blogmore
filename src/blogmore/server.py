@@ -3,9 +3,12 @@
 import dataclasses
 import functools
 import http.server
+import io
+import queue
 import socketserver
 import sys
 import threading
+import time
 from pathlib import Path
 from typing import Any
 
@@ -25,6 +28,35 @@ from blogmore.config import (
 from blogmore.generator import SiteGenerator
 from blogmore.parser import CUSTOM_404_HTML
 from blogmore.site_config import SiteConfig
+
+# Registry of active SSE connections for browser reloading
+_reload_queues: list[queue.Queue[str]] = []
+_reload_lock = threading.Lock()
+
+
+def _trigger_reload() -> None:
+    """Signal all connected browsers to reload."""
+    with _reload_lock:
+        for reload_queue in _reload_queues:
+            reload_queue.put("reload")
+
+
+RELOAD_SCRIPT = """
+<script>
+(function() {
+    const eventSource = new EventSource('/_blogmore/reload');
+    eventSource.onmessage = (event) => {
+        if (event.data === 'reload') {
+            console.log('BlogMore: Change detected, reloading...');
+            location.reload();
+        }
+    };
+    eventSource.onerror = () => {
+        console.warn('BlogMore: Reload connection lost. Retrying...');
+    };
+})();
+</script>
+"""
 
 
 class ReusingTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -55,6 +87,9 @@ class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     When a `404.html` file exists in the served directory it is returned as
     the response body for any 404 error, mirroring the behaviour of services
     such as GitHub Pages.
+
+    Also handles the `/_blogmore/reload` SSE endpoint and injects an auto-reload
+    script into all served HTML files when they are requested.
     """
 
     # Enable HTTP/1.1 for persistent connections (keep-alive)
@@ -70,6 +105,92 @@ class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             # Client disconnected before we finished sending data.
             # This is normal behavior and not an error condition.
             pass
+
+    def do_GET(self) -> None:
+        """Handle a GET request, routing SSE or serving files."""
+        if self.path == "/_blogmore/reload":
+            self._handle_reload_sse()
+            return
+
+        super().do_GET()
+
+    def _handle_reload_sse(self) -> None:
+        """Handle the Server-Sent Events (SSE) connection for auto-reload."""
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Connection", "keep-alive")
+        self.end_headers()
+
+        reload_queue: queue.Queue[str] = queue.Queue()
+        with _reload_lock:
+            _reload_queues.append(reload_queue)
+
+        try:
+            while True:
+                try:
+                    # Wait for a reload signal or timeout for keep-alive ping
+                    reload_message = reload_queue.get(timeout=30)
+                    self.wfile.write(f"data: {reload_message}\n\n".encode())
+                    self.wfile.flush()
+                except queue.Empty:
+                    # Keep-alive ping to prevent connection timeout
+                    self.wfile.write(b": keep-alive\n\n")
+                    self.wfile.flush()
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+        finally:
+            with _reload_lock:
+                _reload_queues.remove(reload_queue)
+
+    def send_head(self) -> io.BytesIO | Any:
+        """Send headers and return a file-like object for HTML injection.
+
+        Overrides SimpleHTTPRequestHandler.send_head to inject the auto-reload
+        script into HTML responses.
+        """
+        file_path = Path(self.translate_path(self.path))
+        response_body: Any = None
+
+        # If the path is a directory, look for index.html
+        if file_path.is_dir():
+            index_file = file_path / "index.html"
+            if index_file.exists():
+                file_path = index_file
+            else:
+                return super().send_head()
+
+        content_type = self.guess_type(str(file_path))
+        if content_type != "text/html":
+            return super().send_head()
+
+        # It's an HTML file. Read, inject, and serve.
+        try:
+            with open(file_path, "rb") as source_file:
+                content = source_file.read()
+
+            try:
+                html_content = content.decode("utf-8")
+                if "</body>" in html_content:
+                    injected = html_content.replace(
+                        "</body>", f"{RELOAD_SCRIPT}</body>"
+                    )
+                    response_content = injected.encode()
+                    response_body = io.BytesIO(response_content)
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/html; charset=utf-8")
+                    self.send_header("Content-Length", str(len(response_content)))
+                    self.send_header(
+                        "Last-Modified", self.date_time_string(time.time())
+                    )
+                    self.end_headers()
+                    return response_body
+            except UnicodeDecodeError:
+                pass
+        except OSError:
+            pass
+
+        return super().send_head()
 
     def send_error(
         self,
@@ -184,6 +305,7 @@ class ContentChangeHandler(FileSystemEventHandler):
             print(f"\nDetected change in {path}, regenerating site...")
             self.generator.generate()
             print("Regeneration complete!")
+            _trigger_reload()
         except Exception as e:
             print(f"Error during regeneration: {e}", file=sys.stderr)
         finally:
@@ -263,6 +385,7 @@ class ConfigChangeHandler(FileSystemEventHandler):
             # Regenerate the site
             self.generator.generate()
             print("Configuration reloaded and regeneration complete!")
+            _trigger_reload()
         except Exception as e:
             print(f"Error reloading config or regenerating: {e}", file=sys.stderr)
 
