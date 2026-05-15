@@ -1,5 +1,11 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed the `lint` command double-reporting errors in the `404` page.
+
 ## v2.23.0
 
 **Released: 2026-05-14**

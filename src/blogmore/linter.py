@@ -119,8 +119,12 @@ class Linter:
 
         # We'll parse manually to catch errors
         pages = []
+        path_404 = pages_dir / "404.md"
         if pages_dir.exists():
             for md_file in pages_dir.rglob("*.md"):
+                # Skip 404.md as it's handled separately below
+                if md_file.resolve() == path_404.resolve():
+                    continue
                 try:
                     page = self.parser.parse_page(md_file)
                     pages.append(page)
@@ -128,7 +132,6 @@ class Linter:
                     self.report_error(f"Malformed frontmatter: {e}", md_file)
 
         page_404 = None
-        path_404 = pages_dir / "404.md"
         if path_404.exists():
             try:
                 page_404 = self.parser.parse_page(path_404)
@@ -152,7 +155,10 @@ class Linter:
 
         # Resolve paths to set .url_path on posts/pages
         resolve_post_output_paths(self.site_config, posts)
-        resolve_page_output_paths(self.site_config, pages)
+        pages_to_resolve = list(pages)
+        if page_404:
+            pages_to_resolve.append(page_404)
+        resolve_page_output_paths(self.site_config, pages_to_resolve)
 
         # 2. Build set of valid internal URLs
         valid_urls: set[str] = set()
@@ -341,7 +347,7 @@ class Linter:
                         path,
                     )
 
-        if not posts and not pages:
+        if not posts and not pages and not page_404:
             print("No posts or pages found to lint.")
             return 1 if self.errors > 0 else 0
 
@@ -383,8 +389,9 @@ class Linter:
                     )
 
         elapsed = time.monotonic() - start_time
+        num_pages = len(pages) + (1 if page_404 else 0)
         print(
-            f"Linting complete: {len(posts)} post(s), {len(pages)} page(s), "
+            f"Linting complete: {len(posts)} post(s), {num_pages} page(s), "
             f"{self.errors} error(s), {self.warnings} warning(s) [{elapsed:.2f}s]."
         )
         return 1 if self.errors > 0 else 0
