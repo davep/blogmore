@@ -5,6 +5,7 @@
 **Released: WiP**
 
 - Fixed the `lint` command double-reporting errors in the `404` page.
+  ([#489](https://github.com/davep/blogmore/pull/489))
 
 ## v2.23.0
 
