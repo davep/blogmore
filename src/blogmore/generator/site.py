@@ -49,8 +49,8 @@ class SiteGenerator:
     def _initialize_components(self) -> None:
         """Initialize or re-initialize internal components based on current config."""
         content_dir = self.site_config.content_dir
-        if content_dir is None:
-            raise ValueError("site_config.content_dir must not be None")
+        # We know content_dir is not None because we checked in __init__
+        assert content_dir is not None
 
         # Ensure paths are expanded (handle ~)
         content_dir = content_dir.expanduser()
@@ -84,8 +84,9 @@ class SiteGenerator:
         # Define local expanded paths for the build pass
         content_dir = self.site_config.content_dir
         output_dir = self.site_config.output_dir
-        if content_dir is None:
-            raise ValueError("site_config.content_dir must not be None")
+
+        # We know content_dir is not None because we checked in __init__
+        assert content_dir is not None
 
         content_dir = content_dir.expanduser()
         output_dir = output_dir.expanduser()
