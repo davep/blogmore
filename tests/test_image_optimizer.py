@@ -45,6 +45,10 @@ class TestConstants:
         """Test that PNG is in supported extensions."""
         assert ".png" in SUPPORTED_EXTENSIONS
 
+    def test_supported_extensions_contains_webp(self) -> None:
+        """Test that WebP is in supported extensions."""
+        assert ".webp" in SUPPORTED_EXTENSIONS
+
     def test_default_image_widths_are_positive(self) -> None:
         """Test that all default widths are positive integers."""
         assert all(isinstance(w, int) and w > 0 for w in DEFAULT_IMAGE_WIDTHS)
@@ -165,6 +169,19 @@ class TestImageOptimizerProcessImage:
 
         assert len(variants) == 1
         assert (tmp_path / "logo-480w.webp").exists()
+
+    def test_handles_webp_source(self, tmp_path: Path) -> None:
+        """Test that WebP source images are also processed."""
+        path = tmp_path / "photo.webp"
+        img = Image.new("RGB", (1600, 900), color=(100, 150, 200))
+        img.save(path, format="WEBP", quality=90)
+
+        optimizer = ImageOptimizer(widths=[480], quality=80)
+        variants = optimizer.process_image(path, url_base="/images")
+
+        assert len(variants) == 1
+        assert variants[0].url == "/images/photo-480w.webp"
+        assert (tmp_path / "photo-480w.webp").exists()
 
     def test_returns_empty_list_for_missing_file(self, tmp_path: Path) -> None:
         """Test that a missing source file returns an empty list."""

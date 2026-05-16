@@ -1,9 +1,10 @@
 """Automatic image optimization and responsive variant generation for blogmore.
 
 Processes images found in the ``extras/`` directory, generating resized WebP
-variants at a configurable set of widths.  The resulting variant metadata is
-used by [`blogmore.responsive_images`][] to rewrite ``<img>`` tags in generated
-HTML into ``<picture>`` elements with ``srcset`` for responsive delivery.
+variants at a configurable set of widths.  JPEG, PNG, and WebP source images
+are all supported.  The resulting variant metadata is used by
+[`blogmore.responsive_images`][] to rewrite ``<img>`` tags in generated HTML
+into ``<picture>`` elements with ``srcset`` for responsive delivery.
 """
 
 from __future__ import annotations
@@ -15,7 +16,7 @@ from PIL import Image, UnidentifiedImageError
 
 ##############################################################################
 # File extensions recognised as processable images.
-SUPPORTED_EXTENSIONS: frozenset[str] = frozenset({".jpg", ".jpeg", ".png"})
+SUPPORTED_EXTENSIONS: frozenset[str] = frozenset({".jpg", ".jpeg", ".png", ".webp"})
 
 ##############################################################################
 # Default widths for the responsive size ladder (pixels).

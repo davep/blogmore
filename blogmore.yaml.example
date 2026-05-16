@@ -253,7 +253,7 @@ posts_per_feed: 20
 # minify_html: false
 
 # Optional: Enable automatic image optimization and responsive delivery (default: false)
-# When true, JPEG and PNG images in extras/ are processed during site generation.
+# When true, JPEG, PNG, and WebP images in extras/ are processed during site generation.
 # For each image, WebP variants are produced at the widths listed in image_widths
 # (widths exceeding the source image size are skipped). Variants are written
 # alongside the originals in the output directory as {stem}-{width}w.webp.

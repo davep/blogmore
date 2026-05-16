@@ -526,8 +526,8 @@ class SiteConfig:
     optimize_images: bool = False
     """Whether to automatically optimize images and generate responsive variants.
 
-    When ``True``, images found in the ``extras/`` directory (JPEG and PNG
-    files) are processed during site generation.  For each image, WebP
+    When ``True``, images found in the ``extras/`` directory (JPEG, PNG, and
+    WebP files) are processed during site generation.  For each image, WebP
     variants are produced at the widths listed in ``image_widths`` (any width
     that exceeds the source image's own width is silently skipped to avoid
     upscaling).  Variant files are written alongside the originals in the
