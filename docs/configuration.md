@@ -281,9 +281,9 @@ When a source icon is provided or detected, BlogMore generates 18 icon files opt
 
 See [Metadata and Sidebar — Site icons](metadata_and_sidebar.md#site-icons) for detailed usage instructions.
 
-#### `optimize_images`
+#### `optimise_images`
 
-Enable automatic optimization and resizing for local images found in your Markdown posts. When enabled, BlogMore scans for images located in your `content_dir` or `extras/` directory and generates a "ladder" of optimized versions in multiple widths. It also automatically generates next-gen WebP versions of your images for better performance.
+Enable automatic optimisation and resizing for local images found in your Markdown posts. When enabled, BlogMore scans for images located in your `content_dir` or `extras/` directory and generates a "ladder" of optimised versions in multiple widths. It also automatically generates next-gen WebP versions of your images for better performance.
 
 In the generated HTML, standard `<img>` tags are replaced with responsive `<picture>` elements that use `srcset` to ensure browsers only download the smallest appropriate version of an image for the visitor's screen.
 
@@ -291,12 +291,12 @@ In the generated HTML, standard `<img>` tags are replaced with responsive `<pict
 **Default:** `false`
 
 ```yaml
-optimize_images: true
+optimise_images: true
 ```
 
 #### `image_widths`
 
-The list of pixel widths to generate for each optimized image ladder. Only meaningful when [`optimize_images`](#optimize_images) is `true`.
+The list of pixel widths to generate for each optimised image ladder. Only meaningful when [`optimise_images`](#optimise_images) is `true`.
 
 This is a **configuration file only** option — it cannot be set on the command line.
 
@@ -312,7 +312,7 @@ image_widths:
 
 #### `image_quality`
 
-The compression quality used when generating optimized images. A value from 1 to 100, where higher means better quality but larger file size. Only meaningful when [`optimize_images`](#optimize_images) is `true`.
+The compression quality used when generating optimised images. A value from 1 to 100, where higher means better quality but larger file size. Only meaningful when [`optimise_images`](#optimise_images) is `true`.
 
 This is a **configuration file only** option — it cannot be set on the command line.
 
@@ -325,11 +325,11 @@ image_quality: 80
 
 #### `image_jpeg_fallback`
 
-Whether to generate standard JPEG or PNG fallback versions of optimized images alongside the modern WebP versions. 
+Whether to generate standard JPEG or PNG fallback versions of optimised images alongside the modern WebP versions. 
 
 When `true` (the default), BlogMore ensures 100% browser compatibility by providing standard formats for older browsers. If set to `false`, only WebP images are generated and used, which saves disk space and build time but may result in broken images for visitors using very old browsers.
 
-Only meaningful when [`optimize_images`](#optimize_images) is `true`.
+Only meaningful when [`optimise_images`](#optimise_images) is `true`.
 
 This is a **configuration file only** option — it cannot be set on the command line.
 
@@ -1423,7 +1423,7 @@ clean_first: true
 posts_per_feed: 30
 default_author: "Dave Pearson"
 icon_source: "icon.png"
-optimize_images: true
+optimise_images: true
 with_search: true
 post_path: "{year}/{month}/{day}/{slug}.html"
 with_advert: true

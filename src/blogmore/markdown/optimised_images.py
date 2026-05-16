@@ -1,4 +1,4 @@
-"""Markdown extension for automatically optimizing and resizing local images."""
+"""Markdown extension for automatically optimising and resizing local images."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 IMAGE_LINK_RE = r'\!\[(?P<alt>.*?)\]\s*\((?P<src>.*?)(?P<title>\s+".*?"|\s+\'.*?\')?\)'
 
 
-class OptimizedImageInlineProcessor(Pattern):
+class OptimisedImageInlineProcessor(Pattern):
     """Pattern processor that transforms local Markdown image syntax into responsive <picture> elements."""
 
     def __init__(
@@ -28,7 +28,7 @@ class OptimizedImageInlineProcessor(Pattern):
         md: Any,
         image_manager: ImageManager | None,
         content_dir: Path | None,
-        output_url_base: str = "/static/images/optimized/",
+        output_url_base: str = "/static/images/optimised/",
         base_dir: Path | None = None,
     ) -> None:
         """Initialize the processor.
@@ -36,9 +36,9 @@ class OptimizedImageInlineProcessor(Pattern):
         Args:
             pattern: The regex pattern to match.
             md: The Markdown instance.
-            image_manager: The ImageManager instance to handle optimization.
+            image_manager: The ImageManager instance to handle optimisation.
             content_dir: The blog's content directory for local file verification.
-            output_url_base: Base URL where optimized images are served.
+            output_url_base: Base URL where optimised images are served.
             base_dir: Directory of the current Markdown file for relative resolution.
         """
         super().__init__(pattern, md)
@@ -87,18 +87,18 @@ class OptimizedImageInlineProcessor(Pattern):
         else:
             source_path = self.content_dir / clean_src
 
-        optimized = self.image_manager.get_optimized_image(source_path)
-        if not optimized:
+        optimised = self.image_manager.get_optimised_image(source_path)
+        if not optimised:
             # If it's a local path but file wasn't found, warn the user
             # as this is the most likely cause of "no difference in output".
             if not source_path.is_file():
                 print(
-                    f"Warning: Image optimization skipped; file not found: {source_path}"
+                    f"Warning: Image optimisation skipped; file not found: {source_path}"
                 )
             return self._create_standard_img(src, alt, title)
 
         # Transform to <picture>
-        return self._create_picture_element(optimized, src, alt, title)
+        return self._create_picture_element(optimised, src, alt, title)
 
     def _create_standard_img(self, src: str, alt: str, title: str | None) -> Element:
         """Create a standard <img> tag."""
@@ -111,12 +111,12 @@ class OptimizedImageInlineProcessor(Pattern):
         return el
 
     def _create_picture_element(
-        self, optimized: Any, original_src: str, alt: str, title: str | None
+        self, optimised: Any, original_src: str, alt: str, title: str | None
     ) -> Element:
         """Create a <picture> element for a local image.
 
         Args:
-            optimized: The OptimizedImage metadata.
+            optimised: The OptimisedImage metadata.
             original_src: The original source URL (including fragments).
             alt: The alt text.
             title: The title text.
@@ -132,28 +132,28 @@ class OptimizedImageInlineProcessor(Pattern):
             with_fallback = self.image_manager.site_config.image_jpeg_fallback
 
         # 1. Add WebP source
-        if optimized.webp_paths:
+        if optimised.webp_paths:
             webp_source = SubElement(picture, "source")
             webp_source.set("type", "image/webp")
 
             srcset_parts = []
-            for width, filename in sorted(optimized.webp_paths.items()):
+            for width, filename in sorted(optimised.webp_paths.items()):
                 srcset_parts.append(f"{self.output_url_base}{filename} {width}w")
 
             webp_source.set("srcset", ", ".join(srcset_parts))
             webp_source.set("sizes", "(max-width: 800px) 100vw, 800px")
 
         # 2. Add standard (JPG/PNG) source if enabled
-        if with_fallback and optimized.resized_paths:
+        if with_fallback and optimised.resized_paths:
             std_source = SubElement(picture, "source")
-            first_file = next(iter(optimized.resized_paths.values()))
+            first_file = next(iter(optimised.resized_paths.values()))
             if first_file.endswith((".jpg", ".jpeg")):
                 std_source.set("type", "image/jpeg")
             elif first_file.endswith(".png"):
                 std_source.set("type", "image/png")
 
             srcset_parts = []
-            for width, filename in sorted(optimized.resized_paths.items()):
+            for width, filename in sorted(optimised.resized_paths.items()):
                 srcset_parts.append(f"{self.output_url_base}{filename} {width}w")
 
             std_source.set("srcset", ", ".join(srcset_parts))
@@ -168,19 +168,19 @@ class OptimizedImageInlineProcessor(Pattern):
         # Pick a sensible default src:
         # If we have resized versions, pick the largest.
         # Otherwise, use the original source (which might be the case for small images).
-        if with_fallback and optimized.resized_paths:
-            max_width = max(optimized.resized_paths.keys())
-            fallback_src = f"{self.output_url_base}{optimized.resized_paths[max_width]}"
-        elif not with_fallback and optimized.webp_paths:
-            max_width = max(optimized.webp_paths.keys())
-            fallback_src = f"{self.output_url_base}{optimized.webp_paths[max_width]}"
+        if with_fallback and optimised.resized_paths:
+            max_width = max(optimised.resized_paths.keys())
+            fallback_src = f"{self.output_url_base}{optimised.resized_paths[max_width]}"
+        elif not with_fallback and optimised.webp_paths:
+            max_width = max(optimised.webp_paths.keys())
+            fallback_src = f"{self.output_url_base}{optimised.webp_paths[max_width]}"
         else:
             # Fallback to the original URL if no resizing happened (e.g. image too small)
             fallback_src = original_src
 
         new_img.set("src", fallback_src)
-        new_img.set("width", str(optimized.original_width))
-        new_img.set("height", str(optimized.original_height))
+        new_img.set("width", str(optimised.original_width))
+        new_img.set("height", str(optimised.original_height))
         new_img.set("loading", "lazy")
 
         if "#centre" in original_src and "#centre" not in fallback_src:
@@ -200,8 +200,8 @@ class OptimizedImageInlineProcessor(Pattern):
         return not src.startswith("//")
 
 
-class OptimizedImagesExtension(Extension):
-    """Markdown extension for optimized responsive images."""
+class OptimisedImagesExtension(Extension):
+    """Markdown extension for optimised responsive images."""
 
     def __init__(self, **kwargs: Any) -> None:
         """Initialize the extension."""
@@ -209,8 +209,8 @@ class OptimizedImagesExtension(Extension):
             "image_manager": [None, "ImageManager instance"],
             "content_dir": [None, "Blog content directory"],
             "output_url_base": [
-                "/static/images/optimized/",
-                "Base URL for optimized images",
+                "/static/images/optimised/",
+                "Base URL for optimised images",
             ],
             "base_dir": [None, "Directory of the current Markdown file"],
         }
@@ -227,7 +227,7 @@ class OptimizedImagesExtension(Extension):
         output_url_base = self.getConfig("output_url_base")
         base_dir = self.getConfig("base_dir")
 
-        processor = OptimizedImageInlineProcessor(
+        processor = OptimisedImageInlineProcessor(
             IMAGE_LINK_RE,
             md,
             image_manager,
@@ -236,7 +236,7 @@ class OptimizedImagesExtension(Extension):
             base_dir,
         )
         # Register with high priority to run before standard image patterns
-        md.inlinePatterns.register(processor, "optimized_images", 200)
+        md.inlinePatterns.register(processor, "optimised_images", 200)
         self.processor = processor
 
     def set_base_dir(self, base_dir: Path) -> None:
@@ -245,6 +245,6 @@ class OptimizedImagesExtension(Extension):
             self.processor.base_dir = base_dir
 
 
-def makeExtension(**kwargs: Any) -> OptimizedImagesExtension:
+def makeExtension(**kwargs: Any) -> OptimisedImagesExtension:
     """Create and return an instance of the extension."""
-    return OptimizedImagesExtension(**kwargs)
+    return OptimisedImagesExtension(**kwargs)

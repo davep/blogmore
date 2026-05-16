@@ -60,9 +60,9 @@ class SiteGenerator:
                 f"site_config.content_dir must be a Path, got {type(content_dir).__name__} ({content_dir!r})"
             )
 
-        # Initialize image manager if optimization is enabled
+        # Initialize image manager if optimisation is enabled
         self.image_manager = None
-        if self.site_config.optimize_images:
+        if self.site_config.optimise_images:
             cache_dir = get_blog_cache_dir(content_dir) / "images"
             self.image_manager = ImageManager(self.site_config, cache_dir)
 
@@ -264,9 +264,9 @@ class SiteGenerator:
             with timed_step("Generating graph page..."):
                 feature_gen.generate_graph_page(posts, sidebar_pages)
 
-        # Perform actual image optimization for discovered images
+        # Perform actual image optimisation for discovered images
         if self.image_manager:
-            with timed_step("Optimizing responsive images..."):
+            with timed_step("Optimising responsive images..."):
                 self.image_manager.process_all()
 
         # Finalize static assets & sitemap
@@ -280,9 +280,9 @@ class SiteGenerator:
                 feature_gen.generate_sitemap(asset_manager.extras_html_paths)
 
         if self.image_manager:
-            with timed_step("Deploying optimized responsive images..."):
-                target_output_dir = output_dir / "static" / "images" / "optimized"
-                self.image_manager.deploy_optimized_images(target_output_dir)
+            with timed_step("Deploying optimised responsive images..."):
+                target_output_dir = output_dir / "static" / "images" / "optimised"
+                self.image_manager.deploy_optimised_images(target_output_dir)
 
         total_elapsed = time.monotonic() - generation_start
         print(

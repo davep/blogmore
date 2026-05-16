@@ -1,4 +1,4 @@
-"""Image optimization and resizing manager."""
+"""Image optimisation and resizing manager."""
 
 from __future__ import annotations
 
@@ -16,8 +16,8 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class OptimizedImage:
-    """Metadata for an optimized image ladder."""
+class OptimisedImage:
+    """Metadata for an optimised image ladder."""
 
     source_path: Path
     original_width: int
@@ -40,7 +40,7 @@ class OptimizedImage:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> OptimizedImage:
+    def from_dict(cls, data: dict[str, Any]) -> OptimisedImage:
         """Create an instance from a dictionary."""
         return cls(
             source_path=Path(data["source_path"]),
@@ -53,7 +53,7 @@ class OptimizedImage:
 
 
 class ImageManager:
-    """Manages image resizing, optimization, and caching."""
+    """Manages image resizing, optimisation, and caching."""
 
     MANIFEST_FILENAME = "manifest.json"
 
@@ -69,8 +69,8 @@ class ImageManager:
         self.cache_images_dir = cache_dir / "files"
         self.manifest_path = cache_dir / self.MANIFEST_FILENAME
 
-        # Maps source path string to OptimizedImage
-        self.manifest: dict[str, OptimizedImage] = {}
+        # Maps source path string to OptimisedImage
+        self.manifest: dict[str, OptimisedImage] = {}
         self._load_manifest()
 
         # Set of source paths that need to be processed in this build pass
@@ -83,7 +83,7 @@ class ImageManager:
                 with open(self.manifest_path) as f:
                     data = json.load(f)
                     for path_str, entry_data in data.items():
-                        self.manifest[path_str] = OptimizedImage.from_dict(entry_data)
+                        self.manifest[path_str] = OptimisedImage.from_dict(entry_data)
             except Exception as e:
                 print(f"Warning: Failed to load image manifest: {e}")
                 self.manifest = {}
@@ -110,17 +110,17 @@ class ImageManager:
                 hasher.update(chunk)
         return hasher.hexdigest()
 
-    def get_optimized_image(self, source_path: Path) -> OptimizedImage | None:
-        """Register an image for optimization and return its metadata.
+    def get_optimised_image(self, source_path: Path) -> OptimisedImage | None:
+        """Register an image for optimisation and return its metadata.
 
-        Note: This does NOT perform the actual resizing/optimization yet.
+        Note: This does NOT perform the actual resizing/optimisation yet.
         Call `process_all()` to execute the processing.
 
         Args:
             source_path: Path to the source image.
 
         Returns:
-            An OptimizedImage object if successful, None otherwise.
+            An OptimisedImage object if successful, None otherwise.
         """
         if not source_path.is_file():
             return None
@@ -156,7 +156,7 @@ class ImageManager:
                 orig_w, orig_h = img.size
 
                 # Create a placeholder entry with target metadata
-                entry = OptimizedImage(
+                entry = OptimisedImage(
                     source_path=source_path,
                     original_width=orig_w,
                     original_height=orig_h,
@@ -184,7 +184,7 @@ class ImageManager:
             return None
 
     def process_all(self) -> None:
-        """Perform resizing and optimization for all registered images in the queue."""
+        """Perform resizing and optimisation for all registered images in the queue."""
         if not self._processing_queue:
             return
 
@@ -269,17 +269,17 @@ class ImageManager:
                 processed_count += 1
 
             except Exception as e:
-                print(f"Warning: Failed to optimize image {source_path}: {e}")
+                print(f"Warning: Failed to optimise image {source_path}: {e}")
 
         if processed_count > 0:
             self._save_manifest()
             self._processing_queue.clear()
 
-    def deploy_optimized_images(self, output_dir: Path) -> None:
-        """Copy all cached optimized images to the site output directory.
+    def deploy_optimised_images(self, output_dir: Path) -> None:
+        """Copy all cached optimised images to the site output directory.
 
         Args:
-            output_dir: The site output directory (e.g. output/static/images/optimized/).
+            output_dir: The site output directory (e.g. output/static/images/optimised/).
         """
         if not self.cache_images_dir.exists():
             return

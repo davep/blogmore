@@ -329,8 +329,8 @@ class PostParser:
 
         Args:
             site_url: Optional base URL of the site for determining internal vs external links
-            image_manager: Optional ImageManager instance for image optimization.
-            content_dir: Optional content directory for image optimization.
+            image_manager: Optional ImageManager instance for image optimisation.
+            content_dir: Optional content directory for image optimisation.
         """
         self.site_url = site_url or ""
         self.image_manager = image_manager
@@ -353,7 +353,7 @@ class PostParser:
         #    ensures we rotate to a fresh, correctly-configured instance.
         #
         # We also include image_manager and content_dir presence/identity to
-        # ensure rotation when image optimization is toggled or configured.
+        # ensure rotation when image optimisation is toggled or configured.
         manager_id = id(self.image_manager) if self.image_manager else "none"
         cache_key = f"markdown_{self.site_url}_{manager_id}"
         if not hasattr(_thread_local, cache_key):
@@ -513,7 +513,7 @@ class PostParser:
 
         # Convert markdown to HTML
         try:
-            # If the optimized images extension is active, tell it which
+            # If the optimised images extension is active, tell it which
             # directory we are currently in so it can resolve relative images.
             for ext in self.markdown.registeredExtensions:
                 if hasattr(ext, "set_base_dir"):

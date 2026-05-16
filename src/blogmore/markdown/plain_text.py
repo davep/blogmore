@@ -26,7 +26,7 @@ import markdown
 from blogmore.markdown.admonitions import AdmonitionsExtension
 from blogmore.markdown.external_links import ExternalLinksExtension
 from blogmore.markdown.heading_anchors import HeadingAnchorsExtension
-from blogmore.markdown.optimized_images import OptimizedImagesExtension
+from blogmore.markdown.optimised_images import OptimisedImagesExtension
 from blogmore.markdown.strikethrough import StrikethroughExtension
 
 # Thread-local storage for Markdown instances to ensure thread-safety while
@@ -51,8 +51,8 @@ def create_custom_extensions(
         site_url: Base URL of the site; forwarded to
             :class:`~blogmore.markdown.external_links.ExternalLinksExtension`
             so it can distinguish internal from external links.
-        image_manager: Optional ImageManager instance for image optimization.
-        content_dir: Optional content directory for image optimization.
+        image_manager: Optional ImageManager instance for image optimisation.
+        content_dir: Optional content directory for image optimisation.
 
     Returns:
         A list of configured custom Markdown extension instances.
@@ -65,7 +65,7 @@ def create_custom_extensions(
     ]
     if image_manager is not None:
         extensions.append(
-            OptimizedImagesExtension(
+            OptimisedImagesExtension(
                 image_manager=image_manager,
                 content_dir=content_dir,
             )

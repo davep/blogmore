@@ -459,43 +459,43 @@ class SiteConfig:
     command line.  Empty by default.
     """
 
-    optimize_images: bool = False
-    """Whether to automatically optimize and resize local images.
+    optimise_images: bool = False
+    """Whether to automatically optimise and resize local images.
 
     When enabled, the generator scans all Markdown posts for local images and
-    generates a "ladder" of optimized versions in multiple widths and formats
+    generates a "ladder" of optimised versions in multiple widths and formats
     (including WebP).  Standard image tags are replaced with responsive
     ``<picture>`` elements.  Off by default.
     """
 
     image_widths: list[int] = field(default_factory=lambda: [400, 800, 1200, 1600])
-    """List of pixel widths to generate for every optimized image.
+    """List of pixel widths to generate for every optimised image.
 
     Controls the widths used when building the responsive image ladder.  Only
-    meaningful when ``optimize_images`` is ``True``.
+    meaningful when ``optimise_images`` is ``True``.
 
     This is a **configuration file only** option — it cannot be set on the
     command line.  Defaults to ``[400, 800, 1200, 1600]``.
     """
 
     image_quality: int = 85
-    """Compression quality used when generating optimized images.
+    """Compression quality used when generating optimised images.
 
     A value from 1 to 100, where higher means better quality but larger file
-    size.  Only meaningful when ``optimize_images`` is ``True``.
+    size.  Only meaningful when ``optimise_images`` is ``True``.
 
     This is a **configuration file only** option — it cannot be set on the
     command line.  Defaults to ``85``.
     """
 
     image_jpeg_fallback: bool = True
-    """Whether to generate JPEG/PNG fallbacks for optimized images.
+    """Whether to generate JPEG/PNG fallbacks for optimised images.
 
     When ``True`` (the default), BlogMore generates standard JPEG or PNG
-    versions of optimized images alongside modern WebP versions to ensure
+    versions of optimised images alongside modern WebP versions to ensure
     compatibility with 100% of browsers.  If set to ``False``, only WebP
     images are generated, saving disk space but potentially breaking images
-    for very old browsers.  Only meaningful when ``optimize_images`` is
+    for very old browsers.  Only meaningful when ``optimise_images`` is
     ``True``.
 
     This is a **configuration file only** option — it cannot be set on the
