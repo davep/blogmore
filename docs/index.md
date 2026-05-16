@@ -33,6 +33,7 @@ BlogMore focuses on simplicity and efficiency in creating blog-focused websites.
 - **Blog statistics page** — Optional stats page with histograms, word counts, reading times, lifespan, top linked domains, and more
 - **Calendar view** — Optional full-history year calendar view of all posts, with links to day, month, and year archives (enable with `--with-calendar`)
 - **Post graph** — optional interactive force-directed graph connecting posts, tags, and categories via internal links
+- **Automatic image optimisation** — optional responsive image delivery: JPEG, PNG, and WebP images in `extras/` are resized to WebP variants at configurable widths and `<img>` tags in generated HTML are rewritten to `<picture>` elements with `srcset` (enable with `optimize_images`)
 
 ## Installation
 

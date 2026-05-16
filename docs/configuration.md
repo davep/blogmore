@@ -1057,6 +1057,68 @@ Minify all generated HTML output. When enabled, every `.html` file produced by B
 minify_html: true
 ```
 
+#### `optimize_images`
+
+Enable automatic image optimisation and responsive image delivery. When `true`,
+JPEG, PNG, and WebP images found in the `extras/` directory are processed during
+site generation:
+
+- Resized WebP variants are generated at each width in `image_widths`. Widths
+  that exceed the source image's own width are silently skipped (no upscaling).
+  Variant files are written alongside the originals in the output directory and
+  follow the naming pattern `{stem}-{width}w.webp` (e.g. `photo-480w.webp`).
+- Every `<img>` tag in rendered post and page HTML whose `src` matches a
+  processed image is rewritten into a `<picture>` element containing a WebP
+  `<source srcset="…">` and the original `<img>` as a fallback.
+- `loading="lazy"` is added to any `<img>` tag that does not already carry a
+  `loading` attribute, even if no responsive variants were generated for it.
+
+**Type:** Boolean  
+**Default:** `false`  
+**Configuration file only** — cannot be set on the command line.
+
+```yaml
+optimize_images: true
+```
+
+!!! note
+
+    [Pillow](https://python-pillow.org/) must be installed for image
+    optimisation to work.  If you installed BlogMore with `uv` or `pipx` it is
+    included automatically.
+
+#### `image_widths`
+
+Pixel widths for the responsive image size ladder. Each entry must be a positive
+integer. Widths larger than the source image's natural width are silently skipped
+to prevent upscaling. Only used when `optimize_images` is `true`.
+
+**Type:** List of positive integers  
+**Default:** `[480, 768, 1200]`  
+**Configuration file only** — cannot be set on the command line.
+
+```yaml
+image_widths:
+  - 480
+  - 768
+  - 1200
+  - 1920
+```
+
+#### `image_quality`
+
+WebP compression quality for the generated image variants. Higher values give
+better visual quality at the cost of larger file sizes. Only used when
+`optimize_images` is `true`.
+
+**Type:** Integer (1–95)  
+**Default:** `85`  
+**Configuration file only** — cannot be set on the command line.
+
+```yaml
+image_quality: 80
+```
+
 #### `light_mode_code_style`
 
 The [Pygments](https://pygments.org/styles/) style name to use for syntax highlighting in light mode. This controls the colour scheme applied to fenced code blocks when the visitor is using a light theme (or has not changed the default theme). BlogMore generates a `code.css` file (or `code.min.css` when `minify_css` is enabled) containing only the CSS rules for the configured styles.
@@ -1371,6 +1433,12 @@ with_advert: true
 # Styling
 minify_css: true
 minify_js: true
+optimize_images: true
+image_widths:
+  - 480
+  - 768
+  - 1200
+image_quality: 85
 extra_stylesheets:
   - https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700
   - /assets/custom.css

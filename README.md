@@ -60,6 +60,10 @@ here](https://github.com/davep/davep.github.com)).
 - **Post graph** — optional interactive force-directed graph connecting posts,
   tags, and categories via internal links; click any node to navigate to it;
   respects the active light/dark theme
+- **Automatic image optimisation** — optional responsive image delivery; JPEG,
+  PNG, and WebP images in `extras/` are resized to WebP variants at configurable
+  widths and `<img>` tags are rewritten to `<picture>` with `srcset`; enable
+  with `optimize_images: true`
 - **SEO optimisation** — meta tags, Open Graph tags, and Twitter Card support
 - **Automatic organisation** — tag pages, category pages, and chronological
   archives generated automatically
