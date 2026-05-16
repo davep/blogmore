@@ -96,6 +96,27 @@ posts_per_feed: 20
 # bar automatically, between Calendar and RSS. Configuration file only.
 # with_graph: false
 
+# Optional: Automatically optimize and resize local images (default: false)
+# When true, the generator scans all Markdown posts for local images and
+# generates a "ladder" of optimized versions in multiple widths and formats
+# (including WebP). Standard image tags are replaced with responsive
+# <picture> elements.
+# optimize_images: false
+
+# Optional: List of pixel widths to generate for optimized images (default: [400, 800, 1200, 1600])
+# Controls the widths used when building the responsive image ladder.
+# Configuration file only. Only meaningful when optimize_images is true.
+# image_widths:
+#   - 400
+#   - 800
+#   - 1200
+#   - 1600
+
+# Optional: Compression quality for optimized images (default: 85)
+# A value from 1 to 100, where higher means better quality but larger file size.
+# Configuration file only. Only meaningful when optimize_images is true.
+# image_quality: 85
+
 # Optional: Show estimated reading time on posts (default: false)
 # Displays the approximate time to read each post based on the configured WPM.
 # with_read_time: false

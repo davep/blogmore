@@ -40,6 +40,9 @@ here](https://github.com/davep/davep.github.com)).
   content, running entirely in the browser with no external services
 - **Automatic icon generation** — generate favicons and platform-specific
   icons (iOS, Android/Chrome, Windows) from a single source image
+- **Automatic image optimization** — optional multi-size "ladder" generation and
+  next-gen WebP conversion for local images in Markdown posts; simple `<img>`
+  tags are replaced with stable, responsive `<picture>` elements
 - **CSS minification** — optional minification of the generated stylesheet
 - **JavaScript minification** — optional minification of generated scripts
 - **HTML minification** — optional minification of every generated HTML page

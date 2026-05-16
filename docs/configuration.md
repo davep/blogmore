@@ -281,6 +281,48 @@ When a source icon is provided or detected, BlogMore generates 18 icon files opt
 
 See [Metadata and Sidebar — Site icons](metadata_and_sidebar.md#site-icons) for detailed usage instructions.
 
+#### `optimize_images`
+
+Enable automatic optimization and resizing for local images found in your Markdown posts. When enabled, BlogMore scans for images located in your `content_dir` or `extras/` directory and generates a "ladder" of optimized versions in multiple widths. It also automatically generates next-gen WebP versions of your images for better performance.
+
+In the generated HTML, standard `<img>` tags are replaced with responsive `<picture>` elements that use `srcset` to ensure browsers only download the smallest appropriate version of an image for the visitor's screen.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+optimize_images: true
+```
+
+#### `image_widths`
+
+The list of pixel widths to generate for each optimized image ladder. Only meaningful when [`optimize_images`](#optimize_images) is `true`.
+
+This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** List of integers  
+**Default:** `[400, 800, 1200, 1600]`
+
+```yaml
+image_widths:
+  - 400
+  - 800
+  - 1000
+```
+
+#### `image_quality`
+
+The compression quality used when generating optimized images. A value from 1 to 100, where higher means better quality but larger file size. Only meaningful when [`optimize_images`](#optimize_images) is `true`.
+
+This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** Integer  
+**Default:** `85`
+
+```yaml
+image_quality: 80
+```
+
 #### `with_search`
 
 Enable client-side full-text search. When `true`, BlogMore generates a `search_index.json` file containing every post's title, URL, date, and plain-text content, and a `/search.html` page that performs in-browser search as the reader types. A **Search** link is also added to the navigation bar. No external services are required.
@@ -1364,6 +1406,7 @@ clean_first: true
 posts_per_feed: 30
 default_author: "Dave Pearson"
 icon_source: "icon.png"
+optimize_images: true
 with_search: true
 post_path: "{year}/{month}/{day}/{slug}.html"
 with_advert: true

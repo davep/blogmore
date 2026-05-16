@@ -26,6 +26,7 @@ import markdown
 from blogmore.markdown.admonitions import AdmonitionsExtension
 from blogmore.markdown.external_links import ExternalLinksExtension
 from blogmore.markdown.heading_anchors import HeadingAnchorsExtension
+from blogmore.markdown.optimized_images import OptimizedImagesExtension
 from blogmore.markdown.strikethrough import StrikethroughExtension
 
 # Thread-local storage for Markdown instances to ensure thread-safety while
@@ -33,7 +34,11 @@ from blogmore.markdown.strikethrough import StrikethroughExtension
 _thread_local = threading.local()
 
 
-def create_custom_extensions(site_url: str = "") -> list[Any]:
+def create_custom_extensions(
+    site_url: str = "",
+    image_manager: Any = None,
+    content_dir: Any = None,
+) -> list[Any]:
     """Create instances of all custom BlogMore Markdown extensions.
 
     This is the single source of truth for BlogMore's custom Markdown
@@ -46,16 +51,26 @@ def create_custom_extensions(site_url: str = "") -> list[Any]:
         site_url: Base URL of the site; forwarded to
             :class:`~blogmore.markdown.external_links.ExternalLinksExtension`
             so it can distinguish internal from external links.
+        image_manager: Optional ImageManager instance for image optimization.
+        content_dir: Optional content directory for image optimization.
 
     Returns:
         A list of configured custom Markdown extension instances.
     """
-    return [
+    extensions = [
         AdmonitionsExtension(),
         ExternalLinksExtension(site_url=site_url),
         HeadingAnchorsExtension(),
         StrikethroughExtension(),
     ]
+    if image_manager is not None:
+        extensions.append(
+            OptimizedImagesExtension(
+                image_manager=image_manager,
+                content_dir=content_dir,
+            )
+        )
+    return extensions
 
 
 def get_plain_text_markdown_instance() -> markdown.Markdown:

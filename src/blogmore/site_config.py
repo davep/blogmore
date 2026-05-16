@@ -459,6 +459,35 @@ class SiteConfig:
     command line.  Empty by default.
     """
 
+    optimize_images: bool = False
+    """Whether to automatically optimize and resize local images.
+
+    When enabled, the generator scans all Markdown posts for local images and
+    generates a "ladder" of optimized versions in multiple widths and formats
+    (including WebP).  Standard image tags are replaced with responsive
+    ``<picture>`` elements.  Off by default.
+    """
+
+    image_widths: list[int] = field(default_factory=lambda: [400, 800, 1200, 1600])
+    """List of pixel widths to generate for every optimized image.
+
+    Controls the widths used when building the responsive image ladder.  Only
+    meaningful when ``optimize_images`` is ``True``.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``[400, 800, 1200, 1600]``.
+    """
+
+    image_quality: int = 85
+    """Compression quality used when generating optimized images.
+
+    A value from 1 to 100, where higher means better quality but larger file
+    size.  Only meaningful when ``optimize_images`` is ``True``.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``85``.
+    """
+
     invite_comments: bool = False
     """Whether to show a comment invitation section on individual post pages.
 
