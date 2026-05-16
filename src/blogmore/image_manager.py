@@ -327,11 +327,15 @@ class ImageManager:
 
                         # Save WebP
                         if webp_name and webp_path:
-                            resized.save(
-                                webp_path,
-                                format="WEBP",
-                                quality=self.site_config.image_quality,
-                            )
+                            webp_save_kwargs: dict[str, Any] = {
+                                "format": "WEBP",
+                                "quality": self.site_config.image_quality,
+                            }
+                            # Use lossless encoding for PNG sources (better for screenshots)
+                            if source_path.suffix.lower() == ".png":
+                                webp_save_kwargs["lossless"] = True
+
+                            resized.save(webp_path, **webp_save_kwargs)
 
                 processed_count += 1
 
