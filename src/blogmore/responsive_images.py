@@ -21,7 +21,7 @@ from blogmore.image_optimizer import ImageVariant
 # Regex that matches a single <img …> tag (self-closing or not).
 # Group 1 captures all attribute text inside the tag.
 _IMG_TAG_RE = re.compile(
-    r"<img\s+([^>]*?)(?:\s*/)?>",
+    r"<img\s*([^>]*?)(?:\s*/)?>",
     re.IGNORECASE | re.DOTALL,
 )
 

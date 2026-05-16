@@ -573,13 +573,15 @@ class AssetManager:
             if not output_path.exists():
                 shutil.copy2(file_path, output_path)
 
-            # Build the root-relative URL for this image.
-            url_parts = relative_path.parts
-            url_dir = "/" + "/".join(url_parts[:-1]) if len(url_parts) > 1 else ""
+            # Build the root-relative URL directory for this image.
+            # relative_path.parent is "." for root-level extras files.
+            parent = relative_path.parent
+            url_dir = "/" + parent.as_posix() if str(parent) != "." else ""
             original_url = f"{url_dir}/{relative_path.name}"
 
             # Generate variants in the output directory.
-            url_base = url_dir or "/"
+            # url_base is the directory component of original_url (never empty).
+            url_base = url_dir if url_dir else "/"
             variants = optimizer.process_image(
                 source_path=output_path,
                 url_base=url_base,

@@ -31,7 +31,7 @@ class ImageVariant:
     """Metadata for a single resized image variant.
 
     Attributes:
-        url: Root-relative URL of the generated variant file (e.g. ``"/images/photo-480.webp"``).
+        url: Root-relative URL of the generated variant file (e.g. ``"/images/photo-480w.webp"``).
         width: Width of the variant in pixels.
         mime_type: MIME type of the variant file (e.g. ``"image/webp"``).
     """
