@@ -26,6 +26,10 @@ class OptimisedImage:
     quality: int
     widths: list[int]
     jpeg_fallback: bool
+    # True if the original source file can be used as a WebP version
+    original_is_webp: bool = False
+    # True if the original source file can be used as a standard version
+    original_is_standard: bool = False
     # Maps width to relative output path (standard format)
     resized_paths: dict[int, str] = field(default_factory=dict)
     # Maps width to relative output path (WebP format)
@@ -41,6 +45,8 @@ class OptimisedImage:
             "quality": self.quality,
             "widths": self.widths,
             "jpeg_fallback": self.jpeg_fallback,
+            "original_is_webp": self.original_is_webp,
+            "original_is_standard": self.original_is_standard,
             "resized_paths": {
                 str(width): path for width, path in self.resized_paths.items()
             },
@@ -58,6 +64,8 @@ class OptimisedImage:
             quality=data.get("quality", 85),
             widths=data.get("widths", []),
             jpeg_fallback=data.get("jpeg_fallback", True),
+            original_is_webp=data.get("original_is_webp", False),
+            original_is_standard=data.get("original_is_standard", False),
             resized_paths={
                 int(width): path for width, path in data["resized_paths"].items()
             },
@@ -146,13 +154,37 @@ class ImageManager:
         file_hash = self._get_file_hash(source_path)
         source_key = str(source_path.resolve())
 
+        # Determine target widths: all buckets smaller than the original,
+        # plus the original width itself if it's within the range of our buckets.
+        # This ensures that an image like 753px doesn't get capped at 400px
+        # if the next bucket is 800px.
+        try:
+            with Image.open(source_path) as image:
+                original_width, original_height = image.size
+        except Exception as error:
+            print(
+                f"Warning: Failed to open image {source_path} to determine size: {error}"
+            )
+            return None
+
+        max_bucket_width = max(self.site_config.image_widths, default=0)
+        target_widths = {
+            width for width in self.site_config.image_widths if width < original_width
+        }
+        if original_width <= max_bucket_width:
+            target_widths.add(original_width)
+        if not target_widths and self.site_config.image_widths:
+            target_widths.add(original_width)
+
+        sorted_target_widths = sorted(target_widths)
+
         # Check if we already have a valid manifest entry
         if source_key in self.manifest:
             entry = self.manifest[source_key]
             if (
                 entry.hash == file_hash
                 and entry.quality == self.site_config.image_quality
-                and entry.widths == self.site_config.image_widths
+                and entry.widths == sorted_target_widths
                 and entry.jpeg_fallback == self.site_config.image_jpeg_fallback
             ):
                 # Up to date, but we still need to ensure the physical files
@@ -170,37 +202,48 @@ class ImageManager:
 
         # Not in manifest, hash changed, parameters changed, or cache missing
         try:
-            with Image.open(source_path) as image:
-                original_width, original_height = image.size
+            # Predict target filenames
+            base_name = f"{source_path.stem}_{file_hash[:8]}"
+            standard_extension = ".png" if suffix == ".png" else ".jpg"
 
-                # Create a placeholder entry with target metadata
-                entry = OptimisedImage(
-                    source_path=source_path,
-                    original_width=original_width,
-                    original_height=original_height,
-                    hash=file_hash,
-                    quality=self.site_config.image_quality,
-                    widths=self.site_config.image_widths,
-                    jpeg_fallback=self.site_config.image_jpeg_fallback,
-                )
+            # Determine if the original image can satisfy our needs for the
+            # original resolution version.
+            original_is_webp = suffix == ".webp"
+            original_is_standard = suffix == standard_extension
 
-                # Predict target filenames
-                base_name = f"{source_path.stem}_{file_hash[:8]}"
-                standard_extension = ".png" if suffix == ".png" else ".jpg"
+            # Create a placeholder entry with target metadata
+            entry = OptimisedImage(
+                source_path=source_path,
+                original_width=original_width,
+                original_height=original_height,
+                hash=file_hash,
+                quality=self.site_config.image_quality,
+                widths=sorted_target_widths,
+                jpeg_fallback=self.site_config.image_jpeg_fallback,
+                original_is_webp=original_is_webp,
+                original_is_standard=original_is_standard,
+            )
 
-                for width in self.site_config.image_widths:
-                    if width >= original_width:
-                        continue
-                    if self.site_config.image_jpeg_fallback:
+            for width in sorted_target_widths:
+                if self.site_config.image_jpeg_fallback:
+                    if width == original_width and original_is_standard:
+                        # Skip generation; processor will use the original src
+                        pass
+                    else:
                         entry.resized_paths[width] = (
                             f"{base_name}-{width}{standard_extension}"
                         )
+
+                if width == original_width and original_is_webp:
+                    # Skip generation; processor will use the original src
+                    pass
+                else:
                     entry.webp_paths[width] = f"{base_name}-{width}.webp"
 
-                # Store in manifest and add to queue
-                self.manifest[source_key] = entry
-                self._processing_queue.add(source_path)
-                return entry
+            # Store in manifest and add to queue
+            self.manifest[source_key] = entry
+            self._processing_queue.add(source_path)
+            return entry
 
         except Exception as error:
             print(f"Warning: Failed to register image {source_path}: {error}")
@@ -245,10 +288,14 @@ class ImageManager:
                         # (quality/widths) changed, so we want fresh files.
 
                         # Calculate new height preserving aspect ratio
-                        height = int(original_height * (width / original_width))
-                        resized = image.resize(
-                            (width, height), Image.Resampling.LANCZOS
-                        )
+                        resized: Image.Image
+                        if width == original_width:
+                            resized = image
+                        else:
+                            height = int(original_height * (width / original_width))
+                            resized = image.resize(
+                                (width, height), Image.Resampling.LANCZOS
+                            )
 
                         # Save standard fallback
                         if standard_name and standard_path:
