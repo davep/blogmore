@@ -41,8 +41,10 @@ class OptimisedImage:
             "quality": self.quality,
             "widths": self.widths,
             "jpeg_fallback": self.jpeg_fallback,
-            "resized_paths": {str(w): p for w, p in self.resized_paths.items()},
-            "webp_paths": {str(w): p for w, p in self.webp_paths.items()},
+            "resized_paths": {
+                str(width): path for width, path in self.resized_paths.items()
+            },
+            "webp_paths": {str(width): path for width, path in self.webp_paths.items()},
         }
 
     @classmethod
@@ -56,8 +58,10 @@ class OptimisedImage:
             quality=data.get("quality", 85),
             widths=data.get("widths", []),
             jpeg_fallback=data.get("jpeg_fallback", True),
-            resized_paths={int(w): p for w, p in data["resized_paths"].items()},
-            webp_paths={int(w): p for w, p in data["webp_paths"].items()},
+            resized_paths={
+                int(width): path for width, path in data["resized_paths"].items()
+            },
+            webp_paths={int(width): path for width, path in data["webp_paths"].items()},
         )
 
 
@@ -89,20 +93,20 @@ class ImageManager:
         """Load the manifest from disk if it exists."""
         if self.manifest_path.is_file():
             try:
-                with open(self.manifest_path) as f:
-                    data = json.load(f)
+                with open(self.manifest_path) as manifest_file:
+                    data = json.load(manifest_file)
                     for path_str, entry_data in data.items():
                         self.manifest[path_str] = OptimisedImage.from_dict(entry_data)
-            except Exception as e:
-                print(f"Warning: Failed to load image manifest: {e}")
+            except Exception as error:
+                print(f"Warning: Failed to load image manifest: {error}")
                 self.manifest = {}
 
     def _save_manifest(self) -> None:
         """Save the manifest to disk."""
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         data = {path: entry.to_dict() for path, entry in self.manifest.items()}
-        with open(self.manifest_path, "w") as f:
-            json.dump(data, f, indent=2)
+        with open(self.manifest_path, "w") as manifest_file:
+            json.dump(data, manifest_file, indent=2)
 
     def _get_file_hash(self, path: Path) -> str:
         """Calculate the SHA-256 hash of a file.
@@ -114,8 +118,8 @@ class ImageManager:
             The hex digest of the file hash.
         """
         hasher = hashlib.sha256()
-        with open(path, "rb") as f:
-            for chunk in iter(lambda: f.read(4096), b""):
+        with open(path, "rb") as source_file:
+            for chunk in iter(lambda: source_file.read(4096), b""):
                 hasher.update(chunk)
         return hasher.hexdigest()
 
@@ -166,14 +170,14 @@ class ImageManager:
 
         # Not in manifest, hash changed, parameters changed, or cache missing
         try:
-            with Image.open(source_path) as img:
-                orig_w, orig_h = img.size
+            with Image.open(source_path) as image:
+                original_width, original_height = image.size
 
                 # Create a placeholder entry with target metadata
                 entry = OptimisedImage(
                     source_path=source_path,
-                    original_width=orig_w,
-                    original_height=orig_h,
+                    original_width=original_width,
+                    original_height=original_height,
                     hash=file_hash,
                     quality=self.site_config.image_quality,
                     widths=self.site_config.image_widths,
@@ -182,13 +186,15 @@ class ImageManager:
 
                 # Predict target filenames
                 base_name = f"{source_path.stem}_{file_hash[:8]}"
-                std_ext = ".png" if suffix == ".png" else ".jpg"
+                standard_extension = ".png" if suffix == ".png" else ".jpg"
 
                 for width in self.site_config.image_widths:
-                    if width >= orig_w:
+                    if width >= original_width:
                         continue
                     if self.site_config.image_jpeg_fallback:
-                        entry.resized_paths[width] = f"{base_name}-{width}{std_ext}"
+                        entry.resized_paths[width] = (
+                            f"{base_name}-{width}{standard_extension}"
+                        )
                     entry.webp_paths[width] = f"{base_name}-{width}.webp"
 
                 # Store in manifest and add to queue
@@ -196,8 +202,8 @@ class ImageManager:
                 self._processing_queue.add(source_path)
                 return entry
 
-        except Exception as e:
-            print(f"Warning: Failed to register image {source_path}: {e}")
+        except Exception as error:
+            print(f"Warning: Failed to register image {source_path}: {error}")
             return None
 
     def process_all(self) -> None:
@@ -215,18 +221,20 @@ class ImageManager:
                 continue
 
             try:
-                with Image.open(source_path) as img:
-                    orig_w, orig_h = img.size
+                with Image.open(source_path) as image:
+                    original_width, original_height = image.size
 
                     all_widths = sorted(
                         set(entry.resized_paths.keys()) | set(entry.webp_paths.keys())
                     )
                     for width in all_widths:
-                        std_name = entry.resized_paths.get(width)
+                        standard_name = entry.resized_paths.get(width)
                         webp_name = entry.webp_paths.get(width)
 
-                        std_path = (
-                            self.cache_images_dir / std_name if std_name else None
+                        standard_path = (
+                            self.cache_images_dir / standard_name
+                            if standard_name
+                            else None
                         )
                         webp_path = (
                             self.cache_images_dir / webp_name if webp_name else None
@@ -237,15 +245,17 @@ class ImageManager:
                         # (quality/widths) changed, so we want fresh files.
 
                         # Calculate new height preserving aspect ratio
-                        height = int(orig_h * (width / orig_w))
-                        resized = img.resize((width, height), Image.Resampling.LANCZOS)
+                        height = int(original_height * (width / original_width))
+                        resized = image.resize(
+                            (width, height), Image.Resampling.LANCZOS
+                        )
 
                         # Save standard fallback
-                        if std_name and std_path:
+                        if standard_name and standard_path:
                             save_kwargs: dict[str, Any] = {
                                 "quality": self.site_config.image_quality
                             }
-                            if std_name.endswith(".jpg"):
+                            if standard_name.endswith(".jpg"):
                                 save_kwargs["optimize"] = True
                                 if resized.mode in ("RGBA", "P"):
                                     background = Image.new(
@@ -259,11 +269,11 @@ class ImageManager:
                                     background.paste(
                                         resized_rgb, mask=resized_rgb.split()[3]
                                     )
-                                    background.save(std_path, **save_kwargs)
+                                    background.save(standard_path, **save_kwargs)
                                 else:
-                                    resized.save(std_path, **save_kwargs)
+                                    resized.save(standard_path, **save_kwargs)
                             else:
-                                resized.save(std_path)
+                                resized.save(standard_path)
 
                         # Save WebP
                         if webp_name and webp_path:
@@ -275,8 +285,8 @@ class ImageManager:
 
                 processed_count += 1
 
-            except Exception as e:
-                print(f"Warning: Failed to optimise image {source_path}: {e}")
+            except Exception as error:
+                print(f"Warning: Failed to optimise image {source_path}: {error}")
 
         if processed_count > 0:
             self._save_manifest()
@@ -296,7 +306,7 @@ class ImageManager:
             for filename in list(entry.resized_paths.values()) + list(
                 entry.webp_paths.values()
             ):
-                src = self.cache_images_dir / filename
-                dst = output_dir / filename
-                if src.exists():
-                    shutil.copy2(src, dst)
+                cached_file_path = self.cache_images_dir / filename
+                destination_file_path = output_dir / filename
+                if cached_file_path.exists():
+                    shutil.copy2(cached_file_path, destination_file_path)
