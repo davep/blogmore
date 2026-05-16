@@ -170,7 +170,8 @@ class ImageManager:
                 for width in self.site_config.image_widths:
                     if width >= orig_w:
                         continue
-                    entry.resized_paths[width] = f"{base_name}-{width}{std_ext}"
+                    if self.site_config.image_jpeg_fallback:
+                        entry.resized_paths[width] = f"{base_name}-{width}{std_ext}"
                     entry.webp_paths[width] = f"{base_name}-{width}.webp"
 
                 # Store in manifest and add to queue
@@ -200,13 +201,27 @@ class ImageManager:
                 with Image.open(source_path) as img:
                     orig_w, orig_h = img.size
 
-                    for width, std_name in entry.resized_paths.items():
-                        webp_name = entry.webp_paths[width]
+                    all_widths = sorted(
+                        set(entry.resized_paths.keys()) | set(entry.webp_paths.keys())
+                    )
+                    for width in all_widths:
+                        std_name = entry.resized_paths.get(width)
+                        webp_name = entry.webp_paths.get(width)
 
-                        std_path = self.cache_images_dir / std_name
-                        webp_path = self.cache_images_dir / webp_name
+                        std_path = (
+                            self.cache_images_dir / std_name if std_name else None
+                        )
+                        webp_path = (
+                            self.cache_images_dir / webp_name if webp_name else None
+                        )
 
-                        if not std_path.exists() or not webp_path.exists():
+                        # If both are missing or don't need update, we can skip opening image
+                        # but we already opened it.
+
+                        # Process resizing if needed
+                        resized = None
+
+                        if std_name and std_path and not std_path.exists():
                             # Calculate new height preserving aspect ratio
                             height = int(orig_h * (width / orig_w))
                             resized = img.resize(
@@ -236,6 +251,13 @@ class ImageManager:
                                     resized.save(std_path, **save_kwargs)
                             else:
                                 resized.save(std_path)
+
+                        if webp_name and webp_path and not webp_path.exists():
+                            if not resized:
+                                height = int(orig_h * (width / orig_w))
+                                resized = img.resize(
+                                    (width, height), Image.Resampling.LANCZOS
+                                )
 
                             # Save WebP
                             resized.save(

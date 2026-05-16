@@ -488,6 +488,20 @@ class SiteConfig:
     command line.  Defaults to ``85``.
     """
 
+    image_jpeg_fallback: bool = True
+    """Whether to generate JPEG/PNG fallbacks for optimized images.
+
+    When ``True`` (the default), BlogMore generates standard JPEG or PNG
+    versions of optimized images alongside modern WebP versions to ensure
+    compatibility with 100% of browsers.  If set to ``False``, only WebP
+    images are generated, saving disk space but potentially breaking images
+    for very old browsers.  Only meaningful when ``optimize_images`` is
+    ``True``.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.
+    """
+
     invite_comments: bool = False
     """Whether to show a comment invitation section on individual post pages.
 

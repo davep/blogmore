@@ -323,6 +323,23 @@ This is a **configuration file only** option — it cannot be set on the command
 image_quality: 80
 ```
 
+#### `image_jpeg_fallback`
+
+Whether to generate standard JPEG or PNG fallback versions of optimized images alongside the modern WebP versions. 
+
+When `true` (the default), BlogMore ensures 100% browser compatibility by providing standard formats for older browsers. If set to `false`, only WebP images are generated and used, which saves disk space and build time but may result in broken images for visitors using very old browsers.
+
+Only meaningful when [`optimize_images`](#optimize_images) is `true`.
+
+This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** Boolean  
+**Default:** `true`
+
+```yaml
+image_jpeg_fallback: false
+```
+
 #### `with_search`
 
 Enable client-side full-text search. When `true`, BlogMore generates a `search_index.json` file containing every post's title, URL, date, and plain-text content, and a `/search.html` page that performs in-browser search as the reader types. A **Search** link is also added to the navigation bar. No external services are required.

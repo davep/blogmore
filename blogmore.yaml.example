@@ -117,6 +117,12 @@ posts_per_feed: 20
 # Configuration file only. Only meaningful when optimize_images is true.
 # image_quality: 85
 
+# Optional: Generate JPEG/PNG fallbacks for optimized images (default: true)
+# When true, standard JPEG or PNG versions of images are generated alongside
+# modern WebP versions to ensure 100% browser compatibility. Set to false to
+# only generate WebP images, saving disk space.
+# image_jpeg_fallback: true
+
 # Optional: Show estimated reading time on posts (default: false)
 # Displays the approximate time to read each post based on the configured WPM.
 # with_read_time: false

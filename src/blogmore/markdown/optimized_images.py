@@ -126,6 +126,11 @@ class OptimizedImageInlineProcessor(Pattern):
         """
         picture = Element("picture")
 
+        # Check if we should include a standard (JPG/PNG) fallback
+        with_fallback = True
+        if self.image_manager:
+            with_fallback = self.image_manager.site_config.image_jpeg_fallback
+
         # 1. Add WebP source
         if optimized.webp_paths:
             webp_source = SubElement(picture, "source")
@@ -138,8 +143,8 @@ class OptimizedImageInlineProcessor(Pattern):
             webp_source.set("srcset", ", ".join(srcset_parts))
             webp_source.set("sizes", "(max-width: 800px) 100vw, 800px")
 
-        # 2. Add standard (JPG/PNG) source
-        if optimized.resized_paths:
+        # 2. Add standard (JPG/PNG) source if enabled
+        if with_fallback and optimized.resized_paths:
             std_source = SubElement(picture, "source")
             first_file = next(iter(optimized.resized_paths.values()))
             if first_file.endswith((".jpg", ".jpeg")):
@@ -163,9 +168,12 @@ class OptimizedImageInlineProcessor(Pattern):
         # Pick a sensible default src:
         # If we have resized versions, pick the largest.
         # Otherwise, use the original source (which might be the case for small images).
-        if optimized.resized_paths:
+        if with_fallback and optimized.resized_paths:
             max_width = max(optimized.resized_paths.keys())
             fallback_src = f"{self.output_url_base}{optimized.resized_paths[max_width]}"
+        elif not with_fallback and optimized.webp_paths:
+            max_width = max(optimized.webp_paths.keys())
+            fallback_src = f"{self.output_url_base}{optimized.webp_paths[max_width]}"
         else:
             # Fallback to the original URL if no resizing happened (e.g. image too small)
             fallback_src = original_src
