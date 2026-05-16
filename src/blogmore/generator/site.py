@@ -264,6 +264,11 @@ class SiteGenerator:
             with timed_step("Generating graph page..."):
                 feature_gen.generate_graph_page(posts, sidebar_pages)
 
+        # Perform actual image optimization for discovered images
+        if self.image_manager:
+            with timed_step("Optimizing responsive images..."):
+                self.image_manager.process_all()
+
         # Finalize static assets & sitemap
         asset_manager.copy_static_assets()
         if fontawesome_css_content is not None:

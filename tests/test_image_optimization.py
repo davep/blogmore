@@ -37,34 +37,53 @@ class TestImageManager:
 
     @patch("PIL.Image.open")
     @patch("blogmore.image_manager.ImageManager._get_file_hash")
-    def test_get_optimized_image_success(
+    def test_get_optimized_image_and_process_all(
         self, mock_hash, mock_open, image_manager, tmp_path
     ):
-        """Test successful image optimization."""
+        """Test successful image registration followed by batch processing."""
         mock_hash.return_value = "fakehash"
 
         # Mock PIL Image
         mock_img = MagicMock()
         mock_img.size = (1600, 900)
+        mock_img.mode = "RGB"
         mock_open.return_value.__enter__.return_value = mock_img
 
         source_path = tmp_path / "test.jpg"
         source_path.touch()
 
+        # Step 1: Registration
         optimized = image_manager.get_optimized_image(source_path)
 
         assert optimized is not None
         assert optimized.original_width == 1600
         assert optimized.original_height == 900
-        assert optimized.hash == "fakehash"
         assert 400 in optimized.resized_paths
         assert 800 in optimized.resized_paths
-        assert 400 in optimized.webp_paths
 
-        # Verify resize calls
-        # 1600 -> 400 (scale 0.25)
-        # 1600 -> 800 (scale 0.5)
+        # Metadata should be returned, but NO resizing should have happened yet
+        assert mock_img.resize.call_count == 0
+
+        # Step 2: Processing
+        image_manager.process_all()
+
+        # Verify resize calls occurred during process_all()
+        # 1600 -> 400 and 1600 -> 800
         assert mock_img.resize.call_count == 2
+
+        # Step 3: Re-registration (should be cached)
+        # Clear mock counts
+        mock_img.resize.reset_mock()
+
+        # We need to make the physical files exist so it considers them cached
+        for filename in list(optimized.resized_paths.values()) + list(
+            optimized.webp_paths.values()
+        ):
+            (image_manager.cache_images_dir / filename).touch()
+
+        cached = image_manager.get_optimized_image(source_path)
+        assert cached == optimized
+        assert mock_img.resize.call_count == 0
 
     def test_get_optimized_image_unsupported(self, image_manager, tmp_path):
         """Test that unsupported formats are bypassed."""
@@ -84,6 +103,7 @@ class TestImageManager:
 
         mock_img = MagicMock()
         mock_img.size = (600, 400)
+        mock_img.mode = "RGB"
         mock_open.return_value.__enter__.return_value = mock_img
 
         source_path = tmp_path / "small.jpg"
@@ -126,6 +146,8 @@ class TestOptimizedImageProcessor:
             resized_paths={400: "photo-400.jpg", 800: "photo-800.jpg"},
             webp_paths={400: "photo-400.webp", 800: "photo-800.webp"},
         )
+        # In the real code, get_optimized_image returns the entry and adds it to the queue.
+        # Here we just mock the return.
         image_manager.get_optimized_image = MagicMock(return_value=optimized)
 
         processor = OptimizedImageInlineProcessor(

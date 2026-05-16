@@ -73,6 +73,9 @@ class ImageManager:
         self.manifest: dict[str, OptimizedImage] = {}
         self._load_manifest()
 
+        # Set of source paths that need to be processed in this build pass
+        self._processing_queue: set[Path] = set()
+
     def _load_manifest(self) -> None:
         """Load the manifest from disk if it exists."""
         if self.manifest_path.is_file():
@@ -108,7 +111,10 @@ class ImageManager:
         return hasher.hexdigest()
 
     def get_optimized_image(self, source_path: Path) -> OptimizedImage | None:
-        """Get or create optimized versions of an image.
+        """Register an image for optimization and return its metadata.
+
+        Note: This does NOT perform the actual resizing/optimization yet.
+        Call `process_all()` to execute the processing.
 
         Args:
             source_path: Path to the source image.
@@ -127,17 +133,29 @@ class ImageManager:
         file_hash = self._get_file_hash(source_path)
         source_key = str(source_path.resolve())
 
-        # Check manifest
+        # Check if we already have a valid manifest entry
         if source_key in self.manifest:
             entry = self.manifest[source_key]
             if entry.hash == file_hash:
-                return entry
+                # Up to date, but we still need to ensure the physical files
+                # exist in the cache. If they were deleted, re-queue.
+                all_exist = True
+                for filename in list(entry.resized_paths.values()) + list(
+                    entry.webp_paths.values()
+                ):
+                    if not (self.cache_images_dir / filename).exists():
+                        all_exist = False
+                        break
 
-        # Not in manifest or hash changed: process it
+                if all_exist:
+                    return entry
+
+        # Not in manifest, hash changed, or cache missing: register for processing
         try:
             with Image.open(source_path) as img:
                 orig_w, orig_h = img.size
 
+                # Create a placeholder entry with target metadata
                 entry = OptimizedImage(
                     source_path=source_path,
                     original_width=orig_w,
@@ -145,77 +163,95 @@ class ImageManager:
                     hash=file_hash,
                 )
 
-                # Process ladder
-                self.cache_images_dir.mkdir(parents=True, exist_ok=True)
-
-                # We'll use the hash in the filename to avoid collisions
+                # Predict target filenames
                 base_name = f"{source_path.stem}_{file_hash[:8]}"
+                std_ext = ".png" if suffix == ".png" else ".jpg"
 
                 for width in self.site_config.image_widths:
                     if width >= orig_w:
                         continue
+                    entry.resized_paths[width] = f"{base_name}-{width}{std_ext}"
+                    entry.webp_paths[width] = f"{base_name}-{width}.webp"
 
-                    # Calculate new height preserving aspect ratio
-                    height = int(orig_h * (width / orig_w))
-
-                    # Target filenames
-                    # Fallback "standard" format is JPEG unless it's a PNG source
-                    std_ext = ".png" if suffix == ".png" else ".jpg"
-                    std_name = f"{base_name}-{width}{std_ext}"
-                    webp_name = f"{base_name}-{width}.webp"
-
-                    std_path = self.cache_images_dir / std_name
-                    webp_path = self.cache_images_dir / webp_name
-
-                    # Resize and save if not already in cache
-                    if not std_path.exists() or not webp_path.exists():
-                        resized = img.resize((width, height), Image.Resampling.LANCZOS)
-
-                        # Save standard fallback
-                        save_kwargs: dict[str, Any] = {
-                            "quality": self.site_config.image_quality
-                        }
-                        if std_ext == ".jpg":
-                            save_kwargs["optimize"] = True
-                            # JPEG does not support RGBA; flatten to RGB on white background
-                            if resized.mode in ("RGBA", "P"):
-                                background = Image.new(
-                                    "RGB", resized.size, (255, 255, 255)
-                                )
-                                # Handle palette images with transparency
-                                resized_rgb = (
-                                    resized.convert("RGBA")
-                                    if resized.mode == "P"
-                                    else resized
-                                )
-                                background.paste(
-                                    resized_rgb, mask=resized_rgb.split()[3]
-                                )
-
-                                background.save(std_path, **save_kwargs)
-                            else:
-                                resized.save(std_path, **save_kwargs)
-                        else:
-                            # PNG or other
-                            resized.save(std_path)
-
-                        # Save WebP (native support for transparency)
-                        resized.save(
-                            webp_path,
-                            format="WEBP",
-                            quality=self.site_config.image_quality,
-                        )
-
-                    entry.resized_paths[width] = std_name
-                    entry.webp_paths[width] = webp_name
-
+                # Store in manifest and add to queue
                 self.manifest[source_key] = entry
-                self._save_manifest()
+                self._processing_queue.add(source_path)
                 return entry
 
         except Exception as e:
-            print(f"Warning: Failed to optimize image {source_path}: {e}")
+            print(f"Warning: Failed to register image {source_path}: {e}")
             return None
+
+    def process_all(self) -> None:
+        """Perform resizing and optimization for all registered images in the queue."""
+        if not self._processing_queue:
+            return
+
+        self.cache_images_dir.mkdir(parents=True, exist_ok=True)
+        processed_count = 0
+
+        for source_path in sorted(self._processing_queue):
+            source_key = str(source_path.resolve())
+            entry = self.manifest.get(source_key)
+            if not entry:
+                continue
+
+            try:
+                with Image.open(source_path) as img:
+                    orig_w, orig_h = img.size
+
+                    for width, std_name in entry.resized_paths.items():
+                        webp_name = entry.webp_paths[width]
+
+                        std_path = self.cache_images_dir / std_name
+                        webp_path = self.cache_images_dir / webp_name
+
+                        if not std_path.exists() or not webp_path.exists():
+                            # Calculate new height preserving aspect ratio
+                            height = int(orig_h * (width / orig_w))
+                            resized = img.resize(
+                                (width, height), Image.Resampling.LANCZOS
+                            )
+
+                            # Save standard fallback
+                            save_kwargs: dict[str, Any] = {
+                                "quality": self.site_config.image_quality
+                            }
+                            if std_name.endswith(".jpg"):
+                                save_kwargs["optimize"] = True
+                                if resized.mode in ("RGBA", "P"):
+                                    background = Image.new(
+                                        "RGB", resized.size, (255, 255, 255)
+                                    )
+                                    resized_rgb = (
+                                        resized.convert("RGBA")
+                                        if resized.mode == "P"
+                                        else resized
+                                    )
+                                    background.paste(
+                                        resized_rgb, mask=resized_rgb.split()[3]
+                                    )
+                                    background.save(std_path, **save_kwargs)
+                                else:
+                                    resized.save(std_path, **save_kwargs)
+                            else:
+                                resized.save(std_path)
+
+                            # Save WebP
+                            resized.save(
+                                webp_path,
+                                format="WEBP",
+                                quality=self.site_config.image_quality,
+                            )
+
+                processed_count += 1
+
+            except Exception as e:
+                print(f"Warning: Failed to optimize image {source_path}: {e}")
+
+        if processed_count > 0:
+            self._save_manifest()
+            self._processing_queue.clear()
 
     def deploy_optimized_images(self, output_dir: Path) -> None:
         """Copy all cached optimized images to the site output directory.
