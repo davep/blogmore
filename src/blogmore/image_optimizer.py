@@ -75,19 +75,23 @@ class ImageOptimizer:
         self,
         source_path: Path,
         url_base: str,
+        output_dir: Path | None = None,
     ) -> list[ImageVariant]:
         """Generate WebP variants for *source_path* and return their metadata.
 
-        The variant files are written into the same directory as *source_path*.
-        Each variant is named ``{stem}-{width}w.webp`` (e.g.
-        ``photo-480w.webp``).  Widths that exceed the source image's natural
-        width are skipped so we never upscale.
+        Variant files are written into *output_dir* when provided; otherwise
+        they are written into the same directory as *source_path*.  Each
+        variant is named ``{stem}-{width}w.webp`` (e.g. ``photo-480w.webp``).
+        Widths that exceed the source image's natural width are skipped so we
+        never upscale.
 
         Args:
             source_path: Absolute path to the source image file.
             url_base: Root-relative URL directory prefix for the generated
                 variant URLs (e.g. ``"/images"``).  Must not include a
                 trailing slash.
+            output_dir: Directory where variant files are written.  Defaults
+                to ``source_path.parent`` when not provided.
 
         Returns:
             A list of [`ImageVariant`][blogmore.image_optimizer.ImageVariant]
@@ -95,7 +99,7 @@ class ImageOptimizer:
             ascending width.  Returns an empty list if the source file cannot
             be opened or no variants were produced.
         """
-        output_dir = source_path.parent
+        effective_output_dir = source_path.parent if output_dir is None else output_dir
         stem = source_path.stem
         url_base = url_base.rstrip("/")
 
@@ -120,7 +124,7 @@ class ImageOptimizer:
                     resized = img.resize((width, height), Image.Resampling.LANCZOS)
 
                     variant_filename = f"{stem}-{width}w.webp"
-                    variant_path = output_dir / variant_filename
+                    variant_path = effective_output_dir / variant_filename
                     resized.save(variant_path, format="WEBP", quality=self._quality)
 
                     variant_url = f"{url_base}/{variant_filename}"

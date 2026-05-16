@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import shutil
 import urllib.error
 from importlib.resources import files
@@ -524,24 +526,92 @@ class AssetManager:
         if failed_count > 0:
             print(f"Warning: Failed to copy {failed_count} extra file(s)")
 
+    def _load_cached_variants(
+        self,
+        cached_entry: object,
+        source_hash: str,
+        variant_cache_dir: Path,
+        output_dir: Path,
+    ) -> list[ImageVariant] | None:
+        """Attempt to restore image variants from the cache.
+
+        Deserialises a manifest entry, verifies that the source hash matches,
+        confirms every variant file is present in *variant_cache_dir*, and —
+        if everything checks out — copies the variant files to *output_dir*
+        before returning the reconstructed [`ImageVariant`][blogmore.image_optimizer.ImageVariant]
+        list.  Returns ``None`` if any check fails so the caller can fall back
+        to re-generating the variants.
+
+        Args:
+            cached_entry: Raw value from the manifest dict for this image.
+            source_hash: SHA-256 hex digest of the current source file.
+            variant_cache_dir: Directory in the cache that holds the variant
+                files for this image.
+            output_dir: Destination directory where variants should be copied.
+
+        Returns:
+            A list of [`ImageVariant`][blogmore.image_optimizer.ImageVariant]
+            objects if the cache is valid and complete, otherwise ``None``.
+        """
+        if not isinstance(cached_entry, dict):
+            return None
+        if cached_entry.get("source_hash") != source_hash:
+            return None
+
+        cached_variants_data = cached_entry.get("variants", [])
+        if not isinstance(cached_variants_data, list):
+            return None
+
+        cached_variants: list[ImageVariant] = []
+        for item in cached_variants_data:
+            if (
+                isinstance(item, dict)
+                and "url" in item
+                and "width" in item
+                and "mime_type" in item
+            ):
+                cached_variants.append(
+                    ImageVariant(
+                        url=item["url"],
+                        width=item["width"],
+                        mime_type=item["mime_type"],
+                    )
+                )
+
+        # Verify every variant file is present in the cache directory.
+        for variant in cached_variants:
+            if not (variant_cache_dir / Path(variant.url).name).exists():
+                return None
+
+        # All checks passed — copy from cache to the output directory.
+        for variant in cached_variants:
+            variant_filename = Path(variant.url).name
+            shutil.copy2(
+                variant_cache_dir / variant_filename,
+                output_dir / variant_filename,
+            )
+
+        return cached_variants
+
     def process_images(self) -> dict[str, list[ImageVariant]]:
         """Scan the extras directory and generate responsive WebP image variants.
 
-        For every supported image file (JPEG, PNG) found recursively under
-        ``content_dir/extras/``, this method:
+        For every supported image file (JPEG, PNG, WebP) found recursively
+        under ``content_dir/extras/``, this method generates WebP variants at
+        the widths configured in ``site_config.image_widths`` and writes them
+        to the output directory.  The source images themselves are **not**
+        copied here — that is left to
+        [`copy_extras`][blogmore.generator.assets.AssetManager.copy_extras].
 
-        1. Copies the file to the output directory (preserving its relative
-           path under ``extras/``).
-        2. Generates WebP variants at the widths configured in
-           ``site_config.image_widths``, writing them alongside the copy in
-           the output directory.
+        Generated variants are cached in
+        ``get_blog_cache_dir(content_dir) / "images"`` using a SHA-256 hash of
+        each source file.  On subsequent builds, unchanged images are served
+        from the cache instead of being re-processed.
 
         Returns a mapping from each image's root-relative URL (e.g.
         ``"/images/photo.jpg"``) to the list of
         [`ImageVariant`][blogmore.image_optimizer.ImageVariant] objects for
-        the variants that were actually produced.  Images for which no
-        variants could be produced (e.g. because all requested widths exceed
-        the source width) are included with an empty list.
+        the variants that were actually produced.
 
         Returns:
             Mapping from original image URL to list of generated
@@ -551,6 +621,18 @@ class AssetManager:
         if not extras_dir.exists():
             return {}
 
+        # Set up the per-blog image cache directory and load the manifest.
+        cache_dir = get_blog_cache_dir(self._content_dir) / "images"
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        manifest_path = cache_dir / "manifest.json"
+
+        manifest: dict[str, dict[str, object]] = {}
+        if manifest_path.exists():
+            try:
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                manifest = {}
+
         optimizer = ImageOptimizer(
             widths=self.site_config.image_widths,
             quality=self.site_config.image_quality,
@@ -558,6 +640,8 @@ class AssetManager:
 
         image_variants: dict[str, list[ImageVariant]] = {}
         processed_count = 0
+        cached_count = 0
+        manifest_dirty = False
 
         for file_path in extras_dir.rglob("*"):
             if not file_path.is_file():
@@ -566,34 +650,72 @@ class AssetManager:
                 continue
 
             relative_path = file_path.relative_to(extras_dir)
-            output_path = self.site_config.output_dir / relative_path
+            relative_key = str(relative_path).replace("\\", "/")
+            output_dir = self.site_config.output_dir / relative_path.parent
+            output_dir.mkdir(parents=True, exist_ok=True)
 
-            # Ensure the output file exists (extras may not have been copied yet).
-            output_path.parent.mkdir(parents=True, exist_ok=True)
-            if not output_path.exists():
-                shutil.copy2(file_path, output_path)
-
-            # Build the root-relative URL directory for this image.
-            # relative_path.parent is "." for root-level extras files.
+            # Build the root-relative URL for this image.
             parent = relative_path.parent
             url_dir = "/" + parent.as_posix() if str(parent) != "." else ""
             original_url = f"{url_dir}/{relative_path.name}"
 
-            # Generate variants in the output directory.
-            # url_base is the directory component of original_url (never empty).
+            # Compute SHA-256 hash of source file.
+            source_hash = hashlib.sha256(file_path.read_bytes()).hexdigest()
+            variant_cache_dir = cache_dir / relative_path.parent
+
+            # Try to serve variants from the cache.
+            cached_variants = self._load_cached_variants(
+                cached_entry=manifest.get(relative_key),
+                source_hash=source_hash,
+                variant_cache_dir=variant_cache_dir,
+                output_dir=output_dir,
+            )
+            if cached_variants is not None:
+                image_variants[original_url] = cached_variants
+                cached_count += 1
+                continue
+
+            # No valid cache entry — generate variants from the source file.
             url_base = url_dir if url_dir else "/"
             variants = optimizer.process_image(
-                source_path=output_path,
+                source_path=file_path,
                 url_base=url_base,
+                output_dir=output_dir,
             )
             image_variants[original_url] = variants
             processed_count += 1
 
-        if processed_count > 0:
+            # Persist newly generated variants to the cache.
+            variant_cache_dir.mkdir(parents=True, exist_ok=True)
+            for variant in variants:
+                variant_filename = Path(variant.url).name
+                generated_file = output_dir / variant_filename
+                if generated_file.exists():
+                    shutil.copy2(generated_file, variant_cache_dir / variant_filename)
+
+            manifest[relative_key] = {
+                "source_hash": source_hash,
+                "variants": [
+                    {"url": v.url, "width": v.width, "mime_type": v.mime_type}
+                    for v in variants
+                ],
+            }
+            manifest_dirty = True
+
+        if manifest_dirty:
+            manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+        total = processed_count + cached_count
+        if total > 0:
             total_variants = sum(len(v) for v in image_variants.values())
+            parts: list[str] = []
+            if processed_count > 0:
+                parts.append(f"{processed_count} generated")
+            if cached_count > 0:
+                parts.append(f"{cached_count} from cache")
             print(
-                f"Processed {processed_count} image(s), "
-                f"generated {total_variants} WebP variant(s)"
+                f"Processed {total} image(s) ({', '.join(parts)}), "
+                f"{total_variants} WebP variant(s) total"
             )
 
         return image_variants
