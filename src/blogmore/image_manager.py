@@ -209,7 +209,10 @@ class ImageManager:
             # Determine if the original image can satisfy our needs for the
             # original resolution version.
             original_is_webp = suffix == ".webp"
-            original_is_standard = suffix == standard_extension
+            if standard_extension == ".jpg":
+                original_is_standard = suffix in (".jpg", ".jpeg")
+            else:
+                original_is_standard = suffix == standard_extension
 
             # Create a placeholder entry with target metadata
             entry = OptimisedImage(
