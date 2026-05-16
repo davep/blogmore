@@ -7,8 +7,8 @@ from pathlib import Path
 import markdown
 import pytest
 
+from blogmore.markdown import create_custom_extensions
 from blogmore.markdown.first_paragraph import extract_first_paragraph_from_html
-from blogmore.markdown.plain_text import create_custom_extensions
 from blogmore.parser import (
     Page,
     Post,

@@ -5,11 +5,6 @@ Markdown string to clean, whitespace-collapsed plain text within BlogMore.
 It runs the input through the Python-Markdown library so that all block
 structures (fenced code, blockquotes, tables, admonitions, etc.) are handled
 correctly before HTML tags are stripped.
-
-This module is also the single source of truth for BlogMore's custom Markdown
-extension set via `blogmore.markdown.plain_text.create_custom_extensions`, which is consumed by the
-full site parser, the first-paragraph extractor, and any other context that
-needs to render or strip BlogMore-flavoured Markdown.
 """
 
 ##############################################################################
@@ -17,60 +12,17 @@ needs to render or strip BlogMore-flavoured Markdown.
 import re
 import threading
 from html.parser import HTMLParser
-from typing import Any, cast
+from typing import cast
 
 import markdown
 
 ##############################################################################
 # Local imports.
-from blogmore.markdown.admonitions import AdmonitionsExtension
-from blogmore.markdown.external_links import ExternalLinksExtension
-from blogmore.markdown.heading_anchors import HeadingAnchorsExtension
-from blogmore.markdown.optimised_images import OptimisedImagesExtension
-from blogmore.markdown.strikethrough import StrikethroughExtension
+from blogmore.markdown import create_custom_extensions
 
 # Thread-local storage for Markdown instances to ensure thread-safety while
 # allowing for instance reuse via .reset().
 _thread_local = threading.local()
-
-
-def create_custom_extensions(
-    site_url: str = "",
-    image_manager: Any = None,
-    content_dir: Any = None,
-) -> list[Any]:
-    """Create instances of all custom BlogMore Markdown extensions.
-
-    This is the single source of truth for BlogMore's custom Markdown
-    extension set.  The full-rendering parser, the first-paragraph
-    extractor, and the plain-text converter all pull their custom-extension
-    list from here, so any new extension is automatically included in every
-    context.
-
-    Args:
-        site_url: Base URL of the site; forwarded to
-            :class:`~blogmore.markdown.external_links.ExternalLinksExtension`
-            so it can distinguish internal from external links.
-        image_manager: Optional ImageManager instance for image optimisation.
-        content_dir: Optional content directory for image optimisation.
-
-    Returns:
-        A list of configured custom Markdown extension instances.
-    """
-    extensions = [
-        AdmonitionsExtension(),
-        ExternalLinksExtension(site_url=site_url),
-        HeadingAnchorsExtension(),
-        StrikethroughExtension(),
-    ]
-    if image_manager is not None:
-        extensions.append(
-            OptimisedImagesExtension(
-                image_manager=image_manager,
-                content_dir=content_dir,
-            )
-        )
-    return extensions
 
 
 def get_plain_text_markdown_instance() -> markdown.Markdown:
@@ -94,7 +46,7 @@ def get_plain_text_markdown_instance() -> markdown.Markdown:
                 "md_in_html",
                 "tables",
                 "footnotes",
-                *create_custom_extensions(),
+                *create_custom_extensions(with_optimised_images=False),
             ],
         )
     return cast(markdown.Markdown, _thread_local.plain_text_markdown)

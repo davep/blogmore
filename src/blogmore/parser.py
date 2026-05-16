@@ -15,8 +15,8 @@ import yaml
 from dateutil import parser as dateutil_parser
 from pygments.formatters import HtmlFormatter
 
+from blogmore.markdown import create_custom_extensions
 from blogmore.markdown.first_paragraph import extract_first_paragraph_from_html
-from blogmore.markdown.plain_text import create_custom_extensions
 from blogmore.utils import calculate_reading_time_from_html
 
 _DATE_FORMATS = [
