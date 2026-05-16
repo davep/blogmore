@@ -5,7 +5,6 @@ from __future__ import annotations
 from blogmore.image_optimizer import ImageVariant
 from blogmore.responsive_images import rewrite_img_tags
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -147,3 +146,66 @@ class TestRewriteImgTags:
         result = rewrite_img_tags(html, {"/images/photo.jpg": variants})
 
         assert "<picture>" in result
+
+
+# ---------------------------------------------------------------------------
+# Relative src normalisation (bare-relative paths)
+# ---------------------------------------------------------------------------
+
+
+class TestRewriteImgTagsRelativeSrc:
+    """Test that src values without a leading slash are matched correctly."""
+
+    def test_bare_relative_src_matches_root_relative_key(self) -> None:
+        """A src without a leading slash must match a root-relative dict key."""
+        # Markdown: ![alt](attachments/photo.jpg) → src="attachments/photo.jpg"
+        html = '<img src="attachments/photo.jpg" alt="Alt">'
+        variants = _make_variants("/attachments", "photo", [480])
+        result = rewrite_img_tags(html, {"/attachments/photo.jpg": variants})
+
+        assert "<picture>" in result
+        assert "photo-480w.webp" in result
+
+    def test_bare_relative_src_original_preserved_in_fallback(self) -> None:
+        """The original (unmodified) src value must appear in the fallback img."""
+        html = '<img src="attachments/photo.jpg" alt="Alt">'
+        variants = _make_variants("/attachments", "photo", [480])
+        result = rewrite_img_tags(html, {"/attachments/photo.jpg": variants})
+
+        # The original relative src must be kept as-is in the fallback.
+        assert 'src="attachments/photo.jpg"' in result
+
+    def test_root_relative_src_still_matched(self) -> None:
+        """A src that already has a leading slash must continue to work."""
+        html = '<img src="/attachments/photo.jpg" alt="Alt">'
+        variants = _make_variants("/attachments", "photo", [480])
+        result = rewrite_img_tags(html, {"/attachments/photo.jpg": variants})
+
+        assert "<picture>" in result
+
+    def test_absolute_http_url_not_rewritten(self) -> None:
+        """A fully-qualified http URL must never match a root-relative key."""
+        html = '<img src="https://example.com/photo.jpg" alt="Alt">'
+        variants = _make_variants("/", "photo", [480])
+        result = rewrite_img_tags(html, {"/photo.jpg": variants})
+
+        assert "<picture>" not in result
+        assert 'loading="lazy"' in result
+
+    def test_data_uri_not_rewritten(self) -> None:
+        """A data: URI must not be treated as a relative path."""
+        html = '<img src="data:image/png;base64,abc" alt="Alt">'
+        result = rewrite_img_tags(html, {"/data:image/png;base64,abc": []})
+
+        assert "<picture>" not in result
+
+    def test_nested_relative_path_matched(self) -> None:
+        """A multi-level bare-relative path must match its root-relative key."""
+        html = '<img src="attachments/2022/11/26/shot.webp" alt="S">'
+        variants = _make_variants("/attachments/2022/11/26", "shot", [480])
+        result = rewrite_img_tags(
+            html, {"/attachments/2022/11/26/shot.webp": variants}
+        )
+
+        assert "<picture>" in result
+

@@ -65,6 +65,41 @@ def _build_srcset(variants: list[ImageVariant]) -> str:
     return ", ".join(f"{v.url} {v.width}w" for v in variants)
 
 
+def _normalise_src_for_lookup(src: str) -> str:
+    """Normalise an ``<img src>`` value to a root-relative form for variant lookup.
+
+    Keys in the ``image_variants`` mapping are always root-relative
+    (``/path/to/image.jpg``).  When Markdown posts reference an image without
+    a leading slash (``![alt](attachments/photo.jpg)``), the rendered HTML
+    carries ``src="attachments/photo.jpg"``.  This helper normalises such
+    bare-relative paths to their root-relative equivalent so they match the
+    dictionary keys produced by
+    [`AssetManager.process_images`][blogmore.generator.assets.AssetManager.process_images].
+
+    Full URLs (``http://`` / ``https://`` / ``data:``) and fragment-only
+    references (``#anchor``) are returned unchanged.
+
+    Args:
+        src: The raw value of the ``src`` attribute.
+
+    Returns:
+        A root-relative URL string, or *src* unchanged when normalisation is
+        not applicable.
+    """
+    # Leave absolute URLs, data URIs, and fragment anchors as-is.
+    if src.startswith("/") or src.startswith("#"):
+        return src
+    lower = src.lower()
+    if (
+        lower.startswith("http://")
+        or lower.startswith("https://")
+        or lower.startswith("data:")
+    ):
+        return src
+    # Bare-relative path — prepend a leading slash.
+    return "/" + src
+
+
 def _replace_img_tag(
     match: re.Match[str],
     image_variants: dict[str, list[ImageVariant]],
@@ -72,6 +107,12 @@ def _replace_img_tag(
     """Replace a single ``<img>`` tag with a ``<picture>`` element if variants exist.
 
     Always adds ``loading="lazy"`` to the fallback ``<img>`` when absent.
+
+    The ``src`` attribute is normalised to a root-relative URL before the
+    variant lookup so that both ``src="/photo.jpg"`` and ``src="photo.jpg"``
+    resolve correctly against the dictionary produced by
+    [`AssetManager.process_images`][blogmore.generator.assets.AssetManager.process_images].
+    The original ``src`` value in the rendered HTML is left untouched.
 
     Args:
         match: A regex match object for the ``<img>`` tag.
@@ -91,7 +132,8 @@ def _replace_img_tag(
     src = src_match.group(1) or src_match.group(2)
     lazy_attrs = _add_lazy_loading(attrs)
 
-    variants = image_variants.get(src)
+    lookup_key = _normalise_src_for_lookup(src)
+    variants = image_variants.get(lookup_key)
     if not variants:
         return f"<img {lazy_attrs}>"
 
