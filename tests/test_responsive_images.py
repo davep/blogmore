@@ -209,3 +209,66 @@ class TestRewriteImgTagsRelativeSrc:
 
         assert "<picture>" in result
 
+
+# ---------------------------------------------------------------------------
+# Fragment (#centre / #left / etc.) handling
+# ---------------------------------------------------------------------------
+
+
+class TestRewriteImgTagsFragment:
+    """Test that src values with a fragment suffix are matched correctly."""
+
+    def test_bare_relative_with_fragment_matched(self) -> None:
+        """A bare-relative src with #centre must match the fragment-free key."""
+        html = '<img src="attachments/photo.jpg#centre" alt="Alt">'
+        variants = _make_variants("/attachments", "photo", [480])
+        result = rewrite_img_tags(html, {"/attachments/photo.jpg": variants})
+
+        assert "<picture>" in result
+        assert "photo-480w.webp" in result
+
+    def test_root_relative_with_fragment_matched(self) -> None:
+        """A root-relative src with #centre must match the fragment-free key."""
+        html = '<img src="/attachments/photo.jpg#centre" alt="Alt">'
+        variants = _make_variants("/attachments", "photo", [480])
+        result = rewrite_img_tags(html, {"/attachments/photo.jpg": variants})
+
+        assert "<picture>" in result
+
+    def test_fragment_preserved_in_fallback_img(self) -> None:
+        """The original src (including the fragment) must appear in the fallback <img>."""
+        html = '<img src="attachments/photo.jpg#centre" alt="Alt">'
+        variants = _make_variants("/attachments", "photo", [480])
+        result = rewrite_img_tags(html, {"/attachments/photo.jpg": variants})
+
+        # The fragment must be preserved in the rendered fallback img tag.
+        assert 'src="attachments/photo.jpg#centre"' in result
+
+    def test_fragment_only_src_not_rewritten(self) -> None:
+        """A fragment-only src (#anchor) must not be matched or rewritten."""
+        html = '<img src="#anchor" alt="Alt">'
+        result = rewrite_img_tags(html, {"/anchor": []})
+
+        assert "<picture>" not in result
+
+    def test_various_alignment_fragments(self) -> None:
+        """Common alignment fragments (#centre, #left, #right) are all stripped."""
+        variants = _make_variants("/attachments", "photo", [480])
+        image_map = {"/attachments/photo.jpg": variants}
+
+        for fragment in ("#centre", "#left", "#right", "#float-right"):
+            html = f'<img src="attachments/photo.jpg{fragment}" alt="Alt">'
+            result = rewrite_img_tags(html, image_map)
+            assert "<picture>" in result, f"Fragment {fragment!r} was not handled"
+
+    def test_nested_path_with_fragment_matched(self) -> None:
+        """A multi-level bare-relative path with a fragment must match correctly."""
+        html = '<img src="attachments/2022/11/26/shot.webp#centre" alt="S">'
+        variants = _make_variants("/attachments/2022/11/26", "shot", [480])
+        result = rewrite_img_tags(
+            html, {"/attachments/2022/11/26/shot.webp": variants}
+        )
+
+        assert "<picture>" in result
+        assert 'src="attachments/2022/11/26/shot.webp#centre"' in result
+

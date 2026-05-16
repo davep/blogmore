@@ -68,26 +68,36 @@ def _build_srcset(variants: list[ImageVariant]) -> str:
 def _normalise_src_for_lookup(src: str) -> str:
     """Normalise an ``<img src>`` value to a root-relative form for variant lookup.
 
-    Keys in the ``image_variants`` mapping are always root-relative
-    (``/path/to/image.jpg``).  When Markdown posts reference an image without
-    a leading slash (``![alt](attachments/photo.jpg)``), the rendered HTML
-    carries ``src="attachments/photo.jpg"``.  This helper normalises such
-    bare-relative paths to their root-relative equivalent so they match the
-    dictionary keys produced by
-    [`AssetManager.process_images`][blogmore.generator.assets.AssetManager.process_images].
+    Keys in the ``image_variants`` mapping are always root-relative paths with
+    no fragment (``/path/to/image.jpg``).  This helper transforms a raw ``src``
+    attribute value into that canonical form so the dictionary lookup succeeds
+    in two common cases:
+
+    * **Bare-relative path** — ``attachments/photo.jpg`` (no leading ``/``)
+      becomes ``/attachments/photo.jpg``.
+    * **Fragment suffix** — ``attachments/photo.jpg#centre`` (blogmore's
+      alignment convention) has the ``#centre`` part stripped before the
+      lookup, leaving ``/attachments/photo.jpg``.
+
+    The two transformations are applied together, so
+    ``attachments/photo.jpg#centre`` → ``/attachments/photo.jpg``.
 
     Full URLs (``http://`` / ``https://`` / ``data:``) and fragment-only
-    references (``#anchor``) are returned unchanged.
+    references (``#anchor``) are returned unchanged (no matching variant
+    entry will ever exist for them).
+
+    The original ``src`` value — including any fragment — is *not* modified
+    in the rendered HTML; this function only affects the dictionary lookup key.
 
     Args:
         src: The raw value of the ``src`` attribute.
 
     Returns:
-        A root-relative URL string, or *src* unchanged when normalisation is
-        not applicable.
+        A root-relative URL string suitable for use as a lookup key, or *src*
+        unchanged when normalisation is not applicable.
     """
-    # Leave absolute URLs, data URIs, and fragment anchors as-is.
-    if src.startswith("/") or src.startswith("#"):
+    # Fragment-only references and absolute URLs are never in the variant map.
+    if src.startswith("#"):
         return src
     lower = src.lower()
     if (
@@ -96,8 +106,15 @@ def _normalise_src_for_lookup(src: str) -> str:
         or lower.startswith("data:")
     ):
         return src
-    # Bare-relative path — prepend a leading slash.
-    return "/" + src
+
+    # Strip any fragment (e.g. "#centre") — variant keys contain only the path.
+    image_path, _, _ = src.partition("#")
+
+    # Ensure the path is root-relative.
+    if not image_path.startswith("/"):
+        image_path = "/" + image_path
+
+    return image_path
 
 
 def _replace_img_tag(
@@ -108,10 +125,16 @@ def _replace_img_tag(
 
     Always adds ``loading="lazy"`` to the fallback ``<img>`` when absent.
 
-    The ``src`` attribute is normalised to a root-relative URL before the
-    variant lookup so that both ``src="/photo.jpg"`` and ``src="photo.jpg"``
-    resolve correctly against the dictionary produced by
-    [`AssetManager.process_images`][blogmore.generator.assets.AssetManager.process_images].
+    The ``src`` attribute is normalised to a root-relative URL (with any
+    fragment stripped) before the variant lookup so that all of the following
+    forms resolve correctly against the dictionary produced by
+    [`AssetManager.process_images`][blogmore.generator.assets.AssetManager.process_images]:
+
+    * ``src="/photo.jpg"`` — already root-relative.
+    * ``src="photo.jpg"`` — bare-relative; receives a leading ``/``.
+    * ``src="photo.jpg#centre"`` — blogmore alignment fragment; stripped
+      before lookup, leading ``/`` prepended.
+
     The original ``src`` value in the rendered HTML is left untouched.
 
     Args:
