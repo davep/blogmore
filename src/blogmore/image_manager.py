@@ -23,6 +23,9 @@ class OptimisedImage:
     original_width: int
     original_height: int
     hash: str
+    quality: int
+    widths: list[int]
+    jpeg_fallback: bool
     # Maps width to relative output path (standard format)
     resized_paths: dict[int, str] = field(default_factory=dict)
     # Maps width to relative output path (WebP format)
@@ -35,6 +38,9 @@ class OptimisedImage:
             "original_width": self.original_width,
             "original_height": self.original_height,
             "hash": self.hash,
+            "quality": self.quality,
+            "widths": self.widths,
+            "jpeg_fallback": self.jpeg_fallback,
             "resized_paths": {str(w): p for w, p in self.resized_paths.items()},
             "webp_paths": {str(w): p for w, p in self.webp_paths.items()},
         }
@@ -47,6 +53,9 @@ class OptimisedImage:
             original_width=data["original_width"],
             original_height=data["original_height"],
             hash=data["hash"],
+            quality=data.get("quality", 85),
+            widths=data.get("widths", []),
+            jpeg_fallback=data.get("jpeg_fallback", True),
             resized_paths={int(w): p for w, p in data["resized_paths"].items()},
             webp_paths={int(w): p for w, p in data["webp_paths"].items()},
         )
@@ -136,7 +145,12 @@ class ImageManager:
         # Check if we already have a valid manifest entry
         if source_key in self.manifest:
             entry = self.manifest[source_key]
-            if entry.hash == file_hash:
+            if (
+                entry.hash == file_hash
+                and entry.quality == self.site_config.image_quality
+                and entry.widths == self.site_config.image_widths
+                and entry.jpeg_fallback == self.site_config.image_jpeg_fallback
+            ):
                 # Up to date, but we still need to ensure the physical files
                 # exist in the cache. If they were deleted, re-queue.
                 all_exist = True
@@ -150,7 +164,7 @@ class ImageManager:
                 if all_exist:
                     return entry
 
-        # Not in manifest, hash changed, or cache missing: register for processing
+        # Not in manifest, hash changed, parameters changed, or cache missing
         try:
             with Image.open(source_path) as img:
                 orig_w, orig_h = img.size
@@ -161,6 +175,9 @@ class ImageManager:
                     original_width=orig_w,
                     original_height=orig_h,
                     hash=file_hash,
+                    quality=self.site_config.image_quality,
+                    widths=self.site_config.image_widths,
+                    jpeg_fallback=self.site_config.image_jpeg_fallback,
                 )
 
                 # Predict target filenames
@@ -215,20 +232,16 @@ class ImageManager:
                             self.cache_images_dir / webp_name if webp_name else None
                         )
 
-                        # If both are missing or don't need update, we can skip opening image
-                        # but we already opened it.
+                        # If the file exists, we still overwrite it because being in the
+                        # processing queue means either the source changed OR the settings
+                        # (quality/widths) changed, so we want fresh files.
 
-                        # Process resizing if needed
-                        resized = None
+                        # Calculate new height preserving aspect ratio
+                        height = int(orig_h * (width / orig_w))
+                        resized = img.resize((width, height), Image.Resampling.LANCZOS)
 
-                        if std_name and std_path and not std_path.exists():
-                            # Calculate new height preserving aspect ratio
-                            height = int(orig_h * (width / orig_w))
-                            resized = img.resize(
-                                (width, height), Image.Resampling.LANCZOS
-                            )
-
-                            # Save standard fallback
+                        # Save standard fallback
+                        if std_name and std_path:
                             save_kwargs: dict[str, Any] = {
                                 "quality": self.site_config.image_quality
                             }
@@ -252,14 +265,8 @@ class ImageManager:
                             else:
                                 resized.save(std_path)
 
-                        if webp_name and webp_path and not webp_path.exists():
-                            if not resized:
-                                height = int(orig_h * (width / orig_w))
-                                resized = img.resize(
-                                    (width, height), Image.Resampling.LANCZOS
-                                )
-
-                            # Save WebP
+                        # Save WebP
+                        if webp_name and webp_path:
                             resized.save(
                                 webp_path,
                                 format="WEBP",

@@ -85,6 +85,43 @@ class TestImageManager:
         assert cached == optimised
         assert mock_img.resize.call_count == 0
 
+    @patch("PIL.Image.open")
+    @patch("blogmore.image_manager.ImageManager._get_file_hash")
+    def test_cache_invalidation_on_setting_change(
+        self, mock_hash, mock_open, image_manager, site_config, tmp_path
+    ):
+        """Test that changing quality or widths invalidates the cache and re-queues."""
+        mock_hash.return_value = "constant-hash"
+        mock_img = MagicMock()
+        mock_img.size = (1000, 1000)
+        mock_img.mode = "RGB"
+        mock_open.return_value.__enter__.return_value = mock_img
+
+        source_path = tmp_path / "photo.jpg"
+        source_path.touch()
+
+        # 1. Initial registration
+        entry1 = image_manager.get_optimised_image(source_path)
+        assert entry1.quality == 80
+        assert source_path in image_manager._processing_queue
+        image_manager._processing_queue.clear()
+
+        # 2. Change quality and register again
+        site_config.image_quality = 90
+        entry2 = image_manager.get_optimised_image(source_path)
+
+        assert entry2.quality == 90
+        # Should have been re-added to queue because quality changed
+        assert source_path in image_manager._processing_queue
+        image_manager._processing_queue.clear()
+
+        # 3. Change widths and register again
+        site_config.image_widths = [400]
+        entry3 = image_manager.get_optimised_image(source_path)
+
+        assert entry3.widths == [400]
+        assert source_path in image_manager._processing_queue
+
     def test_get_optimised_image_unsupported(self, image_manager, tmp_path):
         """Test that unsupported formats are bypassed."""
         svg_path = tmp_path / "test.svg"
@@ -143,6 +180,9 @@ class TestOptimisedImageProcessor:
             original_width=1000,
             original_height=500,
             hash="abc",
+            quality=80,
+            widths=[400, 800],
+            jpeg_fallback=True,
             resized_paths={400: "photo-400.jpg", 800: "photo-800.jpg"},
             webp_paths={400: "photo-400.webp", 800: "photo-800.webp"},
         )
@@ -191,6 +231,9 @@ class TestOptimisedImageProcessor:
             original_width=1000,
             original_height=500,
             hash="abc",
+            quality=80,
+            widths=[800],
+            jpeg_fallback=True,
             resized_paths={800: "photo-800.jpg"},
             webp_paths={800: "photo-800.webp"},
         )
