@@ -13,6 +13,7 @@ from blogmore.code_styles import (
     DEFAULT_LIGHT_STYLE,
     is_valid_style,
 )
+from blogmore.image_optimizer import DEFAULT_IMAGE_WIDTHS
 from blogmore.page_path import DEFAULT_PAGE_PATH, validate_page_path_template
 from blogmore.pagination_path import (
     DEFAULT_PAGE_1_PATH,
@@ -71,6 +72,7 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
         "dark_mode_code_style",
         "read_time_wpm",
         "linting_ignore",
+        "image_widths",
     }
 )
 
@@ -594,5 +596,26 @@ def parse_site_config_from_dict(
             kwargs["linting_ignore"] = []
     else:
         kwargs["linting_ignore"] = []
+
+    # --- image_widths --------------------------------------------------------
+    if "image_widths" in config:
+        raw_widths = config["image_widths"]
+        if (
+            isinstance(raw_widths, list)
+            and raw_widths
+            and all(
+                isinstance(w, int) and not isinstance(w, bool) and w > 0
+                for w in raw_widths
+            )
+        ):
+            kwargs["image_widths"] = raw_widths
+        else:
+            errors.append(
+                "image_widths in the configuration file must be a non-empty "
+                "list of positive integers; using the default"
+            )
+            kwargs["image_widths"] = list(DEFAULT_IMAGE_WIDTHS)
+    else:
+        kwargs["image_widths"] = list(DEFAULT_IMAGE_WIDTHS)
 
     return kwargs, errors

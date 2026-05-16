@@ -4,6 +4,16 @@
 
 **Released: WiP**
 
+- Added automatic image optimization and responsive image delivery. When
+  `optimize_images: true` is set in `blogmore.yaml`, JPEG and PNG images in
+  the `extras/` directory are automatically resized to WebP variants at
+  configurable widths (`image_widths`; default `[480, 768, 1200]`). Every
+  `<img>` tag in rendered post and page HTML whose `src` points to a
+  processed image is rewritten to a `<picture>` element with a WebP
+  `<source srcset="…">` for responsive delivery, with the original `<img>`
+  retained as a fallback. A `loading="lazy"` attribute is also injected into
+  any `<img>` tag that does not already carry one.
+  ([#491](https://github.com/davep/blogmore/pull/491))
 - Fixed the `lint` command double-reporting errors in the `404` page.
   ([#489](https://github.com/davep/blogmore/pull/489))
 

@@ -19,6 +19,7 @@ from blogmore.generator.paths import (
 )
 from blogmore.parser import PostParser
 from blogmore.renderer import TemplateRenderer
+from blogmore.responsive_images import rewrite_img_tags
 from blogmore.utils import timed_step
 
 if TYPE_CHECKING:
@@ -133,6 +134,24 @@ class SiteGenerator:
         # Resolve paths
         page_output_paths = resolve_page_output_paths(self.site_config, pages)
         post_output_paths = resolve_post_output_paths(self.site_config, posts)
+
+        # Process images for responsive delivery if requested.
+        if self.site_config.optimize_images:
+            with timed_step("Processing images for responsive delivery..."):
+                image_variants = asset_manager.process_images()
+            if image_variants:
+                for post in posts:
+                    post.html_content = rewrite_img_tags(
+                        post.html_content, image_variants
+                    )
+                for page in pages:
+                    page.html_content = rewrite_img_tags(
+                        page.html_content, image_variants
+                    )
+                if page_404 is not None:
+                    page_404.html_content = rewrite_img_tags(
+                        page_404.html_content, image_variants
+                    )
 
         # Build backlink map
         backlinks_map: dict[str, list[Backlink]] = {}

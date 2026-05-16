@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from blogmore.code_styles import DEFAULT_DARK_STYLE, DEFAULT_LIGHT_STYLE
+from blogmore.image_optimizer import DEFAULT_IMAGE_QUALITY, DEFAULT_IMAGE_WIDTHS
 from blogmore.page_path import DEFAULT_PAGE_PATH
 from blogmore.pagination_path import DEFAULT_PAGE_1_PATH, DEFAULT_PAGE_N_PATH
 from blogmore.post_path import DEFAULT_POST_PATH
@@ -520,6 +521,50 @@ class SiteConfig:
 
     This is a **configuration file only** option — it cannot be set on the
     command line.  Defaults to ``"github-dark"``.
+    """
+
+    optimize_images: bool = False
+    """Whether to automatically optimize images and generate responsive variants.
+
+    When ``True``, images found in the ``extras/`` directory (JPEG and PNG
+    files) are processed during site generation.  For each image, WebP
+    variants are produced at the widths listed in ``image_widths`` (any width
+    that exceeds the source image's own width is silently skipped to avoid
+    upscaling).  Variant files are written alongside the originals in the
+    output directory and are named ``{stem}-{width}w.webp`` (e.g.
+    ``photo-480w.webp``).
+
+    When images are processed, every ``<img>`` tag in rendered post and page
+    HTML whose ``src`` matches a processed image is rewritten into a
+    ``<picture>`` element containing a WebP ``<source srcset="…">`` and the
+    original ``<img>`` as a fallback.  A ``loading="lazy"`` attribute is also
+    added to any ``<img>`` tag that does not already have one, regardless of
+    whether responsive variants exist for that image.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Off by default.
+    """
+
+    image_widths: list[int] = field(default_factory=lambda: list(DEFAULT_IMAGE_WIDTHS))
+    """Pixel widths for the responsive image size ladder.
+
+    Controls which widths are generated when ``optimize_images`` is ``True``.
+    Each width must be a positive integer.  Widths that exceed the source
+    image's natural width are silently skipped so images are never upscaled.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``[480, 768, 1200]``.
+    """
+
+    image_quality: int = DEFAULT_IMAGE_QUALITY
+    """WebP compression quality for optimized image variants (1–95).
+
+    Controls the quality/size trade-off when writing ``.webp`` variant files.
+    Higher values produce better-looking images at the cost of larger file
+    sizes.  Only meaningful when ``optimize_images`` is ``True``.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``85``.
     """
 
     def __post_init__(self) -> None:

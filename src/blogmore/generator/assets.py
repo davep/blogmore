@@ -29,6 +29,7 @@ from blogmore.generator.constants import (
 )
 from blogmore.generator.utils import minified_filename
 from blogmore.icons import IconGenerator, detect_source_icon
+from blogmore.image_optimizer import SUPPORTED_EXTENSIONS, ImageOptimizer, ImageVariant
 from blogmore.utils import get_blog_cache_dir, timed_step
 
 if TYPE_CHECKING:
@@ -522,3 +523,75 @@ class AssetManager:
             print(f"Overrode {override_count} existing file(s)")
         if failed_count > 0:
             print(f"Warning: Failed to copy {failed_count} extra file(s)")
+
+    def process_images(self) -> dict[str, list[ImageVariant]]:
+        """Scan the extras directory and generate responsive WebP image variants.
+
+        For every supported image file (JPEG, PNG) found recursively under
+        ``content_dir/extras/``, this method:
+
+        1. Copies the file to the output directory (preserving its relative
+           path under ``extras/``).
+        2. Generates WebP variants at the widths configured in
+           ``site_config.image_widths``, writing them alongside the copy in
+           the output directory.
+
+        Returns a mapping from each image's root-relative URL (e.g.
+        ``"/images/photo.jpg"``) to the list of
+        [`ImageVariant`][blogmore.image_optimizer.ImageVariant] objects for
+        the variants that were actually produced.  Images for which no
+        variants could be produced (e.g. because all requested widths exceed
+        the source width) are included with an empty list.
+
+        Returns:
+            Mapping from original image URL to list of generated
+            [`ImageVariant`][blogmore.image_optimizer.ImageVariant] objects.
+        """
+        extras_dir = self._content_dir / "extras"
+        if not extras_dir.exists():
+            return {}
+
+        optimizer = ImageOptimizer(
+            widths=self.site_config.image_widths,
+            quality=self.site_config.image_quality,
+        )
+
+        image_variants: dict[str, list[ImageVariant]] = {}
+        processed_count = 0
+
+        for file_path in extras_dir.rglob("*"):
+            if not file_path.is_file():
+                continue
+            if file_path.suffix.lower() not in SUPPORTED_EXTENSIONS:
+                continue
+
+            relative_path = file_path.relative_to(extras_dir)
+            output_path = self.site_config.output_dir / relative_path
+
+            # Ensure the output file exists (extras may not have been copied yet).
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            if not output_path.exists():
+                shutil.copy2(file_path, output_path)
+
+            # Build the root-relative URL for this image.
+            url_parts = relative_path.parts
+            url_dir = "/" + "/".join(url_parts[:-1]) if len(url_parts) > 1 else ""
+            original_url = f"{url_dir}/{relative_path.name}"
+
+            # Generate variants in the output directory.
+            url_base = url_dir or "/"
+            variants = optimizer.process_image(
+                source_path=output_path,
+                url_base=url_base,
+            )
+            image_variants[original_url] = variants
+            processed_count += 1
+
+        if processed_count > 0:
+            total_variants = sum(len(v) for v in image_variants.values())
+            print(
+                f"Processed {processed_count} image(s), "
+                f"generated {total_variants} WebP variant(s)"
+            )
+
+        return image_variants
