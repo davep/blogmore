@@ -13,7 +13,9 @@ from markdown.inlinepatterns import Pattern
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from blogmore.image_manager import ImageManager
+    from markdown import Markdown
+
+    from blogmore.image_manager import ImageManager, OptimisedImage
 
 # A more robust image regex that allows for optional spaces and various title delimiters
 IMAGE_LINK_RE = r'\!\[(?P<alt>.*?)\]\s*\((?P<src>.*?)(?P<title>\s+".*?"|\s+\'.*?\')?\)'
@@ -25,7 +27,7 @@ class OptimisedImageInlineProcessor(Pattern):
     def __init__(
         self,
         pattern: str,
-        md: Any,
+        md: Markdown,
         image_manager: ImageManager | None,
         content_dir: Path | None,
         output_url_base: str = "/static/images/optimised/",
@@ -111,7 +113,7 @@ class OptimisedImageInlineProcessor(Pattern):
         return el
 
     def _create_picture_element(
-        self, optimised: Any, original_src: str, alt: str, title: str | None
+        self, optimised: OptimisedImage, original_src: str, alt: str, title: str | None
     ) -> Element:
         """Create a <picture> element for a local image.
 

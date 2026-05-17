@@ -5,9 +5,9 @@ from __future__ import annotations
 import hashlib
 import json
 import shutil
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 
 from PIL import Image
 
@@ -37,40 +37,25 @@ class OptimisedImage:
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to a dictionary for JSON serialization."""
-        return {
-            "source_path": str(self.source_path),
-            "original_width": self.original_width,
-            "original_height": self.original_height,
-            "hash": self.hash,
-            "quality": self.quality,
-            "widths": self.widths,
-            "make_source_fallback": self.make_source_fallback,
-            "original_is_webp": self.original_is_webp,
-            "original_is_standard": self.original_is_standard,
-            "resized_paths": {
-                str(width): path for width, path in self.resized_paths.items()
-            },
-            "webp_paths": {str(width): path for width, path in self.webp_paths.items()},
-        }
+        data = asdict(self)
+        data["source_path"] = str(self.source_path)
+        # JSON keys must be strings
+        data["resized_paths"] = {str(k): v for k, v in self.resized_paths.items()}
+        data["webp_paths"] = {str(k): v for k, v in self.webp_paths.items()}
+        return data
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> OptimisedImage:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         """Create an instance from a dictionary."""
-        return cls(
-            source_path=Path(data["source_path"]),
-            original_width=data["original_width"],
-            original_height=data["original_height"],
-            hash=data["hash"],
-            quality=data.get("quality", 85),
-            widths=data.get("widths", []),
-            make_source_fallback=data.get("make_source_fallback", True),
-            original_is_webp=data.get("original_is_webp", False),
-            original_is_standard=data.get("original_is_standard", False),
-            resized_paths={
-                int(width): path for width, path in data["resized_paths"].items()
-            },
-            webp_paths={int(width): path for width, path in data["webp_paths"].items()},
-        )
+        # Convert string paths and keys back to their types
+        data["source_path"] = Path(data["source_path"])
+        if "resized_paths" in data:
+            data["resized_paths"] = {
+                int(k): v for k, v in data["resized_paths"].items()
+            }
+        if "webp_paths" in data:
+            data["webp_paths"] = {int(k): v for k, v in data["webp_paths"].items()}
+        return cls(**data)
 
 
 class ImageManager:
