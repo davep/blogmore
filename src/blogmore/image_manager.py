@@ -236,6 +236,28 @@ class ImageManager:
             print(f"Warning: Failed to register image {source_path}: {error}")
             return None
 
+    def _save_standard_image(self, image: Image.Image, path: Path) -> None:
+        """Save an image in a standard format (JPG/PNG), handling transparency for JPG.
+
+        Args:
+            image: The image object to save.
+            path: Target file path.
+        """
+        save_kwargs: dict[str, Any] = {"quality": self.site_config.image_quality}
+        if path.suffix.lower() in (".jpg", ".jpeg"):
+            save_kwargs["optimize"] = True
+            if image.mode in ("RGBA", "P"):
+                # Paste onto a white background to handle transparency
+                background = Image.new("RGB", image.size, (255, 255, 255))
+                # If mode is P, we need to convert to RGBA first to get the alpha mask
+                image_rgba = image.convert("RGBA") if image.mode == "P" else image
+                background.paste(image_rgba, mask=image_rgba.split()[3])
+                background.save(path, **save_kwargs)
+            else:
+                image.save(path, **save_kwargs)
+        else:
+            image.save(path)
+
     def process_all(self) -> None:
         """Perform resizing and optimisation for all registered images in the queue."""
         if not self._processing_queue:
@@ -285,29 +307,8 @@ class ImageManager:
                             )
 
                         # Save standard fallback
-                        if standard_name and standard_path:
-                            save_kwargs: dict[str, Any] = {
-                                "quality": self.site_config.image_quality
-                            }
-                            if standard_name.endswith((".jpg", ".jpeg")):
-                                save_kwargs["optimize"] = True
-                                if resized.mode in ("RGBA", "P"):
-                                    background = Image.new(
-                                        "RGB", resized.size, (255, 255, 255)
-                                    )
-                                    resized_rgb = (
-                                        resized.convert("RGBA")
-                                        if resized.mode == "P"
-                                        else resized
-                                    )
-                                    background.paste(
-                                        resized_rgb, mask=resized_rgb.split()[3]
-                                    )
-                                    background.save(standard_path, **save_kwargs)
-                                else:
-                                    resized.save(standard_path, **save_kwargs)
-                            else:
-                                resized.save(standard_path)
+                        if standard_path:
+                            self._save_standard_image(resized, standard_path)
 
                         # Save WebP
                         if webp_name and webp_path:
