@@ -132,7 +132,7 @@ class OptimisedImageInlineProcessor(Pattern):
         # Check if we should include a standard (JPG/PNG) fallback
         with_fallback = True
         if self.image_manager:
-            with_fallback = self.image_manager.site_config.image_jpeg_fallback
+            with_fallback = self.image_manager.site_config.image_make_source_fallback
 
         # 1. Add WebP source
         # We include it if we have generated WebP versions OR if the original is WebP

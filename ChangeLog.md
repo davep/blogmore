@@ -11,8 +11,8 @@
   multi-size "ladder", converted to WebP, and rendered using responsive
   `<picture>` elements with `srcset` and aspect-ratio stability attributes.
   Processed images are cached per-blog for fast rebuilds. A new
-  `image_jpeg_fallback` option (default `true`) allows disabling the
-  generation of redundant JPEG/PNG versions if only WebP is desired.
+  `image_make_source_fallback` option (default `false`) allows enabling the
+  generation of redundant JPEG/PNG versions alongside the WebP ones.
 
 
 ## v2.23.0

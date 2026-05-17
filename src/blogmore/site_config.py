@@ -488,14 +488,14 @@ class SiteConfig:
     command line.  Defaults to ``85``.
     """
 
-    image_jpeg_fallback: bool = True
+    image_make_source_fallback: bool = False
     """Whether to generate JPEG/PNG fallbacks for optimised images.
 
-    When ``True`` (the default), BlogMore generates standard JPEG or PNG
+    When ``True``, BlogMore generates standard JPEG or PNG
     versions of optimised images alongside modern WebP versions to ensure
-    compatibility with 100% of browsers.  If set to ``False``, only WebP
-    images are generated, saving disk space but potentially breaking images
-    for very old browsers.  Only meaningful when ``optimise_images`` is
+    compatibility with 100% of browsers.  If set to ``False`` (the default),
+    only WebP images are generated, saving disk space but potentially
+    breaking images for very old browsers.  Only meaningful when ``optimise_images`` is
     ``True``.
 
     This is a **configuration file only** option — it cannot be set on the

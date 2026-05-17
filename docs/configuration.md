@@ -323,21 +323,21 @@ This is a **configuration file only** option — it cannot be set on the command
 image_quality: 80
 ```
 
-#### `image_jpeg_fallback`
+#### `image_make_source_fallback`
 
 Whether to generate standard JPEG or PNG fallback versions of optimised images alongside the modern WebP versions. 
 
-When `true` (the default), BlogMore ensures 100% browser compatibility by providing standard formats for older browsers. If set to `false`, only WebP images are generated and used, which saves disk space and build time but may result in broken images for visitors using very old browsers.
+When `true`, BlogMore ensures 100% browser compatibility by providing standard formats for older browsers. If set to `false` (the default), only WebP images are generated and used, which saves disk space and build time but may result in broken images for visitors using very old browsers.
 
 Only meaningful when [`optimise_images`](#optimise_images) is `true`.
 
 This is a **configuration file only** option — it cannot be set on the command line.
 
 **Type:** Boolean  
-**Default:** `true`
+**Default:** `false`
 
 ```yaml
-image_jpeg_fallback: false
+image_make_source_fallback: true
 ```
 
 #### `with_search`

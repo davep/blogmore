@@ -23,6 +23,7 @@ def site_config(tmp_path):
         optimise_images=True,
         image_widths=[400, 800],
         image_quality=80,
+        image_make_source_fallback=True,
     )
 
 
@@ -182,7 +183,7 @@ class TestOptimisedImageProcessor:
             hash="abc",
             quality=80,
             widths=[400, 800],
-            jpeg_fallback=True,
+            make_source_fallback=True,
             resized_paths={400: "photo-400.jpg", 800: "photo-800.jpg"},
             webp_paths={400: "photo-400.webp", 800: "photo-800.webp"},
         )
@@ -233,7 +234,7 @@ class TestOptimisedImageProcessor:
             hash="abc",
             quality=80,
             widths=[800],
-            jpeg_fallback=True,
+            make_source_fallback=True,
             resized_paths={800: "photo-800.jpg"},
             webp_paths={800: "photo-800.webp"},
         )

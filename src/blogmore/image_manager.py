@@ -25,7 +25,7 @@ class OptimisedImage:
     hash: str
     quality: int
     widths: list[int]
-    jpeg_fallback: bool
+    make_source_fallback: bool
     # True if the original source file can be used as a WebP version
     original_is_webp: bool = False
     # True if the original source file can be used as a standard version
@@ -44,7 +44,7 @@ class OptimisedImage:
             "hash": self.hash,
             "quality": self.quality,
             "widths": self.widths,
-            "jpeg_fallback": self.jpeg_fallback,
+            "make_source_fallback": self.make_source_fallback,
             "original_is_webp": self.original_is_webp,
             "original_is_standard": self.original_is_standard,
             "resized_paths": {
@@ -63,7 +63,7 @@ class OptimisedImage:
             hash=data["hash"],
             quality=data.get("quality", 85),
             widths=data.get("widths", []),
-            jpeg_fallback=data.get("jpeg_fallback", True),
+            make_source_fallback=data.get("make_source_fallback", True),
             original_is_webp=data.get("original_is_webp", False),
             original_is_standard=data.get("original_is_standard", False),
             resized_paths={
@@ -185,7 +185,8 @@ class ImageManager:
                 entry.hash == file_hash
                 and entry.quality == self.site_config.image_quality
                 and entry.widths == sorted_target_widths
-                and entry.jpeg_fallback == self.site_config.image_jpeg_fallback
+                and entry.make_source_fallback
+                == self.site_config.image_make_source_fallback
             ):
                 # Up to date, but we still need to ensure the physical files
                 # exist in the cache. If they were deleted, re-queue.
@@ -224,13 +225,13 @@ class ImageManager:
                 hash=file_hash,
                 quality=self.site_config.image_quality,
                 widths=sorted_target_widths,
-                jpeg_fallback=self.site_config.image_jpeg_fallback,
+                make_source_fallback=self.site_config.image_make_source_fallback,
                 original_is_webp=original_is_webp,
                 original_is_standard=original_is_standard,
             )
 
             for width in sorted_target_widths:
-                if self.site_config.image_jpeg_fallback:
+                if self.site_config.image_make_source_fallback:
                     if width == original_width and original_is_standard:
                         # Skip generation; processor will use the original src
                         pass
