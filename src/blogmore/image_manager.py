@@ -125,11 +125,8 @@ class ImageManager:
         Returns:
             The hex digest of the file hash.
         """
-        hasher = hashlib.sha256()
         with open(path, "rb") as source_file:
-            for chunk in iter(lambda: source_file.read(4096), b""):
-                hasher.update(chunk)
-        return hasher.hexdigest()
+            return hashlib.file_digest(source_file, "sha256").hexdigest()
 
     def get_optimised_image(self, source_path: Path) -> OptimisedImage | None:
         """Register an image for optimisation and return its metadata.
