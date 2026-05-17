@@ -149,13 +149,12 @@ class ImageManager:
             )
             return None
 
-        max_bucket_width = max(self.site_config.image_widths, default=0)
         target_widths = {
             width for width in self.site_config.image_widths if width < original_width
         }
-        if original_width <= max_bucket_width:
-            target_widths.add(original_width)
-        if not target_widths and self.site_config.image_widths:
+        if self.site_config.image_widths and original_width <= max(
+            self.site_config.image_widths
+        ):
             target_widths.add(original_width)
 
         sorted_target_widths = sorted(target_widths)
