@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 from xml.etree.ElementTree import Element, SubElement
 
 from markdown.extensions import Extension
-from markdown.inlinepatterns import Pattern
+from markdown.inlinepatterns import InlineProcessor
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 IMAGE_LINK_RE = r'\!\[(?P<alt>.*?)\]\s*\((?P<src>.*?)(?P<title>\s+".*?"|\s+\'.*?\')?\)'
 
 
-class OptimisedImageInlineProcessor(Pattern):
+class OptimisedImageInlineProcessor(InlineProcessor):
     """Pattern processor that transforms local Markdown image syntax into responsive <picture> elements."""
 
     def __init__(
@@ -49,14 +49,17 @@ class OptimisedImageInlineProcessor(Pattern):
         self.output_url_base = output_url_base
         self.base_dir = base_dir
 
-    def handleMatch(self, m: re.Match[str]) -> Element | None:
+    def handleMatch(  # type: ignore[override]
+        self, m: re.Match[str], data: str
+    ) -> tuple[Element | str | None, int | None, int | None]:
         """Process an image match.
 
         Args:
             m: The match object.
+            data: The full document data.
 
         Returns:
-            The replacement element.
+            A tuple of (replacement element, start index, end index).
         """
         src = m.group("src").strip()
         alt = m.group("alt")
@@ -69,7 +72,7 @@ class OptimisedImageInlineProcessor(Pattern):
             or not self.content_dir
             or not self._is_local_image(src)
         ):
-            return self._create_standard_img(src, alt, title)
+            return self._create_standard_img(src, alt, title), m.start(0), m.end(0)
 
         # Remove fragment for path resolution
         clean_src = src.split("#")[0]
@@ -97,10 +100,14 @@ class OptimisedImageInlineProcessor(Pattern):
                 print(
                     f"Warning: Image optimisation skipped; file not found: {source_path}"
                 )
-            return self._create_standard_img(src, alt, title)
+            return self._create_standard_img(src, alt, title), m.start(0), m.end(0)
 
         # Transform to <picture>
-        return self._create_picture_element(optimised, src, alt, title)
+        return (
+            self._create_picture_element(optimised, src, alt, title),
+            m.start(0),
+            m.end(0),
+        )
 
     def _create_standard_img(self, src: str, alt: str, title: str | None) -> Element:
         """Create a standard <img> tag."""

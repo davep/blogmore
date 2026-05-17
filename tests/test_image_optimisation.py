@@ -199,7 +199,7 @@ class TestOptimisedImageProcessor:
         text = "![Some text](photo.jpg)"
         match = next(re.finditer(IMAGE_LINK_RE, text))
 
-        picture = processor.handleMatch(match)
+        picture, start, end = processor.handleMatch(match, text)
 
         assert picture is not None
         assert picture.tag == "picture"
@@ -247,6 +247,6 @@ class TestOptimisedImageProcessor:
         text = "![alt](photo.jpg#centre)"
         match = next(re.finditer(IMAGE_LINK_RE, text))
 
-        picture = processor.handleMatch(match)
+        picture, start, end = processor.handleMatch(match, text)
         fallback = picture.find("img")
         assert fallback.get("src").endswith("#centre")
