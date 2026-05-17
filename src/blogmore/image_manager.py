@@ -204,12 +204,14 @@ class ImageManager:
         try:
             # Predict target filenames
             base_name = f"{source_path.stem}_{file_hash[:8]}"
-            standard_extension = ".png" if suffix == ".png" else ".jpg"
+            standard_extension = (
+                suffix if suffix in (".png", ".jpg", ".jpeg") else ".jpg"
+            )
 
             # Determine if the original image can satisfy our needs for the
             # original resolution version.
             original_is_webp = suffix == ".webp"
-            if standard_extension == ".jpg":
+            if standard_extension in (".jpg", ".jpeg"):
                 original_is_standard = suffix in (".jpg", ".jpeg")
             else:
                 original_is_standard = suffix == standard_extension
@@ -305,7 +307,7 @@ class ImageManager:
                             save_kwargs: dict[str, Any] = {
                                 "quality": self.site_config.image_quality
                             }
-                            if standard_name.endswith(".jpg"):
+                            if standard_name.endswith((".jpg", ".jpeg")):
                                 save_kwargs["optimize"] = True
                                 if resized.mode in ("RGBA", "P"):
                                     background = Image.new(
