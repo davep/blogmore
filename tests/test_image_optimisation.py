@@ -250,3 +250,46 @@ class TestOptimisedImageProcessor:
         picture, start, end = processor.handleMatch(match, text)
         fallback = picture.find("img")
         assert fallback.get("src").endswith("#centre")
+
+    def test_complex_urls(self, image_manager, tmp_path):
+        """Test that URLs with spaces and parentheses are handled."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # 1. URL with parentheses
+        img1 = content_dir / "photo(1).jpg"
+        img1.touch()
+
+        # 2. URL with spaces (using angle brackets)
+        img2 = content_dir / "my photo.jpg"
+        img2.touch()
+
+        image_manager.get_optimised_image = MagicMock(
+            side_effect=lambda p: OptimisedImage(
+                source_path=p,
+                original_width=100,
+                original_height=100,
+                hash="h",
+                quality=80,
+                widths=[],
+                make_source_fallback=True,
+            )
+        )
+
+        processor = OptimisedImageInlineProcessor(
+            IMAGE_LINK_RE, None, image_manager, content_dir
+        )
+
+        # Test parentheses
+        text1 = "![alt](photo(1).jpg)"
+        match1 = next(re.finditer(IMAGE_LINK_RE, text1))
+        # This will fail with current regex because it matches 'photo(1'
+        picture1, _, _ = processor.handleMatch(match1, text1)
+        assert picture1.find("img").get("src") == "photo(1).jpg"
+
+        # Test angle brackets and spaces
+        text2 = "![alt](<my photo.jpg>)"
+        match2 = next(re.finditer(IMAGE_LINK_RE, text2))
+        picture2, _, _ = processor.handleMatch(match2, text2)
+        # Should resolve to the correct file and strip brackets
+        assert picture2.find("img").get("src") == "my photo.jpg"

@@ -18,7 +18,10 @@ if TYPE_CHECKING:
     from blogmore.image_manager import ImageManager, OptimisedImage
 
 # A more robust image regex that allows for optional spaces and various title delimiters
-IMAGE_LINK_RE = r'\!\[(?P<alt>.*?)\]\s*\((?P<src>.*?)(?P<title>\s+".*?"|\s+\'.*?\')?\)'
+IMAGE_LINK_RE = (
+    r"\!\[(?P<alt>.*?)\]\s*\(\s*(?P<src><.*?>|"
+    r'([^\s\(\)]|\([^\s\)]*\))+)\s*(?P<title>\s+".*?"|\s+\'.*?\')?\s*\)'
+)
 
 
 class OptimisedImageInlineProcessor(InlineProcessor):
@@ -62,6 +65,9 @@ class OptimisedImageInlineProcessor(InlineProcessor):
             A tuple of (replacement element, start index, end index).
         """
         src = m.group("src").strip()
+        if src.startswith("<") and src.endswith(">"):
+            src = src[1:-1].strip()
+
         alt = m.group("alt")
         title = m.group("title")
         if title:
