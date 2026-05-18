@@ -6,6 +6,11 @@
 
 - Fixed the `lint` command double-reporting errors in the `404` page.
   ([#489](https://github.com/davep/blogmore/pull/489))
+- Added optional automatic image optimisation (`optimise_images: true`).
+  When enabled, local images in Markdown posts are automatically resized
+  into a multi-size "ladder", converted to WebP, and rendered using
+  responsive `<picture>` elements with `srcset` and aspect-ratio stability
+  attributes. ([#492](https://github.com/davep/blogmore/pull/492))
 
 ## v2.23.0
 

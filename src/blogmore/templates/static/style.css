@@ -1004,6 +1004,11 @@ time a:visited {
     height: auto;
 }
 
+/* Ensure picture elements don't introduce unexpected layout issues */
+.post-content picture {
+    display: contents;
+}
+
 /* Images with #centre on the end of the URL get centred. */
 img[src*="#centre"] {
     display: block;

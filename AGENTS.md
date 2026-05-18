@@ -70,12 +70,13 @@ Markdown extensions and utility modules:
 | `markdown/external_links.py` | Markdown extension: opens external links in a new tab |
 | `markdown/heading_anchors.py` | Markdown extension: hover anchor links on headings |
 | `markdown/strikethrough.py` | Markdown extension: `~~strikethrough~~` syntax |
-| `markdown/plain_text.py` | Markdown-to-plain-text conversion; **single source of truth for the custom extension set** |
+| `markdown/plain_text.py` | Markdown-to-plain-text conversion |
 | `markdown/first_paragraph.py` | Logic for extracting the first meaningful paragraph as plain text |
+| `markdown/__init__.py` | **Single source of truth for the custom extension set** via `create_custom_extensions` |
 
 Any new Markdown extensions must be added as a new module inside
 `src/blogmore/markdown/`, registered in `create_custom_extensions` in
-`markdown/plain_text.py`, and imported in `parser.py`.
+`src/blogmore/markdown/__init__.py`, and imported in `parser.py`.
 
 Templates live in `src/blogmore/templates/`; the stylesheet is
 `src/blogmore/templates/static/style.css`.

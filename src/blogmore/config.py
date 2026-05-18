@@ -71,6 +71,7 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
         "dark_mode_code_style",
         "read_time_wpm",
         "linting_ignore",
+        "image_widths",
     }
 )
 
@@ -573,6 +574,22 @@ def parse_site_config_from_dict(
             kwargs["read_time_wpm"] = raw_wpm
     else:
         kwargs["read_time_wpm"] = 200
+
+    # --- image_widths --------------------------------------------------------
+    raw_image_widths = config.get("image_widths")
+    if raw_image_widths is None:
+        kwargs["image_widths"] = [400, 800, 1200, 1600]
+    elif isinstance(raw_image_widths, list) and all(
+        isinstance(item, int) and not isinstance(item, bool)
+        for item in raw_image_widths
+    ):
+        kwargs["image_widths"] = sorted(set(raw_image_widths))
+    else:
+        errors.append(
+            "image_widths in the configuration file must be a list of integers; "
+            "using the default"
+        )
+        kwargs["image_widths"] = [400, 800, 1200, 1600]
 
     # --- linting_ignore (YAML key: "linting: ignore") ------------------------
     raw_linting = config.get("linting")

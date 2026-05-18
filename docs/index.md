@@ -26,6 +26,7 @@ BlogMore focuses on simplicity and efficiency in creating blog-focused websites.
 - **Built-in linter** - Check your site for broken internal links, missing metadata, duplicate titles, and other common issues
 - **Sidebar customisation** - Optional logo, custom links, and social media icons
 - **SEO optimisation** - Proper meta tags, Open Graph tags, and Twitter Card support
+- **Automatic image optimisation** - Optional multi-size "ladder" generation and next-gen WebP conversion for local images in Markdown posts; simple `<img>` tags are replaced with stable, responsive `<picture>` elements
 - **Automatic icon generation** - Generate favicons and platform-specific icons (iOS, Android, Windows) from a single source image
 - **Client-side search** - Optional full-text search across post titles and content, running entirely in the browser with no external services (enable with `--with-search`)
 - **XML sitemap** - Optional `sitemap.xml` generation for search engine indexing (enable with `--with-sitemap`)

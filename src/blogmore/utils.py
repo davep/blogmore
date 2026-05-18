@@ -195,4 +195,29 @@ def normalize_site_url(site_url: str) -> str:
     return site_url.rstrip("/") if site_url else ""
 
 
+def simplify_html_for_feeds(html_content: str) -> str:
+    """Simplify HTML content for better compatibility with RSS/Atom feed readers.
+
+    Currently performs the following transformations:
+    - Replaces `<picture>` elements with their nested `<img>` fallback tags,
+      ensuring that images display correctly in readers that don't support
+      the modern `<picture>` element.
+
+    Args:
+        html_content: The HTML content to simplify.
+
+    Returns:
+        Simplified HTML string.
+    """
+    # Replace <picture>...</picture> with just the nested <img> tag.
+    # We look for <img ...> inside the picture tags and capture it.
+    # The [^>]*? ensures we handle multi-line tags or attributes correctly.
+    return re.sub(
+        r"<picture\b[^>]*>.*?(<img\b[^>]*>).*?</picture>",
+        r"\1",
+        html_content,
+        flags=re.DOTALL | re.IGNORECASE,
+    )
+
+
 ### utils.py ends here

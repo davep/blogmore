@@ -15,8 +15,8 @@ import yaml
 from dateutil import parser as dateutil_parser
 from pygments.formatters import HtmlFormatter
 
+from blogmore.markdown import create_custom_extensions
 from blogmore.markdown.first_paragraph import extract_first_paragraph_from_html
-from blogmore.markdown.plain_text import create_custom_extensions
 from blogmore.utils import calculate_reading_time_from_html
 
 _DATE_FORMATS = [
@@ -319,13 +319,22 @@ _thread_local = threading.local()
 class PostParser:
     """Parse markdown files with frontmatter into Post objects."""
 
-    def __init__(self, site_url: str | None = None) -> None:
+    def __init__(
+        self,
+        site_url: str | None = None,
+        image_manager: Any = None,
+        content_dir: Path | None = None,
+    ) -> None:
         """Initialize the parser with markdown extensions.
 
         Args:
             site_url: Optional base URL of the site for determining internal vs external links
+            image_manager: Optional ImageManager instance for image optimisation.
+            content_dir: Optional content directory for image optimisation.
         """
         self.site_url = site_url or ""
+        self.image_manager = image_manager
+        self.content_dir = content_dir
 
     @property
     def markdown(self) -> markdown.Markdown:
@@ -342,7 +351,11 @@ class PostParser:
         # 2. In 'serve' mode, if the user changes the site_url in their
         #    config, the parser is re-created; using the URL in the key
         #    ensures we rotate to a fresh, correctly-configured instance.
-        cache_key = f"markdown_{self.site_url}"
+        #
+        # We also include image_manager and content_dir presence/identity to
+        # ensure rotation when image optimisation is toggled or configured.
+        manager_id = id(self.image_manager) if self.image_manager else "none"
+        cache_key = f"markdown_{self.site_url}_{manager_id}"
         if not hasattr(_thread_local, cache_key):
             setattr(
                 _thread_local,
@@ -356,7 +369,11 @@ class PostParser:
                         "tables",
                         "toc",
                         "footnotes",
-                        *create_custom_extensions(site_url=self.site_url),
+                        *create_custom_extensions(
+                            site_url=self.site_url,
+                            image_manager=self.image_manager,
+                            content_dir=self.content_dir,
+                        ),
                     ],
                     extension_configs={
                         "codehilite": {
@@ -496,6 +513,12 @@ class PostParser:
 
         # Convert markdown to HTML
         try:
+            # If the optimised images extension is active, tell it which
+            # directory we are currently in so it can resolve relative images.
+            for ext in self.markdown.registeredExtensions:
+                if hasattr(ext, "set_base_dir"):
+                    ext.set_base_dir(path.parent)
+
             html_content = self.markdown.convert(post_data.content)
         finally:
             self.markdown.reset()

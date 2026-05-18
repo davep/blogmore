@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import shutil
 import time
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from blogmore.backlinks import build_backlink_map
@@ -17,9 +18,10 @@ from blogmore.generator.paths import (
     resolve_post_output_paths,
     resolve_sidebar_pages,
 )
+from blogmore.image_manager import ImageManager
 from blogmore.parser import PostParser
 from blogmore.renderer import TemplateRenderer
-from blogmore.utils import timed_step
+from blogmore.utils import get_blog_cache_dir, timed_step
 
 if TYPE_CHECKING:
     from blogmore.backlinks import Backlink
@@ -42,18 +44,52 @@ class SiteGenerator:
                 "site_config.content_dir must be provided for site generation"
             )
         self.site_config = site_config
+        self._initialize_components()
 
-        self.parser = PostParser(site_url=site_config.site_url)
+    def _initialize_components(self) -> None:
+        """Initialize or re-initialize internal components based on current config."""
+        content_dir = self.site_config.content_dir
+        # We know content_dir is not None because we checked in __init__
+        assert content_dir is not None
+
+        # Ensure paths are expanded (handle ~)
+        content_dir = content_dir.expanduser()
+
+        if not isinstance(content_dir, Path):
+            raise ValueError(
+                f"site_config.content_dir must be a Path, got {type(content_dir).__name__} ({content_dir!r})"
+            )
+
+        # Initialize image manager if optimisation is enabled
+        self.image_manager = None
+        if self.site_config.optimise_images:
+            cache_dir = get_blog_cache_dir(content_dir) / "images"
+            self.image_manager = ImageManager(self.site_config, cache_dir)
+
+        self.parser = PostParser(
+            site_url=self.site_config.site_url,
+            image_manager=self.image_manager,
+            content_dir=content_dir,
+        )
         self.renderer = TemplateRenderer(
-            site_config.templates_dir,
-            site_config.extra_stylesheets,
-            site_config.site_url,
+            self.site_config.templates_dir,
+            self.site_config.extra_stylesheets,
+            self.site_config.site_url,
         )
 
     def generate(self) -> None:
         """Generate the complete static site."""
+        self._initialize_components()
+
+        # Define local expanded paths for the build pass
         content_dir = self.site_config.content_dir
+        output_dir = self.site_config.output_dir
+
+        # We know content_dir is not None because we checked in __init__
         assert content_dir is not None
+
+        content_dir = content_dir.expanduser()
+        output_dir = output_dir.expanduser()
 
         generation_start = time.monotonic()
 
@@ -229,6 +265,11 @@ class SiteGenerator:
             with timed_step("Generating graph page..."):
                 feature_gen.generate_graph_page(posts, sidebar_pages)
 
+        # Perform actual image optimisation for discovered images
+        if self.image_manager:
+            with timed_step("Optimising responsive images..."):
+                self.image_manager.process_all()
+
         # Finalize static assets & sitemap
         asset_manager.copy_static_assets()
         if fontawesome_css_content is not None:
@@ -238,6 +279,11 @@ class SiteGenerator:
         if self.site_config.with_sitemap:
             with timed_step("Generating XML sitemap..."):
                 feature_gen.generate_sitemap(asset_manager.extras_html_paths)
+
+        if self.image_manager:
+            with timed_step("Deploying optimised responsive images..."):
+                target_output_dir = output_dir / "static" / "images" / "optimised"
+                self.image_manager.deploy_optimised_images(target_output_dir)
 
         total_elapsed = time.monotonic() - generation_start
         print(
