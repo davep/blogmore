@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.41">
+      <meta name="generator" content="zensical-0.0.42">
     
     
       
@@ -1033,6 +1033,50 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         <code>icon_source</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimise_images" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>optimise_images</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#image_widths" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>image_widths</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#image_quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>image_quality</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#image_make_source_fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>image_make_source_fallback</code>
       </span>
     </span>
   </a>
@@ -2536,6 +2580,50 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#optimise_images" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>optimise_images</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#image_widths" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>image_widths</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#image_quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>image_quality</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#image_make_source_fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>image_make_source_fallback</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#with_search" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -3823,6 +3911,39 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <li>Location: Must be in the <code>extras/</code> subdirectory of your content directory</li>
 </ul>
 <p>See <a href="../metadata_and_sidebar/#site-icons">Metadata and Sidebar — Site icons</a> for detailed usage instructions.</p>
+<h4 id="optimise_images"><code>optimise_images</code></h4>
+<p>Enable automatic optimisation and resizing for local images found in your Markdown posts. When enabled, BlogMore scans for images located in your <code>content_dir</code> or <code>extras/</code> directory and generates a "ladder" of optimised versions in multiple widths. It also automatically generates next-gen WebP versions of your images for better performance.</p>
+<p>In the generated HTML, standard <code>&lt;img&gt;</code> tags are replaced with responsive <code>&lt;picture&gt;</code> elements that use <code>srcset</code> to ensure browsers only download the smallest appropriate version of an image for the visitor's screen.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">optimise_images</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<h4 id="image_widths"><code>image_widths</code></h4>
+<p>The list of pixel widths to generate for each optimised image ladder. Only meaningful when <a href="#optimise_images"><code>optimise_images</code></a> is <code>true</code>.</p>
+<p>This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
+<p><strong>Type:</strong> List of integers<br />
+<strong>Default:</strong> <code>[400, 800, 1200, 1600]</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">image_widths</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">400</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">800</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+</code></pre></div>
+<h4 id="image_quality"><code>image_quality</code></h4>
+<p>The compression quality used when generating optimised images. A value from 1 to 100, where higher means better quality but larger file size. Only meaningful when <a href="#optimise_images"><code>optimise_images</code></a> is <code>true</code>.</p>
+<p>This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
+<p><strong>Type:</strong> Integer<br />
+<strong>Default:</strong> <code>85</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">image_quality</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+</code></pre></div>
+<h4 id="image_make_source_fallback"><code>image_make_source_fallback</code></h4>
+<p>Whether to generate standard JPEG or PNG fallback versions of optimised images alongside the modern WebP versions. </p>
+<p>When <code>true</code>, BlogMore ensures 100% browser compatibility by providing standard formats for older browsers. If set to <code>false</code> (the default), only WebP images are generated and used, which saves disk space and build time but may result in broken images for visitors using very old browsers.</p>
+<p>Only meaningful when <a href="#optimise_images"><code>optimise_images</code></a> is <code>true</code>.</p>
+<p>This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">image_make_source_fallback</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
 <h4 id="with_search"><code>with_search</code></h4>
 <p>Enable client-side full-text search. When <code>true</code>, BlogMore generates a <code>search_index.json</code> file containing every post's title, URL, date, and plain-text content, and a <code>/search.html</code> page that performs in-browser search as the reader types. A <strong>Search</strong> link is also added to the navigation bar. No external services are required.</p>
 <p><strong>Type:</strong> Boolean<br />
@@ -4555,6 +4676,7 @@ for example to add complex scripts or conditionally include tags — use
 <span class="nt">posts_per_feed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
 <span class="nt">default_author</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dave</span><span class="nv"> </span><span class="s">Pearson&quot;</span>
 <span class="nt">icon_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;icon.png&quot;</span>
+<span class="nt">optimise_images</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="nt">with_search</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="nt">post_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{year}/{month}/{day}/{slug}.html&quot;</span>
 <span class="nt">with_advert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
@@ -4854,7 +4976,7 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
       <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.tabs","navigation.indexes","navigation.tabs.sticky","navigation.footer","content.code.copy"],"search":"../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.dbc0afdc.min.js"></script>
+      <script src="../assets/javascripts/bundle.6e5f0216.min.js"></script>
       
     
   </body>
