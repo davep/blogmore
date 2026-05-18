@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.24.0
 
-**Released: WiP**
+**Released: 2026-05-18**
 
 - Fixed the `lint` command double-reporting errors in the `404` page.
   ([#489](https://github.com/davep/blogmore/pull/489))
