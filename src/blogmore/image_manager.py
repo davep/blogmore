@@ -20,20 +20,27 @@ class OptimisedImage:
     """Metadata for an optimised image ladder."""
 
     source_path: Path
+    """Path to the source image file."""
     original_width: int
+    """Width of the original image in pixels."""
     original_height: int
+    """Height of the original image in pixels."""
     hash: str
+    """SHA-256 hash of the original image file."""
     quality: int
+    """Quality setting used for optimisation."""
     widths: list[int]
+    """List of widths generated for this image."""
     make_source_fallback: bool
-    # True if the original source file can be used as a WebP version
+    """Whether a standard fallback format was generated."""
     original_is_webp: bool = False
-    # True if the original source file can be used as a standard version
+    """True if the original source file can be used as a WebP version."""
     original_is_standard: bool = False
-    # Maps width to relative output path (standard format)
+    """True if the original source file can be used as a standard version."""
     resized_paths: dict[int, str] = field(default_factory=dict)
-    # Maps width to relative output path (WebP format)
+    """Maps width to relative output path for the standard format."""
     webp_paths: dict[int, str] = field(default_factory=dict)
+    """Maps width to relative output path for the WebP format."""
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to a dictionary for JSON serialization."""
