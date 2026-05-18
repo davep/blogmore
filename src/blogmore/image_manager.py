@@ -220,18 +220,14 @@ class ImageManager:
 
             for width in sorted_target_widths:
                 if self.site_config.image_make_source_fallback:
-                    if width == original_width and original_is_standard:
-                        # Skip generation; processor will use the original src
-                        pass
-                    else:
+                    # Register a standard format resized version if the original doesn't match the requirements
+                    if not (width == original_width and original_is_standard):
                         entry.resized_paths[width] = (
                             f"{base_name}-{width}{standard_extension}"
                         )
 
-                if width == original_width and original_is_webp:
-                    # Skip generation; processor will use the original src
-                    pass
-                else:
+                # Register a WebP version if the original isn't already a usable WebP file at this width
+                if not (width == original_width and original_is_webp):
                     entry.webp_paths[width] = f"{base_name}-{width}.webp"
 
             # Store in manifest and add to queue
