@@ -6,14 +6,11 @@
 
 - Fixed the `lint` command double-reporting errors in the `404` page.
   ([#489](https://github.com/davep/blogmore/pull/489))
-- Added optional automatic image optimisation (`optimise_images: true`). When
-  enabled, local images in Markdown posts are automatically resized into a
-  multi-size "ladder", converted to WebP, and rendered using responsive
-  `<picture>` elements with `srcset` and aspect-ratio stability attributes.
-  Processed images are cached per-blog for fast rebuilds. A new
-  `image_make_source_fallback` option (default `false`) allows enabling the
-  generation of redundant JPEG/PNG versions alongside the WebP ones.
-
+- Added optional automatic image optimisation (`optimise_images: true`).
+  When enabled, local images in Markdown posts are automatically resized
+  into a multi-size "ladder", converted to WebP, and rendered using
+  responsive `<picture>` elements with `srcset` and aspect-ratio stability
+  attributes. ([#492](https://github.com/davep/blogmore/pull/492))
 
 ## v2.23.0
 
