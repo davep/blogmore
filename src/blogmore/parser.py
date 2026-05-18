@@ -9,7 +9,7 @@ from functools import cached_property
 from pathlib import Path
 from typing import Any, cast
 
-import frontmatter  # type: ignore[import-untyped]
+import frontmatter
 import markdown
 import yaml
 from dateutil import parser as dateutil_parser
@@ -509,7 +509,7 @@ class PostParser:
             )
 
         # Check draft status
-        draft = post_data.get("draft", False)
+        draft = bool(post_data.get("draft", False))
 
         # Convert markdown to HTML
         try:
