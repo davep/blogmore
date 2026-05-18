@@ -57,7 +57,7 @@ Discussions = "https://github.com/davep/blogmore/discussions"
 blogmore = "blogmore.__main__:main"
 
 [build-system]
-requires = ["uv_build>=0.9.4"]
+requires = ["uv_build>=0.9.4,<0.12"]
 build-backend = "uv_build"
 
 [[tool.uv.index]]
