@@ -1,6 +1,6 @@
 [project]
 name = "blogmore"
-version = "2.23.0"
+version = "2.24.0"
 description = "A blog-oriented static site generation engine"
 readme = "README.md"
 authors = [
@@ -57,7 +57,7 @@ Discussions = "https://github.com/davep/blogmore/discussions"
 blogmore = "blogmore.__main__:main"
 
 [build-system]
-requires = ["uv_build>=0.9.4"]
+requires = ["uv_build>=0.9.4,<0.12"]
 build-backend = "uv_build"
 
 [[tool.uv.index]]
