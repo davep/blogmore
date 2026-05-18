@@ -25,7 +25,7 @@ IMAGE_LINK_RE = (
 
 
 class OptimisedImageInlineProcessor(InlineProcessor):
-    """Pattern processor that transforms local Markdown image syntax into responsive <picture> elements."""
+    """Inline processor that transforms local Markdown image syntax into responsive <picture> elements."""
 
     def __init__(
         self,
