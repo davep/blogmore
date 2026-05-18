@@ -219,12 +219,13 @@ class ImageManager:
             )
 
             for width in sorted_target_widths:
-                if self.site_config.image_make_source_fallback:
-                    # Register a standard format resized version if the original doesn't match the requirements
-                    if not (width == original_width and original_is_standard):
-                        entry.resized_paths[width] = (
-                            f"{base_name}-{width}{standard_extension}"
-                        )
+                # Register a standard format resized version if required and the original doesn't match
+                if self.site_config.image_make_source_fallback and not (
+                    width == original_width and original_is_standard
+                ):
+                    entry.resized_paths[width] = (
+                        f"{base_name}-{width}{standard_extension}"
+                    )
 
                 # Register a WebP version if the original isn't already a usable WebP file at this width
                 if not (width == original_width and original_is_webp):
