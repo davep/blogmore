@@ -1870,6 +1870,95 @@ class TestSiteGenerator:
         assert '<meta name="twitter:image"' not in content
 
 
+class TestBundleCss:
+    """Test the bundle_css feature."""
+
+    def test_bundle_css_false_by_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that CSS is not bundled by default."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
+        )
+
+        generator.generate()
+
+        assert (temp_output_dir / "static" / "style.css").exists()
+        assert (temp_output_dir / "static" / "code.css").exists()
+        assert not (temp_output_dir / "static" / "bundle.css").exists()
+
+    def test_bundle_css_generates_bundle_css(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that bundle_css generates bundle.css."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir, output_dir=temp_output_dir, bundle_css=True
+            )
+        )
+
+        generator.generate()
+
+        assert (temp_output_dir / "static" / "bundle.css").exists()
+
+    def test_bundle_css_url_in_html(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that pages reference bundle.css when bundle_css is enabled."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir, output_dir=temp_output_dir, bundle_css=True
+            )
+        )
+
+        generator.generate()
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert "/static/bundle.css" in content
+        assert "/static/style.css" not in content
+        assert "/static/code.css" not in content
+
+    def test_bundle_css_with_minify_generates_min_bundle(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that bundle_css with minify_css generates bundle.min.css."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                bundle_css=True,
+                minify_css=True,
+            )
+        )
+
+        generator.generate()
+
+        assert (temp_output_dir / "static" / "bundle.min.css").exists()
+        assert not (temp_output_dir / "static" / "bundle.css").exists()
+
+        content = (temp_output_dir / "index.html").read_text()
+        assert "/static/bundle.min.css" in content
+
+    def test_bundle_css_contains_component_styles(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that bundle.css contains content from style.css and code.css."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir, output_dir=temp_output_dir, bundle_css=True
+            )
+        )
+
+        generator.generate()
+
+        bundle_content = (temp_output_dir / "static" / "bundle.css").read_text()
+
+        # Check for something likely to be in style.css
+        assert "body" in bundle_content
+        # Check for something likely to be in code.css (Pygments classes)
+        assert ".highlight" in bundle_content
+
+
 class TestMinifyCss:
     """Test the minify_css feature."""
 

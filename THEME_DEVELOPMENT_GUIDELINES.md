@@ -137,6 +137,7 @@ v2.x.  Key ones that appear in nearly every template:
 - `pages` — sorted list of `Page` objects
 - `prev_page_url`, `next_page_url` — pagination URLs (may be `None`)
 - `canonical_url`
+- `bundle_css`, `bundle_css_url`, `fontawesome_is_bundled` — for CSS bundling support
 
 ### Stable Post attributes
 

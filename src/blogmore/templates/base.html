@@ -27,12 +27,22 @@
     <meta name="msapplication-config" content="/icons/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
     {% endif %}
+    {% if bundle_css %}
+    {% if fontawesome_css_url %}
+    <link rel="preload" href="{{ fontawesome_woff2_url }}" as="font" type="font/woff2" crossorigin="anonymous">
+    {% if not fontawesome_is_bundled %}
+    <link rel="stylesheet" href="{{ fontawesome_css_url }}">
+    {% endif %}
+    {% endif %}
+    <link rel="stylesheet" href="{{ bundle_css_url }}">
+    {% else %}
     {% if fontawesome_css_url %}
     <link rel="preload" href="{{ fontawesome_woff2_url }}" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ fontawesome_css_url }}">
     {% endif %}
     <link rel="stylesheet" href="{{ styles_css_url }}">
     <link rel="stylesheet" href="{{ code_css_url }}">
+    {% endif %}
     {% if extra_stylesheets %}
     {% for stylesheet in extra_stylesheets %}
     <link rel="stylesheet" href="{{ stylesheet }}">

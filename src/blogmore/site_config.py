@@ -139,6 +139,16 @@ class SiteConfig:
     minify_css: bool = False
     """Whether to minify the CSS, writing it as `styles.min.css`."""
 
+    bundle_css: bool = False
+    """Whether to bundle multiple CSS files into a single file.
+
+    When enabled, the main stylesheet (``style.css``), the code syntax
+    highlighting CSS (``code.css``), and any local optimised FontAwesome
+    CSS are combined into a single ``bundle.css`` (or ``bundle.min.css``).
+    This reduces the number of network requests and can improve page load
+    performance.  Off by default.
+    """
+
     minify_js: bool = False
     """Whether to minify the JavaScript output files."""
 

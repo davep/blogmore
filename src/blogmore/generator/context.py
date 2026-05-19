@@ -9,6 +9,7 @@ from blogmore.clean_url import make_url_clean
 from blogmore.fontawesome import FONTAWESOME_CDN_BRANDS_WOFF2_URL
 from blogmore.generator.constants import (
     ARCHIVE_CSS_FILENAME,
+    BUNDLE_CSS_FILENAME,
     CALENDAR_CSS_FILENAME,
     CATEGORY_DIR,
     CODE_CSS_FILENAME,
@@ -40,6 +41,7 @@ class ContextBuilder:
         favicon_url: str | None = None,
         has_platform_icons: bool = False,
         fontawesome_css_url: str = "",
+        fontawesome_is_bundled: bool = False,
     ) -> None:
         """Initialize the context builder.
 
@@ -49,12 +51,14 @@ class ContextBuilder:
             favicon_url: URL for the site favicon.
             has_platform_icons: Whether generated platform icons exist.
             fontawesome_css_url: URL for the FontAwesome stylesheet.
+            fontawesome_is_bundled: Whether FontAwesome is included in the bundle.
         """
         self.site_config = site_config
         self.cache_bust_token = cache_bust_token
         self.favicon_url = favicon_url
         self.has_platform_icons = has_platform_icons
         self.fontawesome_css_url = fontawesome_css_url
+        self.fontawesome_is_bundled = fontawesome_is_bundled
 
     def with_cache_bust(self, url: str) -> str:
         """Return a URL with a cache-busting query parameter appended.
@@ -220,6 +224,11 @@ class ContextBuilder:
             "with_advert": self.site_config.with_advert,
             "default_author": self.site_config.default_author,
             "extra_head_tags": self.site_config.head,
+            "bundle_css": self.site_config.bundle_css,
+            "bundle_css_url": self.get_asset_url(
+                BUNDLE_CSS_FILENAME, self.site_config.minify_css
+            ),
+            "fontawesome_is_bundled": self.fontawesome_is_bundled,
             "fontawesome_css_url": self.with_cache_bust(self.fontawesome_css_url),
             "fontawesome_woff2_url": FONTAWESOME_CDN_BRANDS_WOFF2_URL,
             "styles_css_url": self.get_asset_url(
