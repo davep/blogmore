@@ -353,6 +353,17 @@ class AssetManager:
         output_path.write_text(minified, encoding="utf-8")
         print(f"Generated minified JS as {js_min}")
 
+    def get_theme_js_content(self) -> str | None:
+        """Return the content of the theme JavaScript, optionally minified.
+
+        Returns:
+            The JS content string, or ``None`` if not found.
+        """
+        source = self._get_asset_source(THEME_JS_FILENAME)
+        if source and self.site_config.minify_js:
+            return rjsmin.jsmin(source)
+        return source
+
     def copy_static_assets(self) -> None:
         """Copy static assets (CSS, JS, images) to output directory.
 

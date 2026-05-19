@@ -58,7 +58,11 @@
     {% endif %}
     {% endblock %}
     {% block meta_tags %}{% endblock %}
+    {% if inline_theme_js and theme_js_content %}
+    <script>{{ theme_js_content | safe }}</script>
+    {% else %}
     <script src="{{ theme_js_url }}"></script>
+    {% endif %}
     <script src="{{ codeblocks_js_url }}" defer></script>
     {% if prev_page_url %}<link rel="prev" href="{{ prev_page_url }}">{% endif %}
     {% if next_page_url %}<link rel="next" href="{{ next_page_url }}">{% endif %}

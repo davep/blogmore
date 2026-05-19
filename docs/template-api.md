@@ -49,6 +49,8 @@ below lists all variables that are available in every template.
 | `with_graph` | `bool` | `True` when the graph page is enabled. |
 | `graph_url` | `str` | URL to the graph page (respects `graph_path` and `clean_urls`). |
 | `graph_css_url` | `str` | URL to the graph-page stylesheet (with cache-bust query string). |
+| `inline_theme_js` | `bool` | `True` when theme JavaScript inlining is enabled. |
+| `theme_js_content` | `str \| None` | The content of `theme.js` to be inlined. |
 | `theme_js_url` | `str` | URL to `theme.js` (with cache-bust query string). |
 | `search_js_url` | `str` | URL to `search.js` (with cache-bust query string). |
 | `favicon_url` | `str \| None` | URL to the site favicon, if one exists. |

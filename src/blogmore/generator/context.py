@@ -42,6 +42,7 @@ class ContextBuilder:
         has_platform_icons: bool = False,
         fontawesome_css_url: str = "",
         fontawesome_is_bundled: bool = False,
+        theme_js_content: str | None = None,
     ) -> None:
         """Initialize the context builder.
 
@@ -52,6 +53,7 @@ class ContextBuilder:
             has_platform_icons: Whether generated platform icons exist.
             fontawesome_css_url: URL for the FontAwesome stylesheet.
             fontawesome_is_bundled: Whether FontAwesome is included in the bundle.
+            theme_js_content: The content of theme.js for inlining.
         """
         self.site_config = site_config
         self.cache_bust_token = cache_bust_token
@@ -59,6 +61,7 @@ class ContextBuilder:
         self.has_platform_icons = has_platform_icons
         self.fontawesome_css_url = fontawesome_css_url
         self.fontawesome_is_bundled = fontawesome_is_bundled
+        self.theme_js_content = theme_js_content
 
     def with_cache_bust(self, url: str) -> str:
         """Return a URL with a cache-busting query parameter appended.
@@ -228,6 +231,8 @@ class ContextBuilder:
             "bundle_css_url": self.get_asset_url(
                 BUNDLE_CSS_FILENAME, self.site_config.minify_css
             ),
+            "inline_theme_js": self.site_config.inline_theme_js,
+            "theme_js_content": self.theme_js_content,
             "fontawesome_is_bundled": self.fontawesome_is_bundled,
             "fontawesome_css_url": self.with_cache_bust(self.fontawesome_css_url),
             "fontawesome_woff2_url": FONTAWESOME_CDN_BRANDS_WOFF2_URL,

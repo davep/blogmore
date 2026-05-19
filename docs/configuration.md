@@ -1118,6 +1118,19 @@ Minify the generated JavaScript and write it as `theme.min.js` instead of `theme
 minify_js: true
 ```
 
+#### `inline_theme_js`
+
+Inline the theme JavaScript into the HTML. When enabled, the theme detection and mobile menu JavaScript (`theme.js`) is embedded directly into the `<head>` of every generated HTML page.
+
+This eliminates one critical network request and ensures the theme is applied as early as possible, preventing any "flash of light mode" during page load.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+inline_theme_js: true
+```
+
 #### `minify_html`
 
 Minify all generated HTML output. When enabled, every `.html` file produced by BlogMore is minified before being saved. Unlike the CSS and JavaScript minification options, the output file name is not changed — only the content is minified.

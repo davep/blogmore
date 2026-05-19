@@ -152,6 +152,16 @@ class SiteConfig:
     minify_js: bool = False
     """Whether to minify the JavaScript output files."""
 
+    inline_theme_js: bool = False
+    """Whether to inline the theme JavaScript into the HTML.
+
+    When enabled, the theme detection and mobile menu JavaScript
+    (``theme.js``) is embedded directly into the ``<head>`` of every
+    generated HTML page.  This eliminates one critical network request
+    and ensures the theme is applied as early as possible.  Off by
+    default.
+    """
+
     minify_html: bool = False
     """Whether to minify all generated HTML output.
 

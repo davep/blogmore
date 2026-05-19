@@ -1959,6 +1959,66 @@ class TestBundleCss:
         assert ".highlight" in bundle_content
 
 
+class TestInlineThemeJs:
+    """Test the inline_theme_js feature."""
+
+    def test_inline_theme_js_false_by_default(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that theme JS is not inlined by default."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
+        )
+
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/static/theme.js" in index_content
+        # Check that it's NOT inlined (no script tag with content)
+        # theme.js starts with '/**'
+        assert "<script>/**" not in index_content
+
+    def test_inline_theme_js_true_inlines_content(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that theme JS is inlined when enabled."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir, output_dir=temp_output_dir, inline_theme_js=True
+            )
+        )
+
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/static/theme.js" not in index_content
+        # Check that it's inlined (theme.js content should be present)
+        assert "Theme switching functionality for BlogMore" in index_content
+
+    def test_inline_theme_js_with_minify_js(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that inlined theme JS is minified when minify_js is true."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                inline_theme_js=True,
+                minify_js=True,
+            )
+        )
+
+        generator.generate()
+
+        index_content = (temp_output_dir / "index.html").read_text()
+        assert "/static/theme.js" not in index_content
+        assert "/static/theme.min.js" not in index_content
+        # Check for minified content (no comments)
+        assert "Theme switching functionality for BlogMore" not in index_content
+        # But some known function/variable should be there
+        assert "THEME_COOKIE_NAME" in index_content
+
+
 class TestMinifyCss:
     """Test the minify_css feature."""
 

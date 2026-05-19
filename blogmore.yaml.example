@@ -281,6 +281,10 @@ posts_per_feed: 20
 # If search is enabled, search.js is also minified as search.min.js.
 # minify_js: false
 
+# Optional: Inline the theme JavaScript into the HTML (default: false)
+# When enabled, theme.js is embedded directly into the <head> of every page.
+# inline_theme_js: false
+
 # Optional: Minify all generated HTML output (default: false)
 # minify_html: false
 
