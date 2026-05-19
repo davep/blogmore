@@ -60,14 +60,19 @@ class TestHeadingAnchorsExtension:
         md = self._make_md()
         html = md.convert("## Section Title")
         # The anchor must appear before the closing </h2>
-        assert '<a aria-label="Link to this heading" class="heading-anchor" href="#section-title">' in html
+        assert (
+            '<a aria-label="Link to this heading" class="heading-anchor" href="#section-title">'
+            in html
+        )
         close_pos = html.index("</h2>")
         anchor_pos = html.index("heading-anchor")
         assert anchor_pos < close_pos
 
     def test_custom_id_via_attr_list(self) -> None:
         """Test that {#custom-id} syntax sets a custom ID on the heading."""
-        md = markdown.Markdown(extensions=["toc", "attr_list", HeadingAnchorsExtension()])
+        md = markdown.Markdown(
+            extensions=["toc", "attr_list", HeadingAnchorsExtension()]
+        )
         html = md.convert("## My Great Heading {#custom-id}")
         assert 'id="custom-id"' in html
         assert 'href="#custom-id"' in html
@@ -77,7 +82,9 @@ class TestHeadingAnchorsExtension:
 
     def test_custom_id_anchor_link_uses_custom_id(self) -> None:
         """Test that the anchor link references the custom ID."""
-        md = markdown.Markdown(extensions=["toc", "attr_list", HeadingAnchorsExtension()])
+        md = markdown.Markdown(
+            extensions=["toc", "attr_list", HeadingAnchorsExtension()]
+        )
         html = md.convert("### Installation {#installation}")
         assert 'id="installation"' in html
         assert 'href="#installation"' in html
@@ -155,7 +162,9 @@ class TestHeadingAnchorsExtension:
 
     def test_mixed_custom_and_auto_ids(self) -> None:
         """Test a document with both custom and auto-generated heading IDs."""
-        md = markdown.Markdown(extensions=["toc", "attr_list", HeadingAnchorsExtension()])
+        md = markdown.Markdown(
+            extensions=["toc", "attr_list", HeadingAnchorsExtension()]
+        )
         content = "## Custom Heading {#my-custom}\n\n## Auto Heading"
         html = md.convert(content)
         assert 'href="#my-custom"' in html

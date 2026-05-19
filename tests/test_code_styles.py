@@ -243,9 +243,9 @@ class TestBuildCodeCss:
         rules_section = css.split("/* Syntax highlighting rules */")[1]
         for line in rules_section.splitlines():
             if line.strip():
-                assert line.startswith(
-                    ".highlight"
-                ), f"Rules section should only have .highlight lines, got: {line}"
+                assert line.startswith(".highlight"), (
+                    f"Rules section should only have .highlight lines, got: {line}"
+                )
 
     def test_highlight_rules_declared_once(self) -> None:
         """Each .highlight selector appears only once across the entire output."""
@@ -256,9 +256,9 @@ class TestBuildCodeCss:
             if line.startswith(".highlight") and "{" in line
         ]
         selectors = [line.split("{")[0].strip() for line in rule_lines]
-        assert len(selectors) == len(
-            set(selectors)
-        ), "Duplicate .highlight selector declarations found"
+        assert len(selectors) == len(set(selectors)), (
+            "Duplicate .highlight selector declarations found"
+        )
 
     def test_dark_system_uses_media_query(self) -> None:
         """Dark mode system preference rules are wrapped in a media query."""
@@ -315,9 +315,9 @@ class TestBuildCodeCss:
         rules_section = css.split("/* Syntax highlighting rules */")[1]
         for line in rules_section.splitlines():
             if line.strip() and ":" in line and ".highlight" in line:
-                assert (
-                    "var(--hl-" in line
-                ), f"Rule should use CSS custom property var(): {line}"
+                assert "var(--hl-" in line, (
+                    f"Rule should use CSS custom property var(): {line}"
+                )
 
 
 class TestCodeStyleConfigValidation:

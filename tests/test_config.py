@@ -1,6 +1,7 @@
 """Tests for the config module."""
 
 from pathlib import Path
+from typing import Any
 from unittest.mock import Mock
 
 import pytest
@@ -316,7 +317,7 @@ class TestMergeConfigWithArgs:
 
     def test_missing_attributes_in_args(self) -> None:
         """Test that merge handles missing attributes gracefully."""
-        config = {
+        config: dict[str, Any] = {
             "port": 3000,
             "no_watch": True,
         }
@@ -332,7 +333,7 @@ class TestMergeConfigWithArgs:
 
     def test_empty_config(self) -> None:
         """Test merging with an empty config."""
-        config = {}
+        config: dict[str, Any] = {}
         args = Mock()
         args.site_title = "My Blog"
         args.output = Path("output")
@@ -483,7 +484,10 @@ class TestGetSidebarConfig:
 
     def test_extract_site_logo(self) -> None:
         """Test extracting site_logo from config."""
-        config = {"site_logo": "/images/logo.png", "site_title": "My Blog"}
+        config: dict[str, Any] = {
+            "site_logo": "/images/logo.png",
+            "site_title": "My Blog",
+        }
         result = get_sidebar_config(config)
         assert result == {"site_logo": "/images/logo.png"}
 
@@ -552,7 +556,7 @@ class TestGetSidebarConfig:
 
     def test_extract_from_empty_config(self) -> None:
         """Test extracting from empty config returns empty dict."""
-        config = {}
+        config: dict[str, Any] = {}
         result = get_sidebar_config(config)
         assert result == {}
 
@@ -649,7 +653,7 @@ class TestCleanFirstConfig:
 
     def test_clean_first_from_config(self) -> None:
         """Test loading clean_first from config."""
-        config = {"clean_first": True}
+        config: dict[str, Any] = {"clean_first": True}
         args = Mock()
         args.clean_first = False  # default
 
@@ -669,7 +673,7 @@ class TestCleanFirstConfig:
 
     def test_clean_first_defaults_to_false(self) -> None:
         """Test that clean_first defaults to False when not in config."""
-        config = {}
+        config: dict[str, Any] = {}
         args = Mock()
         args.clean_first = False  # default
 
@@ -683,7 +687,7 @@ class TestSocialsTitleConfig:
 
     def test_socials_title_from_config(self) -> None:
         """Test loading socials_title from config."""
-        config = {"socials_title": "Connect"}
+        config: dict[str, Any] = {"socials_title": "Connect"}
         args = Mock()
         args.socials_title = "Social"  # default
 
@@ -703,7 +707,7 @@ class TestSocialsTitleConfig:
 
     def test_socials_title_defaults_to_social(self) -> None:
         """Test that socials_title defaults to 'Social' when not in config."""
-        config = {}
+        config: dict[str, Any] = {}
         args = Mock()
         args.socials_title = "Social"  # default
 
@@ -717,7 +721,7 @@ class TestLinksTitleConfig:
 
     def test_links_title_from_config(self) -> None:
         """Test loading links_title from config."""
-        config = {"links_title": "Elsewhere"}
+        config: dict[str, Any] = {"links_title": "Elsewhere"}
         args = Mock()
         args.links_title = "Links"  # default
 
@@ -737,7 +741,7 @@ class TestLinksTitleConfig:
 
     def test_links_title_defaults_to_links(self) -> None:
         """Test that links_title defaults to 'Links' when not in config."""
-        config = {}
+        config: dict[str, Any] = {}
         args = Mock()
         args.links_title = "Links"  # default
 
@@ -798,7 +802,7 @@ class TestNormalizeSiteKeywords:
 
     def test_invalid_type_returns_none(self) -> None:
         """Test that an invalid type returns None."""
-        assert normalize_site_keywords(42) is None  # type: ignore[arg-type]
+        assert normalize_site_keywords(42) is None
 
 
 class TestSiteKeywordsConfig:
@@ -806,7 +810,7 @@ class TestSiteKeywordsConfig:
 
     def test_site_keywords_list_from_config(self) -> None:
         """Test loading site_keywords as a YAML list from config."""
-        config = {"site_keywords": ["python", "web", "programming"]}
+        config: dict[str, Any] = {"site_keywords": ["python", "web", "programming"]}
         args = Mock()
         args.site_keywords = None  # default
 
@@ -837,7 +841,7 @@ class TestSiteKeywordsConfig:
 
     def test_site_keywords_not_set_remains_none(self) -> None:
         """Test that site_keywords remains None when not in config."""
-        config = {}
+        config: dict[str, Any] = {}
         args = Mock()
         args.site_keywords = None  # default
 
@@ -1479,9 +1483,7 @@ class TestParseSiteConfigFromDict:
         """A boolean read_time_wpm produces an error (booleans are subclasses of int)."""
         from blogmore.config import parse_site_config_from_dict
 
-        kwargs, errors = parse_site_config_from_dict(
-            {"read_time_wpm": True}, tmp_path
-        )
+        kwargs, errors = parse_site_config_from_dict({"read_time_wpm": True}, tmp_path)
 
         assert len(errors) == 1
         assert "read_time_wpm" in errors[0]

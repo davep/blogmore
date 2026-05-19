@@ -29,7 +29,10 @@ class TestCalculateReadingTime:
 
     def test_calculate_reading_time_with_html_formatting(self) -> None:
         """Test that HTML formatting is stripped before counting."""
-        content = "<p><strong>Bold text</strong> and <em>italic text</em> and <code>code</code> and <a href='url'>link text</a></p>"
+        content = (
+            "<p><strong>Bold text</strong> and <em>italic text</em> and "
+            "<code>code</code> and <a href='url'>link text</a></p>"
+        )
         # Should count: Bold text and italic text and code and link text = 10 words
         assert calculate_reading_time_from_html(content) == 1
 
@@ -188,7 +191,7 @@ class TestMakeUrlsAbsolute:
 
     def test_multiple_attributes_in_one_call(self) -> None:
         """Test that multiple relative attributes are all rewritten."""
-        html = '<img src="/img/banner.png">' '<a href="/posts/hello.html">Hello</a>'
+        html = '<img src="/img/banner.png"><a href="/posts/hello.html">Hello</a>'
         result = make_urls_absolute(html, "https://example.com")
         assert 'src="https://example.com/img/banner.png"' in result
         assert 'href="https://example.com/posts/hello.html"' in result

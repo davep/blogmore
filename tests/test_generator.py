@@ -4,6 +4,7 @@ import re
 import shutil
 import time
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -540,9 +541,9 @@ class TestSiteGenerator:
         about_pos = index_content.find("About Me")
         assert seo_pos != -1
         assert about_pos != -1
-        assert (
-            seo_pos < about_pos
-        ), "SEO Test Page should appear before About Me in the sidebar"
+        assert seo_pos < about_pos, (
+            "SEO Test Page should appear before About Me in the sidebar"
+        )
 
     def test_generate_with_sidebar_pages_unknown_slug_ignored(
         self, posts_dir: Path, pages_dir: Path, temp_output_dir: Path
@@ -1115,12 +1116,12 @@ class TestSiteGenerator:
         original_rmtree = shutil.rmtree
         call_count = 0
 
-        def rmtree_fail_first_attempt(path: object, **kwargs: object) -> None:
+        def rmtree_fail_first_attempt(path: Any, **kwargs: Any) -> None:
             nonlocal call_count
             call_count += 1
             if call_count == 1 and not kwargs.get("ignore_errors"):
                 raise OSError("Directory not empty")
-            original_rmtree(path, **kwargs)  # type: ignore[arg-type]
+            original_rmtree(path, **kwargs)
 
         with (
             patch(
@@ -4416,12 +4417,12 @@ class TestPagePathConfiguration:
         assert post_file.exists(), f"Expected post file at {post_file}"
         post_content = post_file.read_text()
         # The sidebar link must use the clean URL scheme, not the default /{slug}.html.
-        assert (
-            "/dotfiles/" in post_content
-        ), "Expected clean URL /dotfiles/ in sidebar of post page"
-        assert (
-            "/dotfiles.html" not in post_content
-        ), "Unexpected default URL /dotfiles.html found in sidebar of post page"
+        assert "/dotfiles/" in post_content, (
+            "Expected clean URL /dotfiles/ in sidebar of post page"
+        )
+        assert "/dotfiles.html" not in post_content, (
+            "Unexpected default URL /dotfiles.html found in sidebar of post page"
+        )
 
 
 class TestCacheBusting:
@@ -4502,9 +4503,9 @@ class TestCacheBusting:
         for html_file in temp_output_dir.rglob("*.html"):
             page_content = html_file.read_text()
             if "/static/style.css" in page_content:
-                assert (
-                    f"/static/style.css?v={token}" in page_content
-                ), f"File {html_file} uses a different cache-busting token"
+                assert f"/static/style.css?v={token}" in page_content, (
+                    f"File {html_file} uses a different cache-busting token"
+                )
 
     def test_new_generation_produces_different_token(
         self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path

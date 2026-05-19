@@ -180,9 +180,7 @@ class TestCollectSitemapUrls:
         assert f"https://example.com/{CUSTOM_404_HTML}" not in urls
         assert "https://example.com/index.html" in urls
 
-    def test_extra_excluded_paths_excludes_specified_html(
-        self, tmp_path: Path
-    ) -> None:
+    def test_extra_excluded_paths_excludes_specified_html(self, tmp_path: Path) -> None:
         """Test that HTML files in extra_excluded_paths are excluded."""
         (tmp_path / "index.html").write_text("<html/>")
         (tmp_path / "google287c4cf252478b0c.html").write_text("<html/>")

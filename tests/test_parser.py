@@ -240,9 +240,7 @@ class TestExtractFirstParagraph:
         Admonitions are rendered as block-level ``<div>`` elements by the
         BlogMore AdmonitionsExtension, so they are not treated as a paragraph.
         """
-        content = (
-            "> [!NOTE]\n" "> This is a note.\n\n" "This is the first real paragraph."
-        )
+        content = "> [!NOTE]\n> This is a note.\n\nThis is the first real paragraph."
         assert _extract_p(content) == "This is the first real paragraph."
 
     def test_skip_admonition_only_content(self) -> None:
@@ -701,9 +699,7 @@ class TestPostParser:
         """
         parser = PostParser()
         post_file = tmp_path / "plus-one-title.md"
-        post_file.write_text(
-            "---\n" "title: +1\n" "date: 2024-01-01\n" "---\n" "Content"
-        )
+        post_file.write_text("---\ntitle: +1\ndate: 2024-01-01\n---\nContent")
 
         with pytest.raises(ValueError, match="'title' in frontmatter must be a string"):
             parser.parse_file(post_file)
@@ -712,9 +708,7 @@ class TestPostParser:
         """Test that the non-string title error message includes the filename."""
         parser = PostParser()
         post_file = tmp_path / "bad-title.md"
-        post_file.write_text(
-            "---\n" "title: +1\n" "date: 2024-01-01\n" "---\n" "Content"
-        )
+        post_file.write_text("---\ntitle: +1\ndate: 2024-01-01\n---\nContent")
 
         with pytest.raises(ValueError) as exc_info:
             parser.parse_file(post_file)
@@ -827,12 +821,7 @@ class TestPostParser:
         parser = PostParser()
         post_file = tmp_path / "bare-tags.md"
         post_file.write_text(
-            "---\n"
-            "title: Post With Bare Tags\n"
-            "date: 2024-01-01\n"
-            "tags:\n"
-            "---\n"
-            "Content"
+            "---\ntitle: Post With Bare Tags\ndate: 2024-01-01\ntags:\n---\nContent"
         )
 
         post = parser.parse_file(post_file)
@@ -940,7 +929,7 @@ class TestPostParser:
         """
         parser = PostParser()
         page_file = tmp_path / "bad-title-page.md"
-        page_file.write_text("---\n" "title: +1\n" "---\n" "Content")
+        page_file.write_text("---\ntitle: +1\n---\nContent")
 
         with pytest.raises(ValueError, match="'title' in frontmatter must be a string"):
             parser.parse_page(page_file)

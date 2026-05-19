@@ -1,6 +1,7 @@
 """Unit tests for FontAwesome metadata caching."""
 
 import json
+from collections.abc import Iterator
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -15,12 +16,12 @@ class TestFontAwesomeCaching:
     """Test the caching logic in FontAwesomeOptimizer.fetch_icon_metadata."""
 
     @pytest.fixture
-    def mock_cache_dir(self, tmp_path):
+    def mock_cache_dir(self, tmp_path: Path) -> Iterator[Path]:
         """Mock the cache directory using a temporary path."""
         with patch("blogmore.fontawesome.get_user_cache_dir", return_value=tmp_path):
             yield tmp_path
 
-    def test_fetch_uses_cache_when_available(self, mock_cache_dir):
+    def test_fetch_uses_cache_when_available(self, mock_cache_dir: Path) -> None:
         """Test that metadata is loaded from cache if the file exists."""
         cache_file = mock_cache_dir / "fa-metadata-6.5.1.json"
         cache_file.write_text(json.dumps(STUB_METADATA))
@@ -34,7 +35,7 @@ class TestFontAwesomeCaching:
 
         assert metadata == STUB_METADATA
 
-    def test_fetch_updates_cache_on_miss(self, mock_cache_dir):
+    def test_fetch_updates_cache_on_miss(self, mock_cache_dir: Path) -> None:
         """Test that metadata is fetched and saved to cache on a miss."""
         mock_response = MagicMock()
         mock_response.read.return_value = json.dumps(STUB_METADATA).encode("utf-8")
@@ -54,7 +55,7 @@ class TestFontAwesomeCaching:
         assert cache_file.exists()
         assert json.loads(cache_file.read_text()) == STUB_METADATA
 
-    def test_fetch_falls_back_on_corrupt_cache(self, mock_cache_dir):
+    def test_fetch_falls_back_on_corrupt_cache(self, mock_cache_dir: Path) -> None:
         """Test that corrupt cache is ignored and metadata is re-fetched."""
         cache_file = mock_cache_dir / "fa-metadata-6.5.1.json"
         cache_file.write_text("invalid json")
@@ -74,7 +75,7 @@ class TestFontAwesomeCaching:
         # Cache should have been updated with valid data
         assert json.loads(cache_file.read_text()) == STUB_METADATA
 
-    def test_fetch_works_if_cache_cannot_be_written(self, tmp_path):
+    def test_fetch_works_if_cache_cannot_be_written(self, tmp_path: Path) -> None:
         """Test that fetch succeeds even if the cache directory is read-only."""
         # Create a read-only directory
         cache_dir = tmp_path / "readonly_cache"
@@ -87,12 +88,14 @@ class TestFontAwesomeCaching:
         mock_cm = MagicMock()
         mock_cm.__enter__.return_value = mock_response
 
-        with patch("blogmore.fontawesome.get_user_cache_dir", return_value=cache_dir):
+        with (
+            patch("blogmore.fontawesome.get_user_cache_dir", return_value=cache_dir),
             # Mock mkdir to simulate permission error
-            with patch("pathlib.Path.mkdir", side_effect=OSError("Permission denied")):
-                optimizer = FontAwesomeOptimizer(["github"])
-                with patch("urllib.request.urlopen", return_value=mock_cm):
-                    metadata = optimizer.fetch_icon_metadata()
+            patch("pathlib.Path.mkdir", side_effect=OSError("Permission denied")),
+            patch("urllib.request.urlopen", return_value=mock_cm),
+        ):
+            optimizer = FontAwesomeOptimizer(["github"])
+            metadata = optimizer.fetch_icon_metadata()
 
         assert metadata == STUB_METADATA
         # No cache file should have been created (or at least we didn't crash)

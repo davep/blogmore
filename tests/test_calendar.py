@@ -3,8 +3,6 @@
 import datetime as dt
 from pathlib import Path
 
-import pytest
-
 from blogmore.calendar import (
     CalendarDay,
     CalendarMonth,
@@ -126,12 +124,7 @@ class TestBuildCalendarSinglePost:
         post = _make_post(2024, 6, 15)
         result = build_calendar([post], "index.html")
         month = result[0].months[0]
-        post_days = [
-            day
-            for week in month.weeks
-            for day in week
-            if day.post_count > 0
-        ]
+        post_days = [day for week in month.weeks for day in week if day.post_count > 0]
         assert post_days[0].post_count == 1
 
     def test_day_without_posts_has_no_url(self) -> None:
@@ -152,9 +145,7 @@ class TestBuildCalendarSinglePost:
         post = _make_post(2024, 6, 15)
         result = build_calendar([post], "index.html")
         month = result[0].months[0]
-        padding_days = [
-            day for week in month.weeks for day in week if day.date is None
-        ]
+        padding_days = [day for week in month.weeks for day in week if day.date is None]
         # June 2024 starts on Saturday, so there are 5 padding days at the start.
         assert len(padding_days) > 0
 
@@ -175,12 +166,7 @@ class TestBuildCalendarMultiplePosts:
         post2 = _make_post(2024, 3, 10)
         result = build_calendar([post1, post2], "index.html")
         month = result[0].months[0]
-        post_days = [
-            day
-            for week in month.weeks
-            for day in week
-            if day.post_count > 0
-        ]
+        post_days = [day for week in month.weeks for day in week if day.post_count > 0]
         assert len(post_days) == 1
         assert post_days[0].post_count == 2
 
@@ -240,9 +226,7 @@ class TestBuildCalendarCleanUrls:
         post = _make_post(2024, 4, 8)
         result = build_calendar([post], "index.html")
         month = result[0].months[0]
-        post_days = [
-            day for week in month.weeks for day in week if day.post_count > 0
-        ]
+        post_days = [day for week in month.weeks for day in week if day.post_count > 0]
         assert post_days[0].day_url == "/2024/04/08/index.html"
 
     def test_page1_suffix_applied_to_month_url(self) -> None:
@@ -264,9 +248,7 @@ class TestBuildCalendarCleanUrls:
         assert result[0].year_url == "/2024/"
         assert result[0].months[0].month_url == "/2024/04/"
         month = result[0].months[0]
-        post_days = [
-            day for week in month.weeks for day in week if day.post_count > 0
-        ]
+        post_days = [day for week in month.weeks for day in week if day.post_count > 0]
         assert post_days[0].day_url == "/2024/04/08/"
 
 

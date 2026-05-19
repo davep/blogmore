@@ -4,7 +4,6 @@
 # Python imports.
 import datetime as dt
 import re
-import time
 from pathlib import Path
 
 ##############################################################################

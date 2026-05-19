@@ -43,15 +43,15 @@ class TestValidatePage1PathTemplate:
 
     def test_valid_simple_path(self) -> None:
         """A simple filename with no placeholders is valid."""
-        assert validate_page_1_path_template("index.html") is None
+        validate_page_1_path_template("index.html")
 
     def test_valid_path_with_subdirectory(self) -> None:
         """A path with subdirectories is valid."""
-        assert validate_page_1_path_template("pages/index.html") is None
+        validate_page_1_path_template("pages/index.html")
 
     def test_valid_path_with_page_placeholder(self) -> None:
         """The {page} placeholder is allowed in page_1_path."""
-        assert validate_page_1_path_template("page-{page}.html") is None
+        validate_page_1_path_template("page-{page}.html")
 
     def test_empty_template_raises(self) -> None:
         """An empty template raises ValueError."""
@@ -78,11 +78,11 @@ class TestValidatePageNPathTemplate:
 
     def test_valid_path_with_page_placeholder(self) -> None:
         """A path containing {page} is valid."""
-        assert validate_page_n_path_template("page/{page}.html") is None
+        validate_page_n_path_template("page/{page}.html")
 
     def test_valid_subdirectory_path_with_page(self) -> None:
         """A path with a subdirectory and {page} is valid."""
-        assert validate_page_n_path_template("p/{page}/index.html") is None
+        validate_page_n_path_template("p/{page}/index.html")
 
     def test_empty_template_raises(self) -> None:
         """An empty template raises ValueError."""
