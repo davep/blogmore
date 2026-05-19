@@ -1,5 +1,6 @@
 app          := blogmore
 src          := src/
+tests        := tests/
 reports      := .reports
 run          := uv run
 sync         := uv sync --group dev --group test --group docs
@@ -55,23 +56,23 @@ test-watch:			# Run tests in watch mode
 
 .PHONY: lint
 lint:				# Check the code for linting issues
-	$(lint) $(src)
+	$(lint) $(src) $(tests)
 
 .PHONY: codestyle
 codestyle:			# Is the code formatted correctly?
-	$(fmt) --check $(src)
+	$(fmt) --check $(src) $(tests)
 
 .PHONY: typecheck
 typecheck:			# Perform static type checks with mypy
-	$(mypy) --scripts-are-modules $(src)
+	$(mypy) --scripts-are-modules $(src) $(tests)
 
 .PHONY: stricttypecheck
 stricttypecheck:	        # Perform a strict static type checks with mypy
-	$(mypy) --scripts-are-modules --strict $(src)
+	$(mypy) --scripts-are-modules --strict $(src) $(tests)
 
 .PHONY: spellcheck
 spellcheck:			# Spell check the code
-	$(spell) *.md $(src)
+	$(spell) *.md $(src) $(tests)
 
 .PHONY: checkall
 checkall: spellcheck codestyle lint stricttypecheck test # Check all the things
@@ -118,11 +119,11 @@ repl:				# Start a Python REPL in the venv.
 
 .PHONY: delint
 delint:			# Fix linting issues.
-	$(lint) --fix  $(src)
+	$(lint) --fix $(src) $(tests)
 
 .PHONY: pep8ify
 pep8ify:			# Reformat the code to be as PEP8 as possible.
-	$(fmt) $(src)
+	$(fmt) $(src) $(tests)
 
 .PHONY: tidy
 tidy: pep8ify delint		# Tidy up the code, fixing lint and format issues.
