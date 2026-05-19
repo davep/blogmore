@@ -361,7 +361,7 @@ class AssetManager:
         """
         source = self._get_asset_source(THEME_JS_FILENAME)
         if source and self.site_config.minify_js:
-            return rjsmin.jsmin(source)
+            return str(rjsmin.jsmin(source))
         return source
 
     def copy_static_assets(self) -> None:
