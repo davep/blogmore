@@ -461,7 +461,7 @@ int main() {
         generator.generate()
 
         index_content = (temp_output_dir / "index.html").read_text()
-        assert f"Generated with" in index_content
+        assert "Generated with" in index_content
         assert "BlogMore" in index_content
         assert f"v{__version__}" in index_content
         assert "https://blogmore.davep.dev/" in index_content
@@ -526,7 +526,9 @@ class TestBacklinksTitle:
         )
         generator.generate()
 
-        target_html = (temp_output_dir / "2024" / "01" / "10" / "target-post.html").read_text()
+        target_html = (
+            temp_output_dir / "2024" / "01" / "10" / "target-post.html"
+        ).read_text()
         assert "References &amp; mentions" in target_html
 
     def test_custom_backlinks_title(
@@ -550,7 +552,9 @@ class TestBacklinksTitle:
         )
         generator.generate()
 
-        target_html = (temp_output_dir / "2024" / "01" / "10" / "target-post.html").read_text()
+        target_html = (
+            temp_output_dir / "2024" / "01" / "10" / "target-post.html"
+        ).read_text()
         assert "Cited by" in target_html
         assert "References &amp; mentions" not in target_html
 

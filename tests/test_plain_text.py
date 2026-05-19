@@ -4,6 +4,7 @@
 # Application imports.
 from blogmore.markdown.plain_text import markdown_to_plain_text
 
+
 class TestMarkdownToPlainText:
     """Tests for markdown_to_plain_text."""
 
@@ -156,7 +157,9 @@ class TestMarkdownToPlainTextExcludeCodeBlocks:
 
     def test_multiple_fenced_code_blocks_excluded(self) -> None:
         """Content from multiple fenced code blocks is excluded."""
-        content = "First.\n\n```\nblock one\n```\n\nMiddle.\n\n```\nblock two\n```\n\nLast."
+        content = (
+            "First.\n\n```\nblock one\n```\n\nMiddle.\n\n```\nblock two\n```\n\nLast."
+        )
         result = markdown_to_plain_text(content, exclude_code_blocks=True)
         assert "First." in result
         assert "Middle." in result

@@ -92,9 +92,7 @@ class TestBuildSearchIndex:
 
     def test_date_formatted_as_iso_date(self) -> None:
         """Entry date is an ISO-formatted date string."""
-        post = self._make_post(
-            date=dt.datetime(2024, 3, 15, 10, 30, 0, tzinfo=dt.UTC)
-        )
+        post = self._make_post(date=dt.datetime(2024, 3, 15, 10, 30, 0, tzinfo=dt.UTC))
         index = build_search_index([post])
         assert index[0]["date"] == "2024-03-15"
 

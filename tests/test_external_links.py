@@ -2,7 +2,10 @@
 
 import markdown
 
-from blogmore.markdown.external_links import ExternalLinksExtension, ExternalLinksProcessor
+from blogmore.markdown.external_links import (
+    ExternalLinksExtension,
+    ExternalLinksProcessor,
+)
 
 
 class TestExternalLinksProcessor:

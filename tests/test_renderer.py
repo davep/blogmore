@@ -410,8 +410,16 @@ class TestTemplateRenderer:
         post = Post(
             path=Path("test.md"),
             title="Test Post",
-            content="![Image](cover.jpg)\n\nThis is the first paragraph with some **bold** text.\n\nThis is the second paragraph.",
-            html_content='<p><img src="cover.jpg" alt="Image"></p><p>This is the first paragraph with some <strong>bold</strong> text.</p><p>This is the second paragraph.</p>',
+            content=(
+                "![Image](cover.jpg)\n\n"
+                "This is the first paragraph with some **bold** text.\n\n"
+                "This is the second paragraph."
+            ),
+            html_content=(
+                '<p><img src="cover.jpg" alt="Image"></p>'
+                "<p>This is the first paragraph with some <strong>bold</strong> text.</p>"
+                "<p>This is the second paragraph.</p>"
+            ),
             date=dt.datetime(2024, 3, 1, 10, 0, 0, tzinfo=dt.UTC),
             metadata={},
         )

@@ -150,8 +150,8 @@ class TestAdmonitionsExtension:
 > A warning."""
         html = md.convert(text)
         # Count the number of top-level admonition divs (with specific class patterns)
-        assert 'admonition-note' in html
-        assert 'admonition-warning' in html
+        assert "admonition-note" in html
+        assert "admonition-warning" in html
         assert "First note" in html
         assert "A warning" in html
 

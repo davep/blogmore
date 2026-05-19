@@ -19,7 +19,6 @@ from blogmore.page_path import (
 )
 from blogmore.parser import Page
 
-
 ##############################################################################
 # Fixtures.
 
@@ -77,7 +76,7 @@ class TestValidatePagePathTemplate:
 
     def test_allowed_variables_constant_is_correct(self) -> None:
         """ALLOWED_PAGE_PATH_VARIABLES contains exactly the documented variable names."""
-        assert ALLOWED_PAGE_PATH_VARIABLES == {"slug"}
+        assert {"slug"} == ALLOWED_PAGE_PATH_VARIABLES
 
 
 ##############################################################################

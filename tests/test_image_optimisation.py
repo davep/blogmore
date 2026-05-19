@@ -2,10 +2,12 @@
 
 import re
 from pathlib import Path
+from typing import cast
 from unittest.mock import MagicMock, patch
 from xml.etree.ElementTree import Element
 
 import pytest
+from markdown import Markdown
 
 from blogmore.image_manager import ImageManager, OptimisedImage
 from blogmore.markdown.optimised_images import (
@@ -16,7 +18,7 @@ from blogmore.site_config import SiteConfig
 
 
 @pytest.fixture
-def site_config(tmp_path):
+def site_config(tmp_path: Path) -> SiteConfig:
     return SiteConfig(
         output_dir=tmp_path / "output",
         content_dir=tmp_path / "content",
@@ -28,7 +30,7 @@ def site_config(tmp_path):
 
 
 @pytest.fixture
-def image_manager(site_config, tmp_path):
+def image_manager(site_config: SiteConfig, tmp_path: Path) -> ImageManager:
     cache_dir = tmp_path / "cache"
     return ImageManager(site_config, cache_dir)
 
@@ -39,8 +41,12 @@ class TestImageManager:
     @patch("PIL.Image.open")
     @patch("blogmore.image_manager.ImageManager._get_file_hash")
     def test_get_optimised_image_and_process_all(
-        self, mock_hash, mock_open, image_manager, tmp_path
-    ):
+        self,
+        mock_hash: MagicMock,
+        mock_open: MagicMock,
+        image_manager: ImageManager,
+        tmp_path: Path,
+    ) -> None:
         """Test successful image registration followed by batch processing."""
         mock_hash.return_value = "fakehash"
 
@@ -89,8 +95,13 @@ class TestImageManager:
     @patch("PIL.Image.open")
     @patch("blogmore.image_manager.ImageManager._get_file_hash")
     def test_cache_invalidation_on_setting_change(
-        self, mock_hash, mock_open, image_manager, site_config, tmp_path
-    ):
+        self,
+        mock_hash: MagicMock,
+        mock_open: MagicMock,
+        image_manager: ImageManager,
+        site_config: SiteConfig,
+        tmp_path: Path,
+    ) -> None:
         """Test that changing quality or widths invalidates the cache and re-queues."""
         mock_hash.return_value = "constant-hash"
         mock_img = MagicMock()
@@ -103,6 +114,7 @@ class TestImageManager:
 
         # 1. Initial registration
         entry1 = image_manager.get_optimised_image(source_path)
+        assert entry1 is not None
         assert entry1.quality == 80
         assert source_path in image_manager._processing_queue
         image_manager._processing_queue.clear()
@@ -111,6 +123,7 @@ class TestImageManager:
         site_config.image_quality = 90
         entry2 = image_manager.get_optimised_image(source_path)
 
+        assert entry2 is not None
         assert entry2.quality == 90
         # Should have been re-added to queue because quality changed
         assert source_path in image_manager._processing_queue
@@ -120,10 +133,13 @@ class TestImageManager:
         site_config.image_widths = [400]
         entry3 = image_manager.get_optimised_image(source_path)
 
+        assert entry3 is not None
         assert entry3.widths == [400]
         assert source_path in image_manager._processing_queue
 
-    def test_get_optimised_image_unsupported(self, image_manager, tmp_path):
+    def test_get_optimised_image_unsupported(
+        self, image_manager: ImageManager, tmp_path: Path
+    ) -> None:
         """Test that unsupported formats are bypassed."""
         svg_path = tmp_path / "test.svg"
         svg_path.touch()
@@ -135,7 +151,13 @@ class TestImageManager:
 
     @patch("PIL.Image.open")
     @patch("blogmore.image_manager.ImageManager._get_file_hash")
-    def test_no_upscaling(self, mock_hash, mock_open, image_manager, tmp_path):
+    def test_no_upscaling(
+        self,
+        mock_hash: MagicMock,
+        mock_open: MagicMock,
+        image_manager: ImageManager,
+        tmp_path: Path,
+    ) -> None:
         """Test that images are not upscaled."""
         mock_hash.return_value = "smallhash"
 
@@ -158,9 +180,11 @@ class TestImageManager:
 class TestOptimisedImageProcessor:
     """Test the OptimisedImageInlineProcessor Markdown extension."""
 
-    def test_is_local_image(self):
+    def test_is_local_image(self) -> None:
         """Test local image detection logic."""
-        processor = OptimisedImageInlineProcessor(IMAGE_LINK_RE, None, None, None)
+        processor = OptimisedImageInlineProcessor(
+            IMAGE_LINK_RE, cast(Markdown, MagicMock()), None, None
+        )
 
         assert processor._is_local_image("images/test.jpg") is True
         assert processor._is_local_image("/images/test.jpg") is True
@@ -168,7 +192,9 @@ class TestOptimisedImageProcessor:
         assert processor._is_local_image("https://example.com/img.jpg") is False
         assert processor._is_local_image("//example.com/img.jpg") is False
 
-    def test_transform_img_to_picture(self, image_manager, tmp_path):
+    def test_transform_img_to_picture(
+        self, image_manager: ImageManager, tmp_path: Path
+    ) -> None:
         """Test the transformation of ![]() to <picture>."""
         content_dir = tmp_path / "content"
         content_dir.mkdir()
@@ -189,17 +215,19 @@ class TestOptimisedImageProcessor:
         )
         # In the real code, get_optimised_image returns the entry and adds it to the queue.
         # Here we just mock the return.
-        image_manager.get_optimised_image = MagicMock(return_value=optimised)
+        image_manager.get_optimised_image = MagicMock(return_value=optimised)  # type: ignore[method-assign]
 
         processor = OptimisedImageInlineProcessor(
-            IMAGE_LINK_RE, None, image_manager, content_dir
+            IMAGE_LINK_RE, cast(Markdown, MagicMock()), image_manager, content_dir
         )
 
         # Create a mock Match object
         text = "![Some text](photo.jpg)"
         match = next(re.finditer(IMAGE_LINK_RE, text))
 
-        picture, start, end = processor.handleMatch(match, text)
+        res, start, end = processor.handleMatch(match, text)
+        assert isinstance(res, Element)
+        picture = res
 
         assert picture is not None
         assert picture.tag == "picture"
@@ -208,19 +236,25 @@ class TestOptimisedImageProcessor:
         sources = picture.findall("source")
         assert len(sources) == 2
         assert sources[0].get("type") == "image/webp"
-        assert "photo-400.webp 400w" in sources[0].get("srcset")
-        assert "photo-800.webp 800w" in sources[0].get("srcset")
+        srcset0 = sources[0].get("srcset")
+        assert srcset0 is not None
+        assert "photo-400.webp 400w" in srcset0
+        assert "photo-800.webp 800w" in srcset0
 
         # Check fallback <img>
         fallback = picture.find("img")
         assert fallback is not None
         assert fallback.get("alt") == "Some text"
-        assert "/static/images/optimised/photo-800.jpg" in fallback.get("src")
+        fallback_src = fallback.get("src")
+        assert fallback_src is not None
+        assert "/static/images/optimised/photo-800.jpg" in fallback_src
         assert fallback.get("width") == "1000"
         assert fallback.get("height") == "500"
         assert fallback.get("loading") == "lazy"
 
-    def test_preserve_centre_fragment(self, image_manager, tmp_path):
+    def test_preserve_centre_fragment(
+        self, image_manager: ImageManager, tmp_path: Path
+    ) -> None:
         """Test that #centre fragment is preserved in transformed image."""
         content_dir = tmp_path / "content"
         content_dir.mkdir()
@@ -238,20 +272,25 @@ class TestOptimisedImageProcessor:
             resized_paths={800: "photo-800.jpg"},
             webp_paths={800: "photo-800.webp"},
         )
-        image_manager.get_optimised_image = MagicMock(return_value=optimised)
+        image_manager.get_optimised_image = MagicMock(return_value=optimised)  # type: ignore[method-assign]
 
         processor = OptimisedImageInlineProcessor(
-            IMAGE_LINK_RE, None, image_manager, content_dir
+            IMAGE_LINK_RE, cast(Markdown, MagicMock()), image_manager, content_dir
         )
 
         text = "![alt](photo.jpg#centre)"
         match = next(re.finditer(IMAGE_LINK_RE, text))
 
-        picture, start, end = processor.handleMatch(match, text)
+        res, start, end = processor.handleMatch(match, text)
+        assert isinstance(res, Element)
+        picture = res
         fallback = picture.find("img")
-        assert fallback.get("src").endswith("#centre")
+        assert fallback is not None
+        fallback_src = fallback.get("src")
+        assert fallback_src is not None
+        assert fallback_src.endswith("#centre")
 
-    def test_complex_urls(self, image_manager, tmp_path):
+    def test_complex_urls(self, image_manager: ImageManager, tmp_path: Path) -> None:
         """Test that URLs with spaces and parentheses are handled."""
         content_dir = tmp_path / "content"
         content_dir.mkdir()
@@ -264,7 +303,7 @@ class TestOptimisedImageProcessor:
         img2 = content_dir / "my photo.jpg"
         img2.touch()
 
-        image_manager.get_optimised_image = MagicMock(
+        image_manager.get_optimised_image = MagicMock(  # type: ignore[method-assign]
             side_effect=lambda p: OptimisedImage(
                 source_path=p,
                 original_width=100,
@@ -277,19 +316,27 @@ class TestOptimisedImageProcessor:
         )
 
         processor = OptimisedImageInlineProcessor(
-            IMAGE_LINK_RE, None, image_manager, content_dir
+            IMAGE_LINK_RE, cast(Markdown, MagicMock()), image_manager, content_dir
         )
 
         # Test parentheses
         text1 = "![alt](photo(1).jpg)"
         match1 = next(re.finditer(IMAGE_LINK_RE, text1))
         # This will fail with current regex because it matches 'photo(1'
-        picture1, _, _ = processor.handleMatch(match1, text1)
-        assert picture1.find("img").get("src") == "photo(1).jpg"
+        res1, _, _ = processor.handleMatch(match1, text1)
+        assert isinstance(res1, Element)
+        picture1 = res1
+        img_el1 = picture1.find("img")
+        assert img_el1 is not None
+        assert img_el1.get("src") == "photo(1).jpg"
 
         # Test angle brackets and spaces
         text2 = "![alt](<my photo.jpg>)"
         match2 = next(re.finditer(IMAGE_LINK_RE, text2))
-        picture2, _, _ = processor.handleMatch(match2, text2)
+        res2, _, _ = processor.handleMatch(match2, text2)
+        assert isinstance(res2, Element)
+        picture2 = res2
         # Should resolve to the correct file and strip brackets
-        assert picture2.find("img").get("src") == "my photo.jpg"
+        img_el2 = picture2.find("img")
+        assert img_el2 is not None
+        assert img_el2.get("src") == "my photo.jpg"

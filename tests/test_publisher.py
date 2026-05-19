@@ -57,8 +57,9 @@ class TestCheckIsGitRepository:
 
     def test_default_path_uses_cwd(self) -> None:
         """Test that default path is current working directory."""
-        with patch("subprocess.run") as mock_run, patch(
-            "pathlib.Path.cwd", return_value=Path("/current/dir")
+        with (
+            patch("subprocess.run") as mock_run,
+            patch("pathlib.Path.cwd", return_value=Path("/current/dir")),
         ):
             mock_run.return_value = MagicMock(returncode=0)
             check_is_git_repository()
@@ -76,9 +77,7 @@ class TestGetGitRoot:
     def test_get_git_root_success(self) -> None:
         """Test successfully getting git root."""
         with patch("subprocess.run") as mock_run:
-            mock_run.return_value = MagicMock(
-                returncode=0, stdout="/path/to/repo\n"
-            )
+            mock_run.return_value = MagicMock(returncode=0, stdout="/path/to/repo\n")
             result = get_git_root(Path("/some/path"))
             assert result == Path("/path/to/repo")
             mock_run.assert_called_once_with(
@@ -98,12 +97,11 @@ class TestGetGitRoot:
 
     def test_default_path_uses_cwd(self) -> None:
         """Test that default path is current working directory."""
-        with patch("subprocess.run") as mock_run, patch(
-            "pathlib.Path.cwd", return_value=Path("/current/dir")
+        with (
+            patch("subprocess.run") as mock_run,
+            patch("pathlib.Path.cwd", return_value=Path("/current/dir")),
         ):
-            mock_run.return_value = MagicMock(
-                returncode=0, stdout="/path/to/repo\n"
-            )
+            mock_run.return_value = MagicMock(returncode=0, stdout="/path/to/repo\n")
             get_git_root()
             mock_run.assert_called_once_with(
                 ["git", "rev-parse", "--show-toplevel"],
@@ -123,9 +121,11 @@ class TestPublishSite:
         output_dir.mkdir()
         (output_dir / "index.html").write_text("<html></html>")
 
-        with patch("blogmore.publisher.check_git_available", return_value=False):
-            with pytest.raises(PublishError, match="Git command not found"):
-                publish_site(output_dir)
+        with (
+            patch("blogmore.publisher.check_git_available", return_value=False),
+            pytest.raises(PublishError, match="Git command not found"),
+        ):
+            publish_site(output_dir)
 
     def test_publish_site_not_in_git_repo(self, tmp_path: Path) -> None:
         """Test error when not in a git repository."""
@@ -133,12 +133,10 @@ class TestPublishSite:
         output_dir.mkdir()
         (output_dir / "index.html").write_text("<html></html>")
 
-        with patch(
-            "blogmore.publisher.check_git_available", return_value=True
-        ), patch(
-            "blogmore.publisher.check_is_git_repository", return_value=False
-        ), pytest.raises(
-            PublishError, match="Not in a git repository"
+        with (
+            patch("blogmore.publisher.check_git_available", return_value=True),
+            patch("blogmore.publisher.check_is_git_repository", return_value=False),
+            pytest.raises(PublishError, match="Not in a git repository"),
         ):
             publish_site(output_dir)
 
@@ -146,14 +144,11 @@ class TestPublishSite:
         """Test error when output directory doesn't exist."""
         output_dir = tmp_path / "output"
 
-        with patch(
-            "blogmore.publisher.check_git_available", return_value=True
-        ), patch(
-            "blogmore.publisher.check_is_git_repository", return_value=True
-        ), patch(
-            "blogmore.publisher.get_git_root", return_value=tmp_path
-        ), pytest.raises(
-            PublishError, match="Output directory not found"
+        with (
+            patch("blogmore.publisher.check_git_available", return_value=True),
+            patch("blogmore.publisher.check_is_git_repository", return_value=True),
+            patch("blogmore.publisher.get_git_root", return_value=tmp_path),
+            pytest.raises(PublishError, match="Output directory not found"),
         ):
             publish_site(output_dir)
 
@@ -162,14 +157,11 @@ class TestPublishSite:
         output_dir = tmp_path / "output"
         output_dir.mkdir()
 
-        with patch(
-            "blogmore.publisher.check_git_available", return_value=True
-        ), patch(
-            "blogmore.publisher.check_is_git_repository", return_value=True
-        ), patch(
-            "blogmore.publisher.get_git_root", return_value=tmp_path
-        ), pytest.raises(
-            PublishError, match="Output directory is empty"
+        with (
+            patch("blogmore.publisher.check_git_available", return_value=True),
+            patch("blogmore.publisher.check_is_git_repository", return_value=True),
+            patch("blogmore.publisher.get_git_root", return_value=tmp_path),
+            pytest.raises(PublishError, match="Output directory is empty"),
         ):
             publish_site(output_dir)
 
@@ -230,24 +222,18 @@ class TestPublishSite:
 
         # Verify git worktree commands were called
         assert any(
-            call[0][0][:2] == ["git", "worktree"]
-            for call in mock_run.call_args_list
+            call[0][0][:2] == ["git", "worktree"] for call in mock_run.call_args_list
         )
         assert any(
             call[0][0][:3] == ["git", "checkout", "--orphan"]
             for call in mock_run.call_args_list
         )
+        assert any(call[0][0][:2] == ["git", "add"] for call in mock_run.call_args_list)
         assert any(
-            call[0][0][:2] == ["git", "add"]
-            for call in mock_run.call_args_list
+            call[0][0][:2] == ["git", "commit"] for call in mock_run.call_args_list
         )
         assert any(
-            call[0][0][:2] == ["git", "commit"]
-            for call in mock_run.call_args_list
-        )
-        assert any(
-            call[0][0][:2] == ["git", "push"]
-            for call in mock_run.call_args_list
+            call[0][0][:2] == ["git", "push"] for call in mock_run.call_args_list
         )
 
     @patch("blogmore.publisher.subprocess.run")
@@ -307,14 +293,8 @@ class TestPublishSite:
             call[0][0][:3] == ["git", "worktree", "add"]
             for call in mock_run.call_args_list
         )
-        assert any(
-            call[0][0][:2] == ["git", "add"]
-            for call in mock_run.call_args_list
-        )
-        assert any(
-            call[0][0][:2] == ["git", "add"]
-            for call in mock_run.call_args_list
-        )
+        assert any(call[0][0][:2] == ["git", "add"] for call in mock_run.call_args_list)
+        assert any(call[0][0][:2] == ["git", "add"] for call in mock_run.call_args_list)
 
     @patch("blogmore.publisher.subprocess.run")
     @patch("blogmore.publisher.shutil.rmtree")
@@ -373,8 +353,7 @@ class TestPublishSite:
         assert "No changes to publish" in captured.out
         # Should not push if there are no changes
         assert not any(
-            call[0][0][:2] == ["git", "push"]
-            for call in mock_run.call_args_list
+            call[0][0][:2] == ["git", "push"] for call in mock_run.call_args_list
         )
 
     @patch("blogmore.publisher.subprocess.run")
@@ -676,9 +655,7 @@ class TestPublishSite:
         publish_site(output_dir, branch="gh-pages", remote="origin")
 
         # Verify that git fetch was called to update the local branch from remote
-        fetch_calls = [
-            cmd for cmd in git_commands if cmd[:2] == ["git", "fetch"]
-        ]
+        fetch_calls = [cmd for cmd in git_commands if cmd[:2] == ["git", "fetch"]]
         assert fetch_calls, "git fetch should be called when branch exists locally"
         # The fetch must use force (+) to handle non-fast-forward remote updates
         assert any(

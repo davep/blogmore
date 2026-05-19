@@ -4,29 +4,26 @@ from blogmore.content_path import validate_path_template
 
 
 class TestValidatePathTemplate:
-    def test_valid_template(self):
+    def test_valid_template(self) -> None:
         """Test that a valid template passes validation."""
-        assert validate_path_template("{test}", "tester", {"test"}, "test") is None
-        assert (
-            validate_path_template("prefix/{test}/suffix", "tester", {"test"}, "test")
-            is None
-        )
-        assert validate_path_template("nothing", "tester", set(), "test") is None
-        assert validate_path_template("nothing", "tester", {"test"}, "test") is None
+        validate_path_template("{test}", "tester", {"test"}, "test")
+        validate_path_template("prefix/{test}/suffix", "tester", {"test"}, "test")
+        validate_path_template("nothing", "tester", set(), "test")
+        validate_path_template("nothing", "tester", {"test"}, "test")
 
-    def test_empty_template(self):
+    def test_empty_template(self) -> None:
         """Test that an empty template raises a ValueError."""
         with raises(ValueError, match="tester must not be empty"):
             validate_path_template("", "tester", {"test"}, "test")
 
-    def test_unknown_variable(self):
+    def test_unknown_variable(self) -> None:
         """Test that a template with an unknown variable raises a ValueError."""
         with raises(
             ValueError, match="tester '.*' contains unknown variable\\(s\\): unknown"
         ):
             validate_path_template("{unknown}", "tester", {"test"}, "test")
 
-    def test_malformed_template(self):
+    def test_malformed_template(self) -> None:
         """Test that a malformed template raises a ValueError."""
         with raises(
             ValueError, match="tester '.*' contains an invalid placeholder: .*"
@@ -45,7 +42,7 @@ class TestValidatePathTemplate:
         ):
             validate_path_template("}", "tester", {"test"}, "test")
 
-    def test_missing_required_variable(self):
+    def test_missing_required_variable(self) -> None:
         """Test that a template missing a required variable raises a ValueError."""
         with raises(
             ValueError,
@@ -55,7 +52,7 @@ class TestValidatePathTemplate:
                 "This is a {test}", "tester", {"test", "required"}, "test", {"required"}
             )
 
-    def test_invalid_required_variable(self):
+    def test_invalid_required_variable(self) -> None:
         """Test that a template with an invalid required variable raises a ValueError."""
         with raises(
             ValueError,

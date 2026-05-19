@@ -1,6 +1,7 @@
 """Shared pytest fixtures for blogmore tests."""
 
 import datetime as dt
+from collections.abc import Iterator
 from pathlib import Path
 from unittest.mock import patch
 
@@ -10,7 +11,7 @@ from blogmore.parser import Page, Post
 
 
 @pytest.fixture(autouse=True)
-def mock_user_cache_dir(tmp_path: Path):
+def mock_user_cache_dir(tmp_path: Path) -> Iterator[Path]:
     """Automatically mock the user cache directory for all tests.
 
     This prevents tests from ever touching the real user's cache directory

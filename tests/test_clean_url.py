@@ -2,12 +2,10 @@
 
 ##############################################################################
 # Third-party imports.
-import pytest
 
 ##############################################################################
 # Application imports.
 from blogmore.clean_url import CLEAN_URL_INDEX_FILES, make_url_clean
-
 
 ##############################################################################
 # CLEAN_URL_INDEX_FILES tests.
@@ -66,9 +64,7 @@ class TestMakeUrlClean:
 
     def test_strips_deeply_nested_index_html(self) -> None:
         """A deeply nested index.html URL is stripped correctly."""
-        assert (
-            make_url_clean("/a/b/c/d/index.html") == "/a/b/c/d/"
-        )
+        assert make_url_clean("/a/b/c/d/index.html") == "/a/b/c/d/"
 
     def test_strips_single_segment_index_html(self) -> None:
         """A single-segment path ending in /index.html is stripped."""
@@ -88,9 +84,7 @@ class TestMakeUrlClean:
 
     def test_does_not_strip_long_prefix_index_html(self) -> None:
         """A filename that ends in index.html but is not exactly index.html is unchanged."""
-        assert (
-            make_url_clean("/posts/page-index.html") == "/posts/page-index.html"
-        )
+        assert make_url_clean("/posts/page-index.html") == "/posts/page-index.html"
 
     def test_does_not_strip_search_index_htm(self) -> None:
         """A URL ending with search-index.htm is returned unchanged."""

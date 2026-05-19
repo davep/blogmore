@@ -42,7 +42,7 @@ class TestLintCommand:
 
         site_config = SiteConfig(content_dir=content_dir, output_dir=temp_output_dir)
 
-        with patch("sys.stderr") as mock_stderr:
+        with patch("sys.stderr"):
             result = lint_site(site_config)
             # Warnings don't cause failure (result 0)
             assert result == 0
@@ -84,7 +84,13 @@ class TestLintCommand:
 
         post_path = content_dir / "missing-alt.md"
         post_path.write_text(
-            '---\ntitle: Missing Alt Post\ndate: 2024-01-01\n---\n<img src="/images/logo.png">\n<img src="/images/logo.png" alt="">\n<img src="/images/logo.png" alt="   ">\n'
+            "---\n"
+            "title: Missing Alt Post\n"
+            "date: 2024-01-01\n"
+            "---\n"
+            '<img src="/images/logo.png">\n'
+            '<img src="/images/logo.png" alt="">\n'
+            '<img src="/images/logo.png" alt="   ">\n'
         )
 
         site_config = SiteConfig(
@@ -374,37 +380,41 @@ class TestLintCommand:
 
     def test_main_lint_command(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """Test lint command via main()."""
-        with patch.object(
-            sys,
-            "argv",
-            [
-                "blogmore",
-                "lint",
-                str(posts_dir),
-                "-o",
-                str(temp_output_dir),
-            ],
-        ):
+        with (
+            patch.object(
+                sys,
+                "argv",
+                [
+                    "blogmore",
+                    "lint",
+                    str(posts_dir),
+                    "-o",
+                    str(temp_output_dir),
+                ],
+            ),
             # Patch lint_site directly to avoid fixture issues in main command tests
-            with patch("blogmore.__main__.lint_site", return_value=0) as mock_lint:
-                result = main()
-                assert result == 0
-                assert mock_lint.called
+            patch("blogmore.__main__.lint_site", return_value=0) as mock_lint,
+        ):
+            result = main()
+            assert result == 0
+            assert mock_lint.called
 
     def test_main_check_alias(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """Test check alias via main()."""
-        with patch.object(
-            sys,
-            "argv",
-            [
-                "blogmore",
-                "check",
-                str(posts_dir),
-                "-o",
-                str(temp_output_dir),
-            ],
+        with (
+            patch.object(
+                sys,
+                "argv",
+                [
+                    "blogmore",
+                    "check",
+                    str(posts_dir),
+                    "-o",
+                    str(temp_output_dir),
+                ],
+            ),
+            patch("blogmore.__main__.lint_site", return_value=0) as mock_lint,
         ):
-            with patch("blogmore.__main__.lint_site", return_value=0) as mock_lint:
-                result = main()
-                assert result == 0
-                assert mock_lint.called
+            result = main()
+            assert result == 0
+            assert mock_lint.called

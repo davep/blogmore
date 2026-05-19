@@ -20,9 +20,9 @@ from blogmore.post_path import (
     validate_post_path_template,
 )
 
-
 ##############################################################################
 # Fixtures.
+
 
 @pytest.fixture
 def dated_post() -> Post:
@@ -99,11 +99,17 @@ class TestValidatePostPathTemplate:
 
     def test_allowed_variables_constant_is_correct(self) -> None:
         """ALLOWED_PATH_VARIABLES contains exactly the documented variable names."""
-        assert ALLOWED_PATH_VARIABLES == {
-            "year", "month", "day",
-            "hour", "minute", "second",
-            "category", "author", "slug",
-        }
+        assert {
+            "year",
+            "month",
+            "day",
+            "hour",
+            "minute",
+            "second",
+            "category",
+            "author",
+            "slug",
+        } == ALLOWED_PATH_VARIABLES
 
 
 ##############################################################################
@@ -242,7 +248,9 @@ class TestComputeOutputPath:
         output_dir.mkdir()
 
         with pytest.raises(ValueError, match="escapes the output directory"):
-            compute_output_path(output_dir, dated_post, "../../../etc/passwd/{slug}.html")
+            compute_output_path(
+                output_dir, dated_post, "../../../etc/passwd/{slug}.html"
+            )
 
     def test_absolute_path_segments_contained(
         self, dated_post: Post, tmp_path: Path
