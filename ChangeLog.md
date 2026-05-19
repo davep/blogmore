@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed HTML entities being incorrectly included in their escaped form (like
+  `&quot;` and `&gt;`) in the search index snippets.
+  ([#497](https://github.com/davep/blogmore/pull/497))
+
 ## v2.24.0
 
 **Released: 2026-05-18**

@@ -31,6 +31,16 @@ class TestStripHtml:
         """Plain text is returned unchanged (modulo whitespace)."""
         assert strip_html("Hello world") == "Hello world"
 
+    def test_unescapes_entities(self) -> None:
+        """Entities like &quot; and &gt; should be unescaped."""
+        html = "<pre><code>class Test: &quot;hello&quot;</code></pre>"
+        assert strip_html(html) == 'class Test: "hello"'
+
+    def test_unescapes_greater_than(self) -> None:
+        """Entities like &gt; should be unescaped."""
+        html = "<p>a &gt; b</p>"
+        assert strip_html(html) == "a > b"
+
 
 class TestBuildSearchIndex:
     """Tests for build_search_index."""
