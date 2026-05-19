@@ -1,5 +1,6 @@
 """Search index generation for static site search."""
 
+import html
 import json
 import re
 from pathlib import Path
@@ -8,19 +9,20 @@ from typing import Any
 from blogmore.parser import Post
 
 
-def strip_html(html: str) -> str:
+def strip_html(html_str: str) -> str:
     """Strip HTML tags from a string, returning plain text.
 
     Replaces tags with spaces to preserve word boundaries, then collapses
     multiple whitespace characters into a single space.
 
     Args:
-        html: HTML string to strip.
+        html_str: HTML string to strip.
 
     Returns:
         Plain text without HTML tags.
     """
-    text = re.sub(r"<[^>]+>", " ", html)
+    text = re.sub(r"<[^>]+>", " ", html_str)
+    text = html.unescape(text)
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 
