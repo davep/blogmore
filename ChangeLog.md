@@ -7,6 +7,15 @@
 - Fixed HTML entities being incorrectly included in their escaped form (like
   `&quot;` and `&gt;`) in the search index snippets.
   ([#497](https://github.com/davep/blogmore/pull/497))
+- Added support for optionally bundling the main CSS files into a single
+  file, to help speed up the first load from a site (controlled by
+  `bundle_css` and off by default).
+  ([#499](https://github.com/davep/blogmore/pull/499))
+- Added support for optionally inlining the main theming JavaScript code
+  into every generated page, giving the option to reduce the number of
+  JavaScript files that need to be downloaded on the first load of a site
+  (controlled by `inline_theme_js` and off by default).
+  ([#499](https://github.com/davep/blogmore/pull/499))
 
 ## v2.24.0
 
