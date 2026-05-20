@@ -5,6 +5,7 @@ TAG_DIR = "tag"
 CATEGORY_DIR = "category"
 
 CSS_FILENAME = "style.css"
+BUNDLE_CSS_FILENAME = "bundle.css"
 SEARCH_CSS_FILENAME = "search.css"
 STATS_CSS_FILENAME = "stats.css"
 ARCHIVE_CSS_FILENAME = "archive.css"

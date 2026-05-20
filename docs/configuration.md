@@ -1094,6 +1094,19 @@ Minify the generated CSS and write it as `styles.min.css` instead of `style.css`
 minify_css: true
 ```
 
+#### `bundle_css`
+
+Bundle multiple CSS files into a single file. When enabled, the main stylesheet (`style.css`), the code syntax highlighting CSS (`code.css`), and any local optimised FontAwesome CSS are combined into a single `bundle.css` (or `bundle.min.css` if `minify_css` is also enabled).
+
+This reduces the number of critical request chains and can significantly improve page load performance scores (like PageSpeed Insights) by reducing the number of network round trips.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+bundle_css: true
+```
+
 #### `minify_js`
 
 Minify the generated JavaScript and write it as `theme.min.js` instead of `theme.js`. If search is enabled, `search.js` is also minified and written as `search.min.js`. The original unminified files are not written when this option is enabled.
@@ -1103,6 +1116,19 @@ Minify the generated JavaScript and write it as `theme.min.js` instead of `theme
 
 ```yaml
 minify_js: true
+```
+
+#### `inline_theme_js`
+
+Inline the theme JavaScript into the HTML. When enabled, the theme detection and mobile menu JavaScript (`theme.js`) is embedded directly into the `<head>` of every generated HTML page.
+
+This eliminates one critical network request and ensures the theme is applied as early as possible, preventing any "flash of light mode" during page load.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+inline_theme_js: true
 ```
 
 #### `minify_html`

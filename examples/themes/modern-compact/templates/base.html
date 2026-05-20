@@ -35,6 +35,19 @@
     <meta name="msapplication-config" content="/icons/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
     {% endif %}
+    {% if bundle_css %}
+    {% if fontawesome_css_url %}
+    <link rel="preload" href="{{ fontawesome_woff2_url }}" as="font" type="font/woff2" crossorigin="anonymous">
+    {% if not fontawesome_is_bundled %}
+    <link rel="stylesheet" href="{{ fontawesome_css_url }}">
+    {% endif %}
+    {% endif %}
+    <!-- Custom Google Fonts for the modern-compact theme -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ bundle_css_url }}">
+    {% else %}
     {% if fontawesome_css_url %}
     <link rel="preload" href="{{ fontawesome_woff2_url }}" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ fontawesome_css_url }}">
@@ -45,6 +58,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ styles_css_url }}">
     <link rel="stylesheet" href="{{ code_css_url }}">
+    {% endif %}
     {% if extra_stylesheets %}
     {% for stylesheet in extra_stylesheets %}
     <link rel="stylesheet" href="{{ stylesheet }}">
@@ -60,7 +74,11 @@
     {% endif %}
     {% endblock %}
     {% block meta_tags %}{% endblock %}
+    {% if inline_theme_js and theme_js_content %}
+    <script>{{ theme_js_content | safe }}</script>
+    {% else %}
     <script src="{{ theme_js_url }}"></script>
+    {% endif %}
     <script src="{{ codeblocks_js_url }}" defer></script>
     {% if prev_page_url %}<link rel="prev" href="{{ prev_page_url }}">{% endif %}
     {% if next_page_url %}<link rel="next" href="{{ next_page_url }}">{% endif %}

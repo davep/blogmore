@@ -139,8 +139,28 @@ class SiteConfig:
     minify_css: bool = False
     """Whether to minify the CSS, writing it as `styles.min.css`."""
 
+    bundle_css: bool = False
+    """Whether to bundle multiple CSS files into a single file.
+
+    When enabled, the main stylesheet (``style.css``), the code syntax
+    highlighting CSS (``code.css``), and any local optimised FontAwesome
+    CSS are combined into a single ``bundle.css`` (or ``bundle.min.css``).
+    This reduces the number of network requests and can improve page load
+    performance.  Off by default.
+    """
+
     minify_js: bool = False
     """Whether to minify the JavaScript output files."""
+
+    inline_theme_js: bool = False
+    """Whether to inline the theme JavaScript into the HTML.
+
+    When enabled, the theme detection and mobile menu JavaScript
+    (``theme.js``) is embedded directly into the ``<head>`` of every
+    generated HTML page.  This eliminates one critical network request
+    and ensures the theme is applied as early as possible.  Off by
+    default.
+    """
 
     minify_html: bool = False
     """Whether to minify all generated HTML output.
