@@ -101,7 +101,13 @@
             </div>
             <div class="sidebar-content">
                 <div class="sidebar-header">
-                    {% if site_logo %}
+                    {% if site_logo_html %}
+                    <div class="sidebar-logo">
+                        <a href="/">
+                            {{ site_logo_html | safe }}
+                        </a>
+                    </div>
+                    {% elif site_logo %}
                     <div class="sidebar-logo">
                         <a href="/">
                             <img src="{{ site_logo }}" alt="{{ site_title }}">

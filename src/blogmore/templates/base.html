@@ -85,7 +85,11 @@
                     {% if site_logo %}
                     <div class="sidebar-logo">
                         <a href="/">
+                            {% if site_logo_html %}
+                            {{ site_logo_html | safe }}
+                            {% else %}
                             <img src="{{ site_logo }}" alt="{{ site_title }}">
+                            {% endif %}
                         </a>
                     </div>
                     {% endif %}
