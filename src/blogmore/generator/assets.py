@@ -19,6 +19,7 @@ from blogmore.fontawesome import (
     FontAwesomeOptimizer,
 )
 from blogmore.generator.constants import (
+    BUNDLE_CSS_FILENAME,
     CODE_CSS_FILENAME,
     CODEBLOCKS_JS_FILENAME,
     CSS_FILENAME,
@@ -46,6 +47,7 @@ class AssetManager:
         """
         self.site_config = site_config
         self.fontawesome_css_url: str = FONTAWESOME_CDN_CSS_URL
+        self._fontawesome_css_content: str | None = None
         self.extras_html_paths: frozenset[str] = frozenset()
 
     @property
@@ -57,6 +59,15 @@ class AssetManager:
         """
         assert self.site_config.content_dir is not None
         return self.site_config.content_dir
+
+    @property
+    def fontawesome_is_bundled(self) -> bool:
+        """Return whether FontAwesome CSS is included in the bundle.
+
+        Returns:
+            True if FontAwesome was optimized and is ready for bundling.
+        """
+        return self._fontawesome_css_content is not None
 
     def detect_favicon(self) -> str | None:
         """Detect if a favicon file exists in the icons or extras directory.
@@ -180,7 +191,8 @@ class AssetManager:
             else FONTAWESOME_LOCAL_CSS_PATH
         )
         with timed_step("Optimizing FontAwesome CSS..."):
-            return optimizer.build_css(metadata)
+            self._fontawesome_css_content = optimizer.build_css(metadata)
+            return self._fontawesome_css_content
 
     def _get_asset_source(self, filename: str) -> str | None:
         """Read the text content of a static asset, preferring custom over bundled.
@@ -278,6 +290,46 @@ class AssetManager:
             output_path.write_text(css_content, encoding="utf-8")
             print(f"Generated code CSS as {CODE_CSS_FILENAME}")
 
+    def _write_bundled_css(self, output_static: Path) -> None:
+        """Bundle and optionally minify critical CSS files.
+
+        Combines FontAwesome (if local), main stylesheet, and code syntax
+        highlighting into a single bundled CSS file.
+
+        Args:
+            output_static: Path to the output static directory.
+        """
+        bundle_parts = []
+
+        # 1. FontAwesome (if local and optimised)
+        if self._fontawesome_css_content:
+            bundle_parts.append(self._fontawesome_css_content)
+
+        # 2. Main stylesheet
+        style_source = self._get_asset_source(CSS_FILENAME)
+        if style_source:
+            bundle_parts.append(style_source)
+
+        # 3. Code syntax highlighting
+        code_source = build_code_css(
+            self.site_config.light_mode_code_style,
+            self.site_config.dark_mode_code_style,
+        )
+        bundle_parts.append(code_source)
+
+        combined = "\n".join(bundle_parts)
+
+        if self.site_config.minify_css:
+            minified = rcssmin.cssmin(combined)
+            bundle_min = minified_filename(BUNDLE_CSS_FILENAME)
+            output_path = output_static / bundle_min
+            output_path.write_text(minified, encoding="utf-8")
+            print(f"Generated minified bundled CSS as {bundle_min}")
+        else:
+            output_path = output_static / BUNDLE_CSS_FILENAME
+            output_path.write_text(combined, encoding="utf-8")
+            print(f"Generated bundled CSS as {BUNDLE_CSS_FILENAME}")
+
     def _write_minified_js(self, output_static: Path, js_filename: str) -> None:
         """Read a source JavaScript file, minify it, and write it with the minified name.
 
@@ -300,6 +352,17 @@ class AssetManager:
         output_path = output_static / js_min
         output_path.write_text(minified, encoding="utf-8")
         print(f"Generated minified JS as {js_min}")
+
+    def get_theme_js_content(self) -> str | None:
+        """Return the content of the theme JavaScript, optionally minified.
+
+        Returns:
+            The JS content string, or ``None`` if not found.
+        """
+        source = self._get_asset_source(THEME_JS_FILENAME)
+        if source and self.site_config.minify_js:
+            return str(rjsmin.jsmin(source))
+        return source
 
     def copy_static_assets(self) -> None:
         """Copy static assets (CSS, JS, images) to output directory.
@@ -418,6 +481,10 @@ class AssetManager:
         # Minify CSS if requested
         if self.site_config.minify_css:
             self._write_minified_css(output_static)
+
+        # Bundle CSS if requested
+        if self.site_config.bundle_css:
+            self._write_bundled_css(output_static)
 
         # Always generate code.css (or code.min.css) from configured Pygments styles.
         self._write_code_css(output_static)

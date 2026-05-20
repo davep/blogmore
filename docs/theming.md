@@ -16,6 +16,8 @@ BlogMore embeds several stylesheets in every generated site:
 - **`static/style.css`** — the main stylesheet, built around **CSS custom properties** (variables) so that colour schemes can be swapped by changing only those properties.
 - **`static/code.css`** — a generated stylesheet containing only the Pygments syntax-highlighting rules for the configured light and dark mode code styles.
 
+When `bundle_css` is enabled, these two files (along with any local optimised FontAwesome CSS) are combined into a single **`static/bundle.css`** (or `static/bundle.min.css`) to reduce the number of critical request chains and improve page load performance.
+
 The following page-specific stylesheets are included only in the pages that need them:
 
 - **`static/search.css`** — styles for the search page (included only in `search.html`).

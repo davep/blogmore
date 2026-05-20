@@ -164,7 +164,9 @@ class SiteGenerator:
         # Update context builder with discovered asset state.
         context_builder.favicon_url = asset_manager.detect_favicon()
         context_builder.has_platform_icons = asset_manager.detect_generated_icons()
+        context_builder.fontawesome_is_bundled = asset_manager.fontawesome_is_bundled
         context_builder.fontawesome_css_url = asset_manager.fontawesome_css_url
+        context_builder.theme_js_content = asset_manager.get_theme_js_content()
 
         # Resolve paths
         page_output_paths = resolve_page_output_paths(self.site_config, pages)

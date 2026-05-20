@@ -32,6 +32,8 @@ below lists all variables that are available in every template.
 | `backlinks_title` | `str` | The heading text for the backlinks section (defaults to `"References & mentions"`). |
 | `with_advert` | `bool` | `True` when the "Generated with BlogMore" footer is shown. |
 | `default_author` | `str \| None` | Default author name from configuration. |
+| `bundle_css` | `bool` | `True` when CSS bundling is enabled. |
+| `bundle_css_url` | `str` | URL to the bundled stylesheet (with cache-bust query string). |
 | `styles_css_url` | `str` | URL to the compiled stylesheet (with cache-bust query string). |
 | `code_css_url` | `str` | URL to the generated code-highlighting stylesheet (with cache-bust query string). |
 | `search_css_url` | `str` | URL to the search-page stylesheet (with cache-bust query string). |
@@ -47,11 +49,14 @@ below lists all variables that are available in every template.
 | `with_graph` | `bool` | `True` when the graph page is enabled. |
 | `graph_url` | `str` | URL to the graph page (respects `graph_path` and `clean_urls`). |
 | `graph_css_url` | `str` | URL to the graph-page stylesheet (with cache-bust query string). |
+| `inline_theme_js` | `bool` | `True` when theme JavaScript inlining is enabled. |
+| `theme_js_content` | `str \| None` | The content of `theme.js` to be inlined. |
 | `theme_js_url` | `str` | URL to `theme.js` (with cache-bust query string). |
 | `search_js_url` | `str` | URL to `search.js` (with cache-bust query string). |
 | `favicon_url` | `str \| None` | URL to the site favicon, if one exists. |
 | `has_platform_icons` | `bool` | `True` when generated platform icons are present. |
 | `fontawesome_css_url` | `str \| None` | Font Awesome CSS URL, when social icons are used. |
+| `fontawesome_is_bundled` | `bool` | `True` when Font Awesome is included in the bundle. |
 | `extra_stylesheets` | `list[str]` | List of extra stylesheet URLs from configuration. |
 | `tag_dir` | `str` | URL prefix for tag pages (e.g. `/tags`). |
 | `category_dir` | `str` | URL prefix for category pages (e.g. `/categories`). |
