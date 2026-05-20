@@ -16,6 +16,9 @@
   JavaScript files that need to be downloaded on the first load of a site
   (controlled by `inline_theme_js` and off by default).
   ([#499](https://github.com/davep/blogmore/pull/499))
+- Changed the site title in the sidebar from an `<h1>` tag to a `<div
+  class="site-title">` to ensure each page has only one primary heading.
+  ([#501](https://github.com/davep/blogmore/pull/501))
 
 ## v2.24.0
 

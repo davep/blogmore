@@ -326,19 +326,21 @@ body {
     text-align: center;
 }
 
-.sidebar-title h1 {
+.sidebar-title .site-title {
     font-size: 1.8em;
     margin: 0 0 10px 0;
     color: var(--text-color);
+    font-weight: bold;
+    line-height: 1.2;
 }
 
-.sidebar-title h1 a {
+.sidebar-title .site-title a {
     color: var(--text-color);
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
-.sidebar-title h1 a:hover {
+.sidebar-title .site-title a:hover {
     color: var(--link-hover-color);
 }
 
