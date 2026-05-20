@@ -85,7 +85,7 @@
     {% block extra_head %}
     <!-- Modern Compact: Inter font applied to headings and sidebar -->
     <style>
-        h1, h2, h3, h4, h5, h6, .sidebar-title h1 {
+        h1, h2, h3, h4, h5, h6, .sidebar-title .site-title {
             font-family: 'Inter', sans-serif;
         }
     </style>
@@ -110,7 +110,7 @@
                     {% endif %}
 
                     <div class="sidebar-title">
-                        <h1><a href="/">{{ site_title }}</a></h1>
+                        <div class="site-title"><a href="/">{{ site_title }}</a></div>
                         {% if site_subtitle %}
                         <p class="sidebar-subtitle">{{ site_subtitle }}</p>
                         {% endif %}
