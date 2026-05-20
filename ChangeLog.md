@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.25.0
 
-**Released: WiP**
+**Released: 2026-05-20**
 
 - Fixed HTML entities being incorrectly included in their escaped form (like
   `&quot;` and `&gt;`) in the search index snippets.
