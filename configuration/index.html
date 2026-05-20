@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.42">
+      <meta name="generator" content="zensical-0.0.43">
     
     
       
@@ -1784,10 +1784,32 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#bundle_css" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>bundle_css</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#minify_js" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
         <code>minify_js</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inline_theme_js" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>inline_theme_js</code>
       </span>
     </span>
   </a>
@@ -3324,10 +3346,32 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#bundle_css" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>bundle_css</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#minify_js" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
         <code>minify_js</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inline_theme_js" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>inline_theme_js</code>
       </span>
     </span>
   </a>
@@ -4466,11 +4510,25 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <strong>Default:</strong> <code>false</code></p>
 <div class="highlight"><pre><span></span><code><span class="nt">minify_css</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
+<h4 id="bundle_css"><code>bundle_css</code></h4>
+<p>Bundle multiple CSS files into a single file. When enabled, the main stylesheet (<code>style.css</code>), the code syntax highlighting CSS (<code>code.css</code>), and any local optimised FontAwesome CSS are combined into a single <code>bundle.css</code> (or <code>bundle.min.css</code> if <code>minify_css</code> is also enabled).</p>
+<p>This reduces the number of critical request chains and can significantly improve page load performance scores (like PageSpeed Insights) by reducing the number of network round trips.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">bundle_css</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
 <h4 id="minify_js"><code>minify_js</code></h4>
 <p>Minify the generated JavaScript and write it as <code>theme.min.js</code> instead of <code>theme.js</code>. If search is enabled, <code>search.js</code> is also minified and written as <code>search.min.js</code>. The original unminified files are not written when this option is enabled.</p>
 <p><strong>Type:</strong> Boolean<br />
 <strong>Default:</strong> <code>false</code></p>
 <div class="highlight"><pre><span></span><code><span class="nt">minify_js</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<h4 id="inline_theme_js"><code>inline_theme_js</code></h4>
+<p>Inline the theme JavaScript into the HTML. When enabled, the theme detection and mobile menu JavaScript (<code>theme.js</code>) is embedded directly into the <code>&lt;head&gt;</code> of every generated HTML page.</p>
+<p>This eliminates one critical network request and ensures the theme is applied as early as possible, preventing any "flash of light mode" during page load.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">inline_theme_js</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 <h4 id="minify_html"><code>minify_html</code></h4>
 <p>Minify all generated HTML output. When enabled, every <code>.html</code> file produced by BlogMore is minified before being saved. Unlike the CSS and JavaScript minification options, the output file name is not changed — only the content is minified.</p>
