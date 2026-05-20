@@ -5,10 +5,12 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urlparse
-from xml.etree.ElementTree import Element, SubElement
+from xml.etree.ElementTree import Element
 
 from markdown.extensions import Extension
 from markdown.inlinepatterns import InlineProcessor
+
+from blogmore.image_html import create_picture_element
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -139,129 +141,14 @@ class OptimisedImageInlineProcessor(InlineProcessor):
         Returns:
             A new <picture> element.
         """
-        picture = Element("picture")
-
-        # Strip fragment for use in srcset
-        original_url_clean = original_src.split("#")[0]
-
-        # Check if we should include a standard (JPG/PNG) fallback
-        with_fallback = True
-        if self.image_manager:
-            with_fallback = self.image_manager.site_config.image_make_source_fallback
-
-        # 1. Add WebP source
-        # We include it if we have generated WebP versions OR if the original is WebP
-        # and we wanted an optimised version at its original size.
-        has_webp = bool(optimised.webp_paths) or (
-            optimised.original_is_webp and optimised.original_width in optimised.widths
+        return create_picture_element(
+            optimised,
+            original_src,
+            alt,
+            title,
+            self.image_manager,
+            self.output_url_base,
         )
-
-        if has_webp:
-            webp_source = SubElement(picture, "source")
-            webp_source.set("type", "image/webp")
-
-            srcset_parts = []
-            # Add all generated WebP versions
-            for width, filename in sorted(optimised.webp_paths.items()):
-                srcset_parts.append(f"{self.output_url_base}{filename} {width}w")
-
-            # Add the original if it's WebP and was supposed to be in the ladder
-            if (
-                optimised.original_is_webp
-                and optimised.original_width in optimised.widths
-                and optimised.original_width not in optimised.webp_paths
-            ):
-                srcset_parts.append(f"{original_url_clean} {optimised.original_width}w")
-
-            # Sort by width for consistency
-            srcset_parts.sort(key=lambda x: int(x.split()[-1].removesuffix("w")))
-            webp_source.set("srcset", ", ".join(srcset_parts))
-            webp_source.set("sizes", "(max-width: 800px) 100vw, 800px")
-
-        # 2. Add standard (JPG/PNG) source if enabled
-        has_std = (optimised.resized_paths and with_fallback) or (
-            with_fallback
-            and optimised.original_is_standard
-            and optimised.original_width in optimised.widths
-        )
-
-        if has_std:
-            std_source = SubElement(picture, "source")
-            # Determine type from either generated or original
-            first_file = (
-                next(iter(optimised.resized_paths.values()))
-                if optimised.resized_paths
-                else original_url_clean
-            )
-            if first_file.lower().endswith((".jpg", ".jpeg")):
-                std_source.set("type", "image/jpeg")
-            elif first_file.lower().endswith(".png"):
-                std_source.set("type", "image/png")
-
-            srcset_parts = []
-            for width, filename in sorted(optimised.resized_paths.items()):
-                srcset_parts.append(f"{self.output_url_base}{filename} {width}w")
-
-            if (
-                optimised.original_is_standard
-                and optimised.original_width in optimised.widths
-                and optimised.original_width not in optimised.resized_paths
-            ):
-                srcset_parts.append(f"{original_url_clean} {optimised.original_width}w")
-
-            srcset_parts.sort(key=lambda x: int(x.split()[-1].removesuffix("w")))
-            std_source.set("srcset", ", ".join(srcset_parts))
-            std_source.set("sizes", "(max-width: 800px) 100vw, 800px")
-
-        # 3. Add fallback <img>
-        new_img = SubElement(picture, "img")
-        new_img.set("alt", alt)
-        if title:
-            new_img.set("title", title)
-
-        # Pick a sensible default src:
-        # Largest of standard versions, or original if it's standard.
-        std_available_widths = set(optimised.resized_paths.keys())
-        if optimised.original_is_standard:
-            std_available_widths.add(optimised.original_width)
-
-        if with_fallback and std_available_widths:
-            max_width = max(std_available_widths)
-            if max_width == optimised.original_width and optimised.original_is_standard:
-                fallback_src = original_src
-            else:
-                fallback_src = (
-                    f"{self.output_url_base}{optimised.resized_paths[max_width]}"
-                )
-        else:
-            # Fallback to WebP or original
-            webp_available_widths = set(optimised.webp_paths.keys())
-            if optimised.original_is_webp:
-                webp_available_widths.add(optimised.original_width)
-
-            if not with_fallback and webp_available_widths:
-                max_width = max(webp_available_widths)
-                if max_width == optimised.original_width and optimised.original_is_webp:
-                    fallback_src = original_src
-                else:
-                    fallback_src = (
-                        f"{self.output_url_base}{optimised.webp_paths[max_width]}"
-                    )
-            else:
-                fallback_src = original_src
-
-        new_img.set("src", fallback_src)
-        new_img.set("width", str(optimised.original_width))
-        new_img.set("height", str(optimised.original_height))
-        new_img.set("loading", "lazy")
-
-        # Ensure centering fragment is preserved if we switched to an optimised URL
-        if "#centre" in original_src and "#centre" not in new_img.get("src", ""):
-            current_src = new_img.get("src", "")
-            if current_src:
-                new_img.set("src", f"{current_src}#centre")
-
-        return picture
 
     def _is_local_image(self, src: str) -> bool:
         """Check if an image source refers to a local file."""

@@ -104,6 +104,7 @@ class SiteGenerator:
         context_builder = ContextBuilder(
             self.site_config,
             cache_bust_token=cache_bust_token,
+            image_manager=self.image_manager,
         )
 
         # Apply cache-busting to any local extra stylesheets.
@@ -153,6 +154,26 @@ class SiteGenerator:
             print(f"Found {len(pages)} pages")
 
         sidebar_pages = resolve_sidebar_pages(self.site_config, pages)
+
+        # Register site logo with the image manager if image optimization is active
+        logo_path = self.site_config.sidebar_config.get("site_logo")
+        if self.image_manager and logo_path:
+            from urllib.parse import urlparse
+
+            parsed = urlparse(logo_path)
+            is_local = not (
+                parsed.scheme or parsed.netloc or logo_path.startswith("//")
+            )
+            if is_local:
+                clean_logo = logo_path.split("#")[0].split("?")[0].lstrip("/")
+                source_path = content_dir / clean_logo
+                if not source_path.is_file():
+                    extras_path = content_dir / "extras" / clean_logo
+                    if extras_path.is_file():
+                        source_path = extras_path
+
+                if source_path.is_file():
+                    self.image_manager.get_optimised_image(source_path)
 
         # Create output directory
         self.site_config.output_dir.mkdir(parents=True, exist_ok=True)

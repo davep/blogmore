@@ -19,6 +19,10 @@
 - Changed the site title in the sidebar from an `<h1>` tag to a `<div
   class="site-title">` to ensure each page has only one primary heading.
   ([#501](https://github.com/davep/blogmore/pull/501))
+- Added support for responsive sidebar logo image optimisation. When
+  `optimise_images` is enabled, the sidebar site logo is automatically
+  optimised and rendered as a responsive HTML `<picture>` element.
+  ([#502](https://github.com/davep/blogmore/pull/502))
 
 ## v2.24.0
 

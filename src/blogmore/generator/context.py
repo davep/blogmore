@@ -25,9 +25,11 @@ from blogmore.generator.constants import (
     THEME_JS_FILENAME,
 )
 from blogmore.generator.utils import minified_filename
+from blogmore.image_html import render_logo_picture_html
 from blogmore.pagination_path import resolve_pagination_page_path
 
 if TYPE_CHECKING:
+    from blogmore.image_manager import ImageManager
     from blogmore.site_config import SiteConfig
 
 
@@ -43,6 +45,7 @@ class ContextBuilder:
         fontawesome_css_url: str = "",
         fontawesome_is_bundled: bool = False,
         theme_js_content: str | None = None,
+        image_manager: ImageManager | None = None,
     ) -> None:
         """Initialize the context builder.
 
@@ -54,6 +57,7 @@ class ContextBuilder:
             fontawesome_css_url: URL for the FontAwesome stylesheet.
             fontawesome_is_bundled: Whether FontAwesome is included in the bundle.
             theme_js_content: The content of theme.js for inlining.
+            image_manager: The image manager for image optimisation.
         """
         self.site_config = site_config
         self.cache_bust_token = cache_bust_token
@@ -62,6 +66,7 @@ class ContextBuilder:
         self.fontawesome_css_url = fontawesome_css_url
         self.fontawesome_is_bundled = fontawesome_is_bundled
         self.theme_js_content = theme_js_content
+        self.image_manager = image_manager
 
     def with_cache_bust(self, url: str) -> str:
         """Return a URL with a cache-busting query parameter appended.
@@ -284,9 +289,25 @@ class ContextBuilder:
                 self.site_config.minify_js,
             ),
             "pagination_page1_suffix": page1_suffix,
+            "site_logo_html": None,
         }
         # Merge sidebar config into context
         context.update(self.site_config.sidebar_config)
+
+        # If image optimisation is on and the logo is a local file, replace the
+        # plain site_logo URL with the responsive <picture> HTML string.
+        logo_path = self.site_config.sidebar_config.get("site_logo")
+        if self.image_manager and logo_path and self.site_config.optimise_images:
+            assert self.site_config.content_dir is not None
+            result = render_logo_picture_html(
+                logo_path,
+                self.site_config.content_dir,
+                self.site_config.site_title,
+                self.image_manager,
+            )
+            if result is not None:
+                context["site_logo_html"], context["site_logo"] = result
+
         # Ensure SiteConfig fields take precedence over any residual sidebar_config values.
         context["socials_title"] = self.site_config.socials_title
         context["links_title"] = self.site_config.links_title

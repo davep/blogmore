@@ -69,6 +69,7 @@ set in `blogmore.yaml`:
 | Variable | Type | Description |
 |---|---|---|
 | `site_logo` | `str` | Path to the site logo image. |
+| `site_logo_html` | `str \| None` | HTML `<picture>` element rendering the optimized responsive logo, or `None` if image optimisation is disabled or the logo is remote/missing. |
 | `links` | `list[LinkEntry]` | Sidebar link entries (`title`, `url`). |
 | `links_title` | `str` | Heading for the links section (default `"Links"`). |
 | `socials` | `list[SocialEntry]` | Social profile entries (`site`, `url`, optional `title`). |
