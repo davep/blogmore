@@ -388,7 +388,7 @@ The following CSS classes are part of the stable template/CSS contract:
 | `.backlink-date` | `time` | Publication date of the source post. |
 | `.backlink-snippet` | `p` | Plain-text context snippet around the link. |
 | `.backlink-link-text` | `strong` | The link text itself, highlighted within `.backlink-snippet` so it stands out from the surrounding italic context. |
-| `.comment-invite` | `section` | Comment invitation container on a post page (only when `invite_comments` is enabled and an email address is configured). |
+| `.comment-invite` | `div` | Comment invitation container on a post page (only when `invite_comments` is enabled and an email address is configured). |
 | `.comment-invite-content` | `p` | The invitation message paragraph. |
 | `.comment-invite-link` | `a` | The `mailto:` link within the invitation message. |
 
