@@ -1,5 +1,12 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+- Changed the comment invitation box from a `section` to a `div`.
+  ([#505](https://github.com/davep/blogmore/pull/505))
+
+**Released: WiP**
+
 ## v2.25.0
 
 **Released: 2026-05-20**
