@@ -142,7 +142,7 @@
                         {% set day_url = '/' ~ cell.date.year ~ '/' ~ '%02d'|format(cell.date.month) ~ '/' ~ '%02d'|format(cell.date.day) ~ '/' ~ pagination_page1_suffix %}
                         <a href="{{ day_url }}" class="streak-cell streak-cell-level-{{ level }}" title="{{ day_label }}" aria-label="{{ day_label }}"></a>
                         {% else %}
-                        <div class="streak-cell streak-cell-level-0" title="{{ day_label }}" aria-label="{{ day_label }}"></div>
+                        <div class="streak-cell streak-cell-level-0" title="{{ day_label }}" aria-label="{{ day_label }}" role="img"></div>
                         {% endif %}
                         {% endif %}
                         {% endfor %}
