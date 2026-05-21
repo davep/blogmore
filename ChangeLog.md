@@ -4,6 +4,8 @@
 
 - Changed the comment invitation box from a `section` to a `div`.
   ([#505](https://github.com/davep/blogmore/pull/505))
+- Cleaned up a HTML validation error in the graph page.
+  ([#508](https://github.com/davep/blogmore/pull/508))
 
 **Released: WiP**
 
