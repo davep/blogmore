@@ -6,6 +6,8 @@
   ([#505](https://github.com/davep/blogmore/pull/505))
 - Cleaned up a HTML validation error in the graph page.
   ([#508](https://github.com/davep/blogmore/pull/508))
+- Cleaned up a HTML validation error in the stats page.
+  ([#509](https://github.com/davep/blogmore/pull/509))
 
 **Released: WiP**
 
