@@ -1132,6 +1132,69 @@ class TestTemplateRenderer:
 
         assert "reading-time" not in html
 
+    def test_shift_headings_filter(self) -> None:
+        """Test the shift_headings filter directly."""
+        html = "<h1>Title</h1><h2>Subtitle</h2><p>Text</p><h3>Small</h3>"
+
+        # Shift by 1
+        shifted = TemplateRenderer._shift_headings(html, 1)
+        assert "<h2>Title</h2>" in shifted
+        assert "<h3>Subtitle</h3>" in shifted
+        assert "<h4>Small</h4>" in shifted
+        assert "<p>Text</p>" in shifted
+
+        # Shift by 2
+        shifted = TemplateRenderer._shift_headings(html, 2)
+        assert "<h3>Title</h3>" in shifted
+        assert "<h4>Subtitle</h4>" in shifted
+        assert "<h5>Small</h5>" in shifted
+
+        # Clamping to h6
+        html_h6 = "<h6>Already small</h6>"
+        shifted = TemplateRenderer._shift_headings(html_h6, 1)
+        assert "<h6>Already small</h6>" in shifted
+
+        # Shift by 0
+        assert TemplateRenderer._shift_headings(html, 0) == html
+
+        # Negative shift (shift up)
+        html_h2 = "<h2>Title</h2>"
+        shifted = TemplateRenderer._shift_headings(html_h2, -1)
+        assert "<h1>Title</h1>" in shifted
+
+        # Clamping to h1
+        shifted = TemplateRenderer._shift_headings(html_h2, -2)
+        assert "<h1>Title</h1>" in shifted
+
+    def test_shift_headings_closing_tags(self) -> None:
+        """Test that closing heading tags are also shifted."""
+        html = "<h2>Title</h2>"
+        shifted = TemplateRenderer._shift_headings(html, 1)
+        assert "<h3>Title</h3>" in shifted
+
+    def test_shift_headings_in_summary(self) -> None:
+        """Test that headings are shifted when rendering a post summary."""
+        renderer = TemplateRenderer()
+        post = Post(
+            path=Path("test.md"),
+            title="Post Title",
+            content="## Subheading",
+            html_content="<h2>Subheading</h2>",
+            date=dt.datetime(2024, 1, 15, 12, 0, 0, tzinfo=dt.UTC),
+        )
+
+        html = renderer.render_index(
+            posts=[post],
+            page=1,
+            total_pages=1,
+            site_title="Test Blog",
+        )
+
+        # Post title in index is h2
+        assert "<h2>" in html
+        # Subheading in content should be shifted to h3
+        assert "<h3>Subheading</h3>" in html
+
     def test_listing_meta_tags_on_tag_page(self, sample_post: Post) -> None:
         """Test that tag pages include standard listing meta tags."""
         renderer = TemplateRenderer()
