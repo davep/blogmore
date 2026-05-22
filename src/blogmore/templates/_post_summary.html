@@ -33,7 +33,7 @@
     </div>
     {% endif %}
     <div class="post-content">
-        {{ post.html_content|safe }}
+        {{ post.html_content|shift_headings(1)|safe }}
     </div>
     {% if post.tags %}
     <div class="tags">

@@ -1,6 +1,7 @@
 """Template rendering using Jinja2."""
 
 import datetime as dt
+import re
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -66,6 +67,7 @@ class TemplateRenderer:
         self.env.filters["format_date"] = self._format_date
         self.env.filters["format_date_plain"] = self._format_date_plain
         self.env.filters["is_external_link"] = self._is_external_link
+        self.env.filters["shift_headings"] = self._shift_headings
 
         # Provide default values for pagination context variables so that
         # templates rendering without a full generator context (e.g. tests)
@@ -188,6 +190,31 @@ class TemplateRenderer:
 
         # All other links with schemes are external
         return True
+
+    @staticmethod
+    def _shift_headings(html: str, shift: int = 1) -> str:
+        """Shift HTML heading levels (h1-h6) by a given amount.
+
+        Args:
+            html: The HTML content to modify.
+            shift: The number of levels to shift headings by. Positive values
+                make headings smaller (e.g. h1 -> h2), negative values make
+                them larger. Results are clamped to the h1-h6 range.
+
+        Returns:
+            The HTML with heading levels shifted.
+        """
+        if shift == 0:
+            return html
+
+        def shift_tag(match: re.Match[str]) -> str:
+            prefix, level_str = match.groups()
+            level = int(level_str)
+            new_level = max(1, min(6, level + shift))
+            return f"<{prefix}{new_level}"
+
+        # Matches <h1, <h2, ..., </h1, </h2, ...
+        return re.sub(r"<(/?h)([1-6])", shift_tag, html)
 
     def render_post(self, post: Post, **context: Any) -> str:
         """Render a single blog post.

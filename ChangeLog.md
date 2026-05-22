@@ -11,6 +11,11 @@
 - Changed the links and socials headings in the sidebar to `div`s from
   `h2`s, leaving headings only used in the main page or article.
   ([#512](https://github.com/davep/blogmore/pull/512))
+- Changed the heading level of post content in list views (index, archives,
+  tags, categories) to be relative to the post title. For example, if a post
+  uses `h2` headings, they will be rendered as `h3` in list views where the
+  post title itself is an `h2`, maintaining a correct heading hierarchy.
+  ([#513](https://github.com/davep/blogmore/pull/513))
 
 **Released: WiP**
 
