@@ -363,7 +363,7 @@ The following CSS classes are part of the stable template/CSS contract:
 | `.sidebar-content` | `div` | Scrollable sidebar content. |
 | `.sidebar-header` | `div` | Logo and title area. |
 | `.sidebar-pages` | `div` | Navigation links from `pages/`. |
-| `.sidebar-section` | `section` | A sidebar widget section (links, socials). |
+| `.sidebar-section` | `div` | A sidebar widget section (links, socials). |
 | `.sidebar-links` | `ul` | List of sidebar links. |
 | `.sidebar-socials` | `div` | Social icon links. |
 | `.main-wrapper` | `div` | Content area (header + main + footer). |

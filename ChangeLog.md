@@ -1,5 +1,12 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Changed the sidebar from a `section` to a `div`.
+  ([#516](https://github.com/davep/blogmore/pull/516))
+
 ## v2.26.0
 
 **Released: 2026-05-22**

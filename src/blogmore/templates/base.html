@@ -113,18 +113,18 @@
                 {% endif %}
 
                 {% if links %}
-                <section class="sidebar-section">
+                <div class="sidebar-section">
                     <div class="sidebar-heading">{{ links_title | default('Links') }}</div>
                     <ul class="sidebar-links">
                         {% for link in links %}
                         <li><a href="{{ link.url }}"{% if link.url|is_external_link %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.title }}</a></li>
                         {% endfor %}
                     </ul>
-                </section>
+                </div>
                 {% endif %}
 
                 {% if socials %}
-                <section class="sidebar-section">
+                <div class="sidebar-section">
                     <div class="sidebar-heading">{{ socials_title | default('Social') }}</div>
                     <div class="sidebar-socials">
                         {% for social in socials %}
@@ -133,7 +133,7 @@
                         </a>
                         {% endfor %}
                     </div>
-                </section>
+                </div>
                 {% endif %}
             </div>
         </aside>
