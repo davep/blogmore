@@ -418,8 +418,8 @@ class TestFontAwesomeOptimizerInGenerator:
             generator.generate()
 
         index_html = (temp_output_dir / "index.html").read_text()
-        assert "<h2>Follow Me</h2>" in index_html
-        assert "<h2>Social</h2>" not in index_html
+        assert '<div class="sidebar-heading">Follow Me</div>' in index_html
+        assert '<div class="sidebar-heading">Social</div>' not in index_html
 
     def test_socials_uses_default_title_when_not_set(
         self, posts_dir: Path, temp_output_dir: Path
@@ -446,7 +446,7 @@ class TestFontAwesomeOptimizerInGenerator:
             generator.generate()
 
         index_html = (temp_output_dir / "index.html").read_text()
-        assert "<h2>Social</h2>" in index_html
+        assert '<div class="sidebar-heading">Social</div>' in index_html
 
     def test_social_entry_uses_site_as_tooltip_when_title_absent(
         self, posts_dir: Path, temp_output_dir: Path

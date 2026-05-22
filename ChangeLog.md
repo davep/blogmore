@@ -8,6 +8,9 @@
   ([#508](https://github.com/davep/blogmore/pull/508))
 - Cleaned up a HTML validation error in the stats page.
   ([#509](https://github.com/davep/blogmore/pull/509))
+- Changed the links and socials headings in the sidebar to `div`s from
+  `h2`s, leaving headings only used in the main page or article.
+  ([#512](https://github.com/davep/blogmore/pull/512))
 
 **Released: WiP**
 
