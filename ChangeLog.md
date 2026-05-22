@@ -1,6 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.26.0
+
+**Released: 2026-05-22**
 
 - Changed the comment invitation box from a `section` to a `div`.
   ([#505](https://github.com/davep/blogmore/pull/505))
@@ -16,8 +18,6 @@
   uses `h2` headings, they will be rendered as `h3` in list views where the
   post title itself is an `h2`, maintaining a correct heading hierarchy.
   ([#513](https://github.com/davep/blogmore/pull/513))
-
-**Released: WiP**
 
 ## v2.25.0
 
