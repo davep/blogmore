@@ -150,6 +150,10 @@ class SiteGenerator:
             for post in posts:
                 if post.metadata is not None and "author" not in post.metadata:
                     post.metadata["author"] = self.site_config.default_author
+        if self.site_config.default_author_url:
+            for post in posts:
+                if post.metadata is not None and "author_url" not in post.metadata:
+                    post.metadata["author_url"] = self.site_config.default_author_url
         if pages:
             print(f"Found {len(pages)} pages")
 

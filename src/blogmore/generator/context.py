@@ -231,6 +231,7 @@ class ContextBuilder:
             "backlinks_title": self.site_config.backlinks_title,
             "with_advert": self.site_config.with_advert,
             "default_author": self.site_config.default_author,
+            "default_author_url": self.site_config.default_author_url,
             "extra_head_tags": self.site_config.head,
             "bundle_css": self.site_config.bundle_css,
             "bundle_css_url": self.get_asset_url(

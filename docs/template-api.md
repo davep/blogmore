@@ -32,6 +32,7 @@ below lists all variables that are available in every template.
 | `backlinks_title` | `str` | The heading text for the backlinks section (defaults to `"References & mentions"`). |
 | `with_advert` | `bool` | `True` when the "Generated with BlogMore" footer is shown. |
 | `default_author` | `str \| None` | Default author name from configuration. |
+| `default_author_url` | `str \| None` | Default author URL from configuration. |
 | `bundle_css` | `bool` | `True` when CSS bundling is enabled. |
 | `bundle_css_url` | `str` | URL to the bundled stylesheet (with cache-bust query string). |
 | `styles_css_url` | `str` | URL to the compiled stylesheet (with cache-bust query string). |

@@ -100,6 +100,12 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     )
 
     parser.add_argument(
+        "--default-author-url",
+        default=_SITE_CONFIG_DEFAULTS["default_author_url"],
+        help="Default author URL for posts that don't specify an author URL",
+    )
+
+    parser.add_argument(
         "--clean-first",
         action="store_true",
         help="Remove the output directory before generating the site",

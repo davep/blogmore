@@ -140,13 +140,24 @@ Maximum number of posts to include in RSS and Atom feeds. Default: `20`
 ```bash
 blogmore build posts/ --posts-per-feed 50
 ```
-
 #### `--default-author <name>`
 
 Default author name for posts that don't specify an `author` field in frontmatter.
 
+Example:
+
 ```bash
 blogmore build posts/ --default-author "Dave Pearson"
+```
+
+#### `--default-author-url <url>`
+
+Default author URL for posts that don't specify an `author_url` field in frontmatter.
+
+Example:
+
+```bash
+blogmore build posts/ --default-author-url "https://davep.org/"
 ```
 
 #### `--extra-stylesheet <url>`
@@ -363,6 +374,7 @@ The serve command also accepts all the build command options:
 - `--clean-first`
 - `--posts-per-feed`
 - `--default-author`
+- `--default-author-url`
 - `--extra-stylesheet`
 - `--icon-source`
 - `--with-search`
@@ -459,6 +471,7 @@ The publish command also accepts all the build command options:
 - `--clean-first`
 - `--posts-per-feed`
 - `--default-author`
+- `--default-author-url`
 - `--extra-stylesheet`
 - `--icon-source`
 - `--with-search`

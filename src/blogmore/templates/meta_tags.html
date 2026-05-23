@@ -15,6 +15,8 @@
 {# Standard SEO meta tags #}
 {% set item_author = item.metadata.get('author') if item.metadata else none %}
 {% set effective_author = item_author if item_author else default_author %}
+{% set item_author_url = item.metadata.get('author_url') if item.metadata else none %}
+{% set effective_author_url = item_author_url if item_author_url else default_author_url %}
 {% if effective_author %}
 <meta name="author" content="{{ effective_author }}">
 {% endif %}
@@ -125,10 +127,13 @@
   {% elif item.date %}
   "dateModified": "{{ item.date.isoformat() }}",
   {% endif %}
+  {% if effective_author %}
   "author": {
     "@type": "Person",
-    "name": {{ (effective_author | default(site_title | default('Blog'))) | tojson }}
+    "name": {{ effective_author | tojson }}{% if effective_author_url %},
+    "url": {{ effective_author_url | tojson }}{% endif %}
   },
+  {% endif %}
   "publisher": {
     "@type": "Organization",
     "name": {{ (site_title | default('Blog')) | tojson }}

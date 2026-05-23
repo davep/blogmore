@@ -69,8 +69,9 @@
     <link rel="alternate" type="application/atom+xml" title="{{ site_title }} - Atom Feed" href="{{ site_url }}/feeds/all.atom.xml">
     {% endblock %}
     {% block site_author_meta %}
-    {% if default_author %}
-    <meta name="author" content="{{ default_author }}">
+    {% set effective_author = post.metadata.get('author') if post and post.metadata and post.metadata.get('author') else default_author %}
+    {% if effective_author %}
+    <meta name="author" content="{{ effective_author }}">
     {% endif %}
     {% endblock %}
     {% block meta_tags %}{% endblock %}
