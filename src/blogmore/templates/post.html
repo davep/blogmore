@@ -42,6 +42,17 @@
         {% if post.date %}
         <time class="dt-published" datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>{% if post.modified_date %}<span class="modified-date dt-updated"> (Modified: {{ post.modified_date|format_date_plain }})</span>{% endif %}
         {% endif %}
+        {% set item_show_author = post.metadata.get('show_author') if post.metadata else none %}
+        {% set effective_show_author = item_show_author if item_show_author is not none else show_author %}
+        {% if effective_show_author %}
+            {% set item_author = post.metadata.get('author') if post.metadata else none %}
+            {% set effective_author = item_author if item_author else default_author %}
+            {% if effective_author %}
+                {% set item_author_url = post.metadata.get('author_url') if post.metadata else none %}
+                {% set effective_author_url = item_author_url if item_author_url else default_author_url %}
+                <div class="post-author">By {% if effective_author_url %}<a href="{{ effective_author_url }}" rel="me{% if effective_author_url|is_external_link %} noopener noreferrer{% endif %}"{% if effective_author_url|is_external_link %} target="_blank"{% endif %} class="u-author h-card">{{ effective_author }}</a>{% else %}<span class="u-author h-card">{{ effective_author }}</span>{% endif %}</div>
+            {% endif %}
+        {% endif %}
         {% if with_read_time %}
         <div class="reading-time">{{ post.reading_time }} min read</div>
         {% endif %}

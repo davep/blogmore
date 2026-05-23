@@ -230,6 +230,7 @@ class ContextBuilder:
             "with_backlinks": self.site_config.with_backlinks,
             "backlinks_title": self.site_config.backlinks_title,
             "with_advert": self.site_config.with_advert,
+            "show_author": self.site_config.show_author,
             "default_author": self.site_config.default_author,
             "default_author_url": self.site_config.default_author_url,
             "extra_head_tags": self.site_config.head,

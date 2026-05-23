@@ -12,10 +12,14 @@
   CLI argument to set a site-wide default URL for the author.
   ([#524](https://github.com/davep/blogmore/pull/524))
 - Added support for `author_url` in post and page frontmatter, which takes
-  precedence over the site-wide default.
+  precedence over the site-wide `default_author_url` configuration setting.
   ([#524](https://github.com/davep/blogmore/pull/524))
 - Updated JSON-LD structured data to include the author's URL property when
   available. ([#524](https://github.com/davep/blogmore/pull/524))
+- Added `show_author` configuration option and frontmatter property to
+  optionally display the author's name on posts. When enabled, the author's
+  name appears below the date, linking to their URL (if provided).
+  ([#525](https://github.com/davep/blogmore/pull/525))
 
 ## v2.27.0
 

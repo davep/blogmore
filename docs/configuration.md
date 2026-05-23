@@ -262,6 +262,19 @@ Default author URL used for posts that don't specify an `author_url` field in fr
 default_author_url: "https://davep.org/"
 ```
 
+#### `show_author`
+
+Whether to show the author's name on posts. When enabled, and an author is set (either in frontmatter or via `default_author`), the author's name is displayed below the date/time of each post as "By {author name}". If the author has a URL, the name links to it with `rel="me"`.
+
+This setting can be overridden for individual posts using the `show_author` frontmatter property.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+show_author: true
+```
+
 #### `icon_source`
 
 Filename of the source icon image in the `extras/` directory. BlogMore will generate favicons and platform-specific icons from this image.

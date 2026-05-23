@@ -226,10 +226,7 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("post.html")
-        return template.render(
-            post=post, extra_stylesheets=self.extra_stylesheets, **context
-        )
+        return self.render_template("post.html", post=post, **context)
 
     def render_page(self, page: Page, **context: Any) -> str:
         """Render a single static page.
@@ -241,10 +238,7 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("page.html")
-        return template.render(
-            page=page, extra_stylesheets=self.extra_stylesheets, **context
-        )
+        return self.render_template("page.html", page=page, **context)
 
     def render_index(
         self,
@@ -264,12 +258,11 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("index.html")
-        return template.render(
+        return self.render_template(
+            "index.html",
             posts=posts,
             page=page,
             total_pages=total_pages,
-            extra_stylesheets=self.extra_stylesheets,
             **context,
         )
 
@@ -293,13 +286,12 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("archive.html")
-        return template.render(
+        return self.render_template(
+            "archive.html",
             posts=posts,
             archive_title=archive_title,
             page=page,
             total_pages=total_pages,
-            extra_stylesheets=self.extra_stylesheets,
             **context,
         )
 
@@ -323,13 +315,12 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("tag.html")
-        return template.render(
+        return self.render_template(
+            "tag.html",
             tag=tag,
             posts=posts,
             page=page,
             total_pages=total_pages,
-            extra_stylesheets=self.extra_stylesheets,
             **context,
         )
 
@@ -353,13 +344,12 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("category.html")
-        return template.render(
+        return self.render_template(
+            "category.html",
             category=category,
             posts=posts,
             page=page,
             total_pages=total_pages,
-            extra_stylesheets=self.extra_stylesheets,
             **context,
         )
 
@@ -377,10 +367,9 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("tags.html")
-        return template.render(
+        return self.render_template(
+            "tags.html",
             tags=tags,
-            extra_stylesheets=self.extra_stylesheets,
             **context,
         )
 
@@ -398,10 +387,9 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
-        template = self.env.get_template("categories.html")
-        return template.render(
+        return self.render_template(
+            "categories.html",
             categories=categories,
-            extra_stylesheets=self.extra_stylesheets,
             **context,
         )
 
@@ -414,8 +402,7 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string.
         """
-        template = self.env.get_template("search.html")
-        return template.render(extra_stylesheets=self.extra_stylesheets, **context)
+        return self.render_template("search.html", **context)
 
     def render_stats_page(self, **context: Any) -> str:
         """Render the blog statistics page.
@@ -428,8 +415,7 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string.
         """
-        template = self.env.get_template("stats.html")
-        return template.render(extra_stylesheets=self.extra_stylesheets, **context)
+        return self.render_template("stats.html", **context)
 
     def render_calendar_page(self, **context: Any) -> str:
         """Render the calendar view page.
@@ -442,8 +428,7 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string.
         """
-        template = self.env.get_template("calendar.html")
-        return template.render(extra_stylesheets=self.extra_stylesheets, **context)
+        return self.render_template("calendar.html", **context)
 
     def render_graph_page(self, **context: Any) -> str:
         """Render the post-relationship graph page.
@@ -457,8 +442,7 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string.
         """
-        template = self.env.get_template("graph.html")
-        return template.render(extra_stylesheets=self.extra_stylesheets, **context)
+        return self.render_template("graph.html", **context)
 
     def render_template(self, template_name: str, **context: Any) -> str:
         """Render an arbitrary template.
@@ -471,4 +455,14 @@ class TemplateRenderer:
             Rendered HTML string
         """
         template = self.env.get_template(template_name)
-        return template.render(extra_stylesheets=self.extra_stylesheets, **context)
+
+        # Ensure defaults for author variables are present in the context.
+        render_context = {
+            "show_author": False,
+            "default_author": None,
+            "default_author_url": None,
+            "extra_stylesheets": self.extra_stylesheets,
+            **context,
+        }
+
+        return template.render(**render_context)

@@ -88,6 +88,16 @@ Example:
 author_url: https://davep.org/
 ```
 
+#### `show_author`
+
+Whether to show the author's name on this post. This property always overrides the global `show_author` setting in your [configuration](configuration.md). If an author is set (either here or via `default_author`), the name is displayed below the date/time as "By {author name}".
+
+Example:
+
+```yaml
+show_author: true
+```
+
 #### `draft`
 
 Set to `true` to mark the post as a draft. Draft posts are excluded from the build by default. This is useful for work in progress that you're not ready to publish.

@@ -142,6 +142,25 @@
     margin-bottom: 8px;
 }
 
+.post-author {
+    font-size: 0.82em;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    margin-top: -4px;
+}
+
+.post-author a,
+.post-author a:link,
+.post-author a:visited {
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+
+.post-author a:hover {
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+
 /* ---- Footer styling ------------------------------------------------------- */
 footer {
     margin-top: 40px;

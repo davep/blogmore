@@ -635,6 +635,24 @@ article.post {
     font-size: 0.9em;
 }
 
+.post-author {
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    margin-top: 4px;
+}
+
+.post-author a,
+.post-author a:link,
+.post-author a:visited {
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+
+.post-author a:hover {
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+
 .modified-date {
     color: var(--modified-date-color);
     font-style: italic;

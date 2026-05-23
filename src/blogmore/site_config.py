@@ -236,6 +236,20 @@ class SiteConfig:
     command line.  Defaults to ``200``.
     """
 
+    show_author: bool = False
+    """Whether to show the author's name on posts.
+
+    When ``True``, and an author is set (either per-post or via the
+    ``default_author`` setting), the author's name is displayed on each post.
+    If the author has a URL, the name links to it with ``rel="me"``.
+
+    The per-post ``show_author`` front-matter key, when present, overrides this
+    global setting.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Off by default.
+    """
+
     include_drafts: bool = False
     """Whether to include draft posts in generation."""
 
