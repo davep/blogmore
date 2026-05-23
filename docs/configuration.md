@@ -60,6 +60,7 @@ site_title: "My Blog"
 site_subtitle: "Thoughts on code and technology"
 site_url: "https://example.com"
 default_author: "Your Name"
+default_author_url: "https://example.com/"
 ```
 
 ## Configuration Options
@@ -248,6 +249,17 @@ Default author name used for posts that don't specify an `author` field in front
 
 ```yaml
 default_author: "Dave Pearson"
+```
+
+#### `default_author_url`
+
+Default author URL used for posts that don't specify an `author_url` field in frontmatter. When provided, this URL is included in the JSON-LD metadata for the post.
+
+**Type:** String  
+**Default:** None
+
+```yaml
+default_author_url: "https://davep.org/"
 ```
 
 #### `icon_source`

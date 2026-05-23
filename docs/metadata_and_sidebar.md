@@ -70,13 +70,14 @@ site_keywords:
 
 ### Default author
 
-The author name to use for posts that don't specify an `author` field in their frontmatter.
+The author name and URL to use for posts that don't specify an `author` or `author_url` field in their frontmatter.
 
 ```yaml
 default_author: "Dave Pearson"
+default_author_url: "https://davep.org/"
 ```
 
-Command line: `--default-author "Dave Pearson"`
+Command line: `--default-author "Dave Pearson" --default-author-url "https://davep.org/"`
 
 ## Site logo
 

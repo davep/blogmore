@@ -80,6 +80,22 @@ A URL or path to a cover image, used for Open Graph, Twitter Card, and JSON-LD s
 cover: /images/about-cover.png
 ```
 
+#### `author`
+
+The name of the page's author. If not set, BlogMore falls back to the `default_author` set in your [configuration](configuration.md).
+
+```yaml
+author: Dave Pearson
+```
+
+#### `author_url`
+
+The URL of the page's author. If not set, BlogMore falls back to the `default_author_url` set in your [configuration](configuration.md).
+
+```yaml
+author_url: https://davep.org/
+```
+
 #### `twitter_creator`
 
 The Twitter/X handle of the page's author. Used in Twitter Card meta tags.

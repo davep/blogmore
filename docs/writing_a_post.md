@@ -68,13 +68,24 @@ category: python
 ```
 
 See [Categories and tags](#categories-and-tags) below for guidance on when to use each.
-
 #### `author`
 
 The name of the post's author. If not set, BlogMore falls back to the `default_author` set in your [configuration](configuration.md).
 
+Example:
+
 ```yaml
 author: Dave Pearson
+```
+
+#### `author_url`
+
+The URL of the post's author. If not set, BlogMore falls back to the `default_author_url` set in your [configuration](configuration.md).
+
+Example:
+
+```yaml
+author_url: https://davep.org/
 ```
 
 #### `draft`

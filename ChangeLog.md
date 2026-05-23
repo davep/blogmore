@@ -8,6 +8,14 @@
   or page does not have a `cover` image, it now falls back to using the
   platform icons or the site logo, consistent with Open Graph and Twitter
   Card behaviour. ([#523](https://github.com/davep/blogmore/pull/523))
+- Added `default_author_url` configuration option and `--default-author-url`
+  CLI argument to set a site-wide default URL for the author.
+  ([#524](https://github.com/davep/blogmore/pull/524))
+- Added support for `author_url` in post and page frontmatter, which takes
+  precedence over the site-wide default.
+  ([#524](https://github.com/davep/blogmore/pull/524))
+- Updated JSON-LD structured data to include the author's URL property when
+  available. ([#524](https://github.com/davep/blogmore/pull/524))
 
 ## v2.27.0
 

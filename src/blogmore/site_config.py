@@ -89,6 +89,9 @@ class SiteConfig:
     default_author: str | None = None
     """Default author name for posts that lack an author in their frontmatter."""
 
+    default_author_url: str | None = None
+    """Default author URL for posts that lack an author URL in their frontmatter."""
+
     sidebar_config: dict[str, Any] = field(default_factory=dict)
     """Sidebar configuration (`site_logo`, `links`, `socials`, etc.)."""
 
