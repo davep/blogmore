@@ -99,7 +99,7 @@
                 <span class="sidebar-mobile-title"><a href="/">{{ site_title }}</a></span>
                 <button class="burger-menu" type="button" aria-label="Toggle navigation" aria-expanded="false"></button>
             </div>
-            <div class="sidebar-content">
+            <div class="sidebar-content h-card">
                 <div class="sidebar-header">
                     {% if site_logo_html %}
                     <div class="sidebar-logo">
@@ -110,15 +110,15 @@
                     {% elif site_logo %}
                     <div class="sidebar-logo">
                         <a href="/">
-                            <img src="{{ site_logo }}" alt="{{ site_title }}">
+                            <img src="{{ site_logo }}" alt="{{ site_title }}" class="u-photo">
                         </a>
                     </div>
                     {% endif %}
 
                     <div class="sidebar-title">
-                        <div class="site-title"><a href="/">{{ site_title }}</a></div>
+                        <div class="site-title p-name"><a class="u-url" href="/">{{ site_title }}</a></div>
                         {% if site_subtitle %}
-                        <p class="sidebar-subtitle">{{ site_subtitle }}</p>
+                        <p class="sidebar-subtitle p-note">{{ site_subtitle }}</p>
                         {% endif %}
                     </div>
                 </div>
@@ -149,7 +149,7 @@
                     <div class="sidebar-heading">{{ socials_title | default('Social') }}</div>
                     <div class="sidebar-socials">
                         {% for social in socials %}
-                        <a href="{{ social.url }}" title="{{ social.title | default(social.site) }}" aria-label="{{ social.title | default(social.site) }}"{% if social.url|is_external_link %} target="_blank" rel="noopener noreferrer"{% endif %}>
+                        <a href="{{ social.url }}" title="{{ social.title | default(social.site) }}" aria-label="{{ social.title | default(social.site) }}"{% if social.url|is_external_link %} target="_blank" rel="noopener noreferrer me"{% else %} rel="me"{% endif %} class="u-url">
                             <i class="fa-brands fa-{{ social.site }}"></i>
                         </a>
                         {% endfor %}
