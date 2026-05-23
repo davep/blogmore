@@ -74,7 +74,7 @@ description: A little about who I am and what I do.
 
 #### `cover`
 
-A URL or path to a cover image, used for Open Graph and Twitter Card social sharing previews.
+A URL or path to a cover image, used for Open Graph, Twitter Card, and JSON-LD structured data. If not set, BlogMore falls back to the generated platform icons (if available) or the `site_logo`.
 
 ```yaml
 cover: /images/about-cover.png

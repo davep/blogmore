@@ -92,6 +92,8 @@ The image is displayed above the site title. It can be hosted externally:
 site_logo: https://example.com/images/logo.svg
 ```
 
+The site logo is also used as a fallback for Open Graph, Twitter Card, and JSON-LD structured data images if no `cover` image is specified for a post or page.
+
 ## Site icons
 
 BlogMore can automatically generate a full set of favicons and platform-specific icons from a single source image. This means you only need to prepare one image and BlogMore takes care of the rest.
