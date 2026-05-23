@@ -1,7 +1,5 @@
 from pathlib import Path
 
-import pytest
-
 from blogmore.generator.site import SiteGenerator
 from blogmore.site_config import SiteConfig
 
