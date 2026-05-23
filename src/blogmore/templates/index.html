@@ -38,7 +38,31 @@
 {% if og_image %}
 <meta name="twitter:image" content="{{ og_image }}">
 {% endif %}
+
+{# JSON-LD Structured Data #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": {{ (site_title | default('Blog')) | tojson }},
+  "url": "{{ site_url }}/",
+  {% if site_description %}
+  "description": {{ site_description | tojson }},
+  {% endif %}
+  {% if with_search %}
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "{{ site_url }}{{ search_url }}?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+  {% endif %}
+}
+</script>
 {% endblock %}
+
 
 {% from '_pagination.html' import pagination %}
 {% from '_post_summary.html' import post_summary with context %}

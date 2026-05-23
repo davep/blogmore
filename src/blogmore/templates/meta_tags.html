@@ -96,3 +96,90 @@
 {% if item.metadata and item.metadata.get('twitter_site') %}
 <meta name="twitter:site" content="{{ item.metadata.get('twitter_site') }}">
 {% endif %}
+
+{# JSON-LD Structured Data #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "{{ 'BlogPosting' if content_type == 'article' else 'WebPage' }}",
+  "headline": {{ item.title | tojson }},
+  "url": "{{ site_url }}{{ item.url }}",
+  {% if description %}
+  "description": {{ description | tojson }},
+  {% endif %}
+  {% if cover_url %}
+  "image": [
+    "{% if cover_url.startswith('http') %}{{ cover_url }}{% else %}{{ site_url }}{{ cover_url if cover_url.startswith('/') else '/' ~ cover_url }}{% endif %}"
+  ],
+  {% endif %}
+  {% if item.date %}
+  "datePublished": "{{ item.date.isoformat() }}",
+  {% endif %}
+  {% if item.modified_date %}
+  "dateModified": "{{ item.modified_date.isoformat() }}",
+  {% elif item.date %}
+  "dateModified": "{{ item.date.isoformat() }}",
+  {% endif %}
+  "author": {
+    "@type": "Person",
+    "name": {{ (effective_author | default(site_title | default('Blog'))) | tojson }}
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": {{ (site_title | default('Blog')) | tojson }}
+    {% if site_logo %},
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{% if site_logo.startswith('http') %}{{ site_logo }}{% else %}{{ site_url }}{{ site_logo if site_logo.startswith('/') else '/' ~ site_logo }}{% endif %}"
+    }
+    {% elif has_platform_icons and not cover_url %},
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ site_url }}/icons/android-chrome-512x512.png"
+    }
+    {% endif %}
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ site_url }}{{ item.url }}"
+  }{% if item.tags %},
+  "keywords": {{ item.tags | join(', ') | tojson }}
+  {% endif %}
+}
+</script>
+
+{# BreadcrumbList JSON-LD #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Home",
+    "item": "{{ site_url }}/"
+  }
+  {% if content_type == 'article' and item.category %},
+  {
+    "@type": "ListItem",
+    "position": 2,
+    "name": {{ item.category | tojson }},
+    "item": "{{ site_url }}/{{ category_dir }}/{{ item.safe_category }}/"
+  },
+  {
+    "@type": "ListItem",
+    "position": 3,
+    "name": {{ item.title | tojson }},
+    "item": "{{ site_url }}{{ item.url }}"
+  }
+  {% else %},
+  {
+    "@type": "ListItem",
+    "position": 2,
+    "name": {{ item.title | tojson }},
+    "item": "{{ site_url }}{{ item.url }}"
+  }
+  {% endif %}
+  ]
+}
+</script>
