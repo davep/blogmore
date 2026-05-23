@@ -127,11 +127,13 @@
   {% elif item.date %}
   "dateModified": "{{ item.date.isoformat() }}",
   {% endif %}
+  {% if effective_author %}
   "author": {
     "@type": "Person",
-    "name": {{ (effective_author | default(site_title | default('Blog'))) | tojson }}{% if effective_author_url %},
+    "name": {{ effective_author | tojson }}{% if effective_author_url %},
     "url": {{ effective_author_url | tojson }}{% endif %}
   },
+  {% endif %}
   "publisher": {
     "@type": "Organization",
     "name": {{ (site_title | default('Blog')) | tojson }}
