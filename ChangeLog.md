@@ -6,6 +6,12 @@
 
 - Changed the sidebar from a `section` to a `div`.
   ([#516](https://github.com/davep/blogmore/pull/516))
+- Added JSON-LD structured data (`BlogPosting`, `WebPage`, `WebSite`, and
+  `BreadcrumbList`) to all generated pages to improve search engine
+  discoverability and enable rich snippets.
+  ([#517](https://github.com/davep/blogmore/pull/517))
+- Added a Sitelinks Searchbox action to the homepage's JSON-LD when search
+  is enabled. ([#517](https://github.com/davep/blogmore/pull/517))
 
 ## v2.26.0
 
