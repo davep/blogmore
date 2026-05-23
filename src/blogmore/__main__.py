@@ -106,6 +106,7 @@ def main() -> int:
         posts_per_feed=args.posts_per_feed,
         extra_stylesheets=args.extra_stylesheets,
         default_author=args.default_author,
+        default_author_url=args.default_author_url,
         sidebar_config=sidebar_config,
         clean_first=args.clean_first,
         icon_source=args.icon_source,

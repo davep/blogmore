@@ -49,6 +49,11 @@ posts_per_feed: 20
 # Optional: Default author URL for posts without author URL in frontmatter
 # default_author_url: "https://example.com/"
 
+# Optional: Whether to show the author's name on posts. If true, and an
+# author is set, it is displayed below the date/time of the post.
+# Can be overridden per-post with show_author: true/false in frontmatter.
+# show_author: false
+
 # Optional: Icon generation
 # Specify a source image in the extras/ directory to generate favicon.ico
 # and Apple touch icons. Should be a square image, ideally 1024x1024 or larger.
