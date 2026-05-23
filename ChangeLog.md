@@ -12,6 +12,11 @@
   ([#517](https://github.com/davep/blogmore/pull/517))
 - Added a Sitelinks Searchbox action to the homepage's JSON-LD when search
   is enabled. ([#517](https://github.com/davep/blogmore/pull/517))
+- Added Microformats2 semantic markup (`h-entry`, `h-card`, etc.) to all
+  templates to improve machine-readability and IndieWeb compatibility.
+  ([#518](https://github.com/davep/blogmore/pull/518))
+- Added `rel="me"` attributes to social links in the sidebar.
+  ([#518](https://github.com/davep/blogmore/pull/518))
 
 ## v2.26.0
 

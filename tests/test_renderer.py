@@ -1036,7 +1036,7 @@ class TestTemplateRenderer:
             tag_dir="tags",
         )
 
-        assert 'class="post-summary"' in html
+        assert "post-summary" in html
         assert sample_post.title in html
 
     def test_post_summary_shows_category_on_index(self, sample_post: Post) -> None:
@@ -1051,7 +1051,7 @@ class TestTemplateRenderer:
             tag_dir="tags",
         )
 
-        assert 'class="category-link"' in html
+        assert "category-link" in html
         assert "python" in html
 
     def test_post_summary_shows_category_on_tag_page(self, sample_post: Post) -> None:
@@ -1066,7 +1066,7 @@ class TestTemplateRenderer:
             tag_dir="tags",
         )
 
-        assert 'class="category-link"' in html
+        assert "category-link" in html
 
     def test_post_summary_omits_category_on_category_page(
         self, sample_post: Post
@@ -1099,8 +1099,8 @@ class TestTemplateRenderer:
             tag_dir="tags",
         )
 
-        assert 'class="post-summary"' in html
-        assert 'class="category-link"' in html
+        assert "post-summary" in html
+        assert "category-link" in html
 
     def test_post_summary_shows_reading_time_when_enabled(
         self, sample_post: Post
@@ -1191,7 +1191,7 @@ class TestTemplateRenderer:
         )
 
         # Post title in index is h2
-        assert "<h2>" in html
+        assert "<h2" in html
         # Subheading in content should be shifted to h3
         assert "<h3>Subheading</h3>" in html
 

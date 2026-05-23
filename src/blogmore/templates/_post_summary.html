@@ -19,26 +19,26 @@
         tag_dir (str): URL path segment for tag pages.
 #}
 {% macro post_summary(post, include_category=true) %}
-<article class="post-summary{% if post.draft %} draft-post{% endif %}">
-    <h2><a href="{{ post.url }}">{{ post.title }}{% if post.draft %} 🚧{% endif %}</a></h2>
+<article class="h-entry post-summary{% if post.draft %} draft-post{% endif %}">
+    <h2 class="p-name"><a class="u-url" href="{{ post.url }}">{{ post.title }}{% if post.draft %} 🚧{% endif %}</a></h2>
     {% if post.date %}
-    <time datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>{% if post.modified_date %}<span class="modified-date"> (Modified: {{ post.modified_date|format_date_plain }})</span>{% endif %}
+    <time class="dt-published" datetime="{{ post.date.isoformat() }}">{{ post.date|format_date }}</time>{% if post.modified_date %}<span class="modified-date dt-updated"> (Modified: {{ post.modified_date|format_date_plain }})</span>{% endif %}
     {% endif %}
     {% if with_read_time %}
     <div class="reading-time">{{ post.reading_time }} min read</div>
     {% endif %}
     {% if include_category and post.category %}
     <div class="category">
-        <a href="/{{ category_dir }}/{{ post.safe_category }}/{{ pagination_page1_suffix }}" class="category-link">{{ post.category }}</a>
+        <a href="/{{ category_dir }}/{{ post.safe_category }}/{{ pagination_page1_suffix }}" class="p-category category-link">{{ post.category }}</a>
     </div>
     {% endif %}
-    <div class="post-content">
+    <div class="post-content e-content">
         {{ post.html_content|shift_headings(1)|safe }}
     </div>
     {% if post.tags %}
     <div class="tags">
         {% for tag, safe_tag in post.sorted_tag_pairs() %}
-        <a href="/{{ tag_dir }}/{{ safe_tag }}/{{ pagination_page1_suffix }}" class="tag">{{ tag }}</a>
+        <a href="/{{ tag_dir }}/{{ safe_tag }}/{{ pagination_page1_suffix }}" class="p-category tag">{{ tag }}</a>
         {% endfor %}
     </div>
     {% endif %}
