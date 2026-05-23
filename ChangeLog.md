@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Extended JSON-LD structured data to include an image fallback. If a post
+  or page does not have a `cover` image, it now falls back to using the
+  platform icons or the site logo, consistent with Open Graph and Twitter
+  Card behaviour. ([#523](https://github.com/davep/blogmore/pull/523))
+
 ## v2.27.0
 
 **Released: 2026-05-23**

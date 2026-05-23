@@ -28,6 +28,29 @@
 <meta name="keywords" content="{{ site_keywords|join(', ') }}">
 {% endif %}
 
+{# Determine the primary image for social media and JSON-LD #}
+{% set raw_cover = item.metadata.get('cover') if item.metadata else none %}
+{% set social_image_url = none %}
+{% if raw_cover %}
+    {% if raw_cover.startswith(('http://', 'https://')) %}
+        {% set social_image_url = raw_cover %}
+    {% elif raw_cover.startswith('/') %}
+        {% set social_image_url = site_url ~ raw_cover %}
+    {% else %}
+        {% set social_image_url = site_url ~ '/' ~ raw_cover %}
+    {% endif %}
+{% elif has_platform_icons %}
+    {% set social_image_url = site_url ~ '/icons/android-chrome-512x512.png' %}
+{% elif site_logo %}
+    {% if site_logo.startswith(('http://', 'https://')) %}
+        {% set social_image_url = site_logo %}
+    {% elif site_logo.startswith('/') %}
+        {% set social_image_url = site_url ~ site_logo %}
+    {% else %}
+        {% set social_image_url = site_url ~ '/' ~ site_logo %}
+    {% endif %}
+{% endif %}
+
 {# Open Graph meta tags #}
 <meta property="og:title" content="{{ item.title }}">
 <meta property="og:type" content="{{ content_type }}">
@@ -36,17 +59,8 @@
 <meta property="og:description" content="{{ description }}">
 {% endif %}
 <meta property="og:site_name" content="{{ site_title }}">
-{% if item.metadata and item.metadata.get('cover') %}
-{% set cover_url = item.metadata.get('cover') %}
-{% if cover_url.startswith('http://') or cover_url.startswith('https://') %}
-<meta property="og:image" content="{{ cover_url }}">
-{% elif cover_url.startswith('/') %}
-<meta property="og:image" content="{{ site_url }}{{ cover_url }}">
-{% else %}
-<meta property="og:image" content="{{ site_url }}/{{ cover_url }}">
-{% endif %}
-{% elif has_platform_icons %}
-<meta property="og:image" content="{{ site_url }}/icons/android-chrome-512x512.png">
+{% if social_image_url %}
+<meta property="og:image" content="{{ social_image_url }}">
 {% endif %}
 
 {# Article-specific Open Graph tags #}
@@ -78,17 +92,8 @@
 {% if description %}
 <meta name="twitter:description" content="{{ description }}">
 {% endif %}
-{% if item.metadata and item.metadata.get('cover') %}
-{% set cover_url = item.metadata.get('cover') %}
-{% if cover_url.startswith('http://') or cover_url.startswith('https://') %}
-<meta name="twitter:image" content="{{ cover_url }}">
-{% elif cover_url.startswith('/') %}
-<meta name="twitter:image" content="{{ site_url }}{{ cover_url }}">
-{% else %}
-<meta name="twitter:image" content="{{ site_url }}/{{ cover_url }}">
-{% endif %}
-{% elif has_platform_icons %}
-<meta name="twitter:image" content="{{ site_url }}/icons/android-chrome-512x512.png">
+{% if social_image_url %}
+<meta name="twitter:image" content="{{ social_image_url }}">
 {% endif %}
 {% if item.metadata and item.metadata.get('twitter_creator') %}
 <meta name="twitter:creator" content="{{ item.metadata.get('twitter_creator') }}">
@@ -107,9 +112,9 @@
   {% if description %}
   "description": {{ description | tojson }},
   {% endif %}
-  {% if cover_url %}
+  {% if social_image_url %}
   "image": [
-    "{% if cover_url.startswith('http') %}{{ cover_url }}{% else %}{{ site_url }}{{ cover_url if cover_url.startswith('/') else '/' ~ cover_url }}{% endif %}"
+    "{{ social_image_url }}"
   ],
   {% endif %}
   {% if item.date %}
@@ -132,7 +137,7 @@
       "@type": "ImageObject",
       "url": "{% if site_logo.startswith('http') %}{{ site_logo }}{% else %}{{ site_url }}{{ site_logo if site_logo.startswith('/') else '/' ~ site_logo }}{% endif %}"
     }
-    {% elif has_platform_icons and not cover_url %},
+    {% elif has_platform_icons and not raw_cover %},
     "logo": {
       "@type": "ImageObject",
       "url": "{{ site_url }}/icons/android-chrome-512x512.png"
