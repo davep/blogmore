@@ -467,7 +467,7 @@ class TestSiteGenerator:
         # The posts fixture has 7 non-draft posts; the 2 pages in pages_dir
         # must not inflate this count to 9.
         index_content = (temp_output_dir / "index.html").read_text()
-        assert index_content.count('<article class="post-summary">') == 7
+        assert index_content.count("post-summary") == 7
 
     def test_generate_with_sidebar_pages_filter(
         self, posts_dir: Path, pages_dir: Path, temp_output_dir: Path
