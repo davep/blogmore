@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.28.0
 
-**Released: WiP**
+**Released: 2026-05-24**
 
 - Extended JSON-LD structured data to include an image fallback. If a post
   or page does not have a `cover` image, it now falls back to using the
