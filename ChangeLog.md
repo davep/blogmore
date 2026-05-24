@@ -8,6 +8,9 @@
   better accessibility in code block headers. When enabled, elements like
   the language label and copy button will use higher contrast colours.
   ([#529](https://github.com/davep/blogmore/pull/529))
+- Added an underline to the text linking the email address that comment
+  invites are directed to.
+  ([#530](https://github.com/davep/blogmore/pull/530))
 
 ## v2.28.0
 
