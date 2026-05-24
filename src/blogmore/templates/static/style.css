@@ -790,7 +790,7 @@ time a:visited {
     .post-navigation {
         gap: 10px;
     }
-    
+
     .post-nav-link {
         padding: 6px 10px;
         font-size: 0.8em;
@@ -959,12 +959,10 @@ time a:visited {
 
 .comment-invite-link {
     color: var(--link-color);
-    text-decoration: none;
 }
 
 .comment-invite-link:hover {
     color: var(--link-hover-color);
-    text-decoration: underline;
 }
 
 .post-content {
@@ -1317,7 +1315,7 @@ footer a:hover {
     :root:not([data-theme]) .theme-toggle .light-icon {
         display: inline;
     }
-    
+
     :root:not([data-theme]) .theme-toggle .dark-icon {
         display: none;
     }
