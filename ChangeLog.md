@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unrelased
+
+**Released: WiP**
+
+- Added support for the `prefers-contrast` CSS media feature to provide
+  better accessibility in code block headers. When enabled, elements like
+  the language label and copy button will use higher contrast colours.
+  ([#529](https://github.com/davep/blogmore/pull/529))
+
 ## v2.28.0
 
 **Released: 2026-05-24**
