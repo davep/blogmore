@@ -1029,6 +1029,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#default_author_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>default_author_url</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show_author" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_author</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#icon_source" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -2591,6 +2613,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#default_author_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>default_author_url</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show_author" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_author</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#icon_source" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -3821,6 +3865,7 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <span class="nt">site_subtitle</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Thoughts</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">code</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">technology&quot;</span>
 <span class="nt">site_url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://example.com&quot;</span>
 <span class="nt">default_author</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Your</span><span class="nv"> </span><span class="s">Name&quot;</span>
+<span class="nt">default_author_url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://example.com/&quot;</span>
 </code></pre></div>
 <h2 id="configuration-options">Configuration Options</h2>
 <h3 id="core-options">Core Options</h3>
@@ -3931,6 +3976,19 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <p><strong>Type:</strong> String<br />
 <strong>Default:</strong> None</p>
 <div class="highlight"><pre><span></span><code><span class="nt">default_author</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dave</span><span class="nv"> </span><span class="s">Pearson&quot;</span>
+</code></pre></div>
+<h4 id="default_author_url"><code>default_author_url</code></h4>
+<p>Default author URL used for posts that don't specify an <code>author_url</code> field in frontmatter. When provided, this URL is included in the JSON-LD metadata for the post.</p>
+<p><strong>Type:</strong> String<br />
+<strong>Default:</strong> None</p>
+<div class="highlight"><pre><span></span><code><span class="nt">default_author_url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://davep.org/&quot;</span>
+</code></pre></div>
+<h4 id="show_author"><code>show_author</code></h4>
+<p>Whether to show the author's name on posts. When enabled, and an author is set (either in frontmatter or via <code>default_author</code>), the author's name is displayed below the date/time of each post as "By {author name}". If the author has a URL, the name links to it with <code>rel="me"</code>.</p>
+<p>This setting can be overridden for individual posts using the <code>show_author</code> frontmatter property.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">show_author</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 <h4 id="icon_source"><code>icon_source</code></h4>
 <p>Filename of the source icon image in the <code>extras/</code> directory. BlogMore will generate favicons and platform-specific icons from this image.</p>

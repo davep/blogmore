@@ -641,6 +641,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#author" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>author</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#author_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>author_url</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#twitter_creator" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1115,6 +1137,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#author" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>author</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#author_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>author_url</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#twitter_creator" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1256,8 +1300,16 @@ You can find me on [<span class="nt">GitHub</span>](<span class="na">https://git
 <div class="highlight"><pre><span></span><code><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A little about who I am and what I do.</span>
 </code></pre></div>
 <h4 id="cover"><code>cover</code></h4>
-<p>A URL or path to a cover image, used for Open Graph and Twitter Card social sharing previews.</p>
+<p>A URL or path to a cover image, used for Open Graph, Twitter Card, and JSON-LD structured data. If not set, BlogMore falls back to the generated platform icons (if available) or the <code>site_logo</code>.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">cover</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/images/about-cover.png</span>
+</code></pre></div>
+<h4 id="author"><code>author</code></h4>
+<p>The name of the page's author. If not set, BlogMore falls back to the <code>default_author</code> set in your <a href="../configuration/">configuration</a>.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">author</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dave Pearson</span>
+</code></pre></div>
+<h4 id="author_url"><code>author_url</code></h4>
+<p>The URL of the page's author. If not set, BlogMore falls back to the <code>default_author_url</code> set in your <a href="../configuration/">configuration</a>.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">author_url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://davep.org/</span>
 </code></pre></div>
 <h4 id="twitter_creator"><code>twitter_creator</code></h4>
 <p>The Twitter/X handle of the page's author. Used in Twitter Card meta tags.</p>

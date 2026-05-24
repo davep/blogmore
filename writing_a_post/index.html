@@ -614,6 +614,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#author_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>author_url</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show_author" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_author</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#draft" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1342,6 +1364,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#author_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>author_url</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show_author" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_author</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#draft" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1669,7 +1713,18 @@ Welcome to my new blog! This is my first post.
 <p>See <a href="#categories-and-tags">Categories and tags</a> below for guidance on when to use each.</p>
 <h4 id="author"><code>author</code></h4>
 <p>The name of the post's author. If not set, BlogMore falls back to the <code>default_author</code> set in your <a href="../configuration/">configuration</a>.</p>
+<p>Example:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">author</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dave Pearson</span>
+</code></pre></div>
+<h4 id="author_url"><code>author_url</code></h4>
+<p>The URL of the post's author. If not set, BlogMore falls back to the <code>default_author_url</code> set in your <a href="../configuration/">configuration</a>.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">author_url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://davep.org/</span>
+</code></pre></div>
+<h4 id="show_author"><code>show_author</code></h4>
+<p>Whether to show the author's name on this post. This property always overrides the global <code>show_author</code> setting in your <a href="../configuration/">configuration</a>. If an author is set (either here or via <code>default_author</code>), the name is displayed below the date/time as "By {author name}".</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">show_author</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 <h4 id="draft"><code>draft</code></h4>
 <p>Set to <code>true</code> to mark the post as a draft. Draft posts are excluded from the build by default. This is useful for work in progress that you're not ready to publish.</p>
@@ -1681,7 +1736,7 @@ Welcome to my new blog! This is my first post.
 <div class="highlight"><pre><span></span><code><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A gentle introduction to Python decorators with practical examples.</span>
 </code></pre></div>
 <h4 id="cover"><code>cover</code></h4>
-<p>A URL or path to a cover image, used for Open Graph and Twitter Card social sharing previews.</p>
+<p>A URL or path to a cover image, used for Open Graph, Twitter Card, and JSON-LD structured data. If not set, BlogMore falls back to the generated platform icons (if available) or the <code>site_logo</code>.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">cover</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/images/my-post-cover.png</span>
 </code></pre></div>
 <h4 id="twitter_creator"><code>twitter_creator</code></h4>

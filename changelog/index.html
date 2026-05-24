@@ -779,6 +779,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v2280" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        v2.28.0
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v2270" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1546,6 +1557,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v2280" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        v2.28.0
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v2270" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -2257,6 +2279,26 @@
 
 
 <h1 id="blogmore-changelog">BlogMore ChangeLog</h1>
+<h2 id="v2280">v2.28.0</h2>
+<p><strong>Released: 2026-05-24</strong></p>
+<ul>
+<li>Extended JSON-LD structured data to include an image fallback. If a post
+  or page does not have a <code>cover</code> image, it now falls back to using the
+  platform icons or the site logo, consistent with Open Graph and Twitter
+  Card behaviour. (<a href="https://github.com/davep/blogmore/pull/523">#523</a>)</li>
+<li>Added <code>default_author_url</code> configuration option and <code>--default-author-url</code>
+  CLI argument to set a site-wide default URL for the author.
+  (<a href="https://github.com/davep/blogmore/pull/524">#524</a>)</li>
+<li>Added support for <code>author_url</code> in post and page frontmatter, which takes
+  precedence over the site-wide <code>default_author_url</code> configuration setting.
+  (<a href="https://github.com/davep/blogmore/pull/524">#524</a>)</li>
+<li>Updated JSON-LD structured data to include the author's URL property when
+  available. (<a href="https://github.com/davep/blogmore/pull/524">#524</a>)</li>
+<li>Added <code>show_author</code> configuration option and frontmatter property to
+  optionally display the author's name on posts. When enabled, the author's
+  name appears below the date, linking to their URL (if provided).
+  (<a href="https://github.com/davep/blogmore/pull/525">#525</a>)</li>
+</ul>
 <h2 id="v2270">v2.27.0</h2>
 <p><strong>Released: 2026-05-23</strong></p>
 <ul>

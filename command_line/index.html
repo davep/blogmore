@@ -946,6 +946,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-default-author-url-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>--default-author-url &lt;url&gt;</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-extra-stylesheet-url" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1923,6 +1934,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-default-author-url-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>--default-author-url &lt;url&gt;</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-extra-stylesheet-url" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -2645,7 +2667,13 @@ blogmore<span class="w"> </span>gen<span class="w"> </span>&lt;content_dir&gt;<s
 </code></pre></div>
 <h4 id="-default-author-name"><code>--default-author &lt;name&gt;</code></h4>
 <p>Default author name for posts that don't specify an <code>author</code> field in frontmatter.</p>
+<p>Example:</p>
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--default-author<span class="w"> </span><span class="s2">&quot;Dave Pearson&quot;</span>
+</code></pre></div>
+<h4 id="-default-author-url-url"><code>--default-author-url &lt;url&gt;</code></h4>
+<p>Default author URL for posts that don't specify an <code>author_url</code> field in frontmatter.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--default-author-url<span class="w"> </span><span class="s2">&quot;https://davep.org/&quot;</span>
 </code></pre></div>
 <h4 id="-extra-stylesheet-url"><code>--extra-stylesheet &lt;url&gt;</code></h4>
 <p>URL of an additional stylesheet to include. Can be an absolute URL or a path relative to your site root. This option can be used multiple times to include multiple stylesheets.</p>
@@ -2767,6 +2795,7 @@ blogmore<span class="w"> </span>serve
 - <code>--clean-first</code>
 - <code>--posts-per-feed</code>
 - <code>--default-author</code>
+- <code>--default-author-url</code>
 - <code>--extra-stylesheet</code>
 - <code>--icon-source</code>
 - <code>--with-search</code>
@@ -2834,6 +2863,7 @@ blogmore<span class="w"> </span>serve
 - <code>--clean-first</code>
 - <code>--posts-per-feed</code>
 - <code>--default-author</code>
+- <code>--default-author-url</code>
 - <code>--extra-stylesheet</code>
 - <code>--icon-source</code>
 - <code>--with-search</code>

@@ -1301,10 +1301,11 @@
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
 </code></pre></div>
 <h3 id="default-author">Default author</h3>
-<p>The author name to use for posts that don't specify an <code>author</code> field in their frontmatter.</p>
+<p>The author name and URL to use for posts that don't specify an <code>author</code> or <code>author_url</code> field in their frontmatter.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">default_author</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Dave</span><span class="nv"> </span><span class="s">Pearson&quot;</span>
+<span class="nt">default_author_url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://davep.org/&quot;</span>
 </code></pre></div>
-<p>Command line: <code>--default-author "Dave Pearson"</code></p>
+<p>Command line: <code>--default-author "Dave Pearson" --default-author-url "https://davep.org/"</code></p>
 <h2 id="site-logo">Site logo</h2>
 <p>You can display a logo image at the top of the sidebar by setting <code>site_logo</code> to a URL or path:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">site_logo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/images/logo.png</span>
@@ -1312,6 +1313,7 @@
 <p>The image is displayed above the site title. It can be hosted externally:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">site_logo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://example.com/images/logo.svg</span>
 </code></pre></div>
+<p>The site logo is also used as a fallback for Open Graph, Twitter Card, and JSON-LD structured data images if no <code>cover</code> image is specified for a post or page.</p>
 <h2 id="site-icons">Site icons</h2>
 <p>BlogMore can automatically generate a full set of favicons and platform-specific icons from a single source image. This means you only need to prepare one image and BlogMore takes care of the rest.</p>
 <h3 id="preparing-your-source-image">Preparing your source image</h3>
