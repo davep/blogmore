@@ -26,12 +26,12 @@
         <span class="reading-time">{{ post.reading_time }} min read</span>
         {% endif %}
         {% if include_category and post.category %}
-        <a href="/{{ category_dir }}/{{ post.safe_category }}.html" class="category-link p-category">{{ post.category }}</a>
+        <a href="/{{ category_dir }}/{{ post.safe_category }}.html" class="category-link p-category" aria-label="Category: {{ post.category }}">{{ post.category }}</a>
         {% endif %}
         {% if post.tags %}
         <span class="tags">
             {% for tag, safe_tag in post.sorted_tag_pairs() %}
-            <a href="/{{ tag_dir }}/{{ safe_tag }}.html" class="tag p-category">{{ tag }}</a>
+            <a href="/{{ tag_dir }}/{{ safe_tag }}.html" class="tag p-category" aria-label="Tag: {{ tag }}">{{ tag }}</a>
             {% endfor %}
         </span>
         {% endif %}

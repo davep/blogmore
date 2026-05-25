@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added `aria-label` attributes to category and tag links in default and
+  example templates to improve accessibility for screen reader users by
+  preventing identical link text (e.g., "AI" and "AI") with different
+  destinations. ([#533](https://github.com/davep/blogmore/pull/533))
+
 ## v2.29.0
 
 **Released: 2026-05-25**
