@@ -248,6 +248,16 @@ Read time display is **disabled by default**. Pass this flag to opt in.
 blogmore build posts/ --with-read-time
 ```
 
+#### `--with-related`
+
+Enable automated build-time related posts calculation. When enabled, BlogMore uses a pure-Python TF-IDF and Cosine Similarity engine to automatically calculate and list contextually relevant posts for each entry, with zero runtime overhead for readers.
+
+Related posts calculation is **disabled by default**. Pass this flag to opt in.
+
+```bash
+blogmore build posts/ --with-related
+```
+
 #### `--socials-title`
 
 Override the title displayed above the social media icons section in the sidebar. By default the section is labelled "Social".
@@ -386,6 +396,7 @@ The serve command also accepts all the build command options:
 - `--minify-js`
 - `--minify-html`
 - `--with-read-time`
+- `--with-related`
 - `--socials-title`
 - `--links-title`
 
@@ -483,6 +494,7 @@ The publish command also accepts all the build command options:
 - `--minify-js`
 - `--minify-html`
 - `--with-read-time`
+- `--with-related`
 - `--socials-title`
 - `--links-title`
 

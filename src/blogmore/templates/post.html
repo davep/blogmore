@@ -114,5 +114,22 @@
     </section>
     {% endif %}
     {% endblock %}
+    {% block related_posts %}
+    {% if with_related and post.related_posts %}
+    <section class="related-posts">
+        <h2 class="related-posts-heading">{{ related_title }}</h2>
+        <ul class="related-posts-list">
+            {% for related in post.related_posts %}
+            <li class="related-post-item">
+                <a href="{{ related.url }}" class="related-post-title">{{ related.title }}</a>
+                {% if related.date %}
+                <time class="related-post-date" datetime="{{ related.date.isoformat() }}">{{ related.date|format_date }}</time>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+    {% endblock %}
 </article>
 {% endblock %}
