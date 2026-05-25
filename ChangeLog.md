@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unrelased
+## v2.29.0
 
-**Released: WiP**
+**Released: 2026-05-25**
 
 - Added support for the `prefers-contrast` CSS media feature to provide
   better accessibility in code block headers. When enabled, elements like
