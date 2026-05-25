@@ -58,7 +58,7 @@
         {% endif %}
         {% if post.category %}
         <div class="category">
-            <a href="/{{ category_dir }}/{{ post.safe_category }}/{{ pagination_page1_suffix }}" class="p-category category-link">{{ post.category }}</a>
+            <a href="/{{ category_dir }}/{{ post.safe_category }}/{{ pagination_page1_suffix }}" class="p-category category-link" aria-label="Category: {{ post.category }}">{{ post.category }}</a>
         </div>
         {% endif %}
     </header>
@@ -70,7 +70,7 @@
     {% if post.tags %}
     <div class="tags">
         {% for tag, safe_tag in post.sorted_tag_pairs() %}
-        <a href="/{{ tag_dir }}/{{ safe_tag }}/{{ pagination_page1_suffix }}" class="tag p-category">{{ tag }}</a>
+        <a href="/{{ tag_dir }}/{{ safe_tag }}/{{ pagination_page1_suffix }}" class="tag p-category" aria-label="Tag: {{ tag }}">{{ tag }}</a>
         {% endfor %}
     </div>
     {% endif %}
