@@ -104,6 +104,28 @@ posts_per_feed: 20
 # bar automatically, between Calendar and RSS. Configuration file only.
 # with_graph: false
 
+# Optional: Enable automated build-time related posts calculation (default: false)
+# When true, BlogMore uses a pure-Python TF-IDF and Cosine Similarity engine to
+# automatically find and display contextually relevant posts for each entry,
+# with zero runtime overhead for readers.
+# with_related: false
+
+# Optional: The number of related posts to keep and display (default: 3)
+# Only meaningful when with_related is true. Must be a positive integer.
+# related_count: 3
+
+# Optional: The maximum number of unique words used to find related posts (default: 1000)
+# To keep site builds fast, the matching engine only remembers a limited list of unique
+# words, discarding very common words and extremely rare terms or typos.
+# Setting this higher (e.g., 2000) lets the system recognize more unique or niche words
+# for more detailed matching (with slightly slower builds). Setting it lower (e.g., 500)
+# keeps builds faster, but the system might miss some connections between posts.
+# related_prune_vocab_size: 1000
+
+# Optional: Title displayed as the heading of the related posts section (default: "Related Posts")
+# Only meaningful when with_related is true. Configuration file only.
+# related_title: "Related Posts"
+
 # Optional: Automatically optimise and resize local images (default: false)
 # When true, the generator scans all Markdown posts for local images and
 # generates a "ladder" of optimised versions in multiple widths and formats

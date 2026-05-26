@@ -30,6 +30,8 @@ below lists all variables that are available in every template.
 | `with_read_time` | `bool` | `True` when reading time display is enabled. |
 | `with_backlinks` | `bool` | `True` when the backlinks feature is enabled. |
 | `backlinks_title` | `str` | The heading text for the backlinks section (defaults to `"References & mentions"`). |
+| `with_related` | `bool` | `True` when the related posts feature is enabled. |
+| `related_title` | `str` | The heading text for the related posts section (defaults to `"Related Posts"`). |
 | `with_advert` | `bool` | `True` when the "Generated with BlogMore" footer is shown. |
 | `show_author` | `bool` | `True` when the author display is enabled. |
 | `default_author` | `str \| None` | Default author name from configuration. |
@@ -148,6 +150,7 @@ and `next_post`.
 | `description` | `str` (property) | Post description (from metadata or first paragraph). |
 | `reading_time` | `int` (property) | Estimated reading time in minutes (minimum 1). |
 | `modified_date` | `datetime \| None` (property) | Last-modified datetime from metadata, if set. |
+| `related_posts` | `list[Post]` | List of related Post objects calculated via TF-IDF (populated when `with_related` is enabled). |
 
 Helper methods available on `Post`:
 
@@ -393,6 +396,12 @@ The following CSS classes are part of the stable template/CSS contract:
 | `.comment-invite` | `div` | Comment invitation container on a post page (only when `invite_comments` is enabled and an email address is configured). |
 | `.comment-invite-content` | `p` | The invitation message paragraph. |
 | `.comment-invite-link` | `a` | The `mailto:` link within the invitation message. |
+| `.related-posts` | `section` | Related posts container on a post page (only when `with_related` is enabled and there are related posts). |
+| `.related-posts-heading` | `h2` | Heading of the related posts section. |
+| `.related-posts-list` | `ul` | List of related posts. |
+| `.related-post-item` | `li` | A single related post card/item. |
+| `.related-post-title` | `a` | Link to the related post. |
+| `.related-post-date` | `time` | Publication date of the related post. |
 
 ## Stability policy
 

@@ -119,6 +119,7 @@ def main() -> int:
         minify_js=args.minify_js,
         minify_html=args.minify_html,
         with_read_time=args.with_read_time,
+        with_related=args.with_related,
         include_drafts=args.include_drafts,
         socials_title=args.socials_title,
         links_title=args.links_title,

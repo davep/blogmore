@@ -182,6 +182,13 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     )
 
     parser.add_argument(
+        "--with-related",
+        action="store_true",
+        default=_SITE_CONFIG_DEFAULTS["with_related"],
+        help="Calculate and display related posts (default: disabled)",
+    )
+
+    parser.add_argument(
         "--socials-title",
         default=_SITE_CONFIG_DEFAULTS["socials_title"],
         help="Title for the social media icons section in the sidebar (default: Social)",

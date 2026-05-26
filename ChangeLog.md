@@ -8,6 +8,8 @@
   example templates to improve accessibility for screen reader users by
   preventing identical link text (e.g., "AI" and "AI") with different
   destinations. ([#533](https://github.com/davep/blogmore/pull/533))
+- Added a related posts system.
+  ([#538](https://github.com/davep/blogmore/pull/538))
 
 ## v2.29.0
 

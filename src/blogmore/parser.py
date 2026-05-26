@@ -1,5 +1,7 @@
 """Markdown parser with frontmatter support for blog posts."""
 
+from __future__ import annotations
+
 import datetime as dt
 import re
 import threading
@@ -136,6 +138,7 @@ class Post:
     metadata: dict[str, Any] | None = None
     url_path: str | None = field(default=None, repr=False, compare=False)
     words_per_minute: int = field(default=200, repr=False, compare=False)
+    related_posts: list[Post] = field(default_factory=list, repr=False, compare=False)
 
     @property
     def slug(self) -> str:

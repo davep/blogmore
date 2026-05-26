@@ -70,6 +70,8 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
         "light_mode_code_style",
         "dark_mode_code_style",
         "read_time_wpm",
+        "related_count",
+        "related_prune_vocab_size",
         "linting_ignore",
         "image_widths",
     }
@@ -574,6 +576,46 @@ def parse_site_config_from_dict(
             kwargs["read_time_wpm"] = raw_wpm
     else:
         kwargs["read_time_wpm"] = 200
+
+    # --- related_count -------------------------------------------------------
+    if "related_count" in config:
+        raw_count = config["related_count"]
+        if not isinstance(raw_count, int) or isinstance(raw_count, bool):
+            errors.append(
+                "related_count in the configuration file must be an integer; "
+                "using the default"
+            )
+            kwargs["related_count"] = 3
+        elif raw_count <= 0:
+            errors.append(
+                "related_count in the configuration file must be a positive "
+                "integer; using the default"
+            )
+            kwargs["related_count"] = 3
+        else:
+            kwargs["related_count"] = raw_count
+    else:
+        kwargs["related_count"] = 3
+
+    # --- related_prune_vocab_size ---------------------------------------------
+    if "related_prune_vocab_size" in config:
+        raw_vocab = config["related_prune_vocab_size"]
+        if not isinstance(raw_vocab, int) or isinstance(raw_vocab, bool):
+            errors.append(
+                "related_prune_vocab_size in the configuration file must be an integer; "
+                "using the default"
+            )
+            kwargs["related_prune_vocab_size"] = 1000
+        elif raw_vocab <= 0:
+            errors.append(
+                "related_prune_vocab_size in the configuration file must be a positive "
+                "integer; using the default"
+            )
+            kwargs["related_prune_vocab_size"] = 1000
+        else:
+            kwargs["related_prune_vocab_size"] = raw_vocab
+    else:
+        kwargs["related_prune_vocab_size"] = 1000
 
     # --- image_widths --------------------------------------------------------
     raw_image_widths = config.get("image_widths")

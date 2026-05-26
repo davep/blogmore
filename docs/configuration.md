@@ -462,6 +462,53 @@ Off by default.
 with_graph: true
 ```
 
+#### `with_related`
+
+Enable automated build-time related posts calculation. When `true`, BlogMore uses a pure-Python TF-IDF and Cosine Similarity engine to automatically calculate and list contextually relevant posts for each entry, with zero runtime overhead for readers.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+with_related: true
+```
+
+#### `related_count`
+
+The number of related posts to keep and display on individual post pages. Must be a positive integer. Only meaningful when [`with_related`](#with_related) is `true`.
+
+**Type:** Integer  
+**Default:** `3`
+
+```yaml
+related_count: 4
+```
+
+#### `related_prune_vocab_size`
+
+The maximum number of unique words that the similarity matching engine will remember and use to compare posts. To keep building the site fast, the engine automatically discards very common words (like "the", "and") and extremely rare words (like one-off typos) that aren't helpful for finding relationships. Must be a positive integer. Only meaningful when [`with_related`](#with_related) is `true`.
+
+* **Setting it higher** (e.g., `2000`) allows the system to recognize more unique or niche words. This makes the matching more detailed and accurate, but can slightly slow down the site build process and use more memory.
+* **Setting it lower** (e.g., `500`) limits the system to only the most common unique words. This makes site builds faster and uses less memory, but the system might miss subtle connections between posts that share specific words.
+
+**Type:** Integer  
+**Default:** `1000`
+
+```yaml
+related_prune_vocab_size: 500
+```
+
+#### `related_title`
+
+Title displayed as the heading of the related posts section on individual post pages.  Only meaningful when [`with_related`](#with_related) is `true`.  This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** String  
+**Default:** `"Related Posts"`
+
+```yaml
+related_title: "Explore More"
+```
+
 #### `with_read_time`
 
 Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on the configured words-per-minute rate) and displays it next to the post date on all post listings and individual post pages.

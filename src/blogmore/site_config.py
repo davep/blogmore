@@ -233,7 +233,42 @@ class SiteConfig:
     widely-cited average adult reading speed.
 
     This is a **configuration file only** option — it cannot be set on the
-    command line.  Defaults to ``200``.
+    command line.  Defaults to `200`.
+    """
+
+    with_related: bool = False
+    """Whether to calculate and display related posts."""
+
+    related_count: int = 3
+    """The number of related posts to keep and display.
+
+    Must be a positive integer.  Only used when `with_related` is `True`.
+    Defaults to `3`.
+    """
+
+    related_prune_vocab_size: int = 1000
+    """The maximum number of unique words used to find related posts.
+
+    To keep site builds fast, the matching engine only remembers a limited list
+    of unique words, discarding very common words (like "the", "and") and
+    extremely rare terms or typos.  Must be a positive integer.  Only used when
+    `with_related` is `True`.  Defaults to `1000`.
+
+    Setting this value higher (e.g., `2000`) lets the system recognize more
+    unique or niche words for more detailed matching, but slightly slows down
+    the build.  Setting it lower (e.g., `500`) keeps builds faster and saves
+    memory, but the system might miss some connections between posts.
+    """
+
+    related_title: str = "Related Posts"
+    """Title displayed as the heading of the related posts section on post pages.
+
+    Overrides the default "Related Posts" heading rendered inside the
+    `related_posts` template block on individual post pages.  Only meaningful
+    when `with_related` is `True`.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to `Related Posts`.
     """
 
     show_author: bool = False

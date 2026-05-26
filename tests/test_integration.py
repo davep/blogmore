@@ -562,3 +562,82 @@ class TestBacklinksTitle:
         """Test that SiteConfig defaults backlinks_title to 'References & mentions'."""
         config = SiteConfig(output_dir=tmp_path)
         assert config.backlinks_title == "References & mentions"
+
+
+class TestRelatedTitle:
+    """Integration tests for the related_title configuration option."""
+
+    def _create_posts(self, content_dir: Path) -> None:
+        """Write three posts with overlapping content to ensure similarity.
+
+        Args:
+            content_dir: Directory to write the post Markdown files into.
+        """
+        # Post 1
+        (content_dir / "2024-01-10-first.md").write_text(
+            "---\ntitle: First Post\ndate: 2024-01-10\n---\n"
+            "This is a post about python and software engineering concepts.\n"
+        )
+        # Post 2
+        (content_dir / "2024-01-15-second.md").write_text(
+            "---\ntitle: Second Post\ndate: 2024-01-15\n---\n"
+            "This is a post about python and software engineering concepts.\n"
+        )
+        # Post 3
+        (content_dir / "2024-01-20-third.md").write_text(
+            "---\ntitle: Third Post\ndate: 2024-01-20\n---\n"
+            "This is a post about python and software engineering concepts.\n"
+        )
+
+    def test_default_related_title(self, tmp_path: Path, temp_output_dir: Path) -> None:
+        """Test that the default related title is 'Related Posts'."""
+        from blogmore.generator import SiteGenerator
+
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        self._create_posts(content_dir)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_related=True,
+            )
+        )
+        generator.generate()
+
+        target_html = (
+            temp_output_dir / "2024" / "01" / "10" / "first.html"
+        ).read_text()
+        assert "Related Posts" in target_html
+
+    def test_custom_related_title(self, tmp_path: Path, temp_output_dir: Path) -> None:
+        """Test that a custom related_title overrides the default heading."""
+        from blogmore.generator import SiteGenerator
+
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+        self._create_posts(content_dir)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=content_dir,
+                output_dir=temp_output_dir,
+                site_url="https://example.com",
+                with_related=True,
+                related_title="Similar Reading",
+            )
+        )
+        generator.generate()
+
+        target_html = (
+            temp_output_dir / "2024" / "01" / "10" / "first.html"
+        ).read_text()
+        assert "Similar Reading" in target_html
+        assert "Related Posts" not in target_html
+
+    def test_related_title_default_value(self, tmp_path: Path) -> None:
+        """Test that SiteConfig defaults related_title to 'Related Posts'."""
+        config = SiteConfig(output_dir=tmp_path)
+        assert config.related_title == "Related Posts"

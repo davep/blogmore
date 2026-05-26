@@ -21,6 +21,7 @@ from blogmore.generator.paths import (
 from blogmore.image_manager import ImageManager
 from blogmore.parser import PostParser
 from blogmore.renderer import TemplateRenderer
+from blogmore.similarity import SimilarityEngine
 from blogmore.utils import get_blog_cache_dir, timed_step
 
 if TYPE_CHECKING:
@@ -76,6 +77,10 @@ class SiteGenerator:
             self.site_config.extra_stylesheets,
             self.site_config.site_url,
         )
+        if not hasattr(self, "similarity_engine"):
+            self.similarity_engine = SimilarityEngine(self.site_config)
+        else:
+            self.similarity_engine.site_config = self.site_config
 
     def generate(self) -> None:
         """Generate the complete static site."""
@@ -146,6 +151,10 @@ class SiteGenerator:
 
         for post in posts:
             post.words_per_minute = self.site_config.read_time_wpm
+
+        if self.site_config.with_related:
+            with timed_step("Calculating related posts..."):
+                self.similarity_engine.calculate_related_posts(posts)
         if pages:
             print(f"Found {len(pages)} pages")
 

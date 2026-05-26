@@ -139,12 +139,13 @@ v2.x.  Key ones that appear in nearly every template:
 - `canonical_url`
 - `bundle_css`, `bundle_css_url`, `fontawesome_is_bundled` — for CSS bundling support
 - `inline_theme_js`, `theme_js_content` — for theme JavaScript inlining support
+- `with_related`, `related_title` — for related posts feature support
 
 ### Stable Post attributes
 
 `post.title`, `post.html_content`, `post.date`, `post.url`, `post.slug`,
 `post.category`, `post.tags`, `post.description`, `post.reading_time`,
-`post.modified_date`, `post.draft`, `post.metadata`.
+`post.modified_date`, `post.draft`, `post.metadata`, `post.related_posts`.
 
 ### Stable template blocks
 
@@ -161,7 +162,9 @@ v2.x.  Key ones that appear in nearly every template:
 `.theme-toggle`, `.highlight`,
 `.backlinks`, `.backlinks-heading`, `.backlinks-list`, `.backlink-item`,
 `.backlink-meta`, `.backlink-title`, `.backlink-date`, `.backlink-snippet`,
-`.backlink-link-text`.
+`.backlink-link-text`, `.related-posts`, `.related-posts-heading`,
+`.related-posts-list`, `.related-post-item`, `.related-post-title`,
+`.related-post-date`.
 
 ## Rules for making changes
 
