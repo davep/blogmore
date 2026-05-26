@@ -16,6 +16,7 @@ BlogMore provides several commands:
 - **`serve`** - Generate and serve the site locally with auto-reload
 - **`publish`** - Build and publish the site to a git branch
 - **`lint`** - Check the site for common issues (broken links, etc.)
+- **`drafts`** - List the path to all posts marked as drafts
 - **`cache`** - Manage the BlogMore cache
 
 ### Command Aliases
@@ -552,6 +553,28 @@ blogmore check [content_dir] [options]
 Check the site for issues:
 ```bash
 blogmore lint posts/
+```
+
+## Drafts Command
+
+List the path to all the posts in your content directory that are marked as drafts (`draft: true` in frontmatter).
+
+### Synopsis
+
+```bash
+blogmore drafts [content_dir] [options]
+```
+
+### Arguments
+
+**`content_dir`** (optional)
+: Directory containing your Markdown blog posts.
+
+### Examples
+
+List all draft posts:
+```bash
+blogmore drafts posts/
 ```
 
 ## Cache Command

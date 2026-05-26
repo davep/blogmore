@@ -2877,3 +2877,68 @@ class TestCacheCLI:
             assert result == 0
             captured = capsys.readouterr()
             assert f"Cache directory does not exist: {test_cache}" in captured.out
+
+
+class TestDraftsCLI:
+    """Test the 'drafts' CLI command."""
+
+    def test_drafts_command(
+        self, posts_dir: Path, capsys: pytest.CaptureFixture[str], temp_output_dir: Path
+    ) -> None:
+        """Test listing drafts with drafts command."""
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "blogmore",
+                "drafts",
+                str(posts_dir),
+                "-o",
+                str(temp_output_dir),
+            ],
+        ):
+            result = main()
+            assert result == 0
+            captured = capsys.readouterr()
+            assert "2024-01-20-draft-post.md" in captured.out
+            # Non-draft posts should not be listed
+            assert "2024-01-15-first-post.md" not in captured.out
+
+    def test_drafts_no_content_dir_fails(
+        self,
+        capsys: pytest.CaptureFixture[str],
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Test that drafts command fails when content_dir is not provided."""
+        work_dir = tmp_path / "work"
+        work_dir.mkdir()
+        monkeypatch.chdir(work_dir)
+
+        # Config file without content_dir
+        config_file = work_dir / "blogmore.yaml"
+        config_file.write_text("site_title: 'Drafts Test'\n")
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "drafts"],
+        ):
+            result = main()
+            assert result == 1
+            captured = capsys.readouterr()
+            assert "Error: content_dir is required" in captured.err
+
+    def test_drafts_nonexistent_dir_fails(
+        self, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Test that drafts command fails when content_dir does not exist."""
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "drafts", "/nonexistent/posts/dir"],
+        ):
+            result = main()
+            assert result == 1
+            captured = capsys.readouterr()
+            assert "Error: Content directory not found" in captured.err

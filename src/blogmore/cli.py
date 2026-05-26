@@ -306,6 +306,21 @@ def create_parser() -> argparse.ArgumentParser:
 
     add_common_arguments(lint_parser)
 
+    # Drafts command
+    drafts_parser = subparsers.add_parser(
+        "drafts",
+        help="List the path to all posts marked as drafts in the front matter",
+    )
+
+    drafts_parser.add_argument(
+        "content_dir",
+        type=Path,
+        nargs="?",
+        help="Directory containing markdown blog posts",
+    )
+
+    add_common_arguments(drafts_parser)
+
     # Cache command
     cache_parser = subparsers.add_parser(
         "cache",
