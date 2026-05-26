@@ -219,6 +219,38 @@ def main() -> int:
             print(f"Error publishing site: {e}", file=sys.stderr)
             return 1
 
+    # Handle drafts command
+    if args.command == "drafts":
+        # Validate that content_dir is provided
+        if args.content_dir is None:
+            print(
+                "Error: content_dir is required. Specify it on the command line or in the config file.",
+                file=sys.stderr,
+            )
+            return 1
+
+        # Validate inputs
+        if not args.content_dir.exists():
+            print(
+                f"Error: Content directory not found: {args.content_dir}",
+                file=sys.stderr,
+            )
+            return 1
+
+        # Print all drafts
+        try:
+            from blogmore.parser import PostParser
+
+            post_parser = PostParser(site_url=site_config.site_url)
+            posts = post_parser.parse_directory(args.content_dir, include_drafts=True)
+            for post in posts:
+                if post.draft:
+                    print(post.path)
+            return 0
+        except Exception as e:
+            print(f"Error listing drafts: {e}", file=sys.stderr)
+            return 1
+
     # Handle lint command
     if args.command in ("lint", "check"):
         # Validate that content_dir is provided
