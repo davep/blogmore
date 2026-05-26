@@ -24,6 +24,8 @@ BlogMore focuses on simplicity and efficiency in creating blog-focused websites.
 - **GitHub Pages integration** - Simple publishing workflow to GitHub Pages (or any git branch)
 - **Configurable** - Extensive configuration options via YAML config files or command-line arguments
 - **Built-in linter** - Check your site for broken internal links, missing metadata, duplicate titles, and other common issues
+- **External link checking** - Verify the reachability and HTTP status of all external links in your posts with delay options to avoid rate limits
+- **External link dumping** - Extract all external URLs from your posts into a CSV list for easy auditing
 - **Sidebar customisation** - Optional logo, custom links, and social media icons
 - **SEO optimisation** - Proper meta tags, Open Graph tags, and Twitter Card support
 - **Automatic image optimisation** - Optional multi-size "ladder" generation and next-gen WebP conversion for local images in Markdown posts; simple `<img>` tags are replaced with stable, responsive `<picture>` elements
@@ -34,6 +36,7 @@ BlogMore focuses on simplicity and efficiency in creating blog-focused websites.
 - **Blog statistics page** — Optional stats page with histograms, word counts, reading times, lifespan, top linked domains, and more
 - **Calendar view** — Optional full-history year calendar view of all posts, with links to day, month, and year archives (enable with `--with-calendar`)
 - **Post graph** — optional interactive force-directed graph connecting posts, tags, and categories via internal links
+- **Related posts** - Automatically find and display contextually relevant posts for each entry using a build-time TF-IDF and cosine similarity engine (enable with `--with-related`)
 
 ## Installation
 

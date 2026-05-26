@@ -63,6 +63,7 @@ here](https://github.com/davep/davep.github.com)).
 - **Post graph** — optional interactive force-directed graph connecting posts,
   tags, and categories via internal links; click any node to navigate to it;
   respects the active light/dark theme
+- **Related posts** — automatically find and display contextually relevant posts for each entry using a build-time TF-IDF and cosine similarity engine
 - **SEO optimisation** — meta tags, Open Graph tags, and Twitter Card support
 - **Automatic organisation** — tag pages, category pages, and chronological
   archives generated automatically
@@ -72,6 +73,8 @@ here](https://github.com/davep/davep.github.com)).
   on file changes
 - **Built-in linter** — check your site for broken internal links, missing
   metadata, duplicate titles, and other common issues
+- **External link checking** — check the reachability and HTTP status of all external URLs found in posts to detect broken links
+- **External link dumping** — export a CSV list of all external links found in posts along with the files they appear in
 - **YAML configuration file** — keep all your settings in `blogmore.yaml`
   instead of repeating them on the command line
 
