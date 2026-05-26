@@ -1183,6 +1183,50 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#with_related" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>with_related</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related_count" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>related_count</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related_prune_vocab_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>related_prune_vocab_size</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related_title" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>related_title</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#with_read_time" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1998,6 +2042,45 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         <code>linting: ignore</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#link-checking-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Link Checking Options
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Link Checking Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#external_links-check-ignore" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>external_links: check: ignore</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#external_links-check-timeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>external_links: check: timeout</code>
       </span>
     </span>
   </a>
@@ -2767,6 +2850,50 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#with_related" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>with_related</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related_count" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>related_count</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related_prune_vocab_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>related_prune_vocab_size</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related_title" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>related_title</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#with_read_time" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -3594,6 +3721,45 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#link-checking-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Link Checking Options
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Link Checking Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#external_links-check-ignore" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>external_links: check: ignore</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#external_links-check-timeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>external_links: check: timeout</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#serve-command-options" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -4101,6 +4267,34 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <p><strong>Type:</strong> Boolean<br />
 <strong>Default:</strong> <code>false</code></p>
 <div class="highlight"><pre><span></span><code><span class="nt">with_graph</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<h4 id="with_related"><code>with_related</code></h4>
+<p>Enable automated build-time related posts calculation. When <code>true</code>, BlogMore uses a pure-Python TF-IDF and Cosine Similarity engine to automatically calculate and list contextually relevant posts for each entry, with zero runtime overhead for readers.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">with_related</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<h4 id="related_count"><code>related_count</code></h4>
+<p>The number of related posts to keep and display on individual post pages. Must be a positive integer. Only meaningful when <a href="#with_related"><code>with_related</code></a> is <code>true</code>.</p>
+<p><strong>Type:</strong> Integer<br />
+<strong>Default:</strong> <code>3</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">related_count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+</code></pre></div>
+<h4 id="related_prune_vocab_size"><code>related_prune_vocab_size</code></h4>
+<p>The maximum number of unique words that the similarity matching engine will remember and use to compare posts. To keep building the site fast, the engine automatically discards very common words (like "the", "and") and extremely rare words (like one-off typos) that aren't helpful for finding relationships. Must be a positive integer. Only meaningful when <a href="#with_related"><code>with_related</code></a> is <code>true</code>.</p>
+<ul>
+<li><strong>Setting it higher</strong> (e.g., <code>2000</code>) allows the system to recognize more unique or niche words. This makes the matching more detailed and accurate, but can slightly slow down the site build process and use more memory.</li>
+<li><strong>Setting it lower</strong> (e.g., <code>500</code>) limits the system to only the most common unique words. This makes site builds faster and uses less memory, but the system might miss subtle connections between posts that share specific words.</li>
+</ul>
+<p><strong>Type:</strong> Integer<br />
+<strong>Default:</strong> <code>1000</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">related_prune_vocab_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">500</span>
+</code></pre></div>
+<h4 id="related_title"><code>related_title</code></h4>
+<p>Title displayed as the heading of the related posts section on individual post pages.  Only meaningful when <a href="#with_related"><code>with_related</code></a> is <code>true</code>.  This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
+<p><strong>Type:</strong> String<br />
+<strong>Default:</strong> <code>"Related Posts"</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">related_title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Explore</span><span class="nv"> </span><span class="s">More&quot;</span>
 </code></pre></div>
 <h4 id="with_read_time"><code>with_read_time</code></h4>
 <p>Show estimated reading time on each post. When enabled, BlogMore calculates the approximate time to read each post (based on the configured words-per-minute rate) and displays it next to the post date on all post listings and individual post pages.</p>
@@ -4733,6 +4927,35 @@ for example to add complex scripts or conditionally include tags — use
 <span class="w">  </span><span class="nt">ignore</span><span class="p">:</span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/external-resource/</span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/dynamic-app/login.html</span>
+</code></pre></div>
+<p>This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
+<h3 id="link-checking-options">Link Checking Options</h3>
+<h4 id="external_links-check-ignore"><code>external_links: check: ignore</code></h4>
+<p>A list of external URLs or domains that the link checker should ignore when validating external links in blog posts.</p>
+<p>This is useful for:
+- Avoiding slow checks or rate limits on frequently linked large domains.
+- Excluding private, intranet, or development URLs that are not accessible from the public internet.</p>
+<p>Each entry can be either:
+- A bare domain (e.g. <code>google.com</code>) to ignore any link within that domain (including subdomains like <code>sub.google.com</code>).
+- A URL prefix (e.g. <code>https://github.com/davep</code>) to ignore any link that starts with that exact prefix.</p>
+<p><strong>Type:</strong> List of strings (domains/prefixes)<br />
+<strong>Default:</strong> <em>(empty)</em></p>
+<div class="highlight"><pre><span></span><code><span class="nt">external_links</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">check</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">ignore</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/davep</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">google.com</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">t.co</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">twitter.com</span>
+</code></pre></div>
+<p>This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
+<h4 id="external_links-check-timeout"><code>external_links: check: timeout</code></h4>
+<p>The connection timeout in seconds for verifying external links in blog posts.</p>
+<p><strong>Type:</strong> Float or Integer<br />
+<strong>Default:</strong> <code>5.0</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">external_links</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">check</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10.0</span>
 </code></pre></div>
 <p>This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
 <h3 id="serve-command-options">Serve Command Options</h3>

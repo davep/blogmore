@@ -1565,6 +1565,16 @@ below lists all variables that are available in every template.</p>
 <td>The heading text for the backlinks section (defaults to <code>"References &amp; mentions"</code>).</td>
 </tr>
 <tr>
+<td><code>with_related</code></td>
+<td><code>bool</code></td>
+<td><code>True</code> when the related posts feature is enabled.</td>
+</tr>
+<tr>
+<td><code>related_title</code></td>
+<td><code>str</code></td>
+<td>The heading text for the related posts section (defaults to <code>"Related Posts"</code>).</td>
+</tr>
+<tr>
 <td><code>with_advert</code></td>
 <td><code>bool</code></td>
 <td><code>True</code> when the "Generated with BlogMore" footer is shown.</td>
@@ -1967,6 +1977,11 @@ and <code>next_post</code>.</p>
 <td><code>modified_date</code></td>
 <td><code>datetime \| None</code> (property)</td>
 <td>Last-modified datetime from metadata, if set.</td>
+</tr>
+<tr>
+<td><code>related_posts</code></td>
+<td><code>list[Post]</code></td>
+<td>List of related Post objects calculated via TF-IDF (populated when <code>with_related</code> is enabled).</td>
 </tr>
 </tbody>
 </table>
@@ -2565,6 +2580,36 @@ widget.  It is called like this:</p>
 <td><code>.comment-invite-link</code></td>
 <td><code>a</code></td>
 <td>The <code>mailto:</code> link within the invitation message.</td>
+</tr>
+<tr>
+<td><code>.related-posts</code></td>
+<td><code>section</code></td>
+<td>Related posts container on a post page (only when <code>with_related</code> is enabled and there are related posts).</td>
+</tr>
+<tr>
+<td><code>.related-posts-heading</code></td>
+<td><code>h2</code></td>
+<td>Heading of the related posts section.</td>
+</tr>
+<tr>
+<td><code>.related-posts-list</code></td>
+<td><code>ul</code></td>
+<td>List of related posts.</td>
+</tr>
+<tr>
+<td><code>.related-post-item</code></td>
+<td><code>li</code></td>
+<td>A single related post card/item.</td>
+</tr>
+<tr>
+<td><code>.related-post-title</code></td>
+<td><code>a</code></td>
+<td>Link to the related post.</td>
+</tr>
+<tr>
+<td><code>.related-post-date</code></td>
+<td><code>time</code></td>
+<td>Publication date of the related post.</td>
 </tr>
 </tbody>
 </table>

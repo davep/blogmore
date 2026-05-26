@@ -952,6 +952,8 @@
 <li><strong>GitHub Pages integration</strong> - Simple publishing workflow to GitHub Pages (or any git branch)</li>
 <li><strong>Configurable</strong> - Extensive configuration options via YAML config files or command-line arguments</li>
 <li><strong>Built-in linter</strong> - Check your site for broken internal links, missing metadata, duplicate titles, and other common issues</li>
+<li><strong>External link checking</strong> - Verify the reachability and HTTP status of all external links in your posts with delay options to avoid rate limits</li>
+<li><strong>External link dumping</strong> - Extract all external URLs from your posts into a CSV list for easy auditing</li>
 <li><strong>Sidebar customisation</strong> - Optional logo, custom links, and social media icons</li>
 <li><strong>SEO optimisation</strong> - Proper meta tags, Open Graph tags, and Twitter Card support</li>
 <li><strong>Automatic image optimisation</strong> - Optional multi-size "ladder" generation and next-gen WebP conversion for local images in Markdown posts; simple <code>&lt;img&gt;</code> tags are replaced with stable, responsive <code>&lt;picture&gt;</code> elements</li>
@@ -962,6 +964,7 @@
 <li><strong>Blog statistics page</strong> — Optional stats page with histograms, word counts, reading times, lifespan, top linked domains, and more</li>
 <li><strong>Calendar view</strong> — Optional full-history year calendar view of all posts, with links to day, month, and year archives (enable with <code>--with-calendar</code>)</li>
 <li><strong>Post graph</strong> — optional interactive force-directed graph connecting posts, tags, and categories via internal links</li>
+<li><strong>Related posts</strong> - Automatically find and display contextually relevant posts for each entry using a build-time TF-IDF and cosine similarity engine (enable with <code>--with-related</code>)</li>
 </ul>
 <h2 id="installation">Installation</h2>
 <p>BlogMore requires Python 3.12 or later.</p>
