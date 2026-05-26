@@ -8,6 +8,38 @@ from markdown.extensions import Extension
 from markdown.treeprocessors import Treeprocessor
 
 
+def is_external_link(href: str, site_domain: str | None = None) -> bool:
+    """Determine if a link is external.
+
+    Args:
+        href: The href attribute value.
+        site_domain: The base domain of the site.
+
+    Returns:
+        True if the link is external, False otherwise.
+    """
+    # Relative links (starting with /, #, or no scheme) are internal
+    if href.startswith(("/", "#")):
+        return False
+
+    # Parse the URL
+    parsed = urlparse(href)
+
+    # If there's no scheme or netloc, it's a relative link (internal)
+    if not parsed.scheme and not parsed.netloc:
+        return False
+
+    # If we have a site domain, check if the link matches
+    if site_domain:
+        link_domain = parsed.netloc.lower()
+        # If domains match, it's internal
+        if link_domain == site_domain or link_domain == f"www.{site_domain}":
+            return False
+
+    # All other links with schemes are external
+    return True
+
+
 class ExternalLinksProcessor(Treeprocessor):
     """Tree processor that adds target="_blank" to external links."""
 
@@ -67,44 +99,11 @@ class ExternalLinksProcessor(Treeprocessor):
             return
 
         # Check if link is external
-        if self._is_external_link(href):
+        if is_external_link(href, self.site_domain):
             # Add target="_blank" to open in new tab
             element.set("target", "_blank")
             # Add rel="noopener noreferrer" for security
             element.set("rel", "noopener noreferrer")
-
-    def _is_external_link(self, href: str) -> bool:
-        """Determine if a link is external.
-
-        Args:
-            href: The href attribute value
-
-        Returns:
-            True if the link is external, False otherwise
-        """
-        # Relative links (starting with /, #, or no scheme) are internal
-        if href.startswith("/") or href.startswith("#"):
-            return False
-
-        # Parse the URL
-        parsed = urlparse(href)
-
-        # If there's no scheme or netloc, it's a relative link (internal)
-        if not parsed.scheme and not parsed.netloc:
-            return False
-
-        # If we have a site domain, check if the link matches
-        if self.site_domain:
-            link_domain = parsed.netloc.lower()
-            # If domains match, it's internal
-            if (
-                link_domain == self.site_domain
-                or link_domain == f"www.{self.site_domain}"
-            ):
-                return False
-
-        # All other links with schemes are external
-        return True
 
 
 class ExternalLinksExtension(Extension):

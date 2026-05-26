@@ -17,6 +17,7 @@ from blogmore.generator.paths import (
     resolve_page_output_paths,
     resolve_post_output_paths,
 )
+from blogmore.markdown.external_links import is_external_link
 from blogmore.parser import PostParser, sanitize_for_url
 
 if TYPE_CHECKING:
@@ -75,32 +76,6 @@ class Linter:
         prefix = f"{report_path}: " if report_path else ""
         print(f"WARNING: {prefix}{message}", file=sys.stderr)
         self.warnings += 1
-
-    def _is_external_link(self, href: str) -> bool:
-        """Determine if a link is external."""
-        # Relative links (starting with /, #, or no scheme) are internal
-        if href.startswith(("/", "#")):
-            return False
-
-        # Parse the URL
-        parsed = urlparse(href)
-
-        # If there's no scheme and no netloc, it's a relative link (internal)
-        if not parsed.scheme and not parsed.netloc:
-            return False
-
-        # If we have a site domain, check if the link matches
-        if self.site_domain:
-            link_domain = parsed.netloc.lower()
-            # If domains match, it's internal
-            if (
-                link_domain == self.site_domain
-                or link_domain == f"www.{self.site_domain}"
-            ):
-                return False
-
-        # All other links with schemes are external
-        return True
 
     def lint(self) -> int:
         """Perform linting on the site.
@@ -401,7 +376,7 @@ class Linter:
     ) -> None:
         """Check a single link from the site configuration."""
         # Specialized check for config links (base_url is /)
-        if not href or self._is_external_link(href):
+        if not href or is_external_link(href, self.site_domain):
             return
 
         if href.startswith("#"):
@@ -460,7 +435,7 @@ class Linter:
                 )
 
         # Skip external links
-        if self._is_external_link(href):
+        if is_external_link(href, self.site_domain):
             return
 
         # Skip fragments

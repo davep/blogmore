@@ -4,54 +4,56 @@ import markdown
 
 from blogmore.markdown.external_links import (
     ExternalLinksExtension,
-    ExternalLinksProcessor,
+    is_external_link,
 )
 
 
-class TestExternalLinksProcessor:
-    """Test the ExternalLinksProcessor class."""
+class TestExternalLinks:
+    """Test the external link detection logic."""
 
     def test_is_external_link_absolute_external(self) -> None:
         """Test that absolute external URLs are identified correctly."""
-        processor = ExternalLinksProcessor(None, site_url="https://example.com")
-        assert processor._is_external_link("https://external.com/page")
-        assert processor._is_external_link("http://external.com/page")
+        assert is_external_link("https://external.com/page", site_domain="example.com")
+        assert is_external_link("http://external.com/page", site_domain="example.com")
 
     def test_is_external_link_relative(self) -> None:
         """Test that relative URLs are identified as internal."""
-        processor = ExternalLinksProcessor(None, site_url="https://example.com")
-        assert not processor._is_external_link("/posts/my-post")
-        assert not processor._is_external_link("posts/my-post")
-        assert not processor._is_external_link("../posts/my-post")
+        assert not is_external_link("/posts/my-post", site_domain="example.com")
+        assert not is_external_link("posts/my-post", site_domain="example.com")
+        assert not is_external_link("../posts/my-post", site_domain="example.com")
 
     def test_is_external_link_anchor(self) -> None:
         """Test that anchor links are identified as internal."""
-        processor = ExternalLinksProcessor(None, site_url="https://example.com")
-        assert not processor._is_external_link("#section")
-        assert not processor._is_external_link("#top")
+        assert not is_external_link("#section", site_domain="example.com")
+        assert not is_external_link("#top", site_domain="example.com")
 
     def test_is_external_link_same_domain(self) -> None:
         """Test that links to the same domain are identified as internal."""
-        processor = ExternalLinksProcessor(None, site_url="https://example.com")
-        assert not processor._is_external_link("https://example.com/page")
-        assert not processor._is_external_link("https://www.example.com/page")
+        assert not is_external_link(
+            "https://example.com/page", site_domain="example.com"
+        )
+        assert not is_external_link(
+            "https://www.example.com/page", site_domain="example.com"
+        )
 
     def test_is_external_link_no_site_url(self) -> None:
         """Test external link detection when no site URL is configured."""
-        processor = ExternalLinksProcessor(None, site_url=None)
         # With no site URL, all absolute URLs are considered external
-        assert processor._is_external_link("https://example.com/page")
+        assert is_external_link("https://example.com/page", site_domain=None)
         # Relative links are still internal
-        assert not processor._is_external_link("/page")
-        assert not processor._is_external_link("page")
+        assert not is_external_link("/page", site_domain=None)
+        assert not is_external_link("page", site_domain=None)
 
     def test_is_external_link_with_subdomain(self) -> None:
         """Test that different subdomains are treated as external."""
-        processor = ExternalLinksProcessor(None, site_url="https://example.com")
         # Different subdomain should be external
-        assert processor._is_external_link("https://blog.example.com/page")
+        assert is_external_link(
+            "https://blog.example.com/page", site_domain="example.com"
+        )
         # Note: www is treated as the same as no subdomain
-        assert not processor._is_external_link("https://www.example.com/page")
+        assert not is_external_link(
+            "https://www.example.com/page", site_domain="example.com"
+        )
 
 
 class TestExternalLinksExtension:

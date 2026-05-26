@@ -16,6 +16,7 @@ from jinja2 import (
 )
 from markupsafe import Markup
 
+from blogmore.markdown.external_links import is_external_link
 from blogmore.parser import Page, Post
 
 
@@ -158,38 +159,15 @@ class TemplateRenderer:
         """Determine if a link is external.
 
         Args:
-            href: The href attribute value
+            href: The href attribute value.
 
         Returns:
-            True if the link is external, False otherwise
+            True if the link is external, False otherwise.
         """
         # Skip empty hrefs
         if not href:
             return False
-
-        # Relative links (starting with /, #, or no scheme) are internal
-        if href.startswith("/") or href.startswith("#"):
-            return False
-
-        # Parse the URL
-        parsed = urlparse(href)
-
-        # If there's no scheme or netloc, it's a relative link (internal)
-        if not parsed.scheme and not parsed.netloc:
-            return False
-
-        # If we have a site domain, check if the link matches
-        if self.site_domain:
-            link_domain = parsed.netloc.lower()
-            # If domains match, it's internal
-            if (
-                link_domain == self.site_domain
-                or link_domain == f"www.{self.site_domain}"
-            ):
-                return False
-
-        # All other links with schemes are external
-        return True
+        return is_external_link(href, self.site_domain)
 
     @staticmethod
     def _shift_headings(html: str, shift: int = 1) -> str:
