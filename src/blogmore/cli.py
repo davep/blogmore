@@ -388,6 +388,13 @@ def create_parser() -> argparse.ArgumentParser:
         help="Delay in seconds between checking each link",
     )
 
+    check_parser.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Print verbose output (including OK links)",
+    )
+
     add_common_arguments(check_parser)
 
     parser.add_argument(

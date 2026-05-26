@@ -177,6 +177,7 @@ def check_external_links(
     ignore_list: list[str] | None = None,
     delay: float = 0.0,
     timeout: float = 5.0,
+    verbose: bool = False,
 ) -> int:
     """Check all external links found in posts.
 
@@ -186,6 +187,7 @@ def check_external_links(
         ignore_list: Optional list of bare domains or URL prefixes to ignore.
         delay: Delay in seconds between checking each link.
         timeout: Network timeout in seconds for link validation.
+        verbose: If True, print successfully resolved links as well.
 
     Returns:
         0 if all links are OK, or 1 if any broken links are found.
@@ -234,6 +236,8 @@ def check_external_links(
                     if error is not None:
                         print(f"{post.path}: {href} - {error}")
                         broken_links_found = True
+                    elif verbose:
+                        print(f"{post.path}: {href} - OK")
                     continue
 
                 # Introduce delay if requested
@@ -247,6 +251,8 @@ def check_external_links(
                     if error is not None:
                         print(f"{post.path}: {href} - {error}")
                         broken_links_found = True
+                    elif verbose:
+                        print(f"{post.path}: {href} - OK")
                 except RateLimitedError:
                     print(
                         f"Domain {domain} is now off limits (received HTTP 429 Too Many Requests)",

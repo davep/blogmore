@@ -614,6 +614,9 @@ blogmore links check [content_dir] [options]
 **`--delay <seconds>`**
 : Introduce a delay (float, e.g. `0.5` or `1.0`) in seconds between checking each unique link to avoid rate-limiting. Default is `0.0`.
 
+**`--verbose`**, **`-v`**
+: Print verbose output, including successfully resolved (reachable) links with an `OK` status.
+
 ### Arguments
 
 **`content_dir`** (optional)

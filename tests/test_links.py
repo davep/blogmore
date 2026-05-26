@@ -113,6 +113,65 @@ def test_check_external_links_success(
     assert req.headers.get("User-agent") is not None
 
 
+def test_check_external_links_verbose_success(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Test check_external_links with verbose=True when all links are working."""
+    post = Post(
+        path=Path("post.md"),
+        title="Post",
+        content="",
+        html_content='<p><a href="https://external1.com">link1</a></p>',
+    )
+
+    mock_response = MagicMock()
+    mock_response.status = 200
+    mock_response.__enter__.return_value = mock_response
+
+    mock_urlopen = MagicMock(return_value=mock_response)
+    monkeypatch.setattr(urllib.request, "urlopen", mock_urlopen)
+
+    result = check_external_links([post], verbose=True)
+
+    assert result == 0
+    captured = capsys.readouterr()
+    assert "post.md: https://external1.com - OK" in captured.out
+    assert mock_urlopen.call_count == 1
+
+
+def test_check_external_links_verbose_caching(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Test duplicate links reuse cached result, reporting again if verbose is True."""
+    post1 = Post(
+        path=Path("post1.md"),
+        title="Post 1",
+        content="",
+        html_content='<p><a href="https://external1.com">link1</a></p>',
+    )
+    post2 = Post(
+        path=Path("post2.md"),
+        title="Post 2",
+        content="",
+        html_content='<p><a href="https://external1.com">link2</a></p>',
+    )
+
+    mock_response = MagicMock()
+    mock_response.status = 200
+    mock_response.__enter__.return_value = mock_response
+
+    mock_urlopen = MagicMock(return_value=mock_response)
+    monkeypatch.setattr(urllib.request, "urlopen", mock_urlopen)
+
+    result = check_external_links([post1, post2], verbose=True)
+
+    assert result == 0
+    captured = capsys.readouterr()
+    assert "post1.md: https://external1.com - OK" in captured.out
+    assert "post2.md: https://external1.com - OK" in captured.out
+    assert mock_urlopen.call_count == 1
+
+
 def test_check_external_links_fallback_get(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
