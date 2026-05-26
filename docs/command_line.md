@@ -577,6 +577,38 @@ List all draft posts:
 blogmore drafts posts/
 ```
 
+## Links Command
+
+Manage or analyze external links found in your blog posts. This command does nothing on its own.
+
+### Synopsis
+
+```bash
+blogmore links <subcommand> [content_dir] [options]
+```
+
+### Subcommands
+
+#### `dump`
+
+Dump all external links found in posts to stdout in CSV format. The first field is the link, and the second field is the path to the post containing it. If the same external link appears multiple times in a single post, it is listed only once for that post. If a link appears in multiple posts, it is listed once for each post.
+
+```bash
+blogmore links dump [content_dir] [options]
+```
+
+### Arguments
+
+**`content_dir`** (optional)
+: Directory containing your Markdown blog posts.
+
+### Examples
+
+Dump all external links in the posts directory:
+```bash
+blogmore links dump posts/
+```
+
 ## Cache Command
 
 Manage the BlogMore cache directory.

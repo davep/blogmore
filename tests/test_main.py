@@ -2942,3 +2942,83 @@ class TestDraftsCLI:
             assert result == 1
             captured = capsys.readouterr()
             assert "Error: Content directory not found" in captured.err
+
+
+class TestLinksCLI:
+    """Test the 'links' CLI command."""
+
+    def test_links_dump_command(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str], temp_output_dir: Path
+    ) -> None:
+        """Test dumping external links with links dump command."""
+        posts_dir = tmp_path / "posts"
+        posts_dir.mkdir()
+
+        post1_file = posts_dir / "2024-01-15-first-post.md"
+        post1_file.write_text(
+            "---\n"
+            "title: First Post\n"
+            "date: 2024-01-15\n"
+            "---\n"
+            "Here is a [link](https://external.com) and another [link](https://external.com/page).\n"
+        )
+
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "blogmore",
+                "links",
+                "dump",
+                str(posts_dir),
+                "-o",
+                str(temp_output_dir),
+                "--site-url",
+                "https://internal.com",
+            ],
+        ):
+            result = main()
+            assert result == 0
+            captured = capsys.readouterr()
+            assert "https://external.com," in captured.out
+            assert "https://external.com/page," in captured.out
+            assert "internal.com" not in captured.out
+
+    def test_links_no_content_dir_fails(
+        self,
+        capsys: pytest.CaptureFixture[str],
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Test that links dump command fails when content_dir is not provided."""
+        work_dir = tmp_path / "work"
+        work_dir.mkdir()
+        monkeypatch.chdir(work_dir)
+
+        # Config file without content_dir
+        config_file = work_dir / "blogmore.yaml"
+        config_file.write_text("site_title: 'Links Test'\n")
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "links", "dump"],
+        ):
+            result = main()
+            assert result == 1
+            captured = capsys.readouterr()
+            assert "Error: content_dir is required" in captured.err
+
+    def test_links_nonexistent_dir_fails(
+        self, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Test that links dump command fails when content_dir does not exist."""
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "links", "dump", "/nonexistent/posts/dir"],
+        ):
+            result = main()
+            assert result == 1
+            captured = capsys.readouterr()
+            assert "Error: Content directory not found" in captured.err

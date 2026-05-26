@@ -343,6 +343,31 @@ def create_parser() -> argparse.ArgumentParser:
         help="Clear the cache directory",
     )
 
+    # Links command
+    links_parser = subparsers.add_parser(
+        "links",
+        help="Manage or analyze links in posts",
+    )
+
+    links_subparsers = links_parser.add_subparsers(
+        dest="links_command", help="Links sub-command", required=True
+    )
+
+    # Links dump sub-command
+    dump_parser = links_subparsers.add_parser(
+        "dump",
+        help="Dump all external links found in posts to stdout in CSV format",
+    )
+
+    dump_parser.add_argument(
+        "content_dir",
+        type=Path,
+        nargs="?",
+        help="Directory containing markdown blog posts",
+    )
+
+    add_common_arguments(dump_parser)
+
     parser.add_argument(
         "--version",
         action="version",

@@ -276,6 +276,39 @@ def main() -> int:
             print(f"Error linting site: {e}", file=sys.stderr)
             return 1
 
+    # Handle links command
+    if args.command == "links":
+        # Validate that content_dir is provided
+        if args.content_dir is None:
+            print(
+                "Error: content_dir is required. Specify it on the command line or in the config file.",
+                file=sys.stderr,
+            )
+            return 1
+
+        # Validate inputs
+        if not args.content_dir.exists():
+            print(
+                f"Error: Content directory not found: {args.content_dir}",
+                file=sys.stderr,
+            )
+            return 1
+
+        if args.links_command == "dump":
+            try:
+                from blogmore.links import dump_external_links
+                from blogmore.parser import PostParser
+
+                post_parser = PostParser(site_url=site_config.site_url)
+                posts = post_parser.parse_directory(
+                    args.content_dir, include_drafts=site_config.include_drafts
+                )
+                dump_external_links(posts, site_url=site_config.site_url)
+                return 0
+            except Exception as e:
+                print(f"Error dumping external links: {e}", file=sys.stderr)
+                return 1
+
     return 0
 
 

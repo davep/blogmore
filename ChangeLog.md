@@ -13,6 +13,9 @@
 - Added a `drafts` command line command to list the paths of all posts
   marked as being a draft.
   ([#539](https://github.com/davep/blogmore/pull/539))
+- Added `links` command line command with a `dump` subcommand to dump all
+  external links found in posts in CSV format.
+  ([#540](https://github.com/davep/blogmore/pull/540))
 
 ## v2.29.0
 
