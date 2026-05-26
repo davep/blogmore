@@ -396,7 +396,7 @@ no_watch: false
 # external_links:
 #   check:
 #     ignore:
-#       - https://github.com/davep
+#       - archive.org
 #       - google.com
 #       - t.co
 #       - twitter.com
