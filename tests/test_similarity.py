@@ -265,3 +265,39 @@ class TestSimilarityEngine:
             mock_full.assert_called_once()
             mock_fast.assert_not_called()
             assert engine._last_prune_vocab_size == 3
+
+    def test_related_posts_are_sorted_oldest_first(
+        self, site_config: SiteConfig
+    ) -> None:
+        """Verify related posts are sorted from oldest to newest post date."""
+        import datetime as dt
+
+        # post1 is newer (2025), post2 is older (2024), post3 is oldest (2023)
+        post1 = Post(
+            path=Path("p1.md"),
+            title="Python 1",
+            content="",
+            html_content="<p>python programming banana</p>",
+            date=dt.datetime(2025, 1, 1),
+        )
+        post2 = Post(
+            path=Path("p2.md"),
+            title="Python 2",
+            content="",
+            html_content="<p>python programming</p>",
+            date=dt.datetime(2024, 1, 1),
+        )
+        post3 = Post(
+            path=Path("p3.md"),
+            title="Banana",
+            content="",
+            html_content="<p>banana split dessert banana</p>",
+            date=dt.datetime(2023, 1, 1),
+        )
+
+        engine = SimilarityEngine(site_config)
+        engine.calculate_related_posts([post1, post2, post3])
+
+        # For post1, related posts (post2 and post3) should be sorted oldest to newest:
+        # oldest is post3 (2023), then post2 (2024)
+        assert post1.related_posts == [post3, post2]

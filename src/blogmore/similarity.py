@@ -207,6 +207,26 @@ def tokenise(text: str) -> list[str]:
     return [w for w in words if w not in STOP_WORDS]
 
 
+def _sort_oldest_first(posts: list[Post]) -> list[Post]:
+    """Sort a list of posts from oldest to newest post date.
+
+    Posts without dates are placed at the end of the list.
+
+    Args:
+        posts: List of Post objects.
+
+    Returns:
+        A new list of Post objects sorted from oldest to newest.
+    """
+    from blogmore.parser import post_sort_key
+
+    def key_func(p: Post) -> float:
+        val = post_sort_key(p)
+        return float("inf") if val == 0.0 else val
+
+    return sorted(posts, key=key_func)
+
+
 @dataclass
 class PostVector:
     """Represents a sparse TF-IDF vector for a post.
@@ -259,9 +279,10 @@ class SimilarityEngine:
         if len(posts) < 3:
             for post in posts:
                 # Exclude the post itself and limit to related_count
-                post.related_posts = [p for p in posts if p.path != post.path][
+                raw_related = [p for p in posts if p.path != post.path][
                     : self.site_config.related_count
                 ]
+                post.related_posts = _sort_oldest_first(raw_related)
             return
 
         current_paths = {p.path for p in posts}
@@ -500,7 +521,7 @@ class SimilarityEngine:
                         if len(related) >= related_count:
                             break
 
-            post.related_posts = related
+            post.related_posts = _sort_oldest_first(related)
 
     def _calculate_cosine_similarity(self, a: PostVector, b: PostVector) -> float:
         """Calculate the cosine similarity between two post vectors.
