@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.30.0
 
-**Released: WiP**
+**Released: 2026-05-26**
 
 - Added `aria-label` attributes to category and tag links in default and
   example templates to improve accessibility for screen reader users by
