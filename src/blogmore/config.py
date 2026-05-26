@@ -73,6 +73,8 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
         "related_count",
         "related_prune_vocab_size",
         "linting_ignore",
+        "external_links_check_ignore",
+        "external_links_check_timeout",
         "image_widths",
     }
 )
@@ -653,5 +655,57 @@ def parse_site_config_from_dict(
             kwargs["linting_ignore"] = []
     else:
         kwargs["linting_ignore"] = []
+
+    # --- external_links check options (YAML keys: "external_links: check: ignore/timeout")
+    if "external_links_check_timeout" in overrides:
+        kwargs["external_links_check_timeout"] = overrides[
+            "external_links_check_timeout"
+        ]
+
+    raw_external_links = config.get("external_links")
+    if isinstance(raw_external_links, dict):
+        raw_check = raw_external_links.get("check")
+        if isinstance(raw_check, dict):
+            raw_ignore = raw_check.get("ignore")
+            if raw_ignore is None:
+                kwargs["external_links_check_ignore"] = []
+            elif isinstance(raw_ignore, str):
+                kwargs["external_links_check_ignore"] = [raw_ignore]
+            elif isinstance(raw_ignore, list) and all(
+                isinstance(item, str) for item in raw_ignore
+            ):
+                kwargs["external_links_check_ignore"] = raw_ignore
+            else:
+                errors.append(
+                    "external_links: check: ignore in the configuration file must be a string "
+                    "or a list of strings; ignoring value"
+                )
+                kwargs["external_links_check_ignore"] = []
+
+            if "external_links_check_timeout" not in overrides:
+                if "timeout" in raw_check:
+                    raw_timeout = raw_check["timeout"]
+                    if (
+                        isinstance(raw_timeout, (int, float))
+                        and not isinstance(raw_timeout, bool)
+                        and raw_timeout > 0
+                    ):
+                        kwargs["external_links_check_timeout"] = float(raw_timeout)
+                    else:
+                        errors.append(
+                            "external_links: check: timeout in the configuration file must be a positive number; "
+                            "using the default"
+                        )
+                        kwargs["external_links_check_timeout"] = 5.0
+                else:
+                    kwargs["external_links_check_timeout"] = 5.0
+        else:
+            kwargs["external_links_check_ignore"] = []
+            if "external_links_check_timeout" not in overrides:
+                kwargs["external_links_check_timeout"] = 5.0
+    else:
+        kwargs["external_links_check_ignore"] = []
+        if "external_links_check_timeout" not in overrides:
+            kwargs["external_links_check_timeout"] = 5.0
 
     return kwargs, errors

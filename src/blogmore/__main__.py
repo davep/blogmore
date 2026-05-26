@@ -309,6 +309,27 @@ def main() -> int:
                 print(f"Error dumping external links: {e}", file=sys.stderr)
                 return 1
 
+        elif args.links_command == "check":
+            try:
+                from blogmore.links import check_external_links
+                from blogmore.parser import PostParser
+
+                post_parser = PostParser(site_url=site_config.site_url)
+                posts = post_parser.parse_directory(
+                    args.content_dir, include_drafts=site_config.include_drafts
+                )
+                return check_external_links(
+                    posts=posts,
+                    site_url=site_config.site_url,
+                    ignore_list=site_config.external_links_check_ignore,
+                    delay=args.delay,
+                    timeout=site_config.external_links_check_timeout,
+                    verbose=args.verbose,
+                )
+            except Exception as e:
+                print(f"Error checking external links: {e}", file=sys.stderr)
+                return 1
+
     return 0
 
 

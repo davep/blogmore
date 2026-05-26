@@ -1431,6 +1431,50 @@ linting:
 
 This is a **configuration file only** option — it cannot be set on the command line.
 
+### Link Checking Options
+
+#### `external_links: check: ignore`
+
+A list of external URLs or domains that the link checker should ignore when validating external links in blog posts.
+
+This is useful for:
+- Avoiding slow checks or rate limits on frequently linked large domains.
+- Excluding private, intranet, or development URLs that are not accessible from the public internet.
+
+Each entry can be either:
+- A bare domain (e.g. `google.com`) to ignore any link within that domain (including subdomains like `sub.google.com`).
+- A URL prefix (e.g. `https://github.com/davep`) to ignore any link that starts with that exact prefix.
+
+**Type:** List of strings (domains/prefixes)  
+**Default:** *(empty)*
+
+```yaml
+external_links:
+  check:
+    ignore:
+      - https://github.com/davep
+      - google.com
+      - t.co
+      - twitter.com
+```
+
+This is a **configuration file only** option — it cannot be set on the command line.
+
+#### `external_links: check: timeout`
+
+The connection timeout in seconds for verifying external links in blog posts.
+
+**Type:** Float or Integer  
+**Default:** `5.0`
+
+```yaml
+external_links:
+  check:
+    timeout: 10.0
+```
+
+This is a **configuration file only** option — it cannot be set on the command line.
+
 ### Serve Command Options
 
 Options specific to the `serve` command. These are only used when running `blogmore serve`.
