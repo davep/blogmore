@@ -597,6 +597,23 @@ Dump all external links found in posts to stdout in CSV format. The first field 
 blogmore links dump [content_dir] [options]
 ```
 
+#### `check`
+
+Check the reachability and status of all external links found in posts. It verifies whether external domains can be contacted and if the links resolve successfully.
+
+To minimize bandwidth usage, it uses HEAD requests first. If a HEAD request returns HTTP 403 or 405, it falls back to a GET request requesting only the first 1024 bytes.
+
+If a link returns HTTP 429 (Too Many Requests), that entire domain is assumed to be off limits and skipped for the rest of the checking session. Results are cached within a session so each unique link is only checked once.
+
+```bash
+blogmore links check [content_dir] [options]
+```
+
+##### Options
+
+**`--delay <seconds>`**
+: Introduce a delay (float, e.g. `0.5` or `1.0`) in seconds between checking each unique link to avoid rate-limiting. Default is `0.0`.
+
 ### Arguments
 
 **`content_dir`** (optional)
@@ -607,6 +624,11 @@ blogmore links dump [content_dir] [options]
 Dump all external links in the posts directory:
 ```bash
 blogmore links dump posts/
+```
+
+Check all external links with a 0.5 seconds delay between requests:
+```bash
+blogmore links check posts/ --delay 0.5
 ```
 
 ## Cache Command

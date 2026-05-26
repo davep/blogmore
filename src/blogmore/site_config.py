@@ -515,6 +515,17 @@ class SiteConfig:
     command line.  Empty by default.
     """
 
+    external_links_check_ignore: list[str] = field(default_factory=list)
+    """Optional list of external URLs/domains to ignore during link checking.
+
+    Each entry can be a bare domain (e.g. `google.com`) to ignore all links
+    within that domain, or a URL prefix (e.g. `https://github.com/davep`) to
+    ignore any link starting with that fragment.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line. Empty by default.
+    """
+
     head: list[dict[str, Any]] = field(default_factory=list)
     """Extra ``<head>`` tags to inject into every generated page.
 

@@ -73,6 +73,7 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
         "related_count",
         "related_prune_vocab_size",
         "linting_ignore",
+        "external_links_check_ignore",
         "image_widths",
     }
 )
@@ -653,5 +654,30 @@ def parse_site_config_from_dict(
             kwargs["linting_ignore"] = []
     else:
         kwargs["linting_ignore"] = []
+
+    # --- external_links_check_ignore (YAML key: "external_links: check: ignore")
+    raw_external_links = config.get("external_links")
+    if isinstance(raw_external_links, dict):
+        raw_check = raw_external_links.get("check")
+        if isinstance(raw_check, dict):
+            raw_ignore = raw_check.get("ignore")
+            if raw_ignore is None:
+                kwargs["external_links_check_ignore"] = []
+            elif isinstance(raw_ignore, str):
+                kwargs["external_links_check_ignore"] = [raw_ignore]
+            elif isinstance(raw_ignore, list) and all(
+                isinstance(item, str) for item in raw_ignore
+            ):
+                kwargs["external_links_check_ignore"] = raw_ignore
+            else:
+                errors.append(
+                    "external_links: check: ignore in the configuration file must be a string "
+                    "or a list of strings; ignoring value"
+                )
+                kwargs["external_links_check_ignore"] = []
+        else:
+            kwargs["external_links_check_ignore"] = []
+    else:
+        kwargs["external_links_check_ignore"] = []
 
     return kwargs, errors

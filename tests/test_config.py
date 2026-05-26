@@ -1488,3 +1488,55 @@ class TestParseSiteConfigFromDict:
         assert len(errors) == 1
         assert "read_time_wpm" in errors[0]
         assert kwargs["read_time_wpm"] == 200
+
+    def test_external_links_check_ignore_valid_list(self, tmp_path: Path) -> None:
+        """A valid list of ignore strings is accepted."""
+        from blogmore.config import parse_site_config_from_dict
+
+        config = {
+            "external_links": {
+                "check": {
+                    "ignore": [
+                        "google.com",
+                        "https://github.com/davep",
+                    ]
+                }
+            }
+        }
+        kwargs, errors = parse_site_config_from_dict(config, tmp_path)
+
+        assert errors == []
+        assert kwargs["external_links_check_ignore"] == [
+            "google.com",
+            "https://github.com/davep",
+        ]
+
+    def test_external_links_check_ignore_single_string(self, tmp_path: Path) -> None:
+        """A single string is converted to a list containing that string."""
+        from blogmore.config import parse_site_config_from_dict
+
+        config = {"external_links": {"check": {"ignore": "google.com"}}}
+        kwargs, errors = parse_site_config_from_dict(config, tmp_path)
+
+        assert errors == []
+        assert kwargs["external_links_check_ignore"] == ["google.com"]
+
+    def test_external_links_check_ignore_absent(self, tmp_path: Path) -> None:
+        """When ignore list is absent, it defaults to an empty list."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({}, tmp_path)
+
+        assert errors == []
+        assert kwargs["external_links_check_ignore"] == []
+
+    def test_external_links_check_ignore_malformed(self, tmp_path: Path) -> None:
+        """A malformed ignore list produces an error and falls back to empty list."""
+        from blogmore.config import parse_site_config_from_dict
+
+        config = {"external_links": {"check": {"ignore": 12345}}}
+        kwargs, errors = parse_site_config_from_dict(config, tmp_path)
+
+        assert len(errors) == 1
+        assert "external_links: check: ignore" in errors[0]
+        assert kwargs["external_links_check_ignore"] == []

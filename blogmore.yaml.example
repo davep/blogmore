@@ -386,3 +386,18 @@ no_watch: false
 
 # Optional: Git remote to push to (default: origin)
 # remote: origin
+
+# Link checking options (only used with 'blogmore links check' command)
+
+# Optional: List of external URLs/domains to ignore during link checking.
+# A bare domain (e.g. google.com) ignores any link within that domain.
+# A URL prefix (e.g. https://github.com/davep) ignores any link starting with
+# that fragment.
+# external_links:
+#   check:
+#     ignore:
+#       - https://github.com/davep
+#       - google.com
+#       - t.co
+#       - twitter.com
+

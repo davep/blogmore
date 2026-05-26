@@ -368,6 +368,28 @@ def create_parser() -> argparse.ArgumentParser:
 
     add_common_arguments(dump_parser)
 
+    # Links check sub-command
+    check_parser = links_subparsers.add_parser(
+        "check",
+        help="Check all external links in posts",
+    )
+
+    check_parser.add_argument(
+        "content_dir",
+        type=Path,
+        nargs="?",
+        help="Directory containing markdown blog posts",
+    )
+
+    check_parser.add_argument(
+        "--delay",
+        type=float,
+        default=0.0,
+        help="Delay in seconds between checking each link",
+    )
+
+    add_common_arguments(check_parser)
+
     parser.add_argument(
         "--version",
         action="version",
