@@ -1540,3 +1540,77 @@ class TestParseSiteConfigFromDict:
         assert len(errors) == 1
         assert "external_links: check: ignore" in errors[0]
         assert kwargs["external_links_check_ignore"] == []
+
+    def test_external_links_check_timeout_valid_float(self, tmp_path: Path) -> None:
+        """A valid float timeout is accepted and converted to float."""
+        from blogmore.config import parse_site_config_from_dict
+
+        config = {"external_links": {"check": {"timeout": 10.5}}}
+        kwargs, errors = parse_site_config_from_dict(config, tmp_path)
+
+        assert errors == []
+        assert kwargs["external_links_check_timeout"] == 10.5
+
+    def test_external_links_check_timeout_valid_int(self, tmp_path: Path) -> None:
+        """A valid int timeout is accepted and converted to float."""
+        from blogmore.config import parse_site_config_from_dict
+
+        config = {"external_links": {"check": {"timeout": 10}}}
+        kwargs, errors = parse_site_config_from_dict(config, tmp_path)
+
+        assert errors == []
+        assert kwargs["external_links_check_timeout"] == 10.0
+
+    def test_external_links_check_timeout_absent(self, tmp_path: Path) -> None:
+        """When timeout is absent, it defaults to 5.0."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({}, tmp_path)
+
+        assert errors == []
+        assert kwargs["external_links_check_timeout"] == 5.0
+
+    def test_external_links_check_timeout_malformed(self, tmp_path: Path) -> None:
+        """A malformed timeout produces an error and falls back to 5.0."""
+        from blogmore.config import parse_site_config_from_dict
+
+        config = {"external_links": {"check": {"timeout": "ten seconds"}}}
+        kwargs, errors = parse_site_config_from_dict(config, tmp_path)
+
+        assert len(errors) == 1
+        assert "external_links: check: timeout" in errors[0]
+        assert kwargs["external_links_check_timeout"] == 5.0
+
+    def test_external_links_check_timeout_bool(self, tmp_path: Path) -> None:
+        """A boolean timeout produces an error and falls back to 5.0."""
+        from blogmore.config import parse_site_config_from_dict
+
+        config = {"external_links": {"check": {"timeout": True}}}
+        kwargs, errors = parse_site_config_from_dict(config, tmp_path)
+
+        assert len(errors) == 1
+        assert "external_links: check: timeout" in errors[0]
+        assert kwargs["external_links_check_timeout"] == 5.0
+
+    def test_external_links_check_timeout_negative(self, tmp_path: Path) -> None:
+        """A negative timeout produces an error and falls back to 5.0."""
+        from blogmore.config import parse_site_config_from_dict
+
+        config = {"external_links": {"check": {"timeout": -1.0}}}
+        kwargs, errors = parse_site_config_from_dict(config, tmp_path)
+
+        assert len(errors) == 1
+        assert "external_links: check: timeout" in errors[0]
+        assert kwargs["external_links_check_timeout"] == 5.0
+
+    def test_external_links_check_timeout_override(self, tmp_path: Path) -> None:
+        """An override for the timeout wins over config and default."""
+        from blogmore.config import parse_site_config_from_dict
+
+        config = {"external_links": {"check": {"timeout": 10.0}}}
+        kwargs, errors = parse_site_config_from_dict(
+            config, tmp_path, cli_overrides={"external_links_check_timeout": 20.0}
+        )
+
+        assert errors == []
+        assert kwargs["external_links_check_timeout"] == 20.0

@@ -176,6 +176,7 @@ def check_external_links(
     site_url: str | None = None,
     ignore_list: list[str] | None = None,
     delay: float = 0.0,
+    timeout: float = 5.0,
 ) -> int:
     """Check all external links found in posts.
 
@@ -184,6 +185,7 @@ def check_external_links(
         site_url: The site URL to filter out internal links.
         ignore_list: Optional list of bare domains or URL prefixes to ignore.
         delay: Delay in seconds between checking each link.
+        timeout: Network timeout in seconds for link validation.
 
     Returns:
         0 if all links are OK, or 1 if any broken links are found.
@@ -194,7 +196,6 @@ def check_external_links(
         site_domain = parsed.netloc.lower()
 
     user_agent = f"BlogMore v{__version__} (https://blogmore.davep.dev/)"
-    timeout = 5.0
 
     # Cache of check results: Map from link to error message (or None if working)
     cache: dict[str, str | None] = {}

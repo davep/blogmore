@@ -526,6 +526,16 @@ class SiteConfig:
     command line. Empty by default.
     """
 
+    external_links_check_timeout: float = 5.0
+    """Network timeout in seconds for link validation.
+
+    Controls how long the link checker waits for external websites to respond
+    before marking them as timed out.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line. Defaults to `5.0`.
+    """
+
     head: list[dict[str, Any]] = field(default_factory=list)
     """Extra ``<head>`` tags to inject into every generated page.
 

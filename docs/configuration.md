@@ -1460,6 +1460,21 @@ external_links:
 
 This is a **configuration file only** option — it cannot be set on the command line.
 
+#### `external_links: check: timeout`
+
+The connection timeout in seconds for verifying external links in blog posts.
+
+**Type:** Float or Integer  
+**Default:** `5.0`
+
+```yaml
+external_links:
+  check:
+    timeout: 10.0
+```
+
+This is a **configuration file only** option — it cannot be set on the command line.
+
 ### Serve Command Options
 
 Options specific to the `serve` command. These are only used when running `blogmore serve`.

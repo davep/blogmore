@@ -311,3 +311,31 @@ def test_check_external_links_keyboard_interrupt(
     assert result == 1
     captured = capsys.readouterr()
     assert "Link checking interrupted by user" in captured.err
+
+
+def test_check_external_links_custom_timeout(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test check_external_links passes the custom timeout parameter to urlopen."""
+    post = Post(
+        path=Path("post.md"),
+        title="Post",
+        content="",
+        html_content='<p><a href="https://external1.com">link1</a></p>',
+    )
+
+    mock_response = MagicMock()
+    mock_response.status = 200
+    mock_response.__enter__.return_value = mock_response
+
+    mock_urlopen = MagicMock(return_value=mock_response)
+    monkeypatch.setattr(urllib.request, "urlopen", mock_urlopen)
+
+    # Call with a custom timeout of 12.3 seconds
+    result = check_external_links([post], timeout=12.3)
+
+    assert result == 0
+    assert mock_urlopen.call_count == 1
+    # Check that timeout parameter was passed to urlopen
+    kwargs = mock_urlopen.call_args[1]
+    assert kwargs.get("timeout") == 12.3

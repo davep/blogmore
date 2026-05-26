@@ -400,4 +400,6 @@ no_watch: false
 #       - google.com
 #       - t.co
 #       - twitter.com
+#     # Optional: Network timeout in seconds for link validation (default: 5.0)
+#     timeout: 5.0
 

@@ -323,6 +323,7 @@ def main() -> int:
                     site_url=site_config.site_url,
                     ignore_list=site_config.external_links_check_ignore,
                     delay=args.delay,
+                    timeout=site_config.external_links_check_timeout,
                 )
             except Exception as e:
                 print(f"Error checking external links: {e}", file=sys.stderr)
