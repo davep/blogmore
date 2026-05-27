@@ -59,9 +59,15 @@ class TestTemplateRenderer:
         """Test that format_date produces archive links for year, month and day."""
         date = dt.datetime(2026, 2, 20, 15, 46, 0, tzinfo=dt.UTC)
         formatted = TemplateRenderer._format_date(date)
-        assert '<a href="/2026/">2026</a>' in formatted
-        assert '<a href="/2026/02/">02</a>' in formatted
-        assert '<a href="/2026/02/20/">20</a>' in formatted
+        assert '<a href="/2026/" aria-label="Archive for 2026">2026</a>' in formatted
+        assert (
+            '<a href="/2026/02/" aria-label="Archive for February 2026">02</a>'
+            in formatted
+        )
+        assert (
+            '<a href="/2026/02/20/" aria-label="Archive for February 20, 2026">20</a>'
+            in formatted
+        )
         assert "15:46:00" in formatted
         assert "UTC" in formatted
 

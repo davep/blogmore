@@ -22,7 +22,7 @@
     <section class="calendar-year-section">
         <h2 class="calendar-year-label">
             {% if year_group.year_url %}
-            <a href="{{ year_group.year_url }}">{{ year_group.year }}</a>
+            <a href="{{ year_group.year_url }}" aria-label="Archive for {{ year_group.year }}">{{ year_group.year }}</a>
             {% else %}
             {{ year_group.year }}
             {% endif %}
@@ -33,7 +33,7 @@
             <div class="calendar-month">
                 <h3 class="calendar-month-label">
                     {% if cal_month.month_url %}
-                    <a href="{{ cal_month.month_url }}">{{ cal_month.month_name }}</a>
+                    <a href="{{ cal_month.month_url }}" aria-label="Archive for {{ cal_month.month_name }} {{ year_group.year }}">{{ cal_month.month_name }}</a>
                     {% else %}
                     {{ cal_month.month_name }}
                     {% endif %}

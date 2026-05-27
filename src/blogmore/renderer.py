@@ -80,9 +80,9 @@ class TemplateRenderer:
     def _format_date(date: dt.datetime | None) -> Markup:
         """Format a datetime object as HTML with archive links.
 
-        The date portion is rendered as
-        `<a href="/{year}/">{year}</a>-<a href="/{year}/{mm}/">{mm}</a>-<a href="/{year}/{mm}/{dd}/">{dd}</a>`
-        so each component links to the corresponding archive page.
+        The date portion is rendered as separate links for the year, month, and day
+        (separated by dashes), with each link containing an appropriate aria-label
+        pointing to the corresponding archive page.
 
         Args:
             date: The datetime to format.
@@ -97,9 +97,18 @@ class TemplateRenderer:
         month = date.month
         day = date.day
 
-        year_link = Markup(f'<a href="/{year}/">{year}</a>')
-        month_link = Markup(f'<a href="/{year}/{month:02d}/">{month:02d}</a>')
-        day_link = Markup(f'<a href="/{year}/{month:02d}/{day:02d}/">{day:02d}</a>')
+        year_label = f"Archive for {year}"
+        month_name = date.strftime("%B")
+        month_label = f"Archive for {month_name} {year}"
+        day_label = f"Archive for {month_name} {day}, {year}"
+
+        year_link = Markup(f'<a href="/{year}/" aria-label="{year_label}">{year}</a>')
+        month_link = Markup(
+            f'<a href="/{year}/{month:02d}/" aria-label="{month_label}">{month:02d}</a>'
+        )
+        day_link = Markup(
+            f'<a href="/{year}/{month:02d}/{day:02d}/" aria-label="{day_label}">{day:02d}</a>'
+        )
 
         time_str = date.strftime("%H:%M:%S")
         formatted = Markup(f"{year_link}-{month_link}-{day_link} {time_str}")

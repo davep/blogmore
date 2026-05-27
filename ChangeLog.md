@@ -10,6 +10,11 @@
 - Added an alternative relatedness graph view to the graph page when the
   related posts feature (`with_related`) is enabled.
   ([#546](https://github.com/davep/blogmore/pull/546))
+- Added `aria-label` attributes to year, month, and day archive links in the
+  archive list pages and calendar templates to improve accessibility for
+  screen reader users by preventing identical link text (e.g. "05" or "May")
+  with different destinations.
+  ([#547](https://github.com/davep/blogmore/pull/547))
 
 ## v2.30.0
 
