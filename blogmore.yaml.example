@@ -161,19 +161,19 @@ posts_per_feed: 20
 # Must be a positive integer. Configuration file only.
 # read_time_wpm: 200
 
-# Optional: Show "References & mentions" section on individual post pages (default: false)
+# Optional: Show "References & Mentions" section on individual post pages (default: false)
 # When enabled, BlogMore scans all post content for internal links and shows a
-# "References & mentions" section on each linked-to post page, listing which
+# "References & Mentions" section on each linked-to post page, listing which
 # posts link to it along with a short plain-text context snippet.
 # Only links in posts are considered; links in static pages are excluded.
 # Configuration file only.
 # with_backlinks: false
 
-# Optional: Title for the backlinks section heading (default: "References & mentions")
-# Overrides the heading displayed in the "References & mentions" section on post
+# Optional: Title for the backlinks section heading (default: "References & Mentions")
+# Overrides the heading displayed in the "References & Mentions" section on post
 # pages when with_backlinks is enabled.
 # Configuration file only.
-# backlinks_title: "References & mentions"
+# backlinks_title: "References & Mentions"
 
 # Optional: Enable comment invitation section on individual post pages (default: false)
 # When true and invite_comments_to is also set, every post will show a subtle

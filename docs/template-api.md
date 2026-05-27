@@ -29,7 +29,7 @@ below lists all variables that are available in every template.
 | `categories_url` | `str` | URL to the categories overview page (respects `categories_path` and `clean_urls`). |
 | `with_read_time` | `bool` | `True` when reading time display is enabled. |
 | `with_backlinks` | `bool` | `True` when the backlinks feature is enabled. |
-| `backlinks_title` | `str` | The heading text for the backlinks section (defaults to `"References & mentions"`). |
+| `backlinks_title` | `str` | The heading text for the backlinks section (defaults to `"References & Mentions"`). |
 | `with_related` | `bool` | `True` when the related posts feature is enabled. |
 | `related_title` | `str` | The heading text for the related posts section (defaults to `"Related Posts"`). |
 | `with_advert` | `bool` | `True` when the "Generated with BlogMore" footer is shown. |
@@ -354,7 +354,7 @@ widget.  It is called like this:
 
 | Block | Description |
 |---|---|
-| `backlinks` | The "References &amp; mentions" section shown after the bottom post-navigation on individual post pages when `with_backlinks` is enabled and there are inbound links.  Override this block in a custom `post.html` to change the layout or styling of the section. |
+| `backlinks` | The "References &amp; Mentions" section shown after the bottom post-navigation on individual post pages when `with_backlinks` is enabled and there are inbound links.  Override this block in a custom `post.html` to change the layout or styling of the section. |
 | `comment_invite` | The comment invitation section shown after the bottom post-navigation (and before the `backlinks` block) when `invite_comments` is enabled.  By default this block includes `_comment_invite.html`.  Override `_comment_invite.html` in your custom templates directory to change the wording or layout, or override this block entirely in a custom `post.html`. |
 
 ## CSS classes used by templates
@@ -384,7 +384,7 @@ The following CSS classes are part of the stable template/CSS contract:
 | `.category-link` | `a` | Category badge link. |
 | `.theme-toggle` | `button` | Dark/light mode toggle button. |
 | `.highlight` | `div` | Syntax-highlighted code block. |
-| `.backlinks` | `section` | "References &amp; mentions" container on a post page (only when `with_backlinks` is enabled and the post has inbound links). |
+| `.backlinks` | `section` | "References &amp; Mentions" container on a post page (only when `with_backlinks` is enabled and the post has inbound links). |
 | `.backlinks-heading` | `h2` | Heading of the backlinks section. |
 | `.backlinks-list` | `ul` | Ordered list of back-linking posts. |
 | `.backlink-item` | `li` | A single back-link entry (one per referencing post). |
