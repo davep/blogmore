@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.31.0
 
-**Released: WiP**
+**Released: 2026-05-27**
 
 - Renamed the default backlinks section title from "References & mentions"
   to "References & Mentions".
