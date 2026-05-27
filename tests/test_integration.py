@@ -509,7 +509,7 @@ class TestBacklinksTitle:
     def test_default_backlinks_title(
         self, tmp_path: Path, temp_output_dir: Path
     ) -> None:
-        """Test that the default backlinks title is 'References & mentions'."""
+        """Test that the default backlinks title is 'References & Mentions'."""
         from blogmore.generator import SiteGenerator
 
         content_dir = tmp_path / "content"
@@ -529,7 +529,7 @@ class TestBacklinksTitle:
         target_html = (
             temp_output_dir / "2024" / "01" / "10" / "target-post.html"
         ).read_text()
-        assert "References &amp; mentions" in target_html
+        assert "References &amp; Mentions" in target_html
 
     def test_custom_backlinks_title(
         self, tmp_path: Path, temp_output_dir: Path
@@ -556,12 +556,12 @@ class TestBacklinksTitle:
             temp_output_dir / "2024" / "01" / "10" / "target-post.html"
         ).read_text()
         assert "Cited by" in target_html
-        assert "References &amp; mentions" not in target_html
+        assert "References &amp; Mentions" not in target_html
 
     def test_backlinks_title_default_value(self, tmp_path: Path) -> None:
-        """Test that SiteConfig defaults backlinks_title to 'References & mentions'."""
+        """Test that SiteConfig defaults backlinks_title to 'References & Mentions'."""
         config = SiteConfig(output_dir=tmp_path)
-        assert config.backlinks_title == "References & mentions"
+        assert config.backlinks_title == "References & Mentions"
 
 
 class TestRelatedTitle:

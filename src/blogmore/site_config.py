@@ -175,11 +175,11 @@ class SiteConfig:
     """
 
     with_backlinks: bool = False
-    """Whether to show a "References & mentions" section on individual post pages.
+    """Whether to show a "References & Mentions" section on individual post pages.
 
     When enabled the generator scans all post content for internal links and
     builds a map of which posts link to which other posts.  On each post page
-    that is referenced by at least one other post, a "References & mentions"
+    that is referenced by at least one other post, a "References & Mentions"
     section is appended below the bottom post-navigation links, listing the
     posts that link here together with a short plain-text snippet showing the
     surrounding context of each link.
@@ -191,15 +191,15 @@ class SiteConfig:
     command line.  Off by default.
     """
 
-    backlinks_title: str = "References & mentions"
+    backlinks_title: str = "References & Mentions"
     """Title displayed as the heading of the backlinks section on post pages.
 
-    Overrides the default "References & mentions" heading rendered inside the
+    Overrides the default "References & Mentions" heading rendered inside the
     ``backlinks`` template block on individual post pages.  Only meaningful
     when ``with_backlinks`` is ``True``.
 
     This is a **configuration file only** option — it cannot be set on the
-    command line.  Defaults to ``"References & mentions"``.
+    command line.  Defaults to ``"References & Mentions"``.
     """
 
     socials_title: str = "Social"
@@ -601,7 +601,7 @@ class SiteConfig:
     When ``True`` and ``invite_comments_to`` is also configured, every
     post will display a comment invitation section towards the bottom of the
     page, after the next/previous navigation buttons and before any
-    "References & mentions" section.
+    "References & Mentions" section.
 
     The per-post ``invite_comments`` front-matter key overrides this setting
     for individual posts.

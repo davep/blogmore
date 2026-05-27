@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Renamed the default backlinks section title from "References & mentions"
+  to "References & Mentions".
+  ([#544](https://github.com/davep/blogmore/pull/544))
+
 ## v2.30.0
 
 **Released: 2026-05-26**

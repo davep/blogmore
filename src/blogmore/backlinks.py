@@ -1,7 +1,7 @@
 """Back-linking system for BlogMore.
 
 Calculates which posts link to other posts, providing data for a
-"References & mentions" section displayed on individual post pages.
+"References & Mentions" section displayed on individual post pages.
 
 This module is only consulted when `with_backlinks` is enabled in the
 site configuration.  When the feature is disabled none of these functions

@@ -533,7 +533,7 @@ read_time_wpm: 250
 
 #### `with_backlinks`
 
-Enable the "References &amp; mentions" section on individual post pages.  When enabled, BlogMore scans the Markdown content of every post for internal links and builds a map of which posts link to which other posts.  Any post that is linked to by at least one other post will have a "References &amp; mentions" section displayed after the bottom previous/next navigation, listing the posts that link to it together with a short plain-text context snippet showing where the link appears in the source post.
+Enable the "References &amp; Mentions" section on individual post pages.  When enabled, BlogMore scans the Markdown content of every post for internal links and builds a map of which posts link to which other posts.  Any post that is linked to by at least one other post will have a "References &amp; Mentions" section displayed after the bottom previous/next navigation, listing the posts that link to it together with a short plain-text context snippet showing where the link appears in the source post.
 
 Only links found in the Markdown of *posts* are considered — links found in static *pages* are excluded.  Self-links (a post linking to itself) and the title links BlogMore adds in the references section itself are also excluded.
 
@@ -550,20 +550,20 @@ with_backlinks: true
 
 #### `backlinks_title`
 
-Override the heading displayed at the top of the "References &amp; mentions" section on individual post pages.  Only meaningful when [`with_backlinks`](#with_backlinks) is `true`.
+Override the heading displayed at the top of the "References &amp; Mentions" section on individual post pages.  Only meaningful when [`with_backlinks`](#with_backlinks) is `true`.
 
-This is a **configuration file only** option — it cannot be set on the command line.  Defaults to `"References & mentions"`.
+This is a **configuration file only** option — it cannot be set on the command line.  Defaults to `"References & Mentions"`.
 
 **Type:** String  
-**Default:** `"References & mentions"`
+**Default:** `"References & Mentions"`
 
 ```yaml
-backlinks_title: "References & mentions"
+backlinks_title: "References & Mentions"
 ```
 
 #### `invite_comments`
 
-Enable a comment invitation section on individual post pages.  When `true` and [`invite_comments_to`](#invite_comments_to) is also configured, every post will display a subtle invitation section towards the bottom of the page, after the next/previous navigation buttons and before any "References &amp; mentions" section.  The section contains a `mailto:` link so readers can email their comments or questions about the post.
+Enable a comment invitation section on individual post pages.  When `true` and [`invite_comments_to`](#invite_comments_to) is also configured, every post will display a subtle invitation section towards the bottom of the page, after the next/previous navigation buttons and before any "References &amp; Mentions" section.  The section contains a `mailto:` link so readers can email their comments or questions about the post.
 
 The invitation section is a Jinja2 template (`_comment_invite.html`) that can be overridden in a custom templates directory.
 
