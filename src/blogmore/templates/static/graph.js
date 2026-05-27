@@ -349,6 +349,52 @@
         });
     }
 
+    function setupModeSelector() {
+        var standardBtn = document.getElementById('graph-mode-standard');
+        var relatedBtn = document.getElementById('graph-mode-related');
+        var page = document.querySelector('.graph-page');
+
+        if (!standardBtn || !relatedBtn) { return; }
+
+        var relatedData = window.RELATED_GRAPH_DATA || { nodes: [], links: [] };
+
+        standardBtn.addEventListener('click', function () {
+            if (standardBtn.classList.contains('graph-mode-btn--active')) { return; }
+
+            standardBtn.classList.add('graph-mode-btn--active');
+            standardBtn.setAttribute('aria-pressed', 'true');
+            relatedBtn.classList.remove('graph-mode-btn--active');
+            relatedBtn.setAttribute('aria-pressed', 'false');
+
+            if (page) {
+                page.classList.remove('graph-page--related-mode');
+            }
+
+            switchGraphData(GRAPH_DATA);
+        });
+
+        relatedBtn.addEventListener('click', function () {
+            if (relatedBtn.classList.contains('graph-mode-btn--active')) { return; }
+
+            relatedBtn.classList.add('graph-mode-btn--active');
+            relatedBtn.setAttribute('aria-pressed', 'true');
+            standardBtn.classList.remove('graph-mode-btn--active');
+            standardBtn.setAttribute('aria-pressed', 'false');
+
+            if (page) {
+                page.classList.add('graph-page--related-mode');
+            }
+
+            switchGraphData(relatedData);
+        });
+    }
+
+    function switchGraphData(data) {
+        if (!graphInstance) { return; }
+        selectNode(null);
+        graphInstance.graphData(data);
+    }
+
     /* -------------------------------------------------------------------------
      * Script loading / bootstrap
      * ---------------------------------------------------------------------- */
@@ -392,6 +438,7 @@
     }
 
     setupFullscreenToggle();
+    setupModeSelector();
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', loadAndInit);

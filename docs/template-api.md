@@ -128,6 +128,7 @@ or `/tag/python/` when `clean_urls` is enabled.
 | `search.html` | `pages`, `canonical_url` |
 | `stats.html` | `stats` (`BlogStats`), `pages`, `canonical_url` |
 | `calendar.html` | `calendar_years` (list of `CalendarYear`), `pages`, `canonical_url` |
+| `graph.html` | `graph_data_json` (`str`), `related_graph_data_json` (`str | None`), `pages`, `canonical_url` |
 
 ## Post object
 

@@ -16,26 +16,35 @@
     <h1>Graph</h1>
 
     <div class="graph-toolbar">
-        <div class="graph-legend" role="group" aria-label="Graph legend">
+        <div class="graph-legend" id="graph-legend" role="group" aria-label="Graph legend">
             <span class="graph-legend-item">
                 <span class="graph-legend-shape graph-legend-shape--post" aria-hidden="true"></span>
                 Posts
             </span>
-            <span class="graph-legend-item">
+            <span class="graph-legend-item" id="graph-legend-tags">
                 <span class="graph-legend-shape graph-legend-shape--tag" aria-hidden="true"></span>
                 Tags
             </span>
-            <span class="graph-legend-item">
+            <span class="graph-legend-item" id="graph-legend-categories">
                 <span class="graph-legend-shape graph-legend-shape--category" aria-hidden="true"></span>
                 Categories
             </span>
         </div>
 
-        <button class="graph-fullscreen-btn" id="graph-fullscreen-btn" type="button"
-                aria-label="Toggle full-page graph view" aria-pressed="false">
-            <span class="graph-fullscreen-enter">&#x26F6; Full screen</span>
-            <span class="graph-fullscreen-exit">&#x2715; Exit full screen</span>
-        </button>
+        <div class="graph-controls">
+            {% if with_related %}
+            <div class="graph-mode-selector" id="graph-mode-selector">
+                <button class="graph-mode-btn graph-mode-btn--active" id="graph-mode-standard" type="button" aria-pressed="true">Standard</button>
+                <button class="graph-mode-btn" id="graph-mode-related" type="button" aria-pressed="false">Related</button>
+            </div>
+            {% endif %}
+
+            <button class="graph-fullscreen-btn" id="graph-fullscreen-btn" type="button"
+                    aria-label="Toggle full-page graph view" aria-pressed="false">
+                <span class="graph-fullscreen-enter">&#x26F6; Full screen</span>
+                <span class="graph-fullscreen-exit">&#x2715; Exit full screen</span>
+            </button>
+        </div>
     </div>
 
     <div class="graph-container" id="graph-container"
@@ -46,6 +55,11 @@
         Drag a node to pin it in place.</p>
 </div>
 
-<script>window.GRAPH_DATA = {{ graph_data_json | safe }};</script>
+<script>
+    window.GRAPH_DATA = {{ graph_data_json | safe }};
+    {% if with_related and related_graph_data_json %}
+    window.RELATED_GRAPH_DATA = {{ related_graph_data_json | safe }};
+    {% endif %}
+</script>
 <script src="{{ graph_js_url }}"></script>
 {% endblock %}

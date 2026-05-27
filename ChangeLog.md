@@ -7,6 +7,9 @@
 - Renamed the default backlinks section title from "References & mentions"
   to "References & Mentions".
   ([#544](https://github.com/davep/blogmore/pull/544))
+- Added an alternative relatedness graph view to the graph page when the
+  related posts feature (`with_related`) is enabled.
+  ([#546](https://github.com/davep/blogmore/pull/546))
 
 ## v2.30.0
 
