@@ -1562,7 +1562,7 @@ below lists all variables that are available in every template.</p>
 <tr>
 <td><code>backlinks_title</code></td>
 <td><code>str</code></td>
-<td>The heading text for the backlinks section (defaults to <code>"References &amp; mentions"</code>).</td>
+<td>The heading text for the backlinks section (defaults to <code>"References &amp; Mentions"</code>).</td>
 </tr>
 <tr>
 <td><code>with_related</code></td>
@@ -1893,6 +1893,10 @@ or <code>/tag/python/</code> when <code>clean_urls</code> is enabled.</p>
 <tr>
 <td><code>calendar.html</code></td>
 <td><code>calendar_years</code> (list of <code>CalendarYear</code>), <code>pages</code>, <code>canonical_url</code></td>
+</tr>
+<tr>
+<td><code>graph.html</code></td>
+<td><code>graph_data_json</code> (<code>str</code>), <code>related_graph_data_json</code> (<code>str | None</code>), <code>pages</code>, <code>canonical_url</code></td>
 </tr>
 </tbody>
 </table>
@@ -2397,7 +2401,7 @@ widget.  It is called like this:</p>
 <tbody>
 <tr>
 <td><code>backlinks</code></td>
-<td>The "References &amp; mentions" section shown after the bottom post-navigation on individual post pages when <code>with_backlinks</code> is enabled and there are inbound links.  Override this block in a custom <code>post.html</code> to change the layout or styling of the section.</td>
+<td>The "References &amp; Mentions" section shown after the bottom post-navigation on individual post pages when <code>with_backlinks</code> is enabled and there are inbound links.  Override this block in a custom <code>post.html</code> to change the layout or styling of the section.</td>
 </tr>
 <tr>
 <td><code>comment_invite</code></td>
@@ -2524,7 +2528,7 @@ widget.  It is called like this:</p>
 <tr>
 <td><code>.backlinks</code></td>
 <td><code>section</code></td>
-<td>"References &amp; mentions" container on a post page (only when <code>with_backlinks</code> is enabled and the post has inbound links).</td>
+<td>"References &amp; Mentions" container on a post page (only when <code>with_backlinks</code> is enabled and the post has inbound links).</td>
 </tr>
 <tr>
 <td><code>.backlinks-heading</code></td>
