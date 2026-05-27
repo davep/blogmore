@@ -62,7 +62,52 @@
     clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
 }
 
-/* ---- Fullscreen toggle button -------------------------------------------- */
+/* ---- Graph mode selector ------------------------------------------------- */
+
+.graph-mode-selector {
+    display: flex;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--bg-color, #fff);
+}
+
+.graph-mode-btn {
+    padding: 3px 12px;
+    font-size: 0.8em;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--text-color, #333);
+    white-space: nowrap;
+    outline: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.graph-mode-btn:not(.graph-mode-btn--active):hover {
+    background: var(--border-color-light, var(--border-color));
+}
+
+.graph-mode-btn.graph-mode-btn--active {
+    background: var(--link-color, #4299e1);
+    color: #fff;
+    cursor: default;
+}
+
+/* Hide tag and category legend items when in related-mode */
+.graph-page--related-mode #graph-legend-tags,
+.graph-page--related-mode #graph-legend-categories {
+    display: none !important;
+}
+
+/* ---- Fullscreen toggle button & controls --------------------------------- */
+
+.graph-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: auto;
+}
 
 .graph-fullscreen-btn {
     padding: 3px 10px;
@@ -74,7 +119,6 @@
     color: var(--text-color, #333);
     white-space: nowrap;
     flex-shrink: 0;
-    margin-left: auto;
 }
 
 .graph-fullscreen-btn:hover {

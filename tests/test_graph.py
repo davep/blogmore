@@ -11,6 +11,7 @@ from pathlib import Path
 from blogmore.graph import (
     GraphData,
     build_graph_data,
+    build_related_graph_data,
 )
 from blogmore.parser import Post, PostParser
 
@@ -438,6 +439,45 @@ class TestBuildGraphData:
             if link["source"] == "/a.html" and link["target"] == "/b.html"
         ]
         assert len(post_to_post) == 1
+
+
+class TestBuildRelatedGraphData:
+    """Tests for the build_related_graph_data function."""
+
+    def test_empty_posts_list(self) -> None:
+        """Empty post list produces a graph with no nodes or links."""
+        graph = build_related_graph_data([])
+        assert graph.nodes == []
+        assert graph.links == []
+
+    def test_post_nodes_created(self) -> None:
+        """Each post produces a node with type 'post'."""
+        posts = [
+            _make_post("post-a", "Content A", "/a.html", title="Post A"),
+            _make_post("post-b", "Content B", "/b.html", title="Post B"),
+        ]
+        graph = build_related_graph_data(posts)
+        post_nodes = [n for n in graph.nodes if n["type"] == "post"]
+        assert len(post_nodes) == 2
+        ids = {n["id"] for n in post_nodes}
+        assert "/a.html" in ids
+        assert "/b.html" in ids
+
+    def test_related_posts_edges(self) -> None:
+        """Edges are created between posts based on their relatedness."""
+        post_a = _make_post("post-a", "Content A", "/a.html", title="Post A")
+        post_b = _make_post("post-b", "Content B", "/b.html", title="Post B")
+        post_c = _make_post("post-c", "Content C", "/c.html", title="Post C")
+
+        # Set up related posts manually to mock similarity calculations
+        post_a.related_posts = [post_b, post_c]
+        post_b.related_posts = [post_a]
+
+        graph = build_related_graph_data([post_a, post_b, post_c])
+
+        assert len(graph.links) == 2
+        assert {"source": "/a.html", "target": "/b.html"} in graph.links
+        assert {"source": "/a.html", "target": "/c.html"} in graph.links
 
 
 ### test_graph.py ends here

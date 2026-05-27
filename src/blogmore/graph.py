@@ -206,4 +206,59 @@ def build_graph_data(
     return graph
 
 
+def build_related_graph_data(posts: list[Post]) -> GraphData:
+    """Build force-directed graph data based purely on post relatedness.
+
+    Creates one node for every post. Adds edges between posts that are
+    related to each other (i.e., if one is in the other's related_posts list).
+
+    Args:
+        posts: All published posts for the site.
+
+    Returns:
+        A [`blogmore.graph.GraphData`][blogmore.graph.GraphData] instance populated with post nodes and
+        relatedness links.
+    """
+    graph = GraphData()
+
+    # --- Post nodes -----------------------------------------------------------
+    for post in posts:
+        raw_cover: str | None = (
+            str(post.metadata["cover"])
+            if post.metadata and post.metadata.get("cover")
+            else None
+        )
+        if raw_cover is None:
+            cover: str | None = None
+        elif raw_cover.startswith(("http://", "https://", "/")):
+            cover = raw_cover
+        else:
+            cover = f"/{raw_cover}"
+        graph.nodes.append(
+            {
+                "id": post.url,
+                "label": post.title,
+                "type": "post",
+                "url": post.url,
+                "date": post.date.strftime("%Y-%m-%d") if post.date else None,
+                "description": post.description,
+                "cover": cover,
+            }
+        )
+
+    # --- Post->post edges from related posts ----------------------------------
+    link_pairs: set[tuple[str, str]] = set()
+    for post in posts:
+        related_posts = getattr(post, "related_posts", [])
+        for rel in related_posts:
+            if rel.url == post.url:
+                continue
+            pair = (post.url, rel.url) if post.url < rel.url else (rel.url, post.url)
+            if pair not in link_pairs:
+                link_pairs.add(pair)
+                graph.links.append({"source": post.url, "target": rel.url})
+
+    return graph
+
+
 ### graph.py ends here

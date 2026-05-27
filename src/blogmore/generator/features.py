@@ -12,7 +12,7 @@ from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
 from blogmore.generator.grouping import group_posts_by_category
 from blogmore.generator.html import write_html
 from blogmore.generator.paths import canonical_url_for_path
-from blogmore.graph import GraphData, build_graph_data
+from blogmore.graph import GraphData, build_graph_data, build_related_graph_data
 from blogmore.parser import Page, Post, post_sort_key
 from blogmore.search import write_search_index
 from blogmore.sitemap import write_sitemap
@@ -220,8 +220,15 @@ class FeatureGenerator:
             category_dir=CATEGORY_DIR,
             site_url=self.site_config.site_url,
         )
+        related_graph_data_json: str | None = None
+        if self.site_config.with_related:
+            related_graph_data = build_related_graph_data(posts)
+            related_graph_data_json = related_graph_data.to_json()
+
         html = self.renderer.render_graph_page(
-            graph_data_json=graph_data.to_json(), **context
+            graph_data_json=graph_data.to_json(),
+            related_graph_data_json=related_graph_data_json,
+            **context,
         )
         write_html(output_path, html, self.site_config.minify_html)
 

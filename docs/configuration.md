@@ -451,6 +451,8 @@ The graph visualises three types of node:
 
 Edges connect each post to the tags and categories it carries, and to any other posts it links to internally via Markdown links.  Clicking a post node navigates to that post; clicking a tag or category node navigates to the corresponding archive.
 
+If the related posts feature ([`with_related`](#with_related)) is also enabled, the graph page includes a toggle switch to transition between this standard view and an alternative **Related** view. The Related view displays only post nodes, connecting them based on content similarity as calculated by the TF-IDF matching engine.
+
 The graph respects the active light/dark theme and is fully responsive.  A **Graph** link is automatically added to the navigation bar between **Calendar** and **RSS**.
 
 Off by default.
