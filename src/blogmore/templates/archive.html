@@ -54,12 +54,12 @@
 
         {% for year in ns.years.keys()|sort(reverse=True) %}
         <section class="archive-year" id="archive-{{ year }}">
-            <h2><a href="/{{ year }}/{{ pagination_page1_suffix }}">{{ year }}</a> <span class="archive-post-count">({{ year_counts[year] }} {{ 'post' if year_counts[year] == 1 else 'posts' }})</span></h2>
+            <h2><a href="/{{ year }}/{{ pagination_page1_suffix }}" aria-label="Archive for {{ year }}">{{ year }}</a> <span class="archive-post-count">({{ year_counts[year] }} {{ 'post' if year_counts[year] == 1 else 'posts' }})</span></h2>
 
             {% for month_key in ns.years[year].keys()|sort(reverse=True) %}
             {% set month_count = ns.years[year][month_key]['posts']|length %}
             <section class="archive-month" id="archive-{{ year }}-{{ month_key }}">
-                <h3><a href="/{{ year }}/{{ month_key }}/{{ pagination_page1_suffix }}">{{ ns.years[year][month_key]['name'] }}</a> <span class="archive-post-count">({{ month_count }} {{ 'post' if month_count == 1 else 'posts' }})</span></h3>
+                <h3><a href="/{{ year }}/{{ month_key }}/{{ pagination_page1_suffix }}" aria-label="Archive for {{ ns.years[year][month_key]['name'] }} {{ year }}">{{ ns.years[year][month_key]['name'] }}</a> <span class="archive-post-count">({{ month_count }} {{ 'post' if month_count == 1 else 'posts' }})</span></h3>
 
                 <ul class="archive-post-list">
                 {% for post in ns.years[year][month_key]['posts'] %}
