@@ -267,6 +267,9 @@ class BlogStats:
     gfi_mode: float = 0.0
     """The mode Gunning Fog Index score across all posts."""
 
+    gfi_histogram: list[int] = field(default_factory=lambda: [0] * 12)
+    """Histogram counts of posts falling into GFI rounded integer buckets."""
+
     @property
     def blog_span_days(self) -> int | None:
         """Return the total span of the blog in days, or [`None`][builtins.None] if fewer than two dated posts exist.
@@ -657,6 +660,17 @@ def compute_blog_stats(
                 stats.gfi_mode = float(statistics.mode(int_scores))
             except statistics.StatisticsError:
                 stats.gfi_mode = float(int_scores[0])
+
+            gfi_counts = [0] * 12
+            for gfi in scores:
+                rounded_gfi = round(gfi)
+                if rounded_gfi <= 6:
+                    gfi_counts[0] += 1
+                elif rounded_gfi >= 17:
+                    gfi_counts[11] += 1
+                else:
+                    gfi_counts[rounded_gfi - 6] += 1
+            stats.gfi_histogram = gfi_counts
 
     return stats
 

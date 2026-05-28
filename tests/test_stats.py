@@ -870,6 +870,7 @@ class TestComputeBlogStatsGfi:
         assert stats.gfi_mean == 0.0
         assert stats.gfi_median == 0.0
         assert stats.gfi_mode == 0.0
+        assert stats.gfi_histogram == [0] * 12
 
     def test_gfi_enabled_computes_statistics(self) -> None:
         """When with_gfi is True, GFI stats (highest, lowest, averages) are correctly calculated."""
@@ -892,3 +893,4 @@ class TestComputeBlogStatsGfi:
         assert abs(stats.gfi_mean - 3.012121212121212) < 1e-5
         assert stats.gfi_median == 2.0
         assert stats.gfi_mode == 1.0
+        assert stats.gfi_histogram == [3] + [0] * 11
