@@ -6064,6 +6064,48 @@ class TestStatsPageGeneration:
         stats_content = (temp_output_dir / "stats.html").read_text()
         assert "Content Overview" in stats_content
 
+    def test_stats_page_contains_heading_anchors(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The stats page includes heading anchors for all main sections."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+                with_read_time=True,
+                with_gfi=True,
+            )
+        )
+        generator.generate()
+
+        stats_content = (temp_output_dir / "stats.html").read_text()
+
+        assert (
+            '<h2 id="posts-by-hour-of-day">Posts by Hour of Day<a aria-label="Link to this heading" class="heading-anchor" href="#posts-by-hour-of-day">¶</a></h2>'
+            in stats_content
+        )
+        assert (
+            '<h2 id="posts-by-day-of-week">Posts by Day of Week<a aria-label="Link to this heading" class="heading-anchor" href="#posts-by-day-of-week">¶</a></h2>'
+            in stats_content
+        )
+        assert (
+            '<h2 id="word-count">Word Count<a aria-label="Link to this heading" class="heading-anchor" href="#word-count">¶</a></h2>'
+            in stats_content
+        )
+        assert (
+            '<h2 id="reading-time">Reading Time<a aria-label="Link to this heading" class="heading-anchor" href="#reading-time">¶</a></h2>'
+            in stats_content
+        )
+        assert (
+            '<h2 id="gunning-fog-index">Gunning Fog Index<a aria-label="Link to this heading" class="heading-anchor" href="#gunning-fog-index">¶</a></h2>'
+            in stats_content
+        )
+        assert (
+            '<h2 id="content-overview">Content Overview<a aria-label="Link to this heading" class="heading-anchor" href="#content-overview">¶</a></h2>'
+            in stats_content
+        )
+
     def test_custom_stats_path(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """A custom stats_path generates the stats page at the specified location."""
         generator = SiteGenerator(
