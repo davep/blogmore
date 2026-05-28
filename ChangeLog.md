@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.32.0
 
-**Released: WiP**
+**Released: 2026-05-28**
 
 - Added `with_gfi` configuration option and `--with-gfi` command-line option
   to calculate and display the Gunning Fog Index (prose readability) on
