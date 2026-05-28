@@ -15,6 +15,16 @@ from blogmore.parser import Post
 # Compiled regular expression for extracting href attributes from anchor tags.
 _LINK_RE: re.Pattern[str] = re.compile(r'<a\s+(?:[^>]*?\s+)?href=["\']([^"\']*)["\']')
 
+_GET_CHECK_BYTE_LIMIT: int = 1024
+"""The number of bytes to request and read when checking a link via GET.
+
+A value of 1024 bytes (1 KiB) is chosen because it fits within a single TCP
+packet (typical MSS is ~1.4 KiB), avoiding extra network packets while
+ensuring we consume enough of the response buffer to allow the socket to close
+cleanly. It also acts as a safety limit if a server ignores the Range header
+and attempts to send a large file.
+"""
+
 
 class RateLimitedError(Exception):
     """Raised when a request returns HTTP 429 Too Many Requests."""
@@ -104,14 +114,14 @@ def _check_single_link_get(url: str, user_agent: str, timeout: float) -> str | N
     """
     req = urllib.request.Request(url, method="GET")
     req.add_header("User-Agent", user_agent)
-    req.add_header("Range", "bytes=0-1024")
+    req.add_header("Range", f"bytes=0-{_GET_CHECK_BYTE_LIMIT}")
 
     try:
         with urllib.request.urlopen(req, timeout=timeout) as response:
             status = response.status
             if 200 <= status < 400:
                 # Read a small amount of bytes, then close (which urlopen's context manager does automatically)
-                response.read(1024)
+                response.read(_GET_CHECK_BYTE_LIMIT)
                 return None
             return f"HTTP {status} (GET)"
     except urllib.error.HTTPError as e:
