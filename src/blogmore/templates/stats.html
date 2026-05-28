@@ -249,7 +249,7 @@
         </dl>
     </section>
 
-    {{ histogram("Posts by Gunning Fog Index", ["6 or lower", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17 or higher"], stats.gfi_histogram) }}
+    {{ histogram("Posts by Gunning Fog Index", ["<= 6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", ">= 17"], stats.gfi_histogram) }}
 
     {% if stats.gfi_highest %}
     <section class="stats-section">

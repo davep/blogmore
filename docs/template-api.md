@@ -265,7 +265,7 @@ most template-relevant attributes are listed below.
 | `gfi_mean` | `float` | The mean Gunning Fog Index score for the blog. |
 | `gfi_median` | `float` | The median Gunning Fog Index score for the blog. |
 | `gfi_mode` | `float` | The mode Gunning Fog Index score for the blog. |
-| `gfi_histogram` | `list[int]` | 12-element list of GFI bucket counts (6 or lower, 7 to 16, 17 or higher). |
+| `gfi_histogram` | `list[int]` | 12-element list of GFI bucket counts (<= 6, 7 to 16, >= 17). |
 
 ## Calendar objects
 
