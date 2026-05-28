@@ -1045,6 +1045,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-with-gfi" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>--with-gfi</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-with-related" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -2200,6 +2211,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-with-gfi" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>--with-gfi</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-with-related" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -3055,6 +3077,11 @@ blogmore<span class="w"> </span>gen<span class="w"> </span>&lt;content_dir&gt;<s
 <p>Read time display is <strong>disabled by default</strong>. Pass this flag to opt in.</p>
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--with-read-time
 </code></pre></div>
+<h4 id="-with-gfi"><code>--with-gfi</code></h4>
+<p>Calculate and display the Gunning Fog Index on the statistics page. When set, BlogMore calculates readability scores of all posts and displays averages and tables on the statistics page.</p>
+<p>Gunning Fog Index calculation is <strong>disabled by default</strong>. Pass this flag to opt in.</p>
+<div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>build<span class="w"> </span>posts/<span class="w"> </span>--with-gfi
+</code></pre></div>
 <h4 id="-with-related"><code>--with-related</code></h4>
 <p>Enable automated build-time related posts calculation. When enabled, BlogMore uses a pure-Python TF-IDF and Cosine Similarity engine to automatically calculate and list contextually relevant posts for each entry, with zero runtime overhead for readers.</p>
 <p>Related posts calculation is <strong>disabled by default</strong>. Pass this flag to opt in.</p>
@@ -3147,6 +3174,7 @@ blogmore<span class="w"> </span>serve
 - <code>--minify-js</code>
 - <code>--minify-html</code>
 - <code>--with-read-time</code>
+- <code>--with-gfi</code>
 - <code>--with-related</code>
 - <code>--socials-title</code>
 - <code>--links-title</code></p>
@@ -3216,6 +3244,7 @@ blogmore<span class="w"> </span>serve
 - <code>--minify-js</code>
 - <code>--minify-html</code>
 - <code>--with-read-time</code>
+- <code>--with-gfi</code>
 - <code>--with-related</code>
 - <code>--socials-title</code>
 - <code>--links-title</code></p>

@@ -1555,6 +1555,11 @@ below lists all variables that are available in every template.</p>
 <td><code>True</code> when reading time display is enabled.</td>
 </tr>
 <tr>
+<td><code>with_gfi</code></td>
+<td><code>bool</code></td>
+<td><code>True</code> when Gunning Fog Index calculation is enabled.</td>
+</tr>
+<tr>
 <td><code>with_backlinks</code></td>
 <td><code>bool</code></td>
 <td><code>True</code> when the backlinks feature is enabled.</td>
@@ -1978,6 +1983,11 @@ and <code>next_post</code>.</p>
 <td>Estimated reading time in minutes (minimum 1).</td>
 </tr>
 <tr>
+<td><code>gfi</code></td>
+<td><code>float</code> (property)</td>
+<td>Gunning Fog Index score for the post.</td>
+</tr>
+<tr>
 <td><code>modified_date</code></td>
 <td><code>datetime \| None</code> (property)</td>
 <td>Last-modified datetime from metadata, if set.</td>
@@ -2159,6 +2169,36 @@ most template-relevant attributes are listed below.</p>
 <td><code>streak_variants</code></td>
 <td><code>list[StreakChartVariant]</code></td>
 <td>Pre-computed streak chart variants (5, 9, and 10 trailing months).</td>
+</tr>
+<tr>
+<td><code>gfi_highest</code></td>
+<td><code>list[Post]</code></td>
+<td>Up to 10 posts with the highest Gunning Fog Index scores.</td>
+</tr>
+<tr>
+<td><code>gfi_lowest</code></td>
+<td><code>list[Post]</code></td>
+<td>Up to 10 posts with the lowest Gunning Fog Index scores.</td>
+</tr>
+<tr>
+<td><code>gfi_mean</code></td>
+<td><code>float</code></td>
+<td>The mean Gunning Fog Index score for the blog.</td>
+</tr>
+<tr>
+<td><code>gfi_median</code></td>
+<td><code>float</code></td>
+<td>The median Gunning Fog Index score for the blog.</td>
+</tr>
+<tr>
+<td><code>gfi_mode</code></td>
+<td><code>float</code></td>
+<td>The mode Gunning Fog Index score for the blog.</td>
+</tr>
+<tr>
+<td><code>gfi_histogram</code></td>
+<td><code>list[int]</code></td>
+<td>12-element list of GFI bucket counts (&lt;= 6, 7 to 16, &gt;= 17).</td>
 </tr>
 </tbody>
 </table>
