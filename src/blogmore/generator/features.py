@@ -144,7 +144,10 @@ class FeatureGenerator:
             )
 
         blog_stats: BlogStats = compute_blog_stats(
-            posts, self.site_config.site_url, backlink_map
+            posts,
+            self.site_config.site_url,
+            backlink_map,
+            with_gfi=self.site_config.with_gfi,
         )
         html = self.renderer.render_stats_page(stats=blog_stats, **context)
         write_html(output_path, html, self.site_config.minify_html)

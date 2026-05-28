@@ -228,6 +228,81 @@
     {% endif %}
 
     {# ------------------------------------------------------------------ #}
+    {# Gunning Fog Index                                                  #}
+    {# ------------------------------------------------------------------ #}
+    {% if with_gfi %}
+    <section class="stats-section">
+        <h2>Gunning Fog Index</h2>
+        <dl class="stats-details">
+            <div class="stats-detail-row">
+                <dt>Mean</dt>
+                <dd>{{ "%.2f" % stats.gfi_mean }}</dd>
+            </div>
+            <div class="stats-detail-row">
+                <dt>Median</dt>
+                <dd>{{ "%.2f" % stats.gfi_median }}</dd>
+            </div>
+            <div class="stats-detail-row">
+                <dt>Mode</dt>
+                <dd>{{ "%.2f" % stats.gfi_mode }}</dd>
+            </div>
+        </dl>
+    </section>
+
+    {% if stats.gfi_highest %}
+    <section class="stats-section">
+        <h2>Highest Gunning Fog Index</h2>
+        <div class="stats-table-wrap">
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Post</th>
+                        <th>Index</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in stats.gfi_highest %}
+                    <tr>
+                        <td class="stats-table-rank">{{ loop.index }}</td>
+                        <td><a href="{{ post.url }}">{{ post.title }}</a></td>
+                        <td class="stats-table-count">{{ "%.2f" % post.gfi }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if stats.gfi_lowest %}
+    <section class="stats-section">
+        <h2>Lowest Gunning Fog Index</h2>
+        <div class="stats-table-wrap">
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Post</th>
+                        <th>Index</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in stats.gfi_lowest %}
+                    <tr>
+                        <td class="stats-table-rank">{{ loop.index }}</td>
+                        <td><a href="{{ post.url }}">{{ post.title }}</a></td>
+                        <td class="stats-table-count">{{ "%.2f" % post.gfi }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
+    {% endif %}
+
+    {# ------------------------------------------------------------------ #}
     {# Blog time span                                                      #}
     {# ------------------------------------------------------------------ #}
     {% if stats.earliest_post_date and stats.latest_post_date %}

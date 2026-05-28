@@ -832,3 +832,63 @@ class TestComputeLongestStreaks:
         assert streak.end_date == dt.date(2024, 4, 5)
         assert streak.days == 5
         assert streak.post_count == 7
+
+
+class TestComputeBlogStatsGfi:
+    """Tests for GFI statistics in compute_blog_stats."""
+
+    def _make_post(
+        self,
+        *,
+        slug: str = "test",
+        title: str = "Test",
+        content: str = "Hello world.",
+        html_content: str | None = None,
+        date: dt.datetime | None = None,
+    ) -> Post:
+        if html_content is None:
+            html_content = f"<p>{content}</p>"
+        return Post(
+            path=Path(f"{slug}.md"),
+            title=title,
+            content=content,
+            html_content=html_content,
+            date=date,
+        )
+
+    def test_gfi_disabled_by_default(self) -> None:
+        """When with_gfi is False, GFI statistics are not calculated and remain default."""
+        posts = [
+            self._make_post(
+                content="This is a simple sentence. We test readability here."
+            ),
+            self._make_post(content="Another sentence here."),
+        ]
+        stats = compute_blog_stats(posts, with_gfi=False)
+        assert stats.gfi_highest == []
+        assert stats.gfi_lowest == []
+        assert stats.gfi_mean == 0.0
+        assert stats.gfi_median == 0.0
+        assert stats.gfi_mode == 0.0
+
+    def test_gfi_enabled_computes_statistics(self) -> None:
+        """When with_gfi is True, GFI stats (highest, lowest, averages) are correctly calculated."""
+        p1 = self._make_post(
+            slug="p1", title="Post A", content="this is simple. we test here."
+        )
+        p2 = self._make_post(
+            slug="p2",
+            title="Post B",
+            content="we write a long story here. we want to check averages.",
+        )
+        p3 = self._make_post(slug="p3", title="Post C", content="we see a short text.")
+
+        posts = [p1, p2, p3]
+        stats = compute_blog_stats(posts, with_gfi=True)
+        assert len(stats.gfi_highest) == 3
+        assert stats.gfi_highest == [p2, p3, p1]
+        assert stats.gfi_lowest == [p1, p3, p2]
+
+        assert abs(stats.gfi_mean - 3.012121212121212) < 1e-5
+        assert stats.gfi_median == 2.0
+        assert abs(stats.gfi_mode - 1.2) < 1e-5

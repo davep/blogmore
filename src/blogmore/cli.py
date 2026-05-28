@@ -182,6 +182,13 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     )
 
     parser.add_argument(
+        "--with-gfi",
+        action="store_true",
+        default=_SITE_CONFIG_DEFAULTS["with_gfi"],
+        help="Calculate and display the Gunning Fog Index on the stats page (default: disabled)",
+    )
+
+    parser.add_argument(
         "--with-related",
         action="store_true",
         default=_SITE_CONFIG_DEFAULTS["with_related"],

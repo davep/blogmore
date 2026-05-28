@@ -28,6 +28,7 @@ below lists all variables that are available in every template.
 | `tags_url` | `str` | URL to the tags overview page (respects `tags_path` and `clean_urls`). |
 | `categories_url` | `str` | URL to the categories overview page (respects `categories_path` and `clean_urls`). |
 | `with_read_time` | `bool` | `True` when reading time display is enabled. |
+| `with_gfi` | `bool` | `True` when Gunning Fog Index calculation is enabled. |
 | `with_backlinks` | `bool` | `True` when the backlinks feature is enabled. |
 | `backlinks_title` | `str` | The heading text for the backlinks section (defaults to `"References & Mentions"`). |
 | `with_related` | `bool` | `True` when the related posts feature is enabled. |
@@ -150,6 +151,7 @@ and `next_post`.
 | `safe_category` | `str \| None` (property) | Category sanitised for use in URLs. |
 | `description` | `str` (property) | Post description (from metadata or first paragraph). |
 | `reading_time` | `int` (property) | Estimated reading time in minutes (minimum 1). |
+| `gfi` | `float` (property) | Gunning Fog Index score for the post. |
 | `modified_date` | `datetime \| None` (property) | Last-modified datetime from metadata, if set. |
 | `related_posts` | `list[Post]` | List of related Post objects calculated via TF-IDF (populated when `with_related` is enabled). |
 
@@ -258,6 +260,11 @@ most template-relevant attributes are listed below.
 | `top_internal_links` | `list[tuple[Post, int]]` | Top 20 posts by incoming internal link count as `(post, count)` pairs, sorted by count descending.  Only posts with at least one backlink are included.  Populated when `with_backlinks` is `true`; otherwise an empty list. |
 | `longest_streaks` | `list[PostingStreak]` | Up to 10 longest consecutive posting streaks of 2 or more days. |
 | `streak_variants` | `list[StreakChartVariant]` | Pre-computed streak chart variants (5, 9, and 10 trailing months). |
+| `gfi_highest` | `list[Post]` | Up to 10 posts with the highest Gunning Fog Index scores. |
+| `gfi_lowest` | `list[Post]` | Up to 10 posts with the lowest Gunning Fog Index scores. |
+| `gfi_mean` | `float` | The mean Gunning Fog Index score for the blog. |
+| `gfi_median` | `float` | The median Gunning Fog Index score for the blog. |
+| `gfi_mode` | `float` | The mode Gunning Fog Index score for the blog. |
 
 ## Calendar objects
 

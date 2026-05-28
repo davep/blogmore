@@ -225,6 +225,9 @@ class SiteConfig:
     with_read_time: bool = False
     """Whether to show estimated reading time on posts."""
 
+    with_gfi: bool = False
+    """Whether to calculate and display the Gunning Fog Index on the statistics page."""
+
     read_time_wpm: int = 200
     """Words per minute used when calculating estimated reading time.
 
