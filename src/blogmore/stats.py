@@ -652,10 +652,11 @@ def compute_blog_stats(
             scores = [gfi for _, gfi in valid_gfis]
             stats.gfi_mean = statistics.mean(scores)
             stats.gfi_median = statistics.median(scores)
+            int_scores = [round(gfi) for gfi in scores]
             try:
-                stats.gfi_mode = statistics.mode(scores)
+                stats.gfi_mode = float(statistics.mode(int_scores))
             except statistics.StatisticsError:
-                stats.gfi_mode = scores[0]
+                stats.gfi_mode = float(int_scores[0])
 
     return stats
 

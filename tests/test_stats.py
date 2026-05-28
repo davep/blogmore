@@ -891,4 +891,4 @@ class TestComputeBlogStatsGfi:
 
         assert abs(stats.gfi_mean - 3.012121212121212) < 1e-5
         assert stats.gfi_median == 2.0
-        assert abs(stats.gfi_mode - 1.2) < 1e-5
+        assert stats.gfi_mode == 1.0
