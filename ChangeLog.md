@@ -8,6 +8,8 @@
   to calculate and display the Gunning Fog Index (prose readability) on
   posts and in the statistics page.
   ([#549](https://github.com/davep/blogmore/pull/549))
+- Added hover anchor links to all headings on the blog statistics page.
+  ([#550](https://github.com/davep/blogmore/pull/550))
 
 ## v2.31.0
 

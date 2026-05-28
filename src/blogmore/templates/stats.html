@@ -23,8 +23,9 @@
     {# ------------------------------------------------------------------ #}
     {% macro histogram(title, labels, counts, label_step=1) %}
     {% set max_count = counts | max if counts | max > 0 else 1 %}
+    {% set section_id = title | lower | replace(' ', '-') %}
     <section class="stats-section stats-histogram">
-        <h2>{{ title }}</h2>
+        <h2 id="{{ section_id }}">{{ title }}<a aria-label="Link to this heading" class="heading-anchor" href="#{{ section_id }}">¶</a></h2>
         <figure class="stats-chart" aria-label="{{ title }}">
             <div class="stats-bars">
                 {% for i in range(labels | length) %}
@@ -66,8 +67,9 @@
     {% if rows %}
     {% set max_count = rows | map(attribute=1) | max %}
     {% set axis_max = ((max_count + 9) // 10 * 10) if max_count > 0 else 10 %}
+    {% set section_id = title | lower | replace(' ', '-') %}
     <section class="stats-section stats-hbarchart">
-        <h2>{{ title }}</h2>
+        <h2 id="{{ section_id }}">{{ title }}<a aria-label="Link to this heading" class="heading-anchor" href="#{{ section_id }}">¶</a></h2>
         <figure class="stats-hchart" aria-label="{{ title }}">
             <div class="stats-hbars">
                 {% for year, count in rows %}
@@ -98,7 +100,7 @@
         {% for variant in stats.streak_variants %}
         {% set count = variant.posts_count %}
         <div class="streak-variant streak-variant-{{ variant.months }}mo">
-            <h2>{{ count }} post{{ '' if count == 1 else 's' }} between {{ variant.first_date }} and {{ variant.last_date }}</h2>
+            <h2 id="posting-activity-{{ variant.months }}mo">{{ count }} post{{ '' if count == 1 else 's' }} between {{ variant.first_date }} and {{ variant.last_date }}<a aria-label="Link to this heading" class="heading-anchor" href="#posting-activity-{{ variant.months }}mo">¶</a></h2>
             <figure class="stats-chart stats-streak-chart" aria-label="Posts between {{ variant.first_date }} and {{ variant.last_date }}">
                 <div class="streak-outer">
                     {# Row 1, Col 1: spacer (aligns month labels with DOW labels column) #}
@@ -159,7 +161,7 @@
     {# Word count                                                         #}
     {# ------------------------------------------------------------------ #}
     <section class="stats-section">
-        <h2>Word Count</h2>
+        <h2 id="word-count">Word Count<a aria-label="Link to this heading" class="heading-anchor" href="#word-count">¶</a></h2>
         <dl class="stats-details">
             <div class="stats-detail-row">
                 <dt>Average</dt>
@@ -195,7 +197,7 @@
     {# ------------------------------------------------------------------ #}
     {% if with_read_time %}
     <section class="stats-section">
-        <h2>Reading Time</h2>
+        <h2 id="reading-time">Reading Time<a aria-label="Link to this heading" class="heading-anchor" href="#reading-time">¶</a></h2>
         <dl class="stats-details">
             <div class="stats-detail-row">
                 <dt>Average</dt>
@@ -232,7 +234,7 @@
     {# ------------------------------------------------------------------ #}
     {% if with_gfi %}
     <section class="stats-section">
-        <h2>Gunning Fog Index</h2>
+        <h2 id="gunning-fog-index">Gunning Fog Index<a aria-label="Link to this heading" class="heading-anchor" href="#gunning-fog-index">¶</a></h2>
         <dl class="stats-details">
             <div class="stats-detail-row">
                 <dt>Mean</dt>
@@ -253,7 +255,7 @@
 
     {% if stats.gfi_highest %}
     <section class="stats-section">
-        <h2>Highest Gunning Fog Index</h2>
+        <h2 id="highest-gunning-fog-index">Highest Gunning Fog Index<a aria-label="Link to this heading" class="heading-anchor" href="#highest-gunning-fog-index">¶</a></h2>
         <div class="stats-table-wrap">
             <table class="stats-table">
                 <thead>
@@ -279,7 +281,7 @@
 
     {% if stats.gfi_lowest %}
     <section class="stats-section">
-        <h2>Lowest Gunning Fog Index</h2>
+        <h2 id="lowest-gunning-fog-index">Lowest Gunning Fog Index<a aria-label="Link to this heading" class="heading-anchor" href="#lowest-gunning-fog-index">¶</a></h2>
         <div class="stats-table-wrap">
             <table class="stats-table">
                 <thead>
@@ -309,7 +311,7 @@
     {# ------------------------------------------------------------------ #}
     {% if stats.earliest_post_date and stats.latest_post_date %}
     <section class="stats-section">
-        <h2>Blog Lifespan</h2>
+        <h2 id="blog-lifespan">Blog Lifespan<a aria-label="Link to this heading" class="heading-anchor" href="#blog-lifespan">¶</a></h2>
         <dl class="stats-details">
             <div class="stats-detail-row">
                 <dt>First post</dt>
@@ -353,7 +355,7 @@
     {# ------------------------------------------------------------------ #}
     {% if stats.longest_streaks %}
     <section class="stats-section">
-        <h2>Longest Streaks</h2>
+        <h2 id="longest-streaks">Longest Streaks<a aria-label="Link to this heading" class="heading-anchor" href="#longest-streaks">¶</a></h2>
         <div class="stats-table-wrap">
             <table class="stats-table">
                 <thead>
@@ -387,7 +389,7 @@
     {# Tags, categories and links overview                                 #}
     {# ------------------------------------------------------------------ #}
     <section class="stats-section">
-        <h2>Content Overview</h2>
+        <h2 id="content-overview">Content Overview<a aria-label="Link to this heading" class="heading-anchor" href="#content-overview">¶</a></h2>
         <dl class="stats-details">
             <div class="stats-detail-row">
                 <dt>Tags</dt>
@@ -409,7 +411,7 @@
     {# ------------------------------------------------------------------ #}
     {% if stats.top_domains %}
     <section class="stats-section">
-        <h2>Top Linked Domains</h2>
+        <h2 id="top-linked-domains">Top Linked Domains<a aria-label="Link to this heading" class="heading-anchor" href="#top-linked-domains">¶</a></h2>
         <div class="stats-table-wrap">
             <table class="stats-table">
                 <thead>
@@ -440,7 +442,7 @@
     {# ------------------------------------------------------------------ #}
     {% if stats.top_internal_links %}
     <section class="stats-section">
-        <h2>Top Internal Links</h2>
+        <h2 id="top-internal-links">Top Internal Links<a aria-label="Link to this heading" class="heading-anchor" href="#top-internal-links">¶</a></h2>
         <div class="stats-table-wrap">
             <table class="stats-table">
                 <thead>
