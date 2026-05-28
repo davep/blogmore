@@ -53,8 +53,17 @@
                 <div class="post-author">By {% if effective_author_url %}<a href="{{ effective_author_url }}" rel="me{% if effective_author_url|is_external_link %} noopener noreferrer{% endif %}"{% if effective_author_url|is_external_link %} target="_blank"{% endif %} class="u-author h-card">{{ effective_author }}</a>{% else %}<span class="u-author h-card">{{ effective_author }}</span>{% endif %}</div>
             {% endif %}
         {% endif %}
-        {% if with_read_time %}
-        <div class="reading-time">{{ post.reading_time }} min read</div>
+        {% if with_read_time or with_gfi %}
+        <div class="reading-time">
+            {%- if with_read_time -%}
+                {{ post.reading_time }} min read
+                {%- if with_gfi -%}
+                    ; {{ "%.0f" % post.gfi }} GFI
+                {%- endif -%}
+            {%- else -%}
+                {{ "%.0f" % post.gfi }} GFI
+            {%- endif -%}
+        </div>
         {% endif %}
         {% if post.category %}
         <div class="category">

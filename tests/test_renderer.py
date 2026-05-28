@@ -1123,6 +1123,38 @@ class TestTemplateRenderer:
 
         assert "reading-time" in html
         assert "min read" in html
+        assert "GFI" not in html
+
+    def test_post_summary_shows_gfi_only(self, sample_post: Post) -> None:
+        """Test that GFI is shown alone when with_gfi is True and with_read_time is False."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=1,
+            total_pages=1,
+            site_title="Test Blog",
+            with_read_time=False,
+            with_gfi=True,
+        )
+
+        assert "reading-time" in html
+        assert "min read" not in html
+        assert "1 GFI" in html
+
+    def test_post_summary_shows_reading_time_and_gfi(self, sample_post: Post) -> None:
+        """Test that reading time and GFI are shown together with semicolon when both are True."""
+        renderer = TemplateRenderer()
+        html = renderer.render_index(
+            posts=[sample_post],
+            page=1,
+            total_pages=1,
+            site_title="Test Blog",
+            with_read_time=True,
+            with_gfi=True,
+        )
+
+        assert "reading-time" in html
+        assert "1 min read; 1 GFI" in html
 
     def test_post_summary_omits_reading_time_by_default(
         self, sample_post: Post

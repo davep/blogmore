@@ -227,6 +227,7 @@ class ContextBuilder:
             "with_graph": self.site_config.with_graph,
             "graph_url": self.get_graph_url(),
             "with_read_time": self.site_config.with_read_time,
+            "with_gfi": self.site_config.with_gfi,
             "with_backlinks": self.site_config.with_backlinks,
             "with_related": self.site_config.with_related,
             "backlinks_title": self.site_config.backlinks_title,

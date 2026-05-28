@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added `with_gfi` configuration option and `--with-gfi` command-line option
+  to calculate and display the Gunning Fog Index (prose readability) on
+  posts and in the statistics page.
+  ([#549](https://github.com/davep/blogmore/pull/549))
+
 ## v2.31.0
 
 **Released: 2026-05-27**

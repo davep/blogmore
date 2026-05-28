@@ -249,6 +249,16 @@ Read time display is **disabled by default**. Pass this flag to opt in.
 blogmore build posts/ --with-read-time
 ```
 
+#### `--with-gfi`
+
+Calculate and display the Gunning Fog Index on the statistics page. When set, BlogMore calculates readability scores of all posts and displays averages and tables on the statistics page.
+
+Gunning Fog Index calculation is **disabled by default**. Pass this flag to opt in.
+
+```bash
+blogmore build posts/ --with-gfi
+```
+
 #### `--with-related`
 
 Enable automated build-time related posts calculation. When enabled, BlogMore uses a pure-Python TF-IDF and Cosine Similarity engine to automatically calculate and list contextually relevant posts for each entry, with zero runtime overhead for readers.
@@ -397,6 +407,7 @@ The serve command also accepts all the build command options:
 - `--minify-js`
 - `--minify-html`
 - `--with-read-time`
+- `--with-gfi`
 - `--with-related`
 - `--socials-title`
 - `--links-title`
@@ -495,6 +506,7 @@ The publish command also accepts all the build command options:
 - `--minify-js`
 - `--minify-html`
 - `--with-read-time`
+- `--with-gfi`
 - `--with-related`
 - `--socials-title`
 - `--links-title`

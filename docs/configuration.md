@@ -522,6 +522,17 @@ Show estimated reading time on each post. When enabled, BlogMore calculates the 
 with_read_time: true
 ```
 
+#### `with_gfi`
+
+Calculate and display the Gunning Fog Index on the statistics page. When enabled, BlogMore calculates the readability index of each post's prose (excluding fenced code blocks) and shows Gunning Fog Index averages (mean, median, and mode) and tables of posts with the 10 highest/lowest GFI scores on the statistics page.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+with_gfi: true
+```
+
 #### `read_time_wpm`
 
 Words per minute used when calculating estimated reading time.  Adjust this value to match the expected reading speed of your audience.  Must be a positive integer.  This is a **configuration file only** option — it cannot be set on the command line.

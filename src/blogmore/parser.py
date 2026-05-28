@@ -17,8 +17,10 @@ import yaml
 from dateutil import parser as dateutil_parser
 from pygments.formatters import HtmlFormatter
 
+from blogmore.gfi import calculate_gunning_fog_index
 from blogmore.markdown import create_custom_extensions
 from blogmore.markdown.first_paragraph import extract_first_paragraph_from_html
+from blogmore.markdown.plain_text import html_to_plain_text
 from blogmore.utils import calculate_reading_time_from_html
 
 _DATE_FORMATS = [
@@ -213,6 +215,20 @@ class Post:
         """
         return calculate_reading_time_from_html(
             self.html_content, self.words_per_minute
+        )
+
+    @cached_property
+    def gfi(self) -> float:
+        """Calculate the Gunning Fog Index for this post.
+
+        The Gunning Fog Index measures the readability of the post's prose.
+        Fenced code blocks are excluded from the calculation.
+
+        Returns:
+            The Gunning Fog Index as a float (0.0 if the post has no text).
+        """
+        return calculate_gunning_fog_index(
+            html_to_plain_text(self.html_content, exclude_code_blocks=True)
         )
 
     @property

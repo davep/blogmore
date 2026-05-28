@@ -252,6 +252,24 @@ class BlogStats:
     Only streaks of two or more days are included.
     """
 
+    gfi_highest: list[Post] = field(default_factory=list)
+    """The 10 posts with the highest Gunning Fog Index scores."""
+
+    gfi_lowest: list[Post] = field(default_factory=list)
+    """The 10 posts with the lowest Gunning Fog Index scores."""
+
+    gfi_mean: float = 0.0
+    """The mean Gunning Fog Index score across all posts."""
+
+    gfi_median: float = 0.0
+    """The median Gunning Fog Index score across all posts."""
+
+    gfi_mode: float = 0.0
+    """The mode Gunning Fog Index score across all posts."""
+
+    gfi_histogram: list[int] = field(default_factory=lambda: [0] * 12)
+    """Histogram counts of posts falling into GFI rounded integer buckets."""
+
     @property
     def blog_span_days(self) -> int | None:
         """Return the total span of the blog in days, or [`None`][builtins.None] if fewer than two dated posts exist.
@@ -459,6 +477,7 @@ def compute_blog_stats(
     posts: list[Post],
     site_url: str = "",
     backlink_map: "dict[str, list[Backlink]] | None" = None,
+    with_gfi: bool = False,
 ) -> BlogStats:
     """Compute aggregated statistics from a collection of blog posts.
 
@@ -471,6 +490,7 @@ def compute_blog_stats(
             [`blogmore.backlinks.build_backlink_map`][blogmore.backlinks.build_backlink_map].  When provided,
             [`BlogStats.top_internal_links`][blogmore.stats.BlogStats.top_internal_links] is populated with the top 20
             posts sorted by incoming link count descending.
+        with_gfi: Whether to calculate and display the Gunning Fog Index.
 
     Returns:
         A [blogmore.stats.BlogStats][blogmore.stats.BlogStats] instance populated from the given posts.
@@ -613,6 +633,44 @@ def compute_blog_stats(
 
     # Longest consecutive posting streaks (2+ days, top 10).
     stats.longest_streaks = _compute_longest_streaks(posts_by_date)
+
+    # --- Gunning Fog Index (GFI) ---------------------------------------------
+    if with_gfi and posts:
+        import statistics
+
+        post_gfis = [(post, post.gfi) for post in posts]
+        valid_gfis = [pair for pair in post_gfis if pair[1] > 0.0]
+
+        if valid_gfis:
+            highest_sorted = sorted(
+                valid_gfis, key=lambda pair: (-pair[1], pair[0].title.casefold())
+            )
+            lowest_sorted = sorted(
+                valid_gfis, key=lambda pair: (pair[1], pair[0].title.casefold())
+            )
+
+            stats.gfi_highest = [post for post, _ in highest_sorted[:10]]
+            stats.gfi_lowest = [post for post, _ in lowest_sorted[:10]]
+
+            scores = [gfi for _, gfi in valid_gfis]
+            stats.gfi_mean = statistics.mean(scores)
+            stats.gfi_median = statistics.median(scores)
+            int_scores = [round(gfi) for gfi in scores]
+            try:
+                stats.gfi_mode = float(statistics.mode(int_scores))
+            except statistics.StatisticsError:
+                stats.gfi_mode = float(int_scores[0])
+
+            gfi_counts = [0] * 12
+            for gfi in scores:
+                rounded_gfi = round(gfi)
+                if rounded_gfi <= 6:
+                    gfi_counts[0] += 1
+                elif rounded_gfi >= 17:
+                    gfi_counts[11] += 1
+                else:
+                    gfi_counts[rounded_gfi - 6] += 1
+            stats.gfi_histogram = gfi_counts
 
     return stats
 

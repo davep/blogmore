@@ -157,6 +157,11 @@ posts_per_feed: 20
 # Displays the approximate time to read each post based on the configured WPM.
 # with_read_time: false
 
+# Optional: Calculate and display Gunning Fog Index on the stats page (default: false)
+# When enabled, calculates the readability of each post and exposes Gunning Fog
+# statistics (mean, median, mode, and tables of top/bottom posts) on the stats page.
+# with_gfi: false
+
 # Optional: Words per minute used when calculating estimated reading time (default: 200)
 # Must be a positive integer. Configuration file only.
 # read_time_wpm: 200
