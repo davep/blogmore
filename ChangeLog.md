@@ -5,8 +5,9 @@
 **Released: WiP**
 
 - Added `with_gfi` configuration option and `--with-gfi` command-line option
-  to calculate and display the Gunning Fog Index (prose readability) on the
-  statistics page. ([#549](https://github.com/davep/blogmore/pull/549))
+  to calculate and display the Gunning Fog Index (prose readability) on
+  posts and in the statistics page.
+  ([#549](https://github.com/davep/blogmore/pull/549))
 
 ## v2.31.0
 
