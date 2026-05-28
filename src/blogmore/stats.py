@@ -11,6 +11,8 @@ from urllib.parse import urlparse
 ##############################################################################
 # Local imports.
 from blogmore.backlinks import Backlink
+from blogmore.focus import extract_top_terms_per_year
+from blogmore.markdown.plain_text import html_to_plain_text
 from blogmore.parser import Post
 from blogmore.utils import count_words_from_html
 
@@ -269,6 +271,9 @@ class BlogStats:
 
     gfi_histogram: list[int] = field(default_factory=lambda: [0] * 12)
     """Histogram counts of posts falling into GFI rounded integer buckets."""
+
+    focus_by_year: dict[int, list[tuple[str, float]]] = field(default_factory=dict)
+    """Top terms per year from TF-IDF analysis."""
 
     @property
     def blog_span_days(self) -> int | None:
@@ -671,6 +676,24 @@ def compute_blog_stats(
                 else:
                     gfi_counts[rounded_gfi - 6] += 1
             stats.gfi_histogram = gfi_counts
+
+    # --- Focus by Year (TF-IDF analysis) -------------------------------------
+    corpus: dict[int, list[str]] = {}
+    for post in dated_posts:
+        assert post.date is not None
+        text = html_to_plain_text(post.html_content, exclude_code_blocks=True)
+        if text.strip():
+            corpus.setdefault(post.date.year, []).append(text)
+
+    aggregated_corpus: dict[int, str] = {}
+    if year_counter:
+        current_year = dt.date.today().year
+        earliest_year = min(year_counter)
+        for year in range(current_year, earliest_year - 1, -1):
+            texts = corpus.get(year, [])
+            aggregated_corpus[year] = " ".join(texts)
+
+    stats.focus_by_year = extract_top_terms_per_year(aggregated_corpus)
 
     return stats
 

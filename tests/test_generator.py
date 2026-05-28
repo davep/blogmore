@@ -6082,27 +6082,33 @@ class TestStatsPageGeneration:
         stats_content = (temp_output_dir / "stats.html").read_text()
 
         assert (
-            '<h2 id="posts-by-hour-of-day">Posts by Hour of Day<a aria-label="Link to this heading" class="heading-anchor" href="#posts-by-hour-of-day">¶</a></h2>'
+            '<h2 id="posts-by-hour-of-day">Posts by Hour of Day'
+            '<a aria-label="Link to this heading" class="heading-anchor" href="#posts-by-hour-of-day">¶</a></h2>'
             in stats_content
         )
         assert (
-            '<h2 id="posts-by-day-of-week">Posts by Day of Week<a aria-label="Link to this heading" class="heading-anchor" href="#posts-by-day-of-week">¶</a></h2>'
+            '<h2 id="posts-by-day-of-week">Posts by Day of Week'
+            '<a aria-label="Link to this heading" class="heading-anchor" href="#posts-by-day-of-week">¶</a></h2>'
             in stats_content
         )
         assert (
-            '<h2 id="word-count">Word Count<a aria-label="Link to this heading" class="heading-anchor" href="#word-count">¶</a></h2>'
+            '<h2 id="word-count">Word Count'
+            '<a aria-label="Link to this heading" class="heading-anchor" href="#word-count">¶</a></h2>'
             in stats_content
         )
         assert (
-            '<h2 id="reading-time">Reading Time<a aria-label="Link to this heading" class="heading-anchor" href="#reading-time">¶</a></h2>'
+            '<h2 id="reading-time">Reading Time'
+            '<a aria-label="Link to this heading" class="heading-anchor" href="#reading-time">¶</a></h2>'
             in stats_content
         )
         assert (
-            '<h2 id="gunning-fog-index">Gunning Fog Index<a aria-label="Link to this heading" class="heading-anchor" href="#gunning-fog-index">¶</a></h2>'
+            '<h2 id="gunning-fog-index">Gunning Fog Index'
+            '<a aria-label="Link to this heading" class="heading-anchor" href="#gunning-fog-index">¶</a></h2>'
             in stats_content
         )
         assert (
-            '<h2 id="content-overview">Content Overview<a aria-label="Link to this heading" class="heading-anchor" href="#content-overview">¶</a></h2>'
+            '<h2 id="content-overview">Content Overview'
+            '<a aria-label="Link to this heading" class="heading-anchor" href="#content-overview">¶</a></h2>'
             in stats_content
         )
 
@@ -6240,6 +6246,41 @@ class TestStatsPageGeneration:
 
         sitemap_content = (temp_output_dir / "sitemap.xml").read_text()
         assert "stats.html" in sitemap_content
+
+    def test_stats_page_contains_focus_by_year_section(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The stats page includes the Focus by Year section with correct links and terms."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+            )
+        )
+        generator.generate()
+
+        stats_content = (temp_output_dir / "stats.html").read_text()
+        assert "Focus by Year" in stats_content
+        assert 'href="/2024/index.html">2024</a>' in stats_content
+
+    def test_stats_page_contains_focus_by_year_section_clean_urls(
+        self, posts_dir: Path, temp_output_dir: Path
+    ) -> None:
+        """The stats page includes Focus by Year links observing clean_urls."""
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+                clean_urls=True,
+            )
+        )
+        generator.generate()
+
+        stats_content = (temp_output_dir / "stats.html").read_text()
+        assert "Focus by Year" in stats_content
+        assert 'href="/2024/">2024</a>' in stats_content
 
 
 class TestCalendarPageGeneration:

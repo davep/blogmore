@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added a "Focus by Year" section to the stats page using TF-IDF analysis on
+  post prose content to highlight key terms per year.
+  ([#554](https://github.com/davep/blogmore/pull/554))
+
 ## v2.32.0
 
 **Released: 2026-05-28**
