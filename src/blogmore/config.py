@@ -76,6 +76,7 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
         "external_links_check_ignore",
         "external_links_check_timeout",
         "image_widths",
+        "stop_words",
     }
 )
 
@@ -707,5 +708,40 @@ def parse_site_config_from_dict(
         kwargs["external_links_check_ignore"] = []
         if "external_links_check_timeout" not in overrides:
             kwargs["external_links_check_timeout"] = 5.0
+
+    # --- stop_words (YAML key: "stats: stop_words") --------------------------
+    raw_stats = config.get("stats")
+    if isinstance(raw_stats, dict):
+        raw_stop_words = raw_stats.get("stop_words")
+        if raw_stop_words is None:
+            kwargs["stop_words"] = []
+        elif isinstance(raw_stop_words, list) and all(
+            isinstance(item, (str, int, float, bool)) for item in raw_stop_words
+        ):
+            tidied_words: list[str] = []
+            for item in raw_stop_words:
+                cleaned = str(item).strip().lower()
+                if cleaned:
+                    tidied_words.append(cleaned)
+            # Remove duplicates while preserving order
+            seen = set()
+            unique_words = []
+            for w in tidied_words:
+                if w not in seen:
+                    seen.add(w)
+                    unique_words.append(w)
+            kwargs["stop_words"] = unique_words
+        else:
+            errors.append(
+                "stats: stop_words in the configuration file must be a list of strings; "
+                "ignoring value"
+            )
+            kwargs["stop_words"] = []
+    else:
+        if raw_stats is not None:
+            errors.append(
+                "stats in the configuration file must be a dictionary; ignoring value"
+            )
+        kwargs["stop_words"] = []
 
     return kwargs, errors

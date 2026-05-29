@@ -397,6 +397,14 @@ class SiteConfig:
     ``stats.html``.
     """
 
+    stop_words: list[str] = field(default_factory=list)
+    """Optional list of custom stop words to append to the default list.
+
+    These are used during TF-IDF calculations for related posts and focus terms.
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Empty by default.
+    """
+
     calendar_path: str = DEFAULT_CALENDAR_PATH
     """Path (relative to the output directory) where the calendar page is written.
 

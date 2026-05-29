@@ -408,3 +408,15 @@ no_watch: false
 #     # Optional: Network timeout in seconds for link validation (default: 5.0)
 #     timeout: 5.0
 
+# Statistics options
+
+# Optional: Custom stop words list to filter out noise words during TF-IDF calculations
+# (such as focus-by-year statistics or related posts generation). The words provided here
+# are stripped of whitespace, lowercased, and appended to the default hardcoded English stop
+# words list.
+# stats:
+#   stop_words:
+#     - wibble
+#     - wobble
+
+
