@@ -129,17 +129,40 @@ class Post:
     """Represents a blog post with metadata and content."""
 
     path: Path
+    """The file path to the source Markdown file."""
+
     title: str
+    """The title of the post."""
+
     content: str
+    """The raw Markdown content of the post."""
+
     html_content: str
+    """The parsed HTML content of the post."""
+
     date: dt.datetime | None = None
+    """The publication date and time of the post, or `None` if not specified."""
+
     category: str | None = None
+    """The category of the post, or `None` if not specified."""
+
     tags: list[str] | None = None
+    """A list of tags associated with the post, or `None` if not specified."""
+
     draft: bool = False
+    """Whether the post is a draft (hidden in production builds)."""
+
     metadata: dict[str, Any] | None = None
+    """Raw frontmatter metadata dictionary parsed from the Markdown file."""
+
     url_path: str | None = field(default=None, repr=False, compare=False)
+    """Pre-resolved custom URL path for this post, or `None` to use the default URL pattern."""
+
     words_per_minute: int = field(default=200, repr=False, compare=False)
+    """Estimated reading speed in words per minute."""
+
     related_posts: list[Post] = field(default_factory=list, repr=False, compare=False)
+    """A list of other [`Post`][blogmore.parser.Post] objects that are related to this post."""
 
     @property
     def slug(self) -> str:
@@ -173,19 +196,32 @@ class Post:
 
     @property
     def safe_category(self) -> str | None:
-        """Get the category sanitized for use in URLs and filenames."""
+        """Get the category sanitized for use in URLs and filenames.
+
+        Returns:
+            The sanitized category name, or `None` if no category is set.
+        """
         if self.category:
             return sanitize_for_url(self.category)
         return None
 
     def safe_tags(self) -> list[str]:
-        """Get tags sanitized for use in URLs and filenames."""
+        """Get tags sanitized for use in URLs and filenames.
+
+        Returns:
+            A list of sanitized tag names.
+        """
         if self.tags:
             return [sanitize_for_url(tag) for tag in self.tags]
         return []
 
     def sorted_tag_pairs(self) -> list[tuple[str, str]]:
-        """Get tags as (display, safe) pairs sorted in casefold alphabetical order."""
+        """Get tags as (display, safe) pairs sorted in casefold alphabetical order.
+
+        Returns:
+            A list of tuples containing the original display tag and the
+            sanitized tag name.
+        """
         if not self.tags:
             return []
         pairs = [(tag, sanitize_for_url(tag)) for tag in self.tags]
@@ -303,11 +339,22 @@ class Page:
     """Represents a static page with metadata and content."""
 
     path: Path
+    """The file path to the source Markdown file."""
+
     title: str
+    """The title of the page."""
+
     content: str
+    """The raw Markdown content of the page."""
+
     html_content: str
+    """The parsed HTML content of the page."""
+
     metadata: dict[str, Any] | None = None
+    """Raw frontmatter metadata dictionary parsed from the Markdown file."""
+
     url_path: str | None = field(default=None, repr=False, compare=False)
+    """Pre-resolved custom URL path for this page, or `None` to use the default URL pattern."""
 
     @property
     def slug(self) -> str:
