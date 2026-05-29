@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed the `dump` command to resolve post output paths so that `url_path`
+  and `url` are populated correctly in the JSON output.
+  ([#564](https://github.com/davep/blogmore/pull/564))
+
 ## v2.33.0
 
 **Released: 2026-05-29**

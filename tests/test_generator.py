@@ -4064,8 +4064,8 @@ class TestPostPathConfiguration:
         generator.generate()
 
         captured = capsys.readouterr()
-        assert "WARNING" in captured.out
-        assert "clash" in captured.out.lower()
+        assert "WARNING" in captured.err
+        assert "clash" in captured.err.lower()
 
     def test_post_path_clash_newest_wins(
         self, tmp_path: Path, temp_output_dir: Path
@@ -4110,7 +4110,7 @@ class TestPostPathConfiguration:
         generator.generate()
 
         captured = capsys.readouterr()
-        assert "WARNING" not in captured.out
+        assert "WARNING" not in captured.err
 
 
 class TestCleanUrls:
