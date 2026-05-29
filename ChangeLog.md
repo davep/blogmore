@@ -10,6 +10,8 @@
 - Some more site generation performance improvements to offset
   recently-added features.
   ([#556](https://github.com/davep/blogmore/pull/556))
+- Added a `dump` command to serialize and dump all blog posts to stdout as
+  JSON data. ([#558](https://github.com/davep/blogmore/pull/558))
 
 ## v2.32.0
 
