@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.33.0
 
-**Released: WiP**
+**Released: 2026-05-29**
 
 - Added a "Focus by Year" section to the stats page using TF-IDF analysis on
   post prose content to highlight key terms per year.
