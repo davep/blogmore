@@ -272,6 +272,7 @@ def main() -> int:
 
         try:
             from blogmore.dump import dump_posts
+            from blogmore.generator.paths import resolve_post_output_paths
             from blogmore.parser import PostParser
 
             post_parser = PostParser(site_url=site_config.site_url)
@@ -280,6 +281,9 @@ def main() -> int:
                 include_drafts=site_config.include_drafts,
                 exclude_dirs=[args.content_dir / "pages"],
             )
+
+            # Resolve paths to populate post.url_path and post.url correctly
+            resolve_post_output_paths(site_config, posts)
 
             for post in posts:
                 post.words_per_minute = site_config.read_time_wpm

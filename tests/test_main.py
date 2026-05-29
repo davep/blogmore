@@ -3092,11 +3092,15 @@ class TestDumpCLI:
             assert data[0]["category"] == "Tech"
             assert data[0]["tags"] == ["Python", "Testing"]
             assert data[0]["word_count"] == 5
+            assert data[0]["url_path"] == "/2024/01/15/first.html"
+            assert data[0]["url"] == "/2024/01/15/first.html"
 
             assert data[1]["title"] == "Second Post"
             assert data[1]["id"] == "second.md"
             assert data[1]["category"] == "Personal"
             assert data[1]["tags"] == ["Thoughts"]
+            assert data[1]["url_path"] == "/2024/01/20/second.html"
+            assert data[1]["url"] == "/2024/01/20/second.html"
 
     def test_dump_no_content_dir_fails(
         self,

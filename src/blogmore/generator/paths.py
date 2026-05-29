@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from collections import defaultdict
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -188,13 +189,14 @@ def resolve_post_output_paths(
             losers = clashing_posts[1:]
             print(
                 "\nWARNING: Post path clash detected!  "
-                "Multiple posts would be written to the same output file."
+                "Multiple posts would be written to the same output file.",
+                file=sys.stderr,
             )
-            print(f"  Output path : {path_str}")
-            print(f"  Winner (newest) : '{winner.title}'")
+            print(f"  Output path : {path_str}", file=sys.stderr)
+            print(f"  Winner (newest) : '{winner.title}'", file=sys.stderr)
             for loser in losers:
-                print(f"  Ignored (older): '{loser.title}'")
-            print()
+                print(f"  Ignored (older): '{loser.title}'", file=sys.stderr)
+            print(file=sys.stderr)
 
     return post_output_paths
 
