@@ -50,15 +50,12 @@ def _sort_oldest_first(posts: list[Post]) -> list[Post]:
 
 @dataclass
 class PostVector:
-    """Represents a sparse TF-IDF vector for a post.
-
-    Attributes:
-        weights: Mapping from term to its TF-IDF weight.
-        magnitude: Pre-computed Euclidean norm (magnitude) of the vector.
-    """
+    """Represents a sparse TF-IDF vector for a post."""
 
     weights: dict[str, float]
+    """Mapping from term to its TF-IDF weight."""
     magnitude: float
+    """Pre-computed Euclidean norm (magnitude) of the vector."""
 
 
 class SimilarityEngine:
