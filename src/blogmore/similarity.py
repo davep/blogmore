@@ -8,8 +8,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from blogmore.markdown.plain_text import html_to_plain_text
-
 if TYPE_CHECKING:
     from blogmore.parser import Post
     from blogmore.site_config import SiteConfig
@@ -157,9 +155,7 @@ class SimilarityEngine:
             posts: The list of all Post objects in the current build.
         """
         # Clean and tokenise the modified post
-        plain_text = html_to_plain_text(
-            modified_post.html_content, exclude_code_blocks=True
-        )
+        plain_text = modified_post.prose_text
         tokens = tokenise(plain_text)
 
         # Update cached tokens
@@ -228,7 +224,7 @@ class SimilarityEngine:
         self._cached_mtimes.clear()
 
         for post in posts:
-            plain_text = html_to_plain_text(post.html_content, exclude_code_blocks=True)
+            plain_text = post.prose_text
             self._cached_tokens[post.path] = tokenise(plain_text)
             try:
                 mtime = post.path.stat().st_mtime

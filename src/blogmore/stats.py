@@ -12,9 +12,7 @@ from urllib.parse import urlparse
 # Local imports.
 from blogmore.backlinks import Backlink
 from blogmore.focus import FocusTerm, extract_top_terms_per_year
-from blogmore.markdown.plain_text import html_to_plain_text
 from blogmore.parser import Post
-from blogmore.utils import count_words_from_html
 
 
 @dataclass
@@ -551,7 +549,7 @@ def compute_blog_stats(
             stats.latest_post_date = _to_naive(stats.latest_post_date)
 
     # --- Word count and reading time -----------------------------------------
-    word_counts = [(post, count_words_from_html(post.html_content)) for post in posts]
+    word_counts = [(post, post.word_count) for post in posts]
     reading_times = [(post, post.reading_time) for post in posts]
 
     if word_counts:
@@ -681,7 +679,7 @@ def compute_blog_stats(
     corpus: dict[int, list[str]] = {}
     for post in dated_posts:
         assert post.date is not None
-        text = html_to_plain_text(post.html_content, exclude_code_blocks=True)
+        text = post.prose_text
         if text.strip():
             corpus.setdefault(post.date.year, []).append(text)
 

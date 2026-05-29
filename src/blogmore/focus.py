@@ -93,22 +93,20 @@ def extract_top_terms_per_year(
         # Find all matching words in their original casing
         tokens = word_pattern.findall(text)
 
-        # Lowercase tokens for TF-IDF calculations
-        lowercase_tokens = [w.lower() for w in tokens]
+        filtered_words: list[str] = []
+        casing_map: dict[str, Counter[str]] = {}
 
-        # Filter out standard stop words using lowercase forms
-        filtered_words = [word for word in lowercase_tokens if word not in STOP_WORDS]
+        for original_word in tokens:
+            lower_word = original_word.lower()
+            if lower_word not in STOP_WORDS:
+                filtered_words.append(lower_word)
+                if lower_word not in casing_map:
+                    casing_map[lower_word] = Counter()
+                casing_map[lower_word][original_word] += 1
 
         # Calculate counts of the canonical lowercase words
         counter = Counter(filtered_words)
         year_word_counts[year] = counter
-
-        # Keep track of casing variants for the filtered words
-        casing_map: dict[str, Counter[str]] = {}
-        for original_word in tokens:
-            lower_word = original_word.lower()
-            if lower_word in counter:
-                casing_map.setdefault(lower_word, Counter())[original_word] += 1
         year_casing_counts[year] = casing_map
 
         for word in counter:

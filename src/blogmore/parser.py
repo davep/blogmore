@@ -21,7 +21,6 @@ from blogmore.gfi import calculate_gunning_fog_index
 from blogmore.markdown import create_custom_extensions
 from blogmore.markdown.first_paragraph import extract_first_paragraph_from_html
 from blogmore.markdown.plain_text import html_to_plain_text
-from blogmore.utils import calculate_reading_time_from_html
 
 _DATE_FORMATS = [
     "%Y-%m-%d %H:%M:%S %z",
@@ -207,15 +206,33 @@ class Post:
         return extract_first_paragraph_from_html(self.html_content)
 
     @cached_property
+    def prose_text(self) -> str:
+        """Get the plain text of the post's prose.
+
+        Strips HTML tags and excludes fenced code blocks.
+
+        Returns:
+            The plain text prose of the post.
+        """
+        return html_to_plain_text(self.html_content, exclude_code_blocks=True)
+
+    @cached_property
+    def word_count(self) -> int:
+        """Get the word count of the post's readable prose.
+
+        Returns:
+            The number of words in the post.
+        """
+        return len([word for word in re.findall(r"\w+", self.prose_text) if word])
+
+    @cached_property
     def reading_time(self) -> int:
         """Calculate the estimated reading time for this post in whole minutes.
 
         Returns:
             Estimated reading time in minutes (minimum 1 minute)
         """
-        return calculate_reading_time_from_html(
-            self.html_content, self.words_per_minute
-        )
+        return max(1, round(self.word_count / self.words_per_minute))
 
     @cached_property
     def gfi(self) -> float:
@@ -227,9 +244,7 @@ class Post:
         Returns:
             The Gunning Fog Index as a float (0.0 if the post has no text).
         """
-        return calculate_gunning_fog_index(
-            html_to_plain_text(self.html_content, exclude_code_blocks=True)
-        )
+        return calculate_gunning_fog_index(self.prose_text)
 
     @property
     def modified_date(self) -> dt.datetime | None:
