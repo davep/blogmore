@@ -6,7 +6,7 @@ import math
 import re
 from collections import Counter
 
-from blogmore.similarity import STOP_WORDS
+from blogmore.stop_words import STOP_WORDS
 
 
 def extract_top_terms_per_year(
