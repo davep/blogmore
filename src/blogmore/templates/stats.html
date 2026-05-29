@@ -242,8 +242,9 @@
                 {% set year_url = '/' ~ year ~ '/' ~ pagination_page1_suffix %}
                 <dt><a href="{{ year_url }}">{{ year }}</a></dt>
                 <dd>
-                    {% for term, weight in terms %}
-                    {{- term -}}{{- ", " if not loop.last else "" -}}
+                    {% for term in terms %}
+                    <data value="{{ term.score }}" title="{{ term.exclusivity }}% of lifetime uses occurred in {{ year }}">{{ term.word }}</data>
+                    {{- ", " if not loop.last else "" -}}
                     {% endfor %}
                 </dd>
                 {% else %}

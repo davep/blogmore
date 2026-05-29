@@ -1,5 +1,7 @@
 """Focus by year terms extraction using TF-IDF analysis."""
 
+from __future__ import annotations
+
 ##############################################################################
 # Python imports.
 import math
@@ -9,9 +11,49 @@ from collections import Counter
 from blogmore.stop_words import STOP_WORDS
 
 
+class FocusTerm(tuple[str, float]):
+    """Represents a focus term with its score, exclusivity, and raw count.
+
+    Acts as a 2-tuple (word, score) for backward-compatible unpacking in
+    templates and tests.
+    """
+
+    def __new__(
+        cls, word: str, score: float, exclusivity: int, raw_count: int
+    ) -> FocusTerm:
+        """Create a new FocusTerm instance.
+
+        Args:
+            word: The term string.
+            score: The TF-IDF score.
+            exclusivity: Percentage of total uses that occurred in this year.
+            raw_count: Number of times used in this year.
+
+        Returns:
+            A new FocusTerm tuple instance.
+        """
+        return super().__new__(cls, (word, score))
+
+    def __init__(
+        self, word: str, score: float, exclusivity: int, raw_count: int
+    ) -> None:
+        """Initialize the FocusTerm instance.
+
+        Args:
+            word: The term string.
+            score: The TF-IDF score.
+            exclusivity: Percentage of total uses that occurred in this year.
+            raw_count: Number of times used in this year.
+        """
+        self.word = word
+        self.score = score
+        self.exclusivity = exclusivity
+        self.raw_count = raw_count
+
+
 def extract_top_terms_per_year(
     corpus: dict[int, str], top_n: int = 5
-) -> dict[int, list[tuple[str, float]]]:
+) -> dict[int, list[FocusTerm]]:
     """Extract the top terms per year from a dictionary of year-to-prose corpus.
 
     Computes TF-IDF for each word per year. Fenced code blocks must not be
@@ -28,10 +70,10 @@ def extract_top_terms_per_year(
         top_n: The maximum number of top terms to return per year.
 
     Returns:
-        A dictionary mapping each year to a list of tuples containing the
-        highest-scoring terms and their weights, sorted in descending order of
-        score. If there are no terms for a year, returns an empty list for that
-        year. Handles empty corpus and other division by zero edge cases safely.
+        A dictionary mapping each year to a list of FocusTerm objects,
+        sorted in descending order of score. If there are no terms for a year,
+        returns an empty list for that year. Handles empty corpus and other
+        division by zero edge cases safely.
     """
     if not corpus:
         return {}
@@ -74,17 +116,19 @@ def extract_top_terms_per_year(
                 word_in_years[word] = set()
             word_in_years[word].add(year)
 
+    # Calculate lifetime counts of each lowercase word across the entire corpus
+    lifetime_word_counts: Counter[str] = Counter()
+    for counter in year_word_counts.values():
+        lifetime_word_counts.update(counter)
+
     # Compute IDF for all encountered words
     idf: dict[str, float] = {}
     for word, years_with_word in word_in_years.items():
         num_years = len(years_with_word)
-        if num_years > 0:
-            idf[word] = math.log(total_years / num_years)
-        else:
-            idf[word] = 0.0
+        idf[word] = math.log(total_years / num_years) if num_years > 0 else 0.0
 
     # Compute TF-IDF and extract top terms per year
-    results: dict[int, list[tuple[str, float]]] = {}
+    results: dict[int, list[FocusTerm]] = {}
     for year in corpus:
         counts = year_word_counts.get(year, Counter())
         total_terms = sum(counts.values())
@@ -93,7 +137,7 @@ def extract_top_terms_per_year(
             results[year] = []
             continue
 
-        tf_idf_scores: list[tuple[str, float]] = []
+        tf_idf_scores: list[FocusTerm] = []
         casing_map = year_casing_counts.get(year, {})
         for word, count in counts.items():
             tf = count / total_terms
@@ -104,7 +148,11 @@ def extract_top_terms_per_year(
             casing_counts = casing_map.get(word)
             best_casing = casing_counts.most_common(1)[0][0] if casing_counts else word
 
-            tf_idf_scores.append((best_casing, score))
+            # Calculate exclusivity (percentage of total uses that occurred in this year)
+            lifetime_count = lifetime_word_counts.get(word, 1)
+            exclusivity = round(100 * count / lifetime_count)
+
+            tf_idf_scores.append(FocusTerm(best_casing, score, exclusivity, count))
 
         # Sort descending by score, then alphabetically for stability
         tf_idf_scores.sort(key=lambda item: (-item[1], item[0]))

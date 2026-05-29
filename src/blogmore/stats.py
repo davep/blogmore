@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 ##############################################################################
 # Local imports.
 from blogmore.backlinks import Backlink
-from blogmore.focus import extract_top_terms_per_year
+from blogmore.focus import FocusTerm, extract_top_terms_per_year
 from blogmore.markdown.plain_text import html_to_plain_text
 from blogmore.parser import Post
 from blogmore.utils import count_words_from_html
@@ -272,7 +272,7 @@ class BlogStats:
     gfi_histogram: list[int] = field(default_factory=lambda: [0] * 12)
     """Histogram counts of posts falling into GFI rounded integer buckets."""
 
-    focus_by_year: dict[int, list[tuple[str, float]]] = field(default_factory=dict)
+    focus_by_year: dict[int, list[FocusTerm]] = field(default_factory=dict)
     """Top terms per year from TF-IDF analysis."""
 
     @property

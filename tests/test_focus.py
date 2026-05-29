@@ -106,3 +106,38 @@ def test_extract_top_terms_case_preservation() -> None:
     # For 2021, mre used once, IMAC used once:
     assert "mre" in terms_2021
     assert "IMAC" in terms_2021
+
+
+def test_focus_term_attributes_and_unpacking() -> None:
+    """Verify that FocusTerm has extra attributes but unpacks exactly as a 2-tuple."""
+    corpus = {
+        2020: "apple banana apple",
+        2021: "banana cherry",
+    }
+    results = extract_top_terms_per_year(corpus, top_n=5)
+
+    assert 2020 in results
+    assert 2021 in results
+
+    # Get FocusTerm objects
+    terms_2020 = results[2020]
+    apple_term = next(t for t in terms_2020 if t.word == "apple")
+
+    # Attributes
+    assert apple_term.word == "apple"
+    assert apple_term.raw_count == 2
+    # apple was used 2 times in 2020 and 0 times in 2021, so 100% exclusivity
+    assert apple_term.exclusivity == 100
+
+    # Unpacking / Indexing compatibility
+    word, score = apple_term
+    assert word == "apple"
+    assert score == apple_term.score
+    assert apple_term[0] == "apple"
+    assert apple_term[1] == apple_term.score
+    assert len(apple_term) == 2
+
+    banana_term_2020 = next(t for t in terms_2020 if t.word == "banana")
+    # banana was used 1 time in 2020 and 1 time in 2021, so 50% exclusivity
+    assert banana_term_2020.raw_count == 1
+    assert banana_term_2020.exclusivity == 50
