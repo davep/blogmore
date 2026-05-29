@@ -779,6 +779,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v2330" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        v2.33.0
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v2320" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1601,6 +1612,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v2330" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        v2.33.0
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v2320" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -2367,6 +2389,22 @@
 
 
 <h1 id="blogmore-changelog">BlogMore ChangeLog</h1>
+<h2 id="v2330">v2.33.0</h2>
+<p><strong>Released: 2026-05-29</strong></p>
+<ul>
+<li>Added a "Focus by Year" section to the stats page using TF-IDF analysis on
+  post prose content to highlight key terms per year.
+  (<a href="https://github.com/davep/blogmore/pull/554">#554</a>)</li>
+<li>Some more site generation performance improvements to offset
+  recently-added features.
+  (<a href="https://github.com/davep/blogmore/pull/556">#556</a>)</li>
+<li>Added a <code>dump</code> command to serialize and dump all blog posts to stdout as
+  JSON data. (<a href="https://github.com/davep/blogmore/pull/558">#558</a>)</li>
+<li>Added support for configuring custom stop words via the configuration
+  file. This lets the user filter out domain-specific noise words during
+  TF-IDF calculations (e.g. for focus-by-year page stats or related posts).
+  (<a href="https://github.com/davep/blogmore/pull/560">#560</a>)</li>
+</ul>
 <h2 id="v2320">v2.32.0</h2>
 <p><strong>Released: 2026-05-28</strong></p>
 <ul>

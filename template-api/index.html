@@ -2200,6 +2200,11 @@ most template-relevant attributes are listed below.</p>
 <td><code>list[int]</code></td>
 <td>12-element list of GFI bucket counts (&lt;= 6, 7 to 16, &gt;= 17).</td>
 </tr>
+<tr>
+<td><code>focus_by_year</code></td>
+<td><code>dict[int, list[tuple[str, float]]]</code></td>
+<td>Dictionary mapping each year to a list of the top terms (word and TF-IDF score pairs) for that year, sorted in descending order of score.</td>
+</tr>
 </tbody>
 </table>
 <h2 id="calendar-objects">Calendar objects</h2>

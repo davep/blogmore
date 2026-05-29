@@ -1671,6 +1671,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#stats-stop_words" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>stats: stop_words</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#calendar_path" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -3349,6 +3360,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#stats-stop_words" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>stats: stop_words</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#calendar_path" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -4692,6 +4714,23 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <span class="nt">clean_urls</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 <p>This makes the stats page accessible at <code>/stats/</code> rather than <code>/stats/index.html</code>.</p>
+<h4 id="stats-stop_words"><code>stats: stop_words</code></h4>
+<p>A list of custom stop words to filter out during TF-IDF statistics calculations (such as focus-by-year page stats or related posts generation).</p>
+<p>By default, BlogMore uses a hardcoded list of common English stop words (like "the", "and", "is", etc.) to filter out noise from statistical calculations and term comparisons. The words you configure in <code>stats: stop_words</code> are:
+1. Stripped of leading and trailing whitespace.
+2. Converted to lowercase to match the case-insensitive TF-IDF engine.
+3. Appended to the default hardcoded English stop words list.</p>
+<p>This is useful if your blog contains domain-specific jargon or frequent words that you do not want showing up as focus terms or influencing post similarity (e.g., if you write about coding, you might want to filter out code-specific terms that appear in every post).</p>
+<p><strong>Type:</strong> List of strings<br />
+<strong>Default:</strong> <em>(empty)</em></p>
+<div class="highlight"><pre><span></span><code><span class="nt">stats</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">stop_words</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">foo</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bar</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Baz</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">WIBBLE</span>
+</code></pre></div>
+<p>This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
 <h4 id="calendar_path"><code>calendar_path</code></h4>
 <p>Path (relative to the output directory) where the calendar page is generated.  This is a <strong>configuration file only</strong> option — it cannot be set on the command line.  Only used when <a href="#with_calendar"><code>with_calendar</code></a> is <code>true</code>.</p>
 <p><strong>Type:</strong> String<br />
