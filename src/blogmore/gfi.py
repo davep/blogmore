@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import re
 import string
+from functools import cache
 
 
-def identify_proper_nouns(text: str) -> set[str]:
+def identify_proper_nouns(text: str, words: list[str] | None = None) -> set[str]:
     """Scan text to isolate potential proper nouns.
 
     A word is designated a proper noun if it is seen title-cased but never
@@ -14,12 +15,14 @@ def identify_proper_nouns(text: str) -> set[str]:
 
     Args:
         text: The plain text to scan.
+        words: Optional pre-extracted list of words.
 
     Returns:
         A set of identified proper nouns in their original casing as seen in
         the text.
     """
-    words = _extract_words(text)
+    if words is None:
+        words = _extract_words(text)
     lowercase_words = {w for w in words if w.islower()}
     title_cased_words = {w for w in words if w and w[0].isupper()}
 
@@ -30,6 +33,7 @@ def identify_proper_nouns(text: str) -> set[str]:
     return proper_nouns
 
 
+@cache
 def count_syllables(word: str) -> int:
     """Calculate the number of syllables in a word using a vowel-group heuristic.
 
@@ -79,7 +83,7 @@ def calculate_gunning_fog_index(text: str) -> float:
     if not words:
         return 0.0
 
-    proper_nouns = identify_proper_nouns(text)
+    proper_nouns = identify_proper_nouns(text, words=words)
     proper_nouns_lower = {pn.lower() for pn in proper_nouns}
 
     # Exclude proper nouns
