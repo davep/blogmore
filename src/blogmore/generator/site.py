@@ -49,6 +49,10 @@ class SiteGenerator:
 
     def _initialize_components(self) -> None:
         """Initialize or re-initialize internal components based on current config."""
+        from blogmore.stop_words import reset_stop_words
+
+        reset_stop_words(self.site_config.stop_words)
+
         content_dir = self.site_config.content_dir
         # We know content_dir is not None because we checked in __init__
         assert content_dir is not None

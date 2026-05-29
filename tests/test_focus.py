@@ -141,3 +141,25 @@ def test_focus_term_attributes_and_unpacking() -> None:
     # banana was used 1 time in 2020 and 1 time in 2021, so 50% exclusivity
     assert banana_term_2020.raw_count == 1
     assert banana_term_2020.exclusivity == 50
+
+
+def test_focus_custom_stop_words() -> None:
+    """Verify that custom stop words are filtered out by extract_top_terms_per_year."""
+    from blogmore.stop_words import STOP_WORDS, reset_stop_words
+
+    # Register custom stop word
+    reset_stop_words(["apple"])
+    try:
+        assert "apple" in STOP_WORDS
+        corpus = {
+            2020: "apple banana cherry",
+        }
+        results = extract_top_terms_per_year(corpus, top_n=5)
+        words = [t[0] for t in results[2020]]
+        # apple should be filtered out because it is in custom stop words
+        assert "apple" not in words
+        assert "banana" in words
+        assert "cherry" in words
+    finally:
+        # Reset back to defaults to not affect other tests
+        reset_stop_words()

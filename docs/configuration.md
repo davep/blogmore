@@ -991,6 +991,31 @@ clean_urls: true
 
 This makes the stats page accessible at `/stats/` rather than `/stats/index.html`.
 
+#### `stats: stop_words`
+
+A list of custom stop words to filter out during TF-IDF statistics calculations (such as focus-by-year page stats or related posts generation).
+
+By default, BlogMore uses a hardcoded list of common English stop words (like "the", "and", "is", etc.) to filter out noise from statistical calculations and term comparisons. The words you configure in `stats: stop_words` are:
+1. Stripped of leading and trailing whitespace.
+2. Converted to lowercase to match the case-insensitive TF-IDF engine.
+3. Appended to the default hardcoded English stop words list.
+
+This is useful if your blog contains domain-specific jargon or frequent words that you do not want showing up as focus terms or influencing post similarity (e.g., if you write about coding, you might want to filter out code-specific terms that appear in every post).
+
+**Type:** List of strings  
+**Default:** *(empty)*
+
+```yaml
+stats:
+  stop_words:
+    - foo
+    - bar
+    - Baz
+    - WIBBLE
+```
+
+This is a **configuration file only** option — it cannot be set on the command line.
+
 #### `calendar_path`
 
 Path (relative to the output directory) where the calendar page is generated.  This is a **configuration file only** option — it cannot be set on the command line.  Only used when [`with_calendar`](#with_calendar) is `true`.

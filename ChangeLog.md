@@ -12,6 +12,10 @@
   ([#556](https://github.com/davep/blogmore/pull/556))
 - Added a `dump` command to serialize and dump all blog posts to stdout as
   JSON data. ([#558](https://github.com/davep/blogmore/pull/558))
+- Added support for configuring custom stop words via the configuration
+  file. This lets the user filter out domain-specific noise words during
+  TF-IDF calculations (e.g. for focus-by-year page stats or related posts).
+  ([#560](https://github.com/davep/blogmore/pull/560))
 
 ## v2.32.0
 

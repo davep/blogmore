@@ -1614,3 +1614,46 @@ class TestParseSiteConfigFromDict:
 
         assert errors == []
         assert kwargs["external_links_check_timeout"] == 20.0
+
+    def test_stop_words_valid(self, tmp_path: Path) -> None:
+        """A valid list of custom stop words is parsed, tidied, and deduplicated."""
+        from blogmore.config import parse_site_config_from_dict
+
+        config = {
+            "stats": {"stop_words": ["foo", "  Bar  ", "Baz", "foo", "wibble", ""]}
+        }
+        kwargs, errors = parse_site_config_from_dict(config, tmp_path)
+
+        assert errors == []
+        assert kwargs["stop_words"] == ["foo", "bar", "baz", "wibble"]
+
+    def test_stop_words_absent(self, tmp_path: Path) -> None:
+        """When stop_words is absent, it defaults to an empty list."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({}, tmp_path)
+
+        assert errors == []
+        assert kwargs["stop_words"] == []
+
+    def test_stop_words_malformed_list(self, tmp_path: Path) -> None:
+        """A malformed stop words value produces an error and falls back to empty list."""
+        from blogmore.config import parse_site_config_from_dict
+
+        config = {"stats": {"stop_words": "not-a-list"}}
+        kwargs, errors = parse_site_config_from_dict(config, tmp_path)
+
+        assert len(errors) == 1
+        assert "stats: stop_words" in errors[0]
+        assert kwargs["stop_words"] == []
+
+    def test_stop_words_stats_not_dict(self, tmp_path: Path) -> None:
+        """When stats section is not a dictionary, it produces an error and falls back to empty list."""
+        from blogmore.config import parse_site_config_from_dict
+
+        config = {"stats": "not-a-dict"}
+        kwargs, errors = parse_site_config_from_dict(config, tmp_path)
+
+        assert len(errors) == 1
+        assert "stats" in errors[0]
+        assert kwargs["stop_words"] == []
