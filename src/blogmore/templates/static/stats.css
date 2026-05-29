@@ -138,6 +138,10 @@
     border-bottom: none;
 }
 
+.stats-focus-empty {
+    color: var(--text-secondary);
+}
+
 .stats-detail-row dt {
     font-weight: 600;
     color: var(--text-secondary);

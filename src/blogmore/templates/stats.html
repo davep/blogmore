@@ -230,6 +230,34 @@
     {% endif %}
 
     {# ------------------------------------------------------------------ #}
+    {# Focus by Year                                                      #}
+    {# ------------------------------------------------------------------ #}
+    {% if stats.focus_by_year %}
+    <section class="stats-section">
+        <h2 id="focus-by-year">Focus by Year<a aria-label="Link to this heading" class="heading-anchor" href="#focus-by-year">¶</a></h2>
+        <dl class="stats-details">
+            {% for year, terms in stats.focus_by_year | dictsort(reverse=true) %}
+            <div class="stats-detail-row">
+                {% if terms %}
+                {% set year_url = '/' ~ year ~ '/' ~ pagination_page1_suffix %}
+                <dt><a href="{{ year_url }}">{{ year }}</a></dt>
+                <dd>
+                    {% for term in terms %}
+                    <data value="{{ term.score }}" title="{{ term.exclusivity }}% of lifetime uses occurred in {{ year }}">{{ term.word }}</data>
+                    {{- ", " if not loop.last else "" -}}
+                    {% endfor %}
+                </dd>
+                {% else %}
+                <dt>{{ year }}</dt>
+                <dd class="stats-focus-empty">&hellip;</dd>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </dl>
+    </section>
+    {% endif %}
+
+    {# ------------------------------------------------------------------ #}
     {# Gunning Fog Index                                                  #}
     {# ------------------------------------------------------------------ #}
     {% if with_gfi %}

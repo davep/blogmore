@@ -337,6 +337,28 @@ class TestComputeBlogStats:
         stats = compute_blog_stats([post], site_url="https://myblog.com")
         assert stats.unique_external_link_count == 0
 
+    def test_focus_by_year_computed(self) -> None:
+        """focus_by_year is computed for dated posts using TF-IDF."""
+        posts = [
+            self._make_post(
+                date=dt.datetime(2024, 1, 1),
+                content="Python python coding is fun.",
+                html_content="<p>Python python coding is fun.</p>",
+            ),
+            self._make_post(
+                date=dt.datetime(2025, 1, 1),
+                content="Coding rust coding is fast.",
+                html_content="<p>Coding rust coding is fast.</p>",
+            ),
+        ]
+        stats = compute_blog_stats(posts)
+        assert 2024 in stats.focus_by_year
+        assert 2025 in stats.focus_by_year
+        assert 2026 in stats.focus_by_year
+        assert stats.focus_by_year[2026] == []
+        terms_2024 = [t for t, _ in stats.focus_by_year[2024]]
+        assert "Python" in terms_2024
+
 
 class TestTopInternalLinks:
     """Tests for the top_internal_links field populated via backlink_map."""

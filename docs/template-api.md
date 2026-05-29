@@ -266,6 +266,7 @@ most template-relevant attributes are listed below.
 | `gfi_median` | `float` | The median Gunning Fog Index score for the blog. |
 | `gfi_mode` | `float` | The mode Gunning Fog Index score for the blog. |
 | `gfi_histogram` | `list[int]` | 12-element list of GFI bucket counts (<= 6, 7 to 16, >= 17). |
+| `focus_by_year` | `dict[int, list[tuple[str, float]]]` | Dictionary mapping each year to a list of the top terms (word and TF-IDF score pairs) for that year, sorted in descending order of score. |
 
 ## Calendar objects
 

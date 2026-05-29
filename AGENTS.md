@@ -30,6 +30,7 @@ All source lives in `src/blogmore/`. Key modules and their responsibilities:
 | `stats.py` | Blog statistics computation (word counts, top tags, etc.) |
 | `comment_invite.py` | mailto: URL generation for "Invite comments" links |
 | `code_styles.py` | Pygments-based CSS generation for code blocks |
+| `stop_words.py` | Standard English stop words and utilities |
 | `utils.py` | Shared utility helpers |
 
 The `generator/` sub-package (`src/blogmore/generator/`) breaks the site
