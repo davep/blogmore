@@ -25,7 +25,7 @@ def tokenise(text: str) -> list[str]:
         List of word tokens.
     """
     words = re.findall(r"[a-z0-9]+", text.lower())
-    return [w for w in words if w not in STOP_WORDS]
+    return [word for word in words if word not in STOP_WORDS]
 
 
 def _sort_oldest_first(posts: list[Post]) -> list[Post]:
@@ -41,24 +41,21 @@ def _sort_oldest_first(posts: list[Post]) -> list[Post]:
     """
     from blogmore.parser import post_sort_key
 
-    def key_func(p: Post) -> float:
-        val = post_sort_key(p)
-        return float("inf") if val == 0.0 else val
+    def key_func(post: Post) -> float:
+        sort_value = post_sort_key(post)
+        return float("inf") if sort_value == 0.0 else sort_value
 
     return sorted(posts, key=key_func)
 
 
 @dataclass
 class PostVector:
-    """Represents a sparse TF-IDF vector for a post.
-
-    Attributes:
-        weights: Mapping from term to its TF-IDF weight.
-        magnitude: Pre-computed Euclidean norm (magnitude) of the vector.
-    """
+    """Represents a sparse TF-IDF vector for a post."""
 
     weights: dict[str, float]
+    """Mapping from term to its TF-IDF weight."""
     magnitude: float
+    """Pre-computed Euclidean norm (magnitude) of the vector."""
 
 
 class SimilarityEngine:
@@ -100,13 +97,13 @@ class SimilarityEngine:
         if len(posts) < 3:
             for post in posts:
                 # Exclude the post itself and limit to related_count
-                raw_related = [p for p in posts if p.path != post.path][
-                    : self.site_config.related_count
-                ]
+                raw_related = [
+                    other_post for other_post in posts if other_post.path != post.path
+                ][: self.site_config.related_count]
                 post.related_posts = _sort_oldest_first(raw_related)
             return
 
-        current_paths = {p.path for p in posts}
+        current_paths = {post.path for post in posts}
         cached_paths = set(self._cached_mtimes.keys())
 
         # Determine changes
@@ -123,7 +120,7 @@ class SimilarityEngine:
                 if mtime != self._cached_mtimes[post.path]:
                     modified_paths.add(post.path)
 
-        post_map = {p.path: p for p in posts}
+        post_map = {post.path: post for post in posts}
 
         # Check if we can run the fast path (exactly 1 modified, 0 added, 0 deleted)
         if (
@@ -173,15 +170,15 @@ class SimilarityEngine:
         weights: dict[str, float] = {}
         if total_tokens > 0:
             counts: dict[str, int] = {}
-            for t in tokens:
-                counts[t] = counts.get(t, 0) + 1
+            for token in tokens:
+                counts[token] = counts.get(token, 0) + 1
 
             for term, idf in self._cached_vocab.items():
                 if term in counts:
-                    tf = counts[term] / total_tokens
-                    weights[term] = tf * idf
+                    term_frequency = counts[term] / total_tokens
+                    weights[term] = term_frequency * idf
 
-        magnitude = math.sqrt(sum(w**2 for w in weights.values()))
+        magnitude = math.sqrt(sum(weight**2 for weight in weights.values()))
         new_vector = PostVector(weights=weights, magnitude=magnitude)
 
         # Update cache
@@ -210,7 +207,7 @@ class SimilarityEngine:
             self._similarities[other_path][mod_path] = score
 
         # Update related posts
-        post_map = {p.path: p for p in posts}
+        post_map = {post.path: post for post in posts}
         self._populate_posts_from_cache(posts, post_map)
 
     def _run_full_calculation(self, posts: list[Post]) -> None:
@@ -235,8 +232,8 @@ class SimilarityEngine:
         # Calculate document frequencies
         doc_counts: dict[str, int] = {}
         for tokens in self._cached_tokens.values():
-            for t in set(tokens):
-                doc_counts[t] = doc_counts.get(t, 0) + 1
+            for token in set(tokens):
+                doc_counts[token] = doc_counts.get(token, 0) + 1
 
         # Keep terms that appear in at least 2 documents and calculate IDF
         num_docs = len(posts)
@@ -247,7 +244,7 @@ class SimilarityEngine:
                 term_idfs.append((term, idf))
 
         # Sort by IDF in descending order (highest IDF first)
-        term_idfs.sort(key=lambda x: x[1], reverse=True)
+        term_idfs.sort(key=lambda term_idf: term_idf[1], reverse=True)
 
         # Prune global vocabulary
         pruned_vocab = dict(term_idfs[: self.site_config.related_prune_vocab_size])
@@ -263,29 +260,29 @@ class SimilarityEngine:
 
             if total_tokens > 0:
                 counts: dict[str, int] = {}
-                for t in tokens:
-                    counts[t] = counts.get(t, 0) + 1
+                for token in tokens:
+                    counts[token] = counts.get(token, 0) + 1
 
                 for term, idf in pruned_vocab.items():
                     if term in counts:
-                        tf = counts[term] / total_tokens
-                        weights[term] = tf * idf
+                        term_frequency = counts[term] / total_tokens
+                        weights[term] = term_frequency * idf
 
-            magnitude = math.sqrt(sum(w**2 for w in weights.values()))
+            magnitude = math.sqrt(sum(weight**2 for weight in weights.values()))
             self._cached_vectors[post.path] = PostVector(
                 weights=weights, magnitude=magnitude
             )
 
         # Pairwise similarities
         self._similarities.clear()
-        for i, post_a in enumerate(posts):
+        for index, post_a in enumerate(posts):
             path_a = post_a.path
             if path_a not in self._similarities:
                 self._similarities[path_a] = {}
 
             vector_a = self._cached_vectors[path_a]
 
-            for post_b in posts[i + 1 :]:
+            for post_b in posts[index + 1 :]:
                 path_b = post_b.path
                 if path_b not in self._similarities:
                     self._similarities[path_b] = {}
@@ -297,7 +294,7 @@ class SimilarityEngine:
                 self._similarities[path_b][path_a] = score
 
         # Update related posts
-        post_map = {p.path: p for p in posts}
+        post_map = {post.path: post for post in posts}
         self._populate_posts_from_cache(posts, post_map)
 
     def _populate_posts_from_cache(
@@ -324,44 +321,50 @@ class SimilarityEngine:
                 if score > 0.0 and other_path in post_map:
                     similar_posts.append((post_map[other_path], score))
 
-            similar_posts.sort(key=lambda x: x[1], reverse=True)
+            similar_posts.sort(
+                key=lambda post_score_pair: post_score_pair[1], reverse=True
+            )
 
-            related = [p for p, _ in similar_posts[:related_count]]
+            related = [
+                related_post for related_post, _ in similar_posts[:related_count]
+            ]
 
             # Fallback: if we don't have enough related posts, fill with the most recent posts
             if len(related) < related_count:
-                seen_paths = {r.path for r in related}
+                seen_paths = {related_post.path for related_post in related}
                 seen_paths.add(post.path)
 
-                for p in posts:
-                    if p.path not in seen_paths:
-                        related.append(p)
-                        seen_paths.add(p.path)
+                for fallback_post in posts:
+                    if fallback_post.path not in seen_paths:
+                        related.append(fallback_post)
+                        seen_paths.add(fallback_post.path)
                         if len(related) >= related_count:
                             break
 
             post.related_posts = _sort_oldest_first(related)
 
-    def _calculate_cosine_similarity(self, a: PostVector, b: PostVector) -> float:
+    def _calculate_cosine_similarity(
+        self, vector_a: PostVector, vector_b: PostVector
+    ) -> float:
         """Calculate the cosine similarity between two post vectors.
 
         Args:
-            a: First sparse TF-IDF vector.
-            b: Second sparse TF-IDF vector.
+            vector_a: First sparse TF-IDF vector.
+            vector_b: Second sparse TF-IDF vector.
 
         Returns:
             The cosine similarity score (between 0.0 and 1.0).
         """
-        if a.magnitude == 0.0 or b.magnitude == 0.0:
+        if vector_a.magnitude == 0.0 or vector_b.magnitude == 0.0:
             return 0.0
 
         dot_product = 0.0
-        dict_a, dict_b = a.weights, b.weights
-        if len(dict_a) > len(dict_b):
-            dict_a, dict_b = dict_b, dict_a
+        weights_a, weights_b = vector_a.weights, vector_b.weights
+        if len(weights_a) > len(weights_b):
+            weights_a, weights_b = weights_b, weights_a
 
-        for token, weight in dict_a.items():
-            if token in dict_b:
-                dot_product += weight * dict_b[token]
+        for token, weight in weights_a.items():
+            if token in weights_b:
+                dot_product += weight * weights_b[token]
 
-        return dot_product / (a.magnitude * b.magnitude)
+        return dot_product / (vector_a.magnitude * vector_b.magnitude)
