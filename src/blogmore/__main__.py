@@ -252,6 +252,50 @@ def main() -> int:
             print(f"Error listing drafts: {e}", file=sys.stderr)
             return 1
 
+    # Handle dump command
+    if args.command == "dump":
+        # Validate that content_dir is provided
+        if args.content_dir is None:
+            print(
+                "Error: content_dir is required. Specify it on the command line or in the config file.",
+                file=sys.stderr,
+            )
+            return 1
+
+        # Validate inputs
+        if not args.content_dir.exists():
+            print(
+                f"Error: Content directory not found: {args.content_dir}",
+                file=sys.stderr,
+            )
+            return 1
+
+        try:
+            from blogmore.dump import dump_posts
+            from blogmore.parser import PostParser
+
+            post_parser = PostParser(site_url=site_config.site_url)
+            posts = post_parser.parse_directory(
+                args.content_dir,
+                include_drafts=site_config.include_drafts,
+                exclude_dirs=[args.content_dir / "pages"],
+            )
+
+            for post in posts:
+                post.words_per_minute = site_config.read_time_wpm
+
+            if site_config.with_related:
+                from blogmore.similarity import SimilarityEngine
+
+                similarity_engine = SimilarityEngine(site_config)
+                similarity_engine.calculate_related_posts(posts)
+
+            dump_posts(posts, args.content_dir)
+            return 0
+        except Exception as e:
+            print(f"Error dumping posts: {e}", file=sys.stderr)
+            return 1
+
     # Handle lint command
     if args.command in ("lint", "check"):
         # Validate that content_dir is provided

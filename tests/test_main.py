@@ -3022,3 +3022,117 @@ class TestLinksCLI:
             assert result == 1
             captured = capsys.readouterr()
             assert "Error: Content directory not found" in captured.err
+
+
+class TestDumpCLI:
+    """Test the 'dump' CLI command."""
+
+    def test_dump_command(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str], temp_output_dir: Path
+    ) -> None:
+        """Test dumping posts as JSON with dump command."""
+        posts_dir = tmp_path / "posts"
+        posts_dir.mkdir()
+
+        # Create two posts in a specific date order
+        post1_file = posts_dir / "first.md"
+        post1_file.write_text(
+            "---\n"
+            "title: First Post\n"
+            "date: 2024-01-15\n"
+            "category: Tech\n"
+            "tags:\n"
+            "  - Python\n"
+            "  - Testing\n"
+            "---\n"
+            "Content of the first post.\n"
+        )
+
+        post2_file = posts_dir / "second.md"
+        post2_file.write_text(
+            "---\n"
+            "title: Second Post\n"
+            "date: 2024-01-20\n"
+            "category: Personal\n"
+            "tags:\n"
+            "  - Thoughts\n"
+            "---\n"
+            "Content of the second post.\n"
+        )
+
+        # Create a static page in pages/ to ensure it is excluded
+        pages_dir = posts_dir / "pages"
+        pages_dir.mkdir()
+        page_file = pages_dir / "about.md"
+        page_file.write_text("---\ntitle: About Page\n---\nThis is a static page.\n")
+
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "blogmore",
+                "dump",
+                str(posts_dir),
+                "-o",
+                str(temp_output_dir),
+            ],
+        ):
+            result = main()
+            assert result == 0
+            captured = capsys.readouterr()
+
+            import json
+
+            data = json.loads(captured.out)
+            assert len(data) == 2
+
+            # Check chronological ordering (posting time order: oldest first)
+            assert data[0]["title"] == "First Post"
+            assert data[0]["id"] == "first.md"
+            assert data[0]["category"] == "Tech"
+            assert data[0]["tags"] == ["Python", "Testing"]
+            assert data[0]["word_count"] == 5
+
+            assert data[1]["title"] == "Second Post"
+            assert data[1]["id"] == "second.md"
+            assert data[1]["category"] == "Personal"
+            assert data[1]["tags"] == ["Thoughts"]
+
+    def test_dump_no_content_dir_fails(
+        self,
+        capsys: pytest.CaptureFixture[str],
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Test that dump command fails when content_dir is not provided."""
+        work_dir = tmp_path / "work"
+        work_dir.mkdir()
+        monkeypatch.chdir(work_dir)
+
+        # Config file without content_dir
+        config_file = work_dir / "blogmore.yaml"
+        config_file.write_text("site_title: 'Dump Test'\n")
+
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "dump"],
+        ):
+            result = main()
+            assert result == 1
+            captured = capsys.readouterr()
+            assert "Error: content_dir is required" in captured.err
+
+    def test_dump_nonexistent_dir_fails(
+        self, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Test that dump command fails when content_dir does not exist."""
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "dump", "/nonexistent/posts/dir"],
+        ):
+            result = main()
+            assert result == 1
+            captured = capsys.readouterr()
+            assert "Error: Content directory not found" in captured.err

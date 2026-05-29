@@ -17,6 +17,7 @@ BlogMore provides several commands:
 - **`publish`** - Build and publish the site to a git branch
 - **`lint`** - Check the site for common issues (broken links, etc.)
 - **`drafts`** - List the path to all posts marked as drafts
+- **`dump`** - Dump all posts to stdout as JSON in posting time order
 - **`cache`** - Manage the BlogMore cache
 
 ### Command Aliases
@@ -587,6 +588,28 @@ blogmore drafts [content_dir] [options]
 List all draft posts:
 ```bash
 blogmore drafts posts/
+```
+
+## Dump Command
+
+Dump all blog posts to stdout as a JSON array in posting time order (oldest first). This is a utility command that includes all available properties of each post, making it easy to integrate with custom external tools or scripts.
+
+### Synopsis
+
+```bash
+blogmore dump [content_dir] [options]
+```
+
+### Arguments
+
+**`content_dir`** (optional)
+: Directory containing your Markdown blog posts.
+
+### Examples
+
+Dump all posts to a JSON file:
+```bash
+blogmore dump posts/ > blog_dump.json
 ```
 
 ## Links Command
