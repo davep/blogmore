@@ -1,6 +1,6 @@
 # BlogMore ChangeLog
 
-## v2.25.0
+## v2.35.0
 
 **Released: 2026-05-31**
 
