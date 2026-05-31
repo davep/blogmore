@@ -9,6 +9,8 @@
   ([#576](https://github.com/davep/blogmore/pull/576))
 - The stats page no longer shows the min/max word count if both values are
   zero. ([#577](https://github.com/davep/blogmore/pull/577))
+- Fixed hover anchor not showing on hover of a heading in user-written
+  pages. ([#578](https://github.com/davep/blogmore/pull/578))
 
 ## v2.35.0
 

@@ -94,6 +94,7 @@ class TestTemplateRenderer:
         assert sample_page.title in html
         assert sample_page.html_content in html
         assert "Test Blog" in html
+        assert 'class="e-content page-content post-content"' in html
 
     def test_render_index(self, sample_post: Post) -> None:
         """Test rendering the index page."""
