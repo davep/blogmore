@@ -18,7 +18,7 @@ from typing import Any
 
 ##############################################################################
 # Local imports.
-from blogmore.backlinks import _find_links, _normalize_url_path, _to_path
+from blogmore.backlinks import find_post_links, normalize_url_path
 from blogmore.parser import Post, sanitize_for_url
 
 
@@ -76,7 +76,7 @@ def build_graph_data(
     * Post -> category relationships (one edge per post that has a category).
     * Post -> post internal links (one edge per unique directed link found in
       Markdown content, discovered by scanning inline and reference-style
-      Markdown links via [`blogmore.backlinks._find_links`][blogmore.backlinks._find_links]).
+      Markdown links via [`blogmore.backlinks.find_links`][blogmore.backlinks.find_links]).
 
     Args:
         posts: All published posts for the site.
@@ -93,10 +93,10 @@ def build_graph_data(
     """
     graph = GraphData()
 
-    # Build a normalised-path -> post URL mapping for efficient link resolution.
-    normalized_to_url: dict[str, str] = {}
+    # Build a normalised-path -> post mapping for efficient link resolution.
+    normalized_to_post: dict[str, Post] = {}
     for post in posts:
-        normalized_to_url[_normalize_url_path(post.url)] = post.url
+        normalized_to_post[normalize_url_path(post.url)] = post
 
     # --- Post nodes -----------------------------------------------------------
     for post in posts:
@@ -185,23 +185,23 @@ def build_graph_data(
             graph.links.append({"source": post.url, "target": cat_node_id})
 
     # --- Post->post edges from internal links ---------------------------------
-    # Reuse the link-scanning logic from the backlinks module: _find_links
-    # returns (url, match_start, match_end, link_text) tuples; only the URL
-    # is needed here for graph edge construction.
+    # Reuse the link-scanning logic from the backlinks module: find_post_links
+    # returns tuples containing the target post; only the URL is needed here
+    # for graph edge construction.
     link_pairs: set[tuple[str, str]] = set()
     for source_post in posts:
-        for raw_url, _, _, _ in _find_links(source_post.html_content):
-            path = _to_path(raw_url, site_url)
-            if path is None:
-                continue
-            normalized = _normalize_url_path(path)
-            target_url = normalized_to_url.get(normalized)
-            if target_url is None or target_url == source_post.url:
-                continue
-            pair = (source_post.url, target_url)
+        for _, _, _, _, target_post in find_post_links(
+            source_post.html_content,
+            normalized_to_post,
+            site_url,
+            source_post,
+        ):
+            pair = (source_post.url, target_post.url)
             if pair not in link_pairs:
                 link_pairs.add(pair)
-                graph.links.append({"source": source_post.url, "target": target_url})
+                graph.links.append(
+                    {"source": source_post.url, "target": target_post.url}
+                )
 
     return graph
 

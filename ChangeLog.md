@@ -7,6 +7,10 @@
 - Fixed the `dump` command to resolve post output paths so that `url_path`
   and `url` are populated correctly in the JSON output.
   ([#564](https://github.com/davep/blogmore/pull/564))
+- Added `internal_links` to the properties of a post when doing a `dump` of
+  posts. ([#566](https://github.com/davep/blogmore/pull/566))
+- Added `external_links` to the properties of a post when doing a `dump` of
+  posts. ([#566](https://github.com/davep/blogmore/pull/566))
 
 ## v2.33.0
 
