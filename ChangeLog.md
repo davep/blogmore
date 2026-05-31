@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.25.0
 
-**Released: WiP**
+**Released: 2026-05-31**
 
 - Bumped the version of FontAwesome used for the social icons from v6.5.1 to
   v6.7.2. ([#573](https://github.com/davep/blogmore/pull/573))
