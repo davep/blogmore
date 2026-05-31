@@ -252,6 +252,31 @@ class TestComputeBlogStats:
         assert stats.min_reading_time == fewest_words.reading_time
         assert stats.max_reading_time == most_words.reading_time
 
+    def test_show_word_count_and_reading_time_false_when_min_max_are_zero(self) -> None:
+        """show_word_count and show_reading_time are False when min and max word counts are both 0."""
+        stats_empty = compute_blog_stats([])
+        assert stats_empty.min_word_count == 0
+        assert stats_empty.max_word_count == 0
+        assert stats_empty.show_word_count is False
+        assert stats_empty.show_reading_time is False
+
+        post1 = self._make_post(content="")
+        post2 = self._make_post(content="")
+        stats_zero = compute_blog_stats([post1, post2])
+        assert stats_zero.min_word_count == 0
+        assert stats_zero.max_word_count == 0
+        assert stats_zero.show_word_count is False
+        assert stats_zero.show_reading_time is False
+
+    def test_show_word_count_and_reading_time_true_when_min_max_not_zero(self) -> None:
+        """show_word_count and show_reading_time are True when min or max word count is non-zero."""
+        post1 = self._make_post(content="hello")
+        stats = compute_blog_stats([post1])
+        assert stats.min_word_count == 1
+        assert stats.max_word_count == 1
+        assert stats.show_word_count is True
+        assert stats.show_reading_time is True
+
     def test_blog_span_days_computed(self) -> None:
         """blog_span_days returns the difference between earliest and latest dates."""
         posts = [

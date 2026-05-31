@@ -6048,6 +6048,28 @@ class TestStatsPageGeneration:
         stats_content = (temp_output_dir / "stats.html").read_text()
         assert "Reading Time" not in stats_content
 
+    def test_stats_page_omits_word_count_and_reading_time_when_word_counts_are_zero(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """The stats page omits word count and reading time sections when all posts have zero word counts."""
+        empty_posts_dir = tmp_path / "empty_posts"
+        empty_posts_dir.mkdir()
+        post_file = empty_posts_dir / "2024-01-01-empty.md"
+        post_file.write_text("---\ntitle: Empty Post\ndate: 2024-01-01\n---\n")
+        generator = SiteGenerator(
+            site_config=SiteConfig(
+                content_dir=empty_posts_dir,
+                output_dir=temp_output_dir,
+                with_stats=True,
+                with_read_time=True,
+            )
+        )
+        generator.generate()
+
+        stats_content = (temp_output_dir / "stats.html").read_text()
+        assert "Word Count" not in stats_content
+        assert "Reading Time" not in stats_content
+
     def test_stats_page_contains_content_overview_section(
         self, posts_dir: Path, temp_output_dir: Path
     ) -> None:

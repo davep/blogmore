@@ -7,6 +7,8 @@
 - Updated the "Focus by Year" statistics calculation for posts with empty
   prose text to fall back on their title and tags instead.
   ([#576](https://github.com/davep/blogmore/pull/576))
+- The stats page no longer shows the min/max word count if both values are
+  zero. ([#577](https://github.com/davep/blogmore/pull/577))
 
 ## v2.35.0
 
