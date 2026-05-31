@@ -11,6 +11,8 @@
   posts. ([#566](https://github.com/davep/blogmore/pull/566))
 - Added `external_links` to the properties of a post when doing a `dump` of
   posts. ([#566](https://github.com/davep/blogmore/pull/566))
+- Documented the post properties included in the JSON output of the `dump`
+  command. ([#567](https://github.com/davep/blogmore/pull/567))
 
 ## v2.33.0
 
