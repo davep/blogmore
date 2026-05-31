@@ -605,6 +605,38 @@ blogmore dump [content_dir] [options]
 **`content_dir`** (optional)
 : Directory containing your Markdown blog posts.
 
+### Output Properties
+
+Each post in the dumped JSON array is represented by an object containing the following properties:
+
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `id` | `string` | The relative path identifier of the source file from the content directory (e.g., `my-post.md`). |
+| `path` | `string` | The absolute path to the source Markdown file. |
+| `title` | `string` | The title of the post, parsed from frontmatter. |
+| `content` | `string` | The raw Markdown content of the post. |
+| `html_content` | `string` | The parsed HTML content of the post. |
+| `date` | `string` or `null` | The publication date and time of the post in ISO format, or `null` if not specified. |
+| `category` | `string` or `null` | The category of the post, or `null` if not specified. |
+| `tags` | `array` of `string` | A list of tags associated with the post. |
+| `draft` | `boolean` | Whether the post is marked as a draft. |
+| `metadata` | `object` | The raw frontmatter metadata parsed from the Markdown file. |
+| `url_path` | `string` or `null` | The custom URL path generated or configured for this post, or `null` if using default URL rules. |
+| `related_posts` | `array` of `string` | A list of post IDs (relative paths) that are related to this post. |
+| `internal_links` | `array` of `string` | A list of post IDs (relative paths) of internal blog posts referenced in this post. |
+| `external_links` | `array` of `string` | A list of unique external URLs linked from this post. |
+| `slug` | `string` | The filename stem used as the URL slug. |
+| `url` | `string` | The final URL path of the post, starting with `/`. |
+| `safe_category` | `string` or `null` | The category name sanitized for use in URLs/filenames, or `null` if not set. |
+| `safe_tags` | `array` of `string` | A list of tag names sanitized for use in URLs/filenames. |
+| `sorted_tag_pairs` | `array` of `array` | A list of `[display_name, safe_name]` pairs for the post's tags, sorted alphabetically. |
+| `description` | `string` | The post's description, either from frontmatter or extracted from the first paragraph. |
+| `prose_text` | `string` | The plain text prose of the post, excluding HTML tags and code blocks. |
+| `word_count` | `integer` | The number of words in the post's prose. |
+| `reading_time` | `integer` | The estimated reading time in whole minutes (minimum 1 minute). |
+| `gfi` | `float` | The Gunning Fog Index readability score for the post's prose (0.0 if empty). |
+| `modified_date` | `string` or `null` | The modified date and time of the post in ISO format, or `null` if not set in metadata. |
+
 ### Examples
 
 Dump all posts to a JSON file:
