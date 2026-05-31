@@ -1499,6 +1499,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#output-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Output Properties
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#examples_5" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -2715,6 +2726,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#output-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Output Properties
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#examples_5" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -3407,6 +3429,144 @@ blogmore<span class="w"> </span>check<span class="w"> </span><span class="o">[</
 <h3 id="arguments_5">Arguments</h3>
 <p><strong><code>content_dir</code></strong> (optional)
 : Directory containing your Markdown blog posts.</p>
+<h3 id="output-properties">Output Properties</h3>
+<p>Each post in the dumped JSON array is represented by an object containing the following properties:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Property</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>id</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">The relative path identifier of the source file from the content directory (e.g., <code>my-post.md</code>).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>path</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">The absolute path to the source Markdown file.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>title</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">The title of the post, parsed from frontmatter.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>content</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">The raw Markdown content of the post.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>html_content</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">The parsed HTML content of the post.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>date</code></td>
+<td style="text-align: left;"><code>string</code> or <code>null</code></td>
+<td style="text-align: left;">The publication date and time of the post in ISO format, or <code>null</code> if not specified.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>category</code></td>
+<td style="text-align: left;"><code>string</code> or <code>null</code></td>
+<td style="text-align: left;">The category of the post, or <code>null</code> if not specified.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>tags</code></td>
+<td style="text-align: left;"><code>array</code> of <code>string</code></td>
+<td style="text-align: left;">A list of tags associated with the post.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>draft</code></td>
+<td style="text-align: left;"><code>boolean</code></td>
+<td style="text-align: left;">Whether the post is marked as a draft.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>metadata</code></td>
+<td style="text-align: left;"><code>object</code></td>
+<td style="text-align: left;">The raw frontmatter metadata parsed from the Markdown file.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>url_path</code></td>
+<td style="text-align: left;"><code>string</code> or <code>null</code></td>
+<td style="text-align: left;">The custom URL path generated or configured for this post, or <code>null</code> if using default URL rules.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>related_posts</code></td>
+<td style="text-align: left;"><code>array</code> of <code>string</code></td>
+<td style="text-align: left;">A list of post IDs (relative paths) that are related to this post.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>internal_links</code></td>
+<td style="text-align: left;"><code>array</code> of <code>string</code></td>
+<td style="text-align: left;">A list of post IDs (relative paths) of internal blog posts referenced in this post.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>external_links</code></td>
+<td style="text-align: left;"><code>array</code> of <code>string</code></td>
+<td style="text-align: left;">A list of unique external URLs linked from this post.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>slug</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">The filename stem used as the URL slug.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>url</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">The final URL path of the post, starting with <code>/</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>safe_category</code></td>
+<td style="text-align: left;"><code>string</code> or <code>null</code></td>
+<td style="text-align: left;">The category name sanitized for use in URLs/filenames, or <code>null</code> if not set.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>safe_tags</code></td>
+<td style="text-align: left;"><code>array</code> of <code>string</code></td>
+<td style="text-align: left;">A list of tag names sanitized for use in URLs/filenames.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>sorted_tag_pairs</code></td>
+<td style="text-align: left;"><code>array</code> of <code>array</code></td>
+<td style="text-align: left;">A list of <code>[display_name, safe_name]</code> pairs for the post's tags, sorted alphabetically.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>description</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">The post's description, either from frontmatter or extracted from the first paragraph.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>prose_text</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">The plain text prose of the post, excluding HTML tags and code blocks.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>word_count</code></td>
+<td style="text-align: left;"><code>integer</code></td>
+<td style="text-align: left;">The number of words in the post's prose.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>reading_time</code></td>
+<td style="text-align: left;"><code>integer</code></td>
+<td style="text-align: left;">The estimated reading time in whole minutes (minimum 1 minute).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>gfi</code></td>
+<td style="text-align: left;"><code>float</code></td>
+<td style="text-align: left;">The Gunning Fog Index readability score for the post's prose (0.0 if empty).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>modified_date</code></td>
+<td style="text-align: left;"><code>string</code> or <code>null</code></td>
+<td style="text-align: left;">The modified date and time of the post in ISO format, or <code>null</code> if not set in metadata.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="examples_5">Examples</h3>
 <p>Dump all posts to a JSON file:
 <div class="highlight"><pre><span></span><code>blogmore<span class="w"> </span>dump<span class="w"> </span>posts/<span class="w"> </span>&gt;<span class="w"> </span>blog_dump.json
