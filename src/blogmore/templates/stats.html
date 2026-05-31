@@ -260,6 +260,7 @@
     {# ------------------------------------------------------------------ #}
     {# Word count                                                         #}
     {# ------------------------------------------------------------------ #}
+    {% if stats.show_word_count %}
     <section class="stats-section">
         <h2 id="word-count">Word Count<a aria-label="Link to this heading" class="heading-anchor" href="#word-count">¶</a></h2>
         <dl class="stats-details">
@@ -291,11 +292,13 @@
             </div>
         </dl>
     </section>
+    {% endif %}
+
 
     {# ------------------------------------------------------------------ #}
     {# Reading time                                                        #}
     {# ------------------------------------------------------------------ #}
-    {% if with_read_time %}
+    {% if with_read_time and stats.show_reading_time %}
     <section class="stats-section">
         <h2 id="reading-time">Reading Time<a aria-label="Link to this heading" class="heading-anchor" href="#reading-time">¶</a></h2>
         <dl class="stats-details">

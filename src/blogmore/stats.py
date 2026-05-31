@@ -286,6 +286,30 @@ class BlogStats:
         delta = self.latest_post_date - self.earliest_post_date
         return delta.days
 
+    @property
+    def show_word_count(self) -> bool:
+        """Return whether to show word count statistics.
+
+        Returns:
+            True if word count statistics should be shown (i.e.,
+            [`min_word_count`][blogmore.stats.BlogStats.min_word_count] and
+            [`max_word_count`][blogmore.stats.BlogStats.max_word_count] are not
+            both zero).
+        """
+        return not (self.min_word_count == 0 and self.max_word_count == 0)
+
+    @property
+    def show_reading_time(self) -> bool:
+        """Return whether to show reading time statistics.
+
+        Returns:
+            True if reading time statistics should be shown (i.e.,
+            [`min_word_count`][blogmore.stats.BlogStats.min_word_count] and
+            [`max_word_count`][blogmore.stats.BlogStats.max_word_count] are not
+            both zero).
+        """
+        return not (self.min_word_count == 0 and self.max_word_count == 0)
+
 
 def _extract_external_links(html_content: str, site_url: str) -> list[str]:
     """Extract all external URLs referenced in an HTML fragment.
