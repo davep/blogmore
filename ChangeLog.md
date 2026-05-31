@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Updated the "Focus by Year" statistics calculation for posts with empty
+  prose text to fall back on their title and tags instead.
+  ([#576](https://github.com/davep/blogmore/pull/576))
+
 ## v2.35.0
 
 **Released: 2026-05-31**
