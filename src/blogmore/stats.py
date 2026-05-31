@@ -680,6 +680,13 @@ def compute_blog_stats(
     for post in dated_posts:
         assert post.date is not None
         text = post.prose_text
+        if not text.strip():
+            parts = []
+            if post.title:
+                parts.append(post.title)
+            if post.tags:
+                parts.extend(post.tags)
+            text = " ".join(parts)
         if text.strip():
             corpus.setdefault(post.date.year, []).append(text)
 

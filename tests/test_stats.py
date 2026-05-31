@@ -359,6 +359,31 @@ class TestComputeBlogStats:
         terms_2024 = [t for t, _ in stats.focus_by_year[2024]]
         assert "Python" in terms_2024
 
+    def test_focus_by_year_empty_text_falls_back_to_title_and_tags(self) -> None:
+        """focus_by_year uses title and tags when a post's text is empty."""
+        posts = [
+            self._make_post(
+                date=dt.datetime(2024, 1, 1),
+                title="Development",
+                content="",
+                html_content="",
+                category="Programming",
+                tags=["Python", "Tutorial"],
+            ),
+            self._make_post(
+                date=dt.datetime(2025, 1, 1),
+                content="Rust coding is fast.",
+                html_content="<p>Rust coding is fast.</p>",
+            ),
+        ]
+        stats = compute_blog_stats(posts)
+        assert 2024 in stats.focus_by_year
+        terms_2024 = [t for t, _ in stats.focus_by_year[2024]]
+        assert "Development" in terms_2024
+        assert "Programming" not in terms_2024
+        assert "Python" in terms_2024
+        assert "Tutorial" in terms_2024
+
 
 class TestTopInternalLinks:
     """Tests for the top_internal_links field populated via backlink_map."""
