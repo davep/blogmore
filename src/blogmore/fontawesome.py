@@ -14,7 +14,7 @@ from typing import Any
 from blogmore.utils import get_user_cache_dir
 
 # FontAwesome version targeted by this optimizer
-FONTAWESOME_VERSION = "6.5.1"
+FONTAWESOME_VERSION = "6.7.2"
 
 # Full CDN stylesheet URL (fallback when optimization fails)
 FONTAWESOME_CDN_CSS_URL = (

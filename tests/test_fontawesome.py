@@ -29,20 +29,20 @@ class TestFontAwesomeConstants:
     """Test that module-level constants have the expected values."""
 
     def test_cdn_css_url_contains_version(self) -> None:
-        """Test that the CDN CSS URL references version 6.5.1."""
-        assert "6.5.1" in FONTAWESOME_CDN_CSS_URL
+        """Test that the CDN CSS URL references version 6.7.2."""
+        assert "6.7.2" in FONTAWESOME_CDN_CSS_URL
 
     def test_cdn_css_url_is_https(self) -> None:
         """Test that the CDN CSS URL uses HTTPS."""
         assert FONTAWESOME_CDN_CSS_URL.startswith("https://")
 
     def test_cdn_webfonts_base_contains_version(self) -> None:
-        """Test that the CDN webfonts base URL references version 6.5.1."""
-        assert "6.5.1" in FONTAWESOME_CDN_WEBFONTS_BASE
+        """Test that the CDN webfonts base URL references version 6.7.2."""
+        assert "6.7.2" in FONTAWESOME_CDN_WEBFONTS_BASE
 
     def test_metadata_url_contains_version(self) -> None:
-        """Test that the metadata URL references version 6.5.1."""
-        assert "6.5.1" in FONTAWESOME_METADATA_URL
+        """Test that the metadata URL references version 6.7.2."""
+        assert "6.7.2" in FONTAWESOME_METADATA_URL
 
     def test_local_css_path_under_static(self) -> None:
         """Test that the local CSS path is under /static/."""

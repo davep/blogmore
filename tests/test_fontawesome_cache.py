@@ -23,7 +23,7 @@ class TestFontAwesomeCaching:
 
     def test_fetch_uses_cache_when_available(self, mock_cache_dir: Path) -> None:
         """Test that metadata is loaded from cache if the file exists."""
-        cache_file = mock_cache_dir / "fa-metadata-6.5.1.json"
+        cache_file = mock_cache_dir / "fa-metadata-6.7.2.json"
         cache_file.write_text(json.dumps(STUB_METADATA))
 
         optimizer = FontAwesomeOptimizer(["github"])
@@ -51,13 +51,13 @@ class TestFontAwesomeCaching:
         assert metadata == STUB_METADATA
 
         # Verify cache file was created
-        cache_file = mock_cache_dir / "fa-metadata-6.5.1.json"
+        cache_file = mock_cache_dir / "fa-metadata-6.7.2.json"
         assert cache_file.exists()
         assert json.loads(cache_file.read_text()) == STUB_METADATA
 
     def test_fetch_falls_back_on_corrupt_cache(self, mock_cache_dir: Path) -> None:
         """Test that corrupt cache is ignored and metadata is re-fetched."""
-        cache_file = mock_cache_dir / "fa-metadata-6.5.1.json"
+        cache_file = mock_cache_dir / "fa-metadata-6.7.2.json"
         cache_file.write_text("invalid json")
 
         mock_response = MagicMock()
