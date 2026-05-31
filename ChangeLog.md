@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.24.0
 
-**Released: WiP**
+**Released: 2026-05-31**
 
 - Fixed the `dump` command to resolve post output paths so that `url_path`
   and `url` are populated correctly in the JSON output.
