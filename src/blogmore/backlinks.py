@@ -159,16 +159,16 @@ def _extract_snippets(
     return results
 
 
-def _find_links(html_content: str) -> list[tuple[str, int, int, str]]:
+def find_links(html_content: str) -> list[tuple[str, int, int, str]]:
     """Find all hyperlinks in rendered HTML content.
 
     Args:
         html_content: Rendered HTML content to scan.
 
     Returns:
-        A list of ``(url, match_start, match_end, link_text)`` tuples.
-        *match_start* and *match_end* are the character positions of the
-        full ``<a>`` tag syntax within *html_content*; *link_text* is the
+        A list of `(url, match_start, match_end, link_text)` tuples.
+        `match_start` and `match_end` are the character positions of the
+        full `<a>` tag syntax within `html_content`; `link_text` is the
         HTML content of the link.
     """
     results: list[tuple[str, int, int, str]] = []
@@ -181,14 +181,14 @@ def _find_links(html_content: str) -> list[tuple[str, int, int, str]]:
     return results
 
 
-def _normalize_url_path(url: str) -> str:
+def normalize_url_path(url: str) -> str:
     """Normalise a URL path for comparison by removing `index.html`, `.html`, and trailing slashes.
 
     Produces a canonical form that can be compared regardless of whether
     `clean_urls` is enabled or which URL format the author used in a link.
 
     Args:
-        url: URL path to normalise (should start with ``/``).
+        url: URL path to normalise (should start with `/`).
 
     Returns:
         The normalised path without a trailing slash, `.html` extension,
@@ -202,16 +202,16 @@ def _normalize_url_path(url: str) -> str:
     return url
 
 
-def _to_path(url: str, site_url: str) -> str | None:
+def to_path(url: str, site_url: str) -> str | None:
     """Convert a link URL to a root-relative path.
 
-    Handles absolute paths (``/path``), full URLs (``https://example.com/path``),
+    Handles absolute paths (`/path`), full URLs (`https://example.com/path`),
     and rejects genuinely external links or non-HTTP schemes.  Fragment-only
-    links (``#section``) and relative links (``../path``) are also rejected.
+    links (`#section`) and relative links (`../path`) are also rejected.
 
     Args:
         url: The raw URL from an HTML link.
-        site_url: The site's base URL (e.g. ``https://example.com``), used
+        site_url: The site's base URL (e.g. `https://example.com`), used
             to strip the domain from full URLs that point back to this site.
 
     Returns:
@@ -244,6 +244,40 @@ def _to_path(url: str, site_url: str) -> str | None:
     return None
 
 
+def find_post_links(
+    html_content: str,
+    normalized_to_post: dict[str, Post],
+    site_url: str = "",
+    source_post: Post | None = None,
+) -> list[tuple[str, int, int, str, Post]]:
+    """Find all links in HTML content that point to other posts in the site.
+
+    Args:
+        html_content: The HTML content to scan.
+        normalized_to_post: A dictionary mapping normalized post URLs to Post objects.
+        site_url: The site's base URL, used to recognize full URLs.
+        source_post: The source post containing the links. If provided, links
+            pointing to this post (self-links) will be excluded.
+
+    Returns:
+        A list of `(raw_url, match_start, match_end, link_text, target_post)`
+        tuples for each matching internal link.
+    """
+    results: list[tuple[str, int, int, str, Post]] = []
+    for raw_url, match_start, match_end, link_text in find_links(html_content):
+        path = to_path(raw_url, site_url)
+        if path is None:
+            continue
+        normalized = normalize_url_path(path)
+        target_post = normalized_to_post.get(normalized)
+        if target_post is None:
+            continue
+        if source_post is not None and target_post is source_post:
+            continue
+        results.append((raw_url, match_start, match_end, link_text, target_post))
+    return results
+
+
 def build_backlink_map(
     posts: list[Post],
     site_url: str = "",
@@ -261,7 +295,7 @@ def build_backlink_map(
 
     Args:
         posts: All posts for the site, sorted by date (newest first).
-        site_url: The site's base URL (e.g. ``https://example.com``).
+        site_url: The site's base URL (e.g. `https://example.com`).
             Used to recognise full URLs that point back to this site.
 
     Returns:
@@ -273,28 +307,26 @@ def build_backlink_map(
     # Build a normalised-URL → Post mapping so we can look up targets quickly.
     normalized_to_post: dict[str, Post] = {}
     for post in posts:
-        normalized_to_post[_normalize_url_path(post.url)] = post
+        normalized_to_post[normalize_url_path(post.url)] = post
 
     # Initialise a list for every post (even those with no backlinks).
     backlinks: dict[str, list[Backlink]] = {post.url: [] for post in posts}
 
     for source_post in posts:
-        internal_links: list[tuple[int, int, str, Post]] = []
-        for raw_url, match_start, match_end, link_text in _find_links(
-            source_post.html_content
-        ):
-            path = _to_path(raw_url, site_url)
-            if path is None:
-                continue
-            normalized = _normalize_url_path(path)
-            target_post = normalized_to_post.get(normalized)
-            if target_post is None or target_post is source_post:
-                continue
-            internal_links.append((match_start, match_end, link_text, target_post))
+        internal_links = find_post_links(
+            source_post.html_content,
+            normalized_to_post,
+            site_url,
+            source_post,
+        )
 
         if internal_links:
+            link_data = [
+                (match_start, match_end, link_text, target_post)
+                for _, match_start, match_end, link_text, target_post in internal_links
+            ]
             for target_post, snippet in _extract_snippets(
-                source_post.html_content, internal_links
+                source_post.html_content, link_data
             ):
                 backlinks[target_post.url].append(
                     Backlink(source_post=source_post, snippet=snippet)

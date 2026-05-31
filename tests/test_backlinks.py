@@ -15,10 +15,10 @@ from markupsafe import Markup
 from blogmore.backlinks import (
     Backlink,
     _extract_snippets,
-    _find_links,
-    _normalize_url_path,
-    _to_path,
     build_backlink_map,
+    find_links,
+    normalize_url_path,
+    to_path,
 )
 from blogmore.parser import Post, PostParser
 
@@ -118,19 +118,19 @@ class TestExtractSnippetBlockStripping:
 
 
 ##############################################################################
-# _find_links tests.
+# find_links tests.
 
 
 class TestFindLinks:
-    """Tests for _find_links."""
+    """Tests for find_links."""
 
     def test_no_links(self) -> None:
         """Content with no links returns an empty list."""
-        assert _find_links("<p>Just some plain text.</p>") == []
+        assert find_links("<p>Just some plain text.</p>") == []
 
     def test_html_link(self) -> None:
         """A single HTML link is found with the correct URL."""
-        links = _find_links(
+        links = find_links(
             '<p>See <a href="/2024/01/post.html">my post</a> for details.</p>'
         )
         assert len(links) == 1
@@ -141,7 +141,7 @@ class TestFindLinks:
 
     def test_html_link_with_attributes(self) -> None:
         """An HTML link with extra attributes returns only the URL."""
-        links = _find_links('<a class="foo" href="/foo.html" id="bar">text</a>')
+        links = find_links('<a class="foo" href="/foo.html" id="bar">text</a>')
         assert len(links) == 1
         assert links[0][0] == "/foo.html"
         assert links[0][3] == "text"
@@ -149,7 +149,7 @@ class TestFindLinks:
     def test_multiple_html_links(self) -> None:
         """Multiple HTML links are all detected."""
         html = '<p>See <a href="/a.html">A</a> and <a href="/b.html">B</a>.</p>'
-        links = _find_links(html)
+        links = find_links(html)
         urls = [url for url, _, _, _ in links]
         assert "/a.html" in urls
         assert "/b.html" in urls
@@ -157,7 +157,7 @@ class TestFindLinks:
     def test_match_positions_span_full_syntax(self) -> None:
         """start/end positions span the full <a> tag syntax."""
         html = 'pre <a href="/url">text</a> post'
-        links = _find_links(html)
+        links = find_links(html)
         assert len(links) == 1
         _, start, end, _ = links[0]
         assert html[start:end] == '<a href="/url">text</a>'
@@ -165,7 +165,7 @@ class TestFindLinks:
     def test_url_with_parentheses(self) -> None:
         """A URL containing parentheses is captured in full."""
         html = '<a href="/2016/11/15/seen_by_davep_(the_return).html">photoblogging</a>'
-        links = _find_links(html)
+        links = find_links(html)
         assert len(links) == 1
         url, _, _, link_text = links[0]
         assert url == "/2016/11/15/seen_by_davep_(the_return).html"
@@ -173,80 +173,78 @@ class TestFindLinks:
 
 
 ##############################################################################
-# _normalize_url_path tests.
+# normalize_url_path tests.
 
 
 class TestNormalizeUrlPath:
-    """Tests for _normalize_url_path."""
+    """Tests for normalize_url_path."""
 
     def test_strips_html_extension(self) -> None:
         """A .html extension is removed."""
-        assert _normalize_url_path("/2024/01/post.html") == "/2024/01/post"
+        assert normalize_url_path("/2024/01/post.html") == "/2024/01/post"
 
     def test_strips_trailing_slash(self) -> None:
         """A trailing slash is removed."""
-        assert _normalize_url_path("/2024/01/post/") == "/2024/01/post"
+        assert normalize_url_path("/2024/01/post/") == "/2024/01/post"
 
     def test_strips_index_html(self) -> None:
         """/index.html at the end is removed entirely."""
-        assert _normalize_url_path("/2024/01/post/index.html") == "/2024/01/post"
+        assert normalize_url_path("/2024/01/post/index.html") == "/2024/01/post"
 
     def test_plain_path_unchanged(self) -> None:
         """A path with no extension or trailing slash is unchanged."""
-        assert _normalize_url_path("/2024/01/post") == "/2024/01/post"
+        assert normalize_url_path("/2024/01/post") == "/2024/01/post"
 
     def test_matching_regular_and_clean_url(self) -> None:
         """Both URL forms for the same post normalise to the same string."""
-        regular = _normalize_url_path("/2024/01/post.html")
-        clean = _normalize_url_path("/2024/01/post/")
+        regular = normalize_url_path("/2024/01/post.html")
+        clean = normalize_url_path("/2024/01/post/")
         assert regular == clean
 
 
 ##############################################################################
-# _to_path tests.
+# to_path tests.
 
 
 class TestToPath:
-    """Tests for _to_path."""
+    """Tests for to_path."""
 
     def test_absolute_path(self) -> None:
         """An absolute root-relative path is returned unchanged."""
-        assert _to_path("/2024/01/post.html", "") == "/2024/01/post.html"
+        assert to_path("/2024/01/post.html", "") == "/2024/01/post.html"
 
     def test_fragment_only_returns_none(self) -> None:
         """A fragment-only link (#section) returns None."""
-        assert _to_path("#section", "") is None
+        assert to_path("#section", "") is None
 
     def test_empty_url_returns_none(self) -> None:
         """An empty URL returns None."""
-        assert _to_path("", "") is None
+        assert to_path("", "") is None
 
     def test_external_url_no_site_url(self) -> None:
         """An external URL with no site_url configured returns None."""
-        assert _to_path("https://example.com/post.html", "") is None
+        assert to_path("https://example.com/post.html", "") is None
 
     def test_full_url_matching_site_url(self) -> None:
         """A full URL matching site_url is converted to a root-relative path."""
-        result = _to_path(
-            "https://example.com/2024/01/post.html", "https://example.com"
-        )
+        result = to_path("https://example.com/2024/01/post.html", "https://example.com")
         assert result == "/2024/01/post.html"
 
     def test_full_url_not_matching_site_url(self) -> None:
         """A full URL not matching site_url returns None."""
-        assert _to_path("https://other.com/post.html", "https://example.com") is None
+        assert to_path("https://other.com/post.html", "https://example.com") is None
 
     def test_relative_path_returns_none(self) -> None:
         """A relative path (../foo) returns None (too ambiguous)."""
-        assert _to_path("../2024/post.html", "") is None
+        assert to_path("../2024/post.html", "") is None
 
     def test_fragment_stripped_from_path(self) -> None:
         """Fragment is stripped before returning the path."""
-        assert _to_path("/2024/01/post.html#section", "") == "/2024/01/post.html"
+        assert to_path("/2024/01/post.html#section", "") == "/2024/01/post.html"
 
     def test_query_stripped_from_path(self) -> None:
         """Query string is stripped before returning the path."""
-        assert _to_path("/2024/01/post.html?ref=feed", "") == "/2024/01/post.html"
+        assert to_path("/2024/01/post.html?ref=feed", "") == "/2024/01/post.html"
 
 
 ##############################################################################

@@ -294,7 +294,7 @@ def main() -> int:
                 similarity_engine = SimilarityEngine(site_config)
                 similarity_engine.calculate_related_posts(posts)
 
-            dump_posts(posts, args.content_dir)
+            dump_posts(posts, args.content_dir, site_url=site_config.site_url)
             return 0
         except Exception as e:
             print(f"Error dumping posts: {e}", file=sys.stderr)
