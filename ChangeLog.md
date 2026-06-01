@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.36.0
 
-**Released: WiP**
+**Released: 2026-06-01**
 
 - Updated the "Focus by Year" statistics calculation for posts with empty
   prose text to fall back on their title and tags instead.
