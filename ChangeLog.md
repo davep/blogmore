@@ -7,6 +7,9 @@
 - Fixed the tag and category count calculations in blog statistics to count
   clean (sanitised) values instead of raw values.
   ([#582](https://github.com/davep/blogmore/pull/582))
+- Ensured all printed warnings and errors are written to `stderr`, avoiding
+  contamination of redirected `stdout`.
+  ([#583](https://github.com/davep/blogmore/pull/583))
 
 ## v2.36.0
 

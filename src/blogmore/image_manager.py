@@ -11,6 +11,8 @@ from typing import TYPE_CHECKING, Any, Self
 
 from PIL import Image
 
+from blogmore.utils import print_warning
+
 if TYPE_CHECKING:
     from blogmore.site_config import SiteConfig
 
@@ -98,7 +100,7 @@ class ImageManager:
                     for path_str, entry_data in data.items():
                         self.manifest[path_str] = OptimisedImage.from_dict(entry_data)
             except Exception as error:
-                print(f"Warning: Failed to load image manifest: {error}")
+                print_warning(f"Warning: Failed to load image manifest: {error}")
                 self.manifest = {}
 
     def _save_manifest(self) -> None:
@@ -151,7 +153,7 @@ class ImageManager:
             with Image.open(source_path) as image:
                 original_width, original_height = image.size
         except Exception as error:
-            print(
+            print_warning(
                 f"Warning: Failed to open image {source_path} to determine size: {error}"
             )
             return None
@@ -237,7 +239,7 @@ class ImageManager:
             return entry
 
         except Exception as error:
-            print(f"Warning: Failed to register image {source_path}: {error}")
+            print_warning(f"Warning: Failed to register image {source_path}: {error}")
             return None
 
     def _save_standard_image(self, image: Image.Image, path: Path) -> None:
@@ -329,7 +331,9 @@ class ImageManager:
                 processed_count += 1
 
             except Exception as error:
-                print(f"Warning: Failed to optimise image {source_path}: {error}")
+                print_warning(
+                    f"Warning: Failed to optimise image {source_path}: {error}"
+                )
 
         if processed_count > 0:
             self._save_manifest()

@@ -30,7 +30,7 @@ from blogmore.generator.constants import (
 )
 from blogmore.generator.utils import minified_filename
 from blogmore.icons import IconGenerator, detect_source_icon
-from blogmore.utils import get_blog_cache_dir, timed_step
+from blogmore.utils import get_blog_cache_dir, print_warning, timed_step
 
 if TYPE_CHECKING:
     from blogmore.site_config import SiteConfig
@@ -148,7 +148,7 @@ class AssetManager:
                     )
                     print("  - favicon.ico (root copy for backward compatibility)")
             else:
-                print("Warning: No icons were generated")
+                print_warning("Warning: No icons were generated")
 
     def prepare_fontawesome_css(self) -> str | None:
         """Determine the FontAwesome CSS URL and optionally build optimised CSS.
@@ -180,8 +180,8 @@ class AssetManager:
             with timed_step("Downloading FontAwesome metadata..."):
                 metadata = optimizer.fetch_icon_metadata()
         except (urllib.error.URLError, ValueError, OSError) as error:
-            print(f"Warning: Could not fetch FontAwesome metadata: {error}")
-            print("Falling back to full FontAwesome CDN stylesheet.")
+            print_warning(f"Warning: Could not fetch FontAwesome metadata: {error}")
+            print_warning("Falling back to full FontAwesome CDN stylesheet.")
             self.fontawesome_css_url = FONTAWESOME_CDN_CSS_URL
             return None
 
@@ -216,7 +216,9 @@ class AssetManager:
             bundled = files("blogmore").joinpath("templates", "static", filename)
             return bundled.read_text(encoding="utf-8")
         except Exception as e:
-            print(f"Warning: Could not read bundled {filename} for minification: {e}")
+            print_warning(
+                f"Warning: Could not read bundled {filename} for minification: {e}"
+            )
             return None
 
     def _minify_one_css(
@@ -437,7 +439,7 @@ class AssetManager:
                             output_file = output_static / item.name
                             output_file.write_bytes(content)
         except Exception as e:
-            print(f"Warning: Could not copy bundled static assets: {e}")
+            print_warning(f"Warning: Could not copy bundled static assets: {e}")
 
         # Then, copy custom static assets (if provided), which will override bundled ones
         if self.site_config.templates_dir is not None:
@@ -577,7 +579,9 @@ class AssetManager:
                         print(f"Overriding existing file: {relative_path}")
                         override_count += 1
                 except (OSError, PermissionError) as e:
-                    print(f"Warning: Failed to copy extra file {file_path}: {e}")
+                    print_warning(
+                        f"Warning: Failed to copy extra file {file_path}: {e}"
+                    )
                     failed_count += 1
                     continue
 
@@ -588,4 +592,4 @@ class AssetManager:
         if override_count > 0:
             print(f"Overrode {override_count} existing file(s)")
         if failed_count > 0:
-            print(f"Warning: Failed to copy {failed_count} extra file(s)")
+            print_warning(f"Warning: Failed to copy {failed_count} extra file(s)")

@@ -11,6 +11,7 @@ from markdown.extensions import Extension
 from markdown.inlinepatterns import InlineProcessor
 
 from blogmore.image_html import create_picture_element
+from blogmore.utils import print_warning
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -105,7 +106,7 @@ class OptimisedImageInlineProcessor(InlineProcessor):
             # If it's a local path but file wasn't found, warn the user
             # as this is the most likely cause of "no difference in output".
             if not source_path.is_file():
-                print(
+                print_warning(
                     f"Warning: Image optimisation skipped; file not found: {source_path}"
                 )
             return self._create_standard_img(src, alt, title), m.start(0), m.end(0)

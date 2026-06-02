@@ -6,7 +6,6 @@ import http.server
 import io
 import queue
 import socketserver
-import sys
 import threading
 import time
 from pathlib import Path
@@ -28,6 +27,7 @@ from blogmore.config import (
 from blogmore.generator import SiteGenerator
 from blogmore.parser import CUSTOM_404_HTML
 from blogmore.site_config import SiteConfig
+from blogmore.utils import print_error, print_warning
 
 # Registry of active SSE connections for browser reloading
 _reload_queues: list[queue.Queue[str]] = []
@@ -313,7 +313,7 @@ class ContentChangeHandler(FileSystemEventHandler):
             print("Regeneration complete!")
             _trigger_reload()
         except Exception as e:
-            print(f"Error during regeneration: {e}", file=sys.stderr)
+            print_error(f"Error during regeneration: {e}")
         finally:
             self._regeneration_lock.release()
 
@@ -393,7 +393,7 @@ class ConfigChangeHandler(FileSystemEventHandler):
             print("Configuration reloaded and regeneration complete!")
             _trigger_reload()
         except Exception as e:
-            print(f"Error reloading config or regenerating: {e}", file=sys.stderr)
+            print_error(f"Error reloading config or regenerating: {e}")
 
     def _update_generator(
         self, config: dict[str, Any], sidebar_config: dict[str, Any]
@@ -410,7 +410,7 @@ class ConfigChangeHandler(FileSystemEventHandler):
             self.cli_overrides,
         )
         for warning in warnings:
-            print(f"Warning: {warning}", file=sys.stderr)
+            print_warning(f"Warning: {warning}")
         self.generator.site_config = dataclasses.replace(
             self.generator.site_config,
             sidebar_config=sidebar_config,
@@ -452,18 +452,12 @@ def serve_site(
 
         # Validate content directory
         if not content_dir.exists():
-            print(
-                f"Error: Content directory not found: {content_dir}",
-                file=sys.stderr,
-            )
+            print_error(f"Error: Content directory not found: {content_dir}")
             return 1
 
         # Validate templates directory if provided
         if templates_dir is not None and not templates_dir.exists():
-            print(
-                f"Error: Templates directory not found: {templates_dir}",
-                file=sys.stderr,
-            )
+            print_error(f"Error: Templates directory not found: {templates_dir}")
             return 1
 
         # Convert to absolute paths before changing directory
@@ -483,7 +477,7 @@ def serve_site(
             generator = SiteGenerator(site_config=site_config)
             generator.generate()
         except Exception as e:
-            print(f"Error generating site: {e}", file=sys.stderr)
+            print_error(f"Error generating site: {e}")
             return 1
 
         # Set up file watching if requested
@@ -520,11 +514,10 @@ def serve_site(
 
             observer.start()
     elif not output_dir.exists():
-        print(
+        print_error(
             f"Error: Output directory not found: {output_dir}\n"
             f"Please provide a content directory to generate the site:\n"
-            f"  blogmore serve <content_dir> [options]",
-            file=sys.stderr,
+            f"  blogmore serve <content_dir> [options]"
         )
         return 1
 
@@ -547,7 +540,7 @@ def serve_site(
     except KeyboardInterrupt:
         print("\nServer stopped")
     except OSError as e:
-        print(f"Error starting server: {e}", file=sys.stderr)
+        print_error(f"Error starting server: {e}")
         return 1
 
     return 0

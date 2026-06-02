@@ -20,7 +20,7 @@ from blogmore.linter import lint_site
 from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
 from blogmore.site_config import SiteConfig, site_config_defaults
-from blogmore.utils import get_user_cache_dir
+from blogmore.utils import get_user_cache_dir, print_error
 
 
 def main() -> int:
@@ -50,7 +50,7 @@ def main() -> int:
                     shutil.rmtree(cache_dir)
                     print(f"Cache cleared: {cache_dir}")
                 except Exception as e:
-                    print(f"Error clearing cache: {e}", file=sys.stderr)
+                    print_error(f"Error clearing cache: {e}")
                     return 1
             else:
                 print(f"Cache directory does not exist: {cache_dir}")
@@ -68,10 +68,10 @@ def main() -> int:
         merge_config_with_args(config, args)
         sidebar_config = get_sidebar_config(config)
     except FileNotFoundError as e:
-        print(f"Error: {e}", file=sys.stderr)
+        print_error(f"Error: {e}")
         return 1
     except ValueError as e:
-        print(f"Error: Invalid configuration file: {e}", file=sys.stderr)
+        print_error(f"Error: Invalid configuration file: {e}")
         return 1
 
     # Normalize site_keywords: CLI provides a string, config provides a list or string
@@ -84,7 +84,7 @@ def main() -> int:
     # correct CLI-wins precedence.
     config_kwargs, config_errors = parse_site_config_from_dict(config, args.output)
     for error in config_errors:
-        print(f"Error: {error}", file=sys.stderr)
+        print_error(f"Error: {error}")
     if config_errors:
         return 1
     # Exclude any field that is also accessible via args (handled above by
@@ -141,26 +141,19 @@ def main() -> int:
     if args.command in ("build", "generate", "gen"):
         # Validate that content_dir is provided
         if args.content_dir is None:
-            print(
-                "Error: content_dir is required. Specify it on the command line or in the config file.",
-                file=sys.stderr,
+            print_error(
+                "Error: content_dir is required. Specify it on the command line or in the config file."
             )
             return 1
 
         # Validate inputs
         if not args.content_dir.exists():
-            print(
-                f"Error: Content directory not found: {args.content_dir}",
-                file=sys.stderr,
-            )
+            print_error(f"Error: Content directory not found: {args.content_dir}")
             return 1
 
         # Validate templates directory if provided
         if args.templates is not None and not args.templates.exists():
-            print(
-                f"Error: Templates directory not found: {args.templates}",
-                file=sys.stderr,
-            )
+            print_error(f"Error: Templates directory not found: {args.templates}")
             return 1
 
         # Generate the site
@@ -169,33 +162,26 @@ def main() -> int:
             generator.generate()
             return 0
         except Exception as e:
-            print(f"Error generating site: {e}", file=sys.stderr)
+            print_error(f"Error generating site: {e}")
             return 1
 
     # Handle publish command
     if args.command == "publish":
         # Validate that content_dir is provided
         if args.content_dir is None:
-            print(
-                "Error: content_dir is required. Specify it on the command line or in the config file.",
-                file=sys.stderr,
+            print_error(
+                "Error: content_dir is required. Specify it on the command line or in the config file."
             )
             return 1
 
         # Validate inputs
         if not args.content_dir.exists():
-            print(
-                f"Error: Content directory not found: {args.content_dir}",
-                file=sys.stderr,
-            )
+            print_error(f"Error: Content directory not found: {args.content_dir}")
             return 1
 
         # Validate templates directory if provided
         if args.templates is not None and not args.templates.exists():
-            print(
-                f"Error: Templates directory not found: {args.templates}",
-                file=sys.stderr,
-            )
+            print_error(f"Error: Templates directory not found: {args.templates}")
             return 1
 
         # Generate the site first
@@ -205,7 +191,7 @@ def main() -> int:
             generator.generate()
             print("Site built successfully")
         except Exception as e:
-            print(f"Error generating site: {e}", file=sys.stderr)
+            print_error(f"Error generating site: {e}")
             return 1
 
         # Publish the site
@@ -217,25 +203,21 @@ def main() -> int:
             )
             return 0
         except PublishError as e:
-            print(f"Error publishing site: {e}", file=sys.stderr)
+            print_error(f"Error publishing site: {e}")
             return 1
 
     # Handle drafts command
     if args.command == "drafts":
         # Validate that content_dir is provided
         if args.content_dir is None:
-            print(
-                "Error: content_dir is required. Specify it on the command line or in the config file.",
-                file=sys.stderr,
+            print_error(
+                "Error: content_dir is required. Specify it on the command line or in the config file."
             )
             return 1
 
         # Validate inputs
         if not args.content_dir.exists():
-            print(
-                f"Error: Content directory not found: {args.content_dir}",
-                file=sys.stderr,
-            )
+            print_error(f"Error: Content directory not found: {args.content_dir}")
             return 1
 
         # Print all drafts
@@ -249,25 +231,21 @@ def main() -> int:
                     print(post.path)
             return 0
         except Exception as e:
-            print(f"Error listing drafts: {e}", file=sys.stderr)
+            print_error(f"Error listing drafts: {e}")
             return 1
 
     # Handle dump command
     if args.command == "dump":
         # Validate that content_dir is provided
         if args.content_dir is None:
-            print(
-                "Error: content_dir is required. Specify it on the command line or in the config file.",
-                file=sys.stderr,
+            print_error(
+                "Error: content_dir is required. Specify it on the command line or in the config file."
             )
             return 1
 
         # Validate inputs
         if not args.content_dir.exists():
-            print(
-                f"Error: Content directory not found: {args.content_dir}",
-                file=sys.stderr,
-            )
+            print_error(f"Error: Content directory not found: {args.content_dir}")
             return 1
 
         try:
@@ -297,50 +275,42 @@ def main() -> int:
             dump_posts(posts, args.content_dir, site_url=site_config.site_url)
             return 0
         except Exception as e:
-            print(f"Error dumping posts: {e}", file=sys.stderr)
+            print_error(f"Error dumping posts: {e}")
             return 1
 
     # Handle lint command
     if args.command in ("lint", "check"):
         # Validate that content_dir is provided
         if args.content_dir is None:
-            print(
-                "Error: content_dir is required. Specify it on the command line or in the config file.",
-                file=sys.stderr,
+            print_error(
+                "Error: content_dir is required. Specify it on the command line or in the config file."
             )
             return 1
 
         # Validate inputs
         if not args.content_dir.exists():
-            print(
-                f"Error: Content directory not found: {args.content_dir}",
-                file=sys.stderr,
-            )
+            print_error(f"Error: Content directory not found: {args.content_dir}")
             return 1
 
         # Run the linter
         try:
             return lint_site(site_config=site_config)
         except Exception as e:
-            print(f"Error linting site: {e}", file=sys.stderr)
+            print_error(f"Error linting site: {e}")
             return 1
 
     # Handle links command
     if args.command == "links":
         # Validate that content_dir is provided
         if args.content_dir is None:
-            print(
-                "Error: content_dir is required. Specify it on the command line or in the config file.",
-                file=sys.stderr,
+            print_error(
+                "Error: content_dir is required. Specify it on the command line or in the config file."
             )
             return 1
 
         # Validate inputs
         if not args.content_dir.exists():
-            print(
-                f"Error: Content directory not found: {args.content_dir}",
-                file=sys.stderr,
-            )
+            print_error(f"Error: Content directory not found: {args.content_dir}")
             return 1
 
         if args.links_command == "dump":
@@ -355,7 +325,7 @@ def main() -> int:
                 dump_external_links(posts, site_url=site_config.site_url)
                 return 0
             except Exception as e:
-                print(f"Error dumping external links: {e}", file=sys.stderr)
+                print_error(f"Error dumping external links: {e}")
                 return 1
 
         elif args.links_command == "check":
@@ -376,7 +346,7 @@ def main() -> int:
                     verbose=args.verbose,
                 )
             except Exception as e:
-                print(f"Error checking external links: {e}", file=sys.stderr)
+                print_error(f"Error checking external links: {e}")
                 return 1
 
     return 0

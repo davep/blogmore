@@ -7,6 +7,8 @@ from xml.etree import ElementTree as ET
 
 from PIL import Image
 
+from blogmore.utils import print_warning
+
 # PNG icon specifications: (size, filename) tuples for all platforms
 PNG_ICON_SPECS: list[tuple[int, str]] = [
     # Standard favicon PNG sizes
@@ -221,7 +223,7 @@ class IconGenerator:
                 json.dump(info, f)
 
         except Exception as e:
-            print(f"Warning: Failed to save icons to cache: {e}")
+            print_warning(f"Warning: Failed to save icons to cache: {e}")
 
     def _generate_png_icons_batch(
         self,

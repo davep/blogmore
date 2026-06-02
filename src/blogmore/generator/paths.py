@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import sys
 from collections import defaultdict
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -11,6 +10,7 @@ from blogmore.clean_url import make_url_clean
 from blogmore.page_path import compute_page_output_path
 from blogmore.pagination_path import resolve_pagination_page_path
 from blogmore.post_path import compute_output_path
+from blogmore.utils import print_warning
 
 if TYPE_CHECKING:
     from blogmore.parser import Page, Post
@@ -187,16 +187,15 @@ def resolve_post_output_paths(
             clashing_posts = [post_by_id[pid] for pid in clashing_ids]
             winner = clashing_posts[0]  # newest (list is sorted newest-first)
             losers = clashing_posts[1:]
-            print(
+            print_warning(
                 "\nWARNING: Post path clash detected!  "
-                "Multiple posts would be written to the same output file.",
-                file=sys.stderr,
+                "Multiple posts would be written to the same output file."
             )
-            print(f"  Output path : {path_str}", file=sys.stderr)
-            print(f"  Winner (newest) : '{winner.title}'", file=sys.stderr)
+            print_warning(f"  Output path : {path_str}")
+            print_warning(f"  Winner (newest) : '{winner.title}'")
             for loser in losers:
-                print(f"  Ignored (older): '{loser.title}'", file=sys.stderr)
-            print(file=sys.stderr)
+                print_warning(f"  Ignored (older): '{loser.title}'")
+            print_warning("")
 
     return post_output_paths
 

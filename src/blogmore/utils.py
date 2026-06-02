@@ -11,8 +11,6 @@ from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
 
-from blogmore.markdown.plain_text import html_to_plain_text
-
 
 @contextmanager
 def timed_step(label: str) -> Generator[None, None, None]:
@@ -95,6 +93,8 @@ def count_words_from_html(html_content: str) -> int:
         >>> count_words_from_html("<p>word </p>" * 10)
         10
     """
+    from blogmore.markdown.plain_text import html_to_plain_text
+
     return len(
         [
             word
@@ -218,6 +218,24 @@ def simplify_html_for_feeds(html_content: str) -> str:
         html_content,
         flags=re.DOTALL | re.IGNORECASE,
     )
+
+
+def print_warning(message: str) -> None:
+    """Print a warning message to stderr.
+
+    Args:
+        message: The warning message to print.
+    """
+    print(message, file=sys.stderr)
+
+
+def print_error(message: str) -> None:
+    """Print an error message to stderr.
+
+    Args:
+        message: The error message to print.
+    """
+    print(message, file=sys.stderr)
 
 
 ### utils.py ends here
