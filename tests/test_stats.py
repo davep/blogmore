@@ -295,23 +295,26 @@ class TestComputeBlogStats:
         assert stats.blog_span_days is None
 
     def test_tag_count_unique(self) -> None:
-        """tag_count is the number of distinct tags across all posts."""
+        """tag_count is the number of distinct sanitized tags across all posts."""
         posts = [
-            self._make_post(tags=["python", "testing"]),
-            self._make_post(tags=["python", "web"]),
+            self._make_post(tags=["Python", "testing"]),
+            self._make_post(tags=["python", "web dev"]),
+            self._make_post(tags=["web-dev"]),
         ]
         stats = compute_blog_stats(posts)
-        assert stats.tag_count == 3  # python, testing, web
+        assert stats.tag_count == 3  # python, testing, web-dev
 
     def test_category_count_unique(self) -> None:
-        """category_count is the number of distinct categories."""
+        """category_count is the number of distinct sanitized categories."""
         posts = [
             self._make_post(category="Programming"),
             self._make_post(category="News"),
-            self._make_post(category="Programming"),
+            self._make_post(category="programming"),
+            self._make_post(category="Web Dev"),
+            self._make_post(category="web-dev"),
         ]
         stats = compute_blog_stats(posts)
-        assert stats.category_count == 2
+        assert stats.category_count == 3  # programming, news, web-dev
 
     def test_unique_external_link_count(self) -> None:
         """unique_external_link_count reflects distinct URLs across all posts."""

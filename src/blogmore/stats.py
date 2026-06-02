@@ -601,9 +601,9 @@ def compute_blog_stats(
     all_categories: set[str] = set()
     for post in posts:
         if post.tags:
-            all_tags.update(post.tags)
-        if post.category:
-            all_categories.add(post.category)
+            all_tags.update(post.safe_tags())
+        if post.safe_category:
+            all_categories.add(post.safe_category)
     stats.tag_count = len(all_tags)
     stats.category_count = len(all_categories)
 

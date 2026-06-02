@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed the tag and category count calculations in blog statistics to count
+  clean (sanitised) values instead of raw values.
+  ([#582](https://github.com/davep/blogmore/pull/582))
+
 ## v2.36.0
 
 **Released: 2026-06-01**
