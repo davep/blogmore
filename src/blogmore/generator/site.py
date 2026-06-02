@@ -22,7 +22,7 @@ from blogmore.image_manager import ImageManager
 from blogmore.parser import PostParser
 from blogmore.renderer import TemplateRenderer
 from blogmore.similarity import SimilarityEngine
-from blogmore.utils import get_blog_cache_dir, timed_step
+from blogmore.utils import get_blog_cache_dir, print_warning, timed_step
 
 if TYPE_CHECKING:
     from blogmore.backlinks import Backlink
@@ -138,7 +138,9 @@ class SiteGenerator:
                         shutil.rmtree(self.site_config.output_dir, ignore_errors=True)
                         removal_warning = True
             if removal_warning:
-                print("Warning: Some files could not be removed from output directory")
+                print_warning(
+                    "Warning: Some files could not be removed from output directory"
+                )
 
         # Parse all pages & posts
         pages_dir = content_dir / "pages"

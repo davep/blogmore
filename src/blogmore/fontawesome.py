@@ -11,7 +11,7 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-from blogmore.utils import get_user_cache_dir
+from blogmore.utils import get_user_cache_dir, print_warning
 
 # FontAwesome version targeted by this optimizer
 FONTAWESOME_VERSION = "6.7.2"
@@ -181,7 +181,7 @@ class FontAwesomeOptimizer:
         try:
             metadata = self.fetch_icon_metadata()
         except (urllib.error.URLError, ValueError, OSError) as error:
-            print(f"Warning: Could not fetch FontAwesome metadata: {error}")
+            print_warning(f"Warning: Could not fetch FontAwesome metadata: {error}")
             return False
 
         css_content = self.build_css(metadata)

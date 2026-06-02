@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import datetime as dt
 import re
-import sys
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -19,6 +18,7 @@ from blogmore.generator.paths import (
 )
 from blogmore.markdown.external_links import is_external_link
 from blogmore.parser import PostParser, sanitize_for_url
+from blogmore.utils import print_error, print_warning
 
 if TYPE_CHECKING:
     from blogmore.site_config import SiteConfig
@@ -62,7 +62,7 @@ class Linter:
         """
         report_path = self._get_report_path(path)
         prefix = f"{report_path}: " if report_path else ""
-        print(f"ERROR: {prefix}{message}", file=sys.stderr)
+        print_error(f"ERROR: {prefix}{message}")
         self.errors += 1
 
     def report_warning(self, message: str, path: Path | None = None) -> None:
@@ -74,7 +74,7 @@ class Linter:
         """
         report_path = self._get_report_path(path)
         prefix = f"{report_path}: " if report_path else ""
-        print(f"WARNING: {prefix}{message}", file=sys.stderr)
+        print_warning(f"WARNING: {prefix}{message}")
         self.warnings += 1
 
     def lint(self) -> int:

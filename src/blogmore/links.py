@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 from blogmore import __version__
 from blogmore.markdown.external_links import is_external_link
 from blogmore.parser import Post
+from blogmore.utils import print_error, print_warning
 
 # Compiled regular expression for extracting href attributes from anchor tags.
 _LINK_RE: re.Pattern[str] = re.compile(r'<a\s+(?:[^>]*?\s+)?href=["\']([^"\']*)["\']')
@@ -264,16 +265,15 @@ def check_external_links(
                     elif verbose:
                         print(f"{post.path}: {href} - OK")
                 except RateLimitedError:
-                    print(
-                        f"Domain {domain} is now off limits (received HTTP 429 Too Many Requests)",
-                        file=sys.stderr,
+                    print_warning(
+                        f"Domain {domain} is now off limits (received HTTP 429 Too Many Requests)"
                     )
                     off_limits_domains.add(domain)
                     cache[href] = "HTTP 429 Too Many Requests"
                     print(f"{post.path}: {href} - HTTP 429 Too Many Requests")
                     broken_links_found = True
     except KeyboardInterrupt:
-        print("\nLink checking interrupted by user. Exiting.", file=sys.stderr)
+        print_error("\nLink checking interrupted by user. Exiting.")
         return 1
 
     return 1 if broken_links_found else 0

@@ -1,10 +1,14 @@
 """Unit tests for the utils module."""
 
+import pytest
+
 from blogmore.utils import (
     calculate_reading_time_from_html,
     count_words_from_html,
     make_urls_absolute,
     normalize_site_url,
+    print_error,
+    print_warning,
 )
 
 
@@ -215,6 +219,32 @@ class TestMakeUrlsAbsolute:
         html = "<p>Hello world</p>"
         result = make_urls_absolute(html, "https://example.com")
         assert result == html
+
+
+class TestPrintStderr:
+    """Test the print_warning and print_error functions."""
+
+    def test_print_warning(self, capsys: pytest.CaptureFixture[str]) -> None:
+        """Test that print_warning prints to stderr.
+
+        Args:
+            capsys: The pytest capture fixture.
+        """
+        print_warning("This is a warning message")
+        captured = capsys.readouterr()
+        assert captured.out == ""
+        assert captured.err == "This is a warning message\n"
+
+    def test_print_error(self, capsys: pytest.CaptureFixture[str]) -> None:
+        """Test that print_error prints to stderr.
+
+        Args:
+            capsys: The pytest capture fixture.
+        """
+        print_error("This is an error message")
+        captured = capsys.readouterr()
+        assert captured.out == ""
+        assert captured.err == "This is an error message\n"
 
 
 ### test_utils.py ends here

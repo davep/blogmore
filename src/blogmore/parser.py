@@ -21,6 +21,7 @@ from blogmore.gfi import calculate_gunning_fog_index
 from blogmore.markdown import create_custom_extensions
 from blogmore.markdown.first_paragraph import extract_first_paragraph_from_html
 from blogmore.markdown.plain_text import html_to_plain_text
+from blogmore.utils import print_warning
 
 _DATE_FORMATS = [
     "%Y-%m-%d %H:%M:%S %z",
@@ -649,7 +650,7 @@ class PostParser:
                 if not post.draft or include_drafts:
                     posts.append(post)
             except (ValueError, FileNotFoundError) as e:
-                print(f"Warning: Skipping {md_file}: {e}")
+                print_warning(f"Warning: Skipping {md_file}: {e}")
                 continue
 
         # Sort by date (newest first)
@@ -723,7 +724,7 @@ class PostParser:
                 page = self.parse_page(md_file)
                 pages.append(page)
             except (ValueError, FileNotFoundError) as e:
-                print(f"Warning: Skipping {md_file}: {e}")
+                print_warning(f"Warning: Skipping {md_file}: {e}")
                 continue
 
         # Sort by title (alphabetically)
@@ -746,5 +747,5 @@ class PostParser:
         try:
             return self.parse_page(path)
         except (ValueError, FileNotFoundError) as e:
-            print(f"Warning: Skipping {path}: {e}")
+            print_warning(f"Warning: Skipping {path}: {e}")
             return None
