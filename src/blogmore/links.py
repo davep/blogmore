@@ -9,9 +9,9 @@ import urllib.request
 from urllib.parse import urlparse
 
 from blogmore import __version__
+from blogmore.console import print_error, print_warning
 from blogmore.markdown.external_links import is_external_link
 from blogmore.parser import Post
-from blogmore.utils import print_error, print_warning
 
 # Compiled regular expression for extracting href attributes from anchor tags.
 _LINK_RE: re.Pattern[str] = re.compile(r'<a\s+(?:[^>]*?\s+)?href=["\']([^"\']*)["\']')

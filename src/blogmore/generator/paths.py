@@ -7,10 +7,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from blogmore.clean_url import make_url_clean
+from blogmore.console import print_warning
 from blogmore.page_path import compute_page_output_path
 from blogmore.pagination_path import resolve_pagination_page_path
 from blogmore.post_path import compute_output_path
-from blogmore.utils import print_warning
 
 if TYPE_CHECKING:
     from blogmore.parser import Page, Post

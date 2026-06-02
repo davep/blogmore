@@ -8,10 +8,10 @@ from pathlib import Path
 from typing import Any
 
 from blogmore.code_styles import DEFAULT_DARK_STYLE, DEFAULT_LIGHT_STYLE
+from blogmore.html_utils import normalize_site_url
 from blogmore.page_path import DEFAULT_PAGE_PATH
 from blogmore.pagination_path import DEFAULT_PAGE_1_PATH, DEFAULT_PAGE_N_PATH
 from blogmore.post_path import DEFAULT_POST_PATH
-from blogmore.utils import normalize_site_url
 
 ##############################################################################
 # Default archive page path (relative to the output directory).

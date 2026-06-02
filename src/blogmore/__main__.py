@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from blogmore.cache import get_user_cache_dir
 from blogmore.cli import create_parser
 from blogmore.config import (
     DEFAULT_CONFIG_FILES,
@@ -15,12 +16,12 @@ from blogmore.config import (
     normalize_site_keywords,
     parse_site_config_from_dict,
 )
+from blogmore.console import print_error
 from blogmore.generator import SiteGenerator
 from blogmore.linter import lint_site
 from blogmore.publisher import PublishError, publish_site
 from blogmore.server import serve_site
 from blogmore.site_config import SiteConfig, site_config_defaults
-from blogmore.utils import get_user_cache_dir, print_error
 
 
 def main() -> int:

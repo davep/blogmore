@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from blogmore.backlinks import build_backlink_map
+from blogmore.cache import get_blog_cache_dir
+from blogmore.console import print_warning, timed_step
 from blogmore.generator.assets import AssetManager
 from blogmore.generator.context import ContextBuilder
 from blogmore.generator.features import FeatureGenerator
@@ -22,7 +24,6 @@ from blogmore.image_manager import ImageManager
 from blogmore.parser import PostParser
 from blogmore.renderer import TemplateRenderer
 from blogmore.similarity import SimilarityEngine
-from blogmore.utils import get_blog_cache_dir, print_warning, timed_step
 
 if TYPE_CHECKING:
     from blogmore.backlinks import Backlink

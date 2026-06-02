@@ -4,9 +4,9 @@ from pathlib import Path
 from xml.etree.ElementTree import Element, SubElement, indent, tostring
 
 from blogmore.clean_url import make_url_clean
+from blogmore.html_utils import normalize_site_url
 from blogmore.parser import CUSTOM_404_HTML
 from blogmore.site_config import DEFAULT_SEARCH_PATH
-from blogmore.utils import normalize_site_url
 
 SITEMAP_XMLNS = "http://www.sitemaps.org/schemas/sitemap/0.9"
 SITEMAP_FILENAME = "sitemap.xml"

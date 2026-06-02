@@ -7,7 +7,7 @@ from xml.etree import ElementTree as ET
 
 from PIL import Image
 
-from blogmore.utils import print_warning
+from blogmore.console import print_warning
 
 # PNG icon specifications: (size, filename) tuples for all platforms
 PNG_ICON_SPECS: list[tuple[int, str]] = [

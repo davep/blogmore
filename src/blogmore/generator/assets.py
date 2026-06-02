@@ -11,7 +11,9 @@ from typing import TYPE_CHECKING, Any
 import rcssmin  # type: ignore[import-untyped]
 import rjsmin  # type: ignore[import-untyped]
 
+from blogmore.cache import get_blog_cache_dir
 from blogmore.code_styles import build_code_css
+from blogmore.console import print_warning, timed_step
 from blogmore.fontawesome import (
     FONTAWESOME_CDN_CSS_URL,
     FONTAWESOME_LOCAL_CSS_MINIFIED_PATH,
@@ -30,7 +32,6 @@ from blogmore.generator.constants import (
 )
 from blogmore.generator.utils import minified_filename
 from blogmore.icons import IconGenerator, detect_source_icon
-from blogmore.utils import get_blog_cache_dir, print_warning, timed_step
 
 if TYPE_CHECKING:
     from blogmore.site_config import SiteConfig

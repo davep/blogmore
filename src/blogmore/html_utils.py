@@ -1,78 +1,15 @@
-"""Utility functions for blogmore."""
+"""HTML and URL utility functions for blogmore.
+
+Provides helpers for parsing and manipulating HTML content and formatting URLs,
+including word counting, reading time estimation, feed simplification, and
+relative-to-absolute URL translation.
+"""
 
 from __future__ import annotations
 
-import hashlib
-import os
 import re
-import sys
-import time
-from collections.abc import Generator
-from contextlib import contextmanager
-from pathlib import Path
 
-
-@contextmanager
-def timed_step(label: str) -> Generator[None, None, None]:
-    """Time a named generation step and print its wall-clock duration.
-
-    Prints `label` immediately (without a trailing newline) so the elapsed
-    time can be appended on the same line once the step finishes.  If the
-    step raises an exception a bare newline is emitted before re-raising, so
-    subsequent output always starts on a fresh line.
-
-    Args:
-        label: Human-readable description of the step, printed as it begins.
-
-    Yields:
-        Nothing — the caller performs the work inside the `with` block.
-    """
-    print(label, end="", flush=True)
-    start = time.monotonic()
-    try:
-        yield
-    except BaseException:
-        print()  # ensure subsequent output starts on a fresh line
-        raise
-    elapsed = time.monotonic() - start
-    print(f" [{elapsed:.2f}s]")
-
-
-def get_user_cache_dir() -> Path:
-    """Return the platform-specific user cache directory for blogmore.
-
-    On Windows, this uses %LOCALAPPDATA%. On all other platforms (Unix/macOS),
-    it follows the XDG Base Directory Specification (~/.cache).
-
-    Returns:
-        A Path object pointing to the user's cache directory for blogmore.
-    """
-    if sys.platform == "win32":
-        # Windows: %LOCALAPPDATA%\blogmore\cache
-        base = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local"))
-        return base / "blogmore" / "cache"
-
-    # Unix-like (Linux, macOS, etc.): ~/.cache/blogmore or $XDG_CACHE_HOME/blogmore
-    base = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache"))
-    return base / "blogmore"
-
-
-def get_blog_cache_dir(content_dir: Path) -> Path:
-    """Return a unique cache directory for a specific blog.
-
-    The directory is unique to the absolute path of the blog's content directory,
-    allowing multiple blogs to be managed on the same system without cache
-    collisions.
-
-    Args:
-        content_dir: The blog's content directory.
-
-    Returns:
-        A Path object pointing to the blog-specific cache directory.
-    """
-    # Create a unique hash for the absolute path of the content directory
-    path_hash = hashlib.sha256(str(content_dir.resolve()).encode("utf-8")).hexdigest()
-    return get_user_cache_dir() / "blogs" / path_hash
+from blogmore.markdown.plain_text import html_to_plain_text
 
 
 def count_words_from_html(html_content: str) -> int:
@@ -93,8 +30,6 @@ def count_words_from_html(html_content: str) -> int:
         >>> count_words_from_html("<p>word </p>" * 10)
         10
     """
-    from blogmore.markdown.plain_text import html_to_plain_text
-
     return len(
         [
             word
@@ -113,7 +48,7 @@ def calculate_reading_time_from_html(
 
     Args:
         html_content: The HTML content to analyse.
-        words_per_minute: Average reading speed (default: 200 WPM)
+        words_per_minute: Average reading speed (default: 200 WPM).
 
     Returns:
         Estimated reading time in whole minutes (minimum 1 minute).
@@ -131,15 +66,15 @@ def make_urls_absolute(html_content: str, base_url: str) -> str:
     """Rewrite root-relative URLs in HTML content to absolute URLs.
 
     Converts `src` and `href` attributes whose values begin with `/`
-    to full absolute URLs by prepending *base_url*.  Attributes that already
+    to full absolute URLs by prepending `base_url`.  Attributes that already
     contain an absolute URL (i.e. they include a scheme such as `https://`)
     are left unchanged.
 
     Args:
         html_content: HTML string that may contain root-relative URL references.
-        base_url: The absolute base URL to prepend (e.g. ``https://example.com``).
+        base_url: The absolute base URL to prepend (e.g. `https://example.com`).
             Any trailing slash is ignored because root-relative paths already
-            start with ``/``.
+            start with `/`.
 
     Returns:
         HTML string with root-relative `src`/`href` values replaced by
@@ -177,10 +112,10 @@ def normalize_site_url(site_url: str) -> str:
     - Multiple trailing slashes: All are removed
 
     Args:
-        site_url: The site URL to normalize
+        site_url: The site URL to normalize.
 
     Returns:
-        The normalized site URL without trailing slash, or empty string if empty
+        The normalized site URL without trailing slash, or empty string if empty.
 
     Examples:
         >>> normalize_site_url("https://example.com/")
@@ -218,24 +153,3 @@ def simplify_html_for_feeds(html_content: str) -> str:
         html_content,
         flags=re.DOTALL | re.IGNORECASE,
     )
-
-
-def print_warning(message: str) -> None:
-    """Print a warning message to stderr.
-
-    Args:
-        message: The warning message to print.
-    """
-    print(message, file=sys.stderr)
-
-
-def print_error(message: str) -> None:
-    """Print an error message to stderr.
-
-    Args:
-        message: The error message to print.
-    """
-    print(message, file=sys.stderr)
-
-
-### utils.py ends here

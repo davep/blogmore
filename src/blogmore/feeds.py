@@ -5,12 +5,12 @@ from pathlib import Path
 
 from feedgen.feed import FeedGenerator as FeedGen  # type: ignore[import-untyped]
 
-from blogmore.parser import Post, sanitize_for_url
-from blogmore.utils import (
+from blogmore.html_utils import (
     make_urls_absolute,
     normalize_site_url,
     simplify_html_for_feeds,
 )
+from blogmore.parser import Post, sanitize_for_url
 
 # Directory for feed files (excluding main RSS feed which is at root)
 FEEDS_DIR = "feeds"

@@ -24,10 +24,10 @@ from blogmore.config import (
     load_config,
     parse_site_config_from_dict,
 )
+from blogmore.console import print_error, print_warning
 from blogmore.generator import SiteGenerator
 from blogmore.parser import CUSTOM_404_HTML
 from blogmore.site_config import SiteConfig
-from blogmore.utils import print_error, print_warning
 
 # Registry of active SSE connections for browser reloading
 _reload_queues: list[queue.Queue[str]] = []

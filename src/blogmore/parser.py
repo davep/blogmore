@@ -17,11 +17,11 @@ import yaml
 from dateutil import parser as dateutil_parser
 from pygments.formatters import HtmlFormatter
 
+from blogmore.console import print_warning
 from blogmore.gfi import calculate_gunning_fog_index
 from blogmore.markdown import create_custom_extensions
 from blogmore.markdown.first_paragraph import extract_first_paragraph_from_html
 from blogmore.markdown.plain_text import html_to_plain_text
-from blogmore.utils import print_warning
 
 _DATE_FORMATS = [
     "%Y-%m-%d %H:%M:%S %z",

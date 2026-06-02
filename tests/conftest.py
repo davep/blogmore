@@ -20,7 +20,7 @@ def mock_user_cache_dir(tmp_path: Path) -> Iterator[Path]:
     test_cache = tmp_path / "blogmore_test_cache"
     test_cache.mkdir(parents=True, exist_ok=True)
     with (
-        patch("blogmore.utils.get_user_cache_dir", return_value=test_cache),
+        patch("blogmore.cache.get_user_cache_dir", return_value=test_cache),
         patch("blogmore.fontawesome.get_user_cache_dir", return_value=test_cache),
     ):
         yield test_cache
