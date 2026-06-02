@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any, Self
 
 from PIL import Image
 
-from blogmore.utils import print_warning
+from blogmore.console import print_warning
 
 if TYPE_CHECKING:
     from blogmore.site_config import SiteConfig

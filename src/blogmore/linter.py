@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urljoin, urlparse
 
+from blogmore.console import print_error, print_warning
 from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
 from blogmore.generator.context import ContextBuilder
 from blogmore.generator.grouping import group_posts_by_category, group_posts_by_tag
@@ -18,7 +19,6 @@ from blogmore.generator.paths import (
 )
 from blogmore.markdown.external_links import is_external_link
 from blogmore.parser import PostParser, sanitize_for_url
-from blogmore.utils import print_error, print_warning
 
 if TYPE_CHECKING:
     from blogmore.site_config import SiteConfig

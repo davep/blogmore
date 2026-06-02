@@ -10,8 +10,8 @@ from xml.etree.ElementTree import Element
 from markdown.extensions import Extension
 from markdown.inlinepatterns import InlineProcessor
 
+from blogmore.console import print_warning
 from blogmore.image_html import create_picture_element
-from blogmore.utils import print_warning
 
 if TYPE_CHECKING:
     from pathlib import Path
