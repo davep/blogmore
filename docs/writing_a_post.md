@@ -363,6 +363,35 @@ fragment, where the address can be copied from the browser's location bar.
 The anchor appears and disappears with a smooth fade and does not affect the
 layout of the page in any way.
 
+### Table of Contents
+
+For long posts with many sections, a table of contents makes it easy for readers to navigate your content. It provides a quick overview of the post's structure and lets users jump directly to any heading.
+
+#### Syntax
+
+To insert a table of contents, place `[TOC]` on its own line in your Markdown file:
+
+```markdown
+# My Long Article
+
+Here is an overview of what we will cover:
+
+[TOC]
+
+## Section One
+...
+## Section Two
+...
+```
+
+#### How it works
+
+BlogMore automatically scans your post for all headings (`#` through `######`) and generates a nested list of links in place of the `[TOC]` marker. 
+
+- The links target the automatically generated heading IDs (see [Heading IDs and anchor links](#heading-ids-and-anchor-links) above).
+- The generated list is automatically nested based on heading levels (e.g., `###` headings are nested under `##` headings).
+- The table of contents is pre-styled to match your blog's theme, with hover effects and responsive indentation.
+
 ### Markdown inside HTML tags
 
 By default, Markdown inside raw HTML blocks is left as-is and is not processed
