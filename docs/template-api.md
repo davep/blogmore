@@ -154,6 +154,9 @@ and `next_post`.
 | `gfi` | `float` (property) | Gunning Fog Index score for the post. |
 | `modified_date` | `datetime \| None` (property) | Last-modified datetime from metadata, if set. |
 | `related_posts` | `list[Post]` | List of related Post objects calculated via TF-IDF (populated when `with_related` is enabled). |
+| `toc_html` | `str` | Rendered HTML block containing the post's Table of Contents. |
+| `show_toc` | `bool` | `True` when the post should display a Table of Contents (can be disabled via frontmatter). |
+| `has_toc` | `bool` (property) | `True` when the post has a non-empty Table of Contents (i.e. contains headings and `show_toc` is enabled). |
 
 Helper methods available on `Post`:
 
@@ -386,6 +389,11 @@ The following CSS classes are part of the stable template/CSS contract:
 | `.post-content` | `div` | Rendered post/page HTML body. |
 | `.post-summary` | `article` | A single post card on a listing page. |
 | `.post-navigation` | `nav` | Previous/next post links. |
+| `.post-toc-container-mobile` | `aside` | Collapsible inline container for post TOC on small viewports. |
+| `.post-toc-container-desktop` | `aside` | Floating sticky container for post TOC on large viewports. |
+| `.post-toc-details` | `details` | Collapsible details element for responsive post TOC. |
+| `.post-toc-summary` | `summary` | Table of Contents title and toggle button. |
+| `.post-toc` | `nav` | Navigation element containing the TOC links list. |
 | `.pagination` | `nav` | Page navigation on listing pages. |
 | `.archive-post-count` | `span` | Parenthetical post count in archive headings (h1/h2/h3). |
 | `.archive-toc-count` | `span` | Parenthetical numeric count in the archive TOC sidebar. |

@@ -1313,6 +1313,109 @@ footer a:hover {
 }
 
 /* =============================================================================
+   POST TABLE OF CONTENTS
+   ============================================================================= */
+
+/* Container for mobile table of contents */
+.post-toc-container-mobile {
+    margin: 1.5em 0;
+    padding: 12px 16px;
+    background: var(--code-bg);
+    border: 1px solid var(--border-color-light);
+    border-radius: 6px;
+}
+
+/* Hide desktop TOC by default */
+.post-toc-container-desktop {
+    display: none;
+}
+
+.post-toc-details {
+    outline: none;
+}
+
+.post-toc-summary {
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    color: var(--text-color);
+    outline: none;
+}
+
+.post-toc-summary:focus-visible {
+    outline: 2px solid var(--hover-color);
+}
+
+.post-toc-details nav.post-toc {
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.post-toc-details nav.post-toc ul,
+.post-toc-container-desktop nav.post-toc ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.post-toc-details nav.post-toc ul ul,
+.post-toc-container-desktop nav.post-toc ul ul {
+    padding-left: 16px;
+    margin-top: 4px;
+}
+
+.post-toc-details nav.post-toc li,
+.post-toc-container-desktop nav.post-toc li {
+    margin-bottom: 6px;
+}
+
+.post-toc-details nav.post-toc a,
+.post-toc-container-desktop nav.post-toc a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    display: inline-block;
+}
+
+.post-toc-details nav.post-toc a:hover,
+.post-toc-container-desktop nav.post-toc a:hover {
+    color: var(--hover-color);
+}
+
+/* Floating Table of Contents for wide screens */
+@media (min-width: 1280px) {
+    /* Hide mobile TOC on desktop */
+    .post-toc-container-mobile {
+        display: none;
+    }
+
+    /* Show and float desktop TOC */
+    .post-toc-container-desktop {
+        display: block;
+        position: fixed;
+        left: calc(280px + 800px + 20px);
+        top: 20px;
+        width: 180px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+
+    .post-toc-title {
+        font-weight: 600;
+        font-size: 0.9em;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+
+    .post-toc-container-desktop nav.post-toc a {
+        font-size: 0.9em;
+        line-height: 1.3;
+    }
+}
+
+/* =============================================================================
    THEME TOGGLE
    ============================================================================= */
 

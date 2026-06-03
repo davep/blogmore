@@ -173,6 +173,14 @@ invite_comments_to: "specific-address@example.com"
 
 This key only has an effect when the comment invitation feature is enabled (either globally via [`invite_comments`](configuration.md#invite_comments) or via the per-post `invite_comments` front-matter key above).
 
+#### `show_toc`
+
+Whether to show the Table of Contents for this post. Set to `true` by default. Set to `false` to hide the Table of Contents on this specific post even if it contains headings.
+
+```yaml
+show_toc: false
+```
+
 ### Date formats
 
 BlogMore accepts dates in several formats:
@@ -386,8 +394,14 @@ Here is an overview of what we will cover:
 
 #### How it works
 
-BlogMore automatically scans your post for all headings (`#` through `######`) and generates a nested list of links in place of the `[TOC]` marker. 
+BlogMore automatically scans your post for all headings (`#` through `######`) and generates a Table of Contents.
 
+- **Sidebar & Responsive TOC:** By default, on desktop displays, a floating, sticky Table of Contents is shown in the right-hand margin of the page. On smaller mobile screens, this TOC is presented inline at the top of the post under a collapsible accordion.
+- **Manual TOC:** You can also insert the TOC manually at a specific place inside the post content by placing `[TOC]` on its own line.
+- **Disabling the TOC:** If you have headings but do not want a Table of Contents to be displayed at all (neither floating nor inline), you can set the `show_toc` property to `false` in the post's frontmatter:
+  ```yaml
+  show_toc: false
+  ```
 - The links target the automatically generated heading IDs (see [Heading IDs and anchor links](#heading-ids-and-anchor-links) above).
 - The generated list is automatically nested based on heading levels (e.g., `###` headings are nested under `##` headings).
 - The table of contents is pre-styled to match your blog's theme, with hover effects and responsive indentation.

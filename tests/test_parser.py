@@ -1140,3 +1140,50 @@ This post has [an external link](https://external.com) and
 
         assert "9:00am" in page.html_content
         assert "This is paragraph two." in page.html_content
+
+    def test_post_toc_generation(self, tmp_path: Path) -> None:
+        """Test that Table of Contents (TOC) is parsed and has_toc works correctly."""
+        parser = PostParser()
+
+        # Post with headings (should have a TOC)
+        post_with_headings = tmp_path / "with-headings.md"
+        post_with_headings.write_text(
+            "---\ntitle: Post with Headings\n---\n\n"
+            "# Heading 1\n"
+            "Some content.\n\n"
+            "## Heading 2\n"
+            "More content.\n"
+        )
+        post = parser.parse_file(post_with_headings)
+        assert post.toc_html != ""
+        assert "<li>" in post.toc_html
+        assert "heading-1" in post.toc_html
+        assert "heading-2" in post.toc_html
+        assert post.show_toc is True
+        assert post.has_toc is True
+
+        # Post with headings but show_toc: false (should not have TOC shown)
+        post_show_toc_false = tmp_path / "show-toc-false.md"
+        post_show_toc_false.write_text(
+            "---\ntitle: Post with show_toc False\nshow_toc: false\n---\n\n"
+            "# Heading 1\n"
+            "Some content.\n\n"
+            "## Heading 2\n"
+            "More content.\n"
+        )
+        post_disabled = parser.parse_file(post_show_toc_false)
+        assert post_disabled.toc_html != ""  # Markdown generates it internally
+        assert post_disabled.show_toc is False
+        assert post_disabled.has_toc is False
+
+        # Post with no headings (should have an empty/meaningless TOC)
+        post_no_headings = tmp_path / "no-headings.md"
+        post_no_headings.write_text(
+            "---\ntitle: Post without Headings\n---\n\n"
+            "Just some plain text content without any markdown headers.\n"
+        )
+        post_empty = parser.parse_file(post_no_headings)
+        # It might contain container tags like <div class="toc"><ul></ul></div> but no <li> elements
+        assert "<li>" not in post_empty.toc_html
+        assert post_empty.show_toc is True
+        assert post_empty.has_toc is False

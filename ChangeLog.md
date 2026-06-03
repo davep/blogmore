@@ -8,6 +8,10 @@
   categories, external links, word counts, lifespan, streaks) with commas
   when they run into the thousands.
   ([#586](https://github.com/davep/blogmore/pull/586))
+- Added a responsive table of contents display, which floats to the right on
+  wider displays, or as a collapsible inline list on narrow displays. Also
+  added support for a `show_toc` frontmatter property (on by default).
+  ([#588](https://github.com/davep/blogmore/pull/588))
 
 ## v2.37.0
 

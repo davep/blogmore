@@ -165,6 +165,23 @@ class Post:
     related_posts: list[Post] = field(default_factory=list, repr=False, compare=False)
     """A list of other [`Post`][blogmore.parser.Post] objects that are related to this post."""
 
+    toc_html: str = field(default="", repr=False, compare=False)
+    """The generated Table of Contents HTML for the post, if any."""
+
+    show_toc: bool = True
+    """Whether to show the Table of Contents on this post (enabled by default)."""
+
+    @property
+    def has_toc(self) -> bool:
+        """Check if the post has a non-empty Table of Contents.
+
+        Returns:
+            True if the post has a Table of Contents with items, False otherwise.
+        """
+        if not self.show_toc:
+            return False
+        return bool(self.toc_html and "<li>" in self.toc_html)
+
     @property
     def slug(self) -> str:
         """Generate a URL slug from the post filename."""
@@ -593,6 +610,9 @@ class PostParser:
         # Check draft status
         draft = bool(post_data.get("draft", False))
 
+        # Check show_toc status
+        show_toc = bool(post_data.get("show_toc", True))
+
         # Convert markdown to HTML
         try:
             # If the optimised images extension is active, tell it which
@@ -602,6 +622,7 @@ class PostParser:
                     ext.set_base_dir(path.parent)
 
             html_content = self.markdown.convert(post_data.content)
+            toc_html = getattr(self.markdown, "toc", "")
         finally:
             self.markdown.reset()
 
@@ -615,6 +636,8 @@ class PostParser:
             tags=tags,
             draft=draft,
             metadata=dict(post_data.metadata),
+            toc_html=toc_html,
+            show_toc=show_toc,
         )
 
     def parse_directory(

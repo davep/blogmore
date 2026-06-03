@@ -72,6 +72,26 @@
         {% endif %}
     </header>
     
+    {% if post.has_toc %}
+    <!-- Mobile/Tablet Table of Contents (Inline, Collapsible) -->
+    <aside class="post-toc-container-mobile">
+        <details class="post-toc-details">
+            <summary class="post-toc-summary">Table of Contents</summary>
+            <nav class="post-toc" aria-label="Post table of contents">
+                {{ post.toc_html|safe }}
+            </nav>
+        </details>
+    </aside>
+
+    <!-- Desktop Table of Contents (Floating, Sticky) -->
+    <aside class="post-toc-container-desktop">
+        <div class="post-toc-title">Table of Contents</div>
+        <nav class="post-toc" aria-label="Post table of contents">
+            {{ post.toc_html|safe }}
+        </nav>
+    </aside>
+    {% endif %}
+    
     <div class="e-content post-content">
         {{ post.html_content|safe }}
     </div>
