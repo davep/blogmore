@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.37.0
 
-**Released: WiP**
+**Released: 2026-06-03**
 
 - Fixed the tag and category count calculations in blog statistics to count
   clean (sanitised) values instead of raw values.
