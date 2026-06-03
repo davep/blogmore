@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Formatted count numbers on the statistics page (such as posts, tags,
+  categories, external links, word counts, lifespan, streaks) with commas
+  when they run into the thousands.
+  ([#586](https://github.com/davep/blogmore/pull/586))
+
 ## v2.37.0
 
 **Released: 2026-06-03**

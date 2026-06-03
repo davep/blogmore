@@ -262,6 +262,26 @@ class TestTemplateRenderer:
         # Should contain formatted date
         assert "2024" in html
 
+    def test_format_commas_filter_directly(self) -> None:
+        """Test the _format_commas method directly."""
+        assert TemplateRenderer._format_commas(None) == ""
+        assert TemplateRenderer._format_commas(123) == "123"
+        assert TemplateRenderer._format_commas(1234) == "1,234"
+        assert TemplateRenderer._format_commas(1234567) == "1,234,567"
+        assert TemplateRenderer._format_commas(1234.56) == "1,234.56"
+        assert TemplateRenderer._format_commas("1234") == "1,234"
+        assert TemplateRenderer._format_commas("1234.5") == "1,234.5"
+        assert TemplateRenderer._format_commas("not a number") == "not a number"
+
+    def test_format_commas_filter_in_template(self) -> None:
+        """Test that the format_commas filter works in templates."""
+        renderer = TemplateRenderer()
+        assert "format_commas" in renderer.env.filters
+
+        template_str = "{{ 1234567 | format_commas }}"
+        template = renderer.env.from_string(template_str)
+        assert template.render() == "1,234,567"
+
     def test_custom_templates_precedence(
         self, tmp_path: Path, sample_post: Post
     ) -> None:
@@ -1487,6 +1507,106 @@ class TestTemplateRenderer:
         assert (
             '<meta name="twitter:title" content="Blog Statistics - Test Blog">' in html
         )
+
+    def test_stats_page_formats_counts_with_commas(self) -> None:
+        """Test that counts running into thousands are formatted with commas on the stats page."""
+        import datetime as dt
+
+        from blogmore.stats import BlogStats, PostingStreak, StreakChartVariant
+
+        renderer = TemplateRenderer()
+
+        from blogmore.parser import Post
+
+        mock_post = Post(
+            path=Path("test.md"),
+            title="Test Post",
+            content="",
+            html_content="",
+        )
+
+        stats = BlogStats(
+            posts_per_hour=[1000] + [0] * 23,
+            tag_count=1234,
+            category_count=5678,
+            unique_external_link_count=9012,
+            posts_per_year=[(2024, 1500)],
+            avg_word_count=2500.4,
+            min_word_count=1100,
+            max_word_count=5400,
+            earliest_post_date=dt.datetime(2020, 1, 1),
+            latest_post_date=dt.datetime(2020, 1, 1) + dt.timedelta(days=1800),
+            longest_streaks=[
+                PostingStreak(
+                    start_date=dt.date(2024, 1, 1),
+                    end_date=dt.date(2024, 1, 5),
+                    days=1200,
+                    post_count=1300,
+                )
+            ],
+            top_domains=[("example.com", 2200)],
+            top_internal_links=[(mock_post, 3300)],
+        )
+
+        # Add streak chart variant
+        stats.streak_variants = [
+            StreakChartVariant(
+                months=5,
+                posts_count=1450,
+                first_date=dt.date(2024, 1, 1),
+                last_date=dt.date(2024, 5, 1),
+                month_label_positions=[("Jan", 1)],
+                weeks=[],
+            )
+        ]
+
+        html = renderer.render_stats_page(
+            site_title="Test Blog",
+            stats=stats,
+            with_read_time=False,
+            pagination_page1_suffix="index.html",
+        )
+
+        # 1. total_posts -> sum of posts_per_hour -> 1000 -> "1,000"
+        assert "Statistics for 1,000 posts" in html
+
+        # 2. tag_count -> 1234 -> "1,234"
+        assert ">1,234</a>" in html
+
+        # 3. category_count -> 5678 -> "5,678"
+        assert ">5,678</a>" in html
+
+        # 4. unique_external_link_count -> 9012 -> "9,012"
+        assert "<dd>9,012</dd>" in html
+
+        # 5. posts_per_hour count in histogram bar value and title
+        assert '<span class="stats-bar-value">1,000</span>' in html
+        assert 'title="00: 1,000 posts"' in html
+
+        # 6. posts_per_year count in horizontal bar chart value and title
+        assert 'title="2024: 1,500 posts"' in html
+        assert '<div class="stats-hbar-value">1,500</div>' in html
+
+        # 7. streak variant post count
+        assert "1,450 posts between 2024-01-01 and 2024-05-01" in html
+
+        # 8. longest streak days and post count
+        assert '<td class="stats-table-count">1,200</td>' in html
+        assert '<td class="stats-table-count">1,300</td>' in html
+
+        # 9. word count: average, min, max
+        # average 2500.4 rounds to 2500 -> "2,500"
+        assert "2,500 words" in html
+        # min 1100 -> "1,100"
+        assert "1,100 words" in html
+        # max 5400 -> "5,400"
+        assert "5,400 words" in html
+
+        # 10. top domains
+        assert '<td class="stats-table-count">2,200</td>' in html
+
+        # 11. top internal links
+        assert '<td class="stats-table-count">3,300</td>' in html
 
     def test_listing_meta_tags_full_social_graph_on_calendar_page(self) -> None:
         """Test that the calendar page includes full social graph meta tags."""
