@@ -16,7 +16,7 @@
     <h1>Blog Statistics</h1>
 
     {% set total_posts = stats.posts_per_hour | sum %}
-    <p class="stats-summary">Statistics for {{ total_posts }} post{{ '' if total_posts == 1 else 's' }}.</p>
+    <p class="stats-summary">Statistics for {{ total_posts | format_commas }} post{{ '' if total_posts == 1 else 's' }}.</p>
 
     {# ------------------------------------------------------------------ #}
     {# Tags, categories and links overview                                 #}
@@ -26,15 +26,15 @@
       <dl class="stats-details">
         <div class="stats-detail-row">
           <dt>Tags</dt>
-          <dd><a href="{{ tags_url }}">{{ stats.tag_count }}</a></dd>
+          <dd><a href="{{ tags_url }}">{{ stats.tag_count | format_commas }}</a></dd>
         </div>
         <div class="stats-detail-row">
           <dt>Categories</dt>
-          <dd><a href="{{ categories_url }}">{{ stats.category_count }}</a></dd>
+          <dd><a href="{{ categories_url }}">{{ stats.category_count | format_commas }}</a></dd>
         </div>
         <div class="stats-detail-row">
           <dt>Unique external links</dt>
-          <dd>{{ stats.unique_external_link_count }}</dd>
+          <dd>{{ stats.unique_external_link_count | format_commas }}</dd>
         </div>
       </dl>
     </section>
@@ -53,10 +53,10 @@
                 {% set pct = (counts[i] / max_count * 100) | round(1) %}
                 <div class="stats-bar-group">
                     <div class="stats-bar-value-area">
-                        <span class="stats-bar-value">{{ counts[i] }}</span>
+                        <span class="stats-bar-value">{{ counts[i] | format_commas }}</span>
                     </div>
                     <div class="stats-bar-wrap">
-                        <div class="stats-bar" style="height: {{ pct }}%" title="{{ labels[i] }}: {{ counts[i] }} post{{ '' if counts[i] == 1 else 's' }}"></div>
+                        <div class="stats-bar" style="height: {{ pct }}%" title="{{ labels[i] }}: {{ counts[i] | format_commas }} post{{ '' if counts[i] == 1 else 's' }}"></div>
                     </div>
                     {% if loop.index0 % label_step == 0 or loop.last %}
                     <div class="stats-bar-label">{{ labels[i] }}</div>
@@ -96,12 +96,12 @@
                 {% for year, count in rows %}
                 {% set pct = (count / axis_max * 100) | round(1) %}
                 {% set year_url = '/' ~ year ~ '/' ~ pagination_page1_suffix %}
-                <div class="stats-hbar-row" title="{{ year }}: {{ count }} post{{ '' if count == 1 else 's' }}">
+                <div class="stats-hbar-row" title="{{ year }}: {{ count | format_commas }} post{{ '' if count == 1 else 's' }}">
                     <div class="stats-hbar-label">{% if count > 0 %}<a href="{{ year_url }}">{{ year }}</a>{% else %}{{ year }}{% endif %}</div>
                     <div class="stats-hbar-track">
                         {% if count > 0 %}<div class="stats-hbar-fill" style="width: {{ pct }}%"></div>{% endif %}
                     </div>
-                    <div class="stats-hbar-value">{{ count }}</div>
+                    <div class="stats-hbar-value">{{ count | format_commas }}</div>
                 </div>
                 {% endfor %}
             </div>
@@ -121,7 +121,7 @@
         {% for variant in stats.streak_variants %}
         {% set count = variant.posts_count %}
         <div class="streak-variant streak-variant-{{ variant.months }}mo">
-            <h2 id="posting-activity-{{ variant.months }}mo">{{ count }} post{{ '' if count == 1 else 's' }} between {{ variant.first_date }} and {{ variant.last_date }}<a aria-label="Link to this heading" class="heading-anchor" href="#posting-activity-{{ variant.months }}mo">¶</a></h2>
+            <h2 id="posting-activity-{{ variant.months }}mo">{{ count | format_commas }} post{{ '' if count == 1 else 's' }} between {{ variant.first_date }} and {{ variant.last_date }}<a aria-label="Link to this heading" class="heading-anchor" href="#posting-activity-{{ variant.months }}mo">¶</a></h2>
             <figure class="stats-chart stats-streak-chart" aria-label="Posts between {{ variant.first_date }} and {{ variant.last_date }}">
                 <div class="streak-outer">
                     {# Row 1, Col 1: spacer (aligns month labels with DOW labels column) #}
@@ -160,7 +160,7 @@
                         {% else %}
                         {% set level = 4 %}
                         {% endif %}
-                        {% set day_label = cell.date.strftime('%Y-%m-%d') ~ ': ' ~ cell.count ~ ' post' ~ ('' if cell.count == 1 else 's') %}
+                        {% set day_label = cell.date.strftime('%Y-%m-%d') ~ ': ' ~ (cell.count | format_commas) ~ ' post' ~ ('' if cell.count == 1 else 's') %}
                         {% if cell.count > 0 %}
                         {% set day_url = '/' ~ cell.date.year ~ '/' ~ '%02d'|format(cell.date.month) ~ '/' ~ '%02d'|format(cell.date.day) ~ '/' ~ pagination_page1_suffix %}
                         <a href="{{ day_url }}" class="streak-cell streak-cell-level-{{ level }}" title="{{ day_label }}" aria-label="{{ day_label }}"></a>
@@ -214,7 +214,7 @@
             {% elif span >= 365 %}
             {{ "%.1f" % (span / 365.25) }} year{{ '' if (span / 365.25) | round(1) == 1.0 else 's' }}
             {% else %}
-            {{ span }} day{{ '' if span == 1 else 's' }}
+            {{ span | format_commas }} day{{ '' if span == 1 else 's' }}
             {% endif %}
           </dd>
         </div>
@@ -245,10 +245,10 @@
                     {% set end_url = '/' ~ streak.end_date.year ~ '/' ~ '%02d'|format(streak.end_date.month) ~ '/' ~ '%02d'|format(streak.end_date.day) ~ '/' ~ pagination_page1_suffix %}
                     <tr>
                         <td class="stats-table-rank">{{ loop.index }}</td>
-                        <td class="stats-table-count">{{ streak.days }}</td>
+                        <td class="stats-table-count">{{ streak.days | format_commas }}</td>
                         <td><a href="{{ start_url }}">{{ streak.start_date.strftime('%Y-%m-%d') }}</a></td>
                         <td><a href="{{ end_url }}">{{ streak.end_date.strftime('%Y-%m-%d') }}</a></td>
-                        <td class="stats-table-count">{{ streak.post_count }}</td>
+                        <td class="stats-table-count">{{ streak.post_count | format_commas }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -266,16 +266,17 @@
         <dl class="stats-details">
             <div class="stats-detail-row">
                 <dt>Average</dt>
-                <dd>{{ "%.0f" % stats.avg_word_count }} word{{ '' if ("%.0f" % stats.avg_word_count) | int == 1 else 's' }}</dd>
+                {% set avg_words = "%.0f" % stats.avg_word_count %}
+                <dd>{{ avg_words | format_commas }} word{{ '' if avg_words | int == 1 else 's' }}</dd>
             </div>
             <div class="stats-detail-row">
                 <dt>Shortest</dt>
                 <dd>
                     {% if stats.min_word_count_post %}
                     <a href="{{ stats.min_word_count_post.url }}">{{ stats.min_word_count_post.title }}</a>
-                    — {{ stats.min_word_count }} word{{ '' if stats.min_word_count == 1 else 's' }}
+                    — {{ stats.min_word_count | format_commas }} word{{ '' if stats.min_word_count == 1 else 's' }}
                     {% else %}
-                    {{ stats.min_word_count }} word{{ '' if stats.min_word_count == 1 else 's' }}
+                    {{ stats.min_word_count | format_commas }} word{{ '' if stats.min_word_count == 1 else 's' }}
                     {% endif %}
                 </dd>
             </div>
@@ -284,9 +285,9 @@
                 <dd>
                     {% if stats.max_word_count_post %}
                     <a href="{{ stats.max_word_count_post.url }}">{{ stats.max_word_count_post.title }}</a>
-                    — {{ stats.max_word_count }} word{{ '' if stats.max_word_count == 1 else 's' }}
+                    — {{ stats.max_word_count | format_commas }} word{{ '' if stats.max_word_count == 1 else 's' }}
                     {% else %}
-                    {{ stats.max_word_count }} word{{ '' if stats.max_word_count == 1 else 's' }}
+                    {{ stats.max_word_count | format_commas }} word{{ '' if stats.max_word_count == 1 else 's' }}
                     {% endif %}
                 </dd>
             </div>
@@ -459,7 +460,7 @@
                         <td class="stats-table-domain">
                             <a href="https://{{ domain }}" target="_blank" rel="noopener noreferrer">{{ domain }}</a>
                         </td>
-                        <td class="stats-table-count">{{ count }}</td>
+                        <td class="stats-table-count">{{ count | format_commas }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -488,7 +489,7 @@
                     <tr>
                         <td class="stats-table-rank">{{ loop.index }}</td>
                         <td><a href="{{ post.url }}">{{ post.title }}</a></td>
-                        <td class="stats-table-count">{{ count }}</td>
+                        <td class="stats-table-count">{{ count | format_commas }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

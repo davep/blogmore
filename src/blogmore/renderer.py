@@ -69,6 +69,7 @@ class TemplateRenderer:
         self.env.filters["format_date_plain"] = self._format_date_plain
         self.env.filters["is_external_link"] = self._is_external_link
         self.env.filters["shift_headings"] = self._shift_headings
+        self.env.filters["format_commas"] = self._format_commas
 
         # Provide default values for pagination context variables so that
         # templates rendering without a full generator context (e.g. tests)
@@ -163,6 +164,36 @@ class TemplateRenderer:
                     )
 
         return formatted
+
+    @staticmethod
+    def _format_commas(value: Any) -> str:
+        """Format a numeric value or string with commas for thousands.
+
+        Args:
+            value: The value to format.
+
+        Returns:
+            A string with commas if the value is numeric, otherwise the string
+            representation of the value.
+        """
+        if value is None:
+            return ""
+        try:
+            if isinstance(value, (int, float)):
+                return f"{value:,}"
+            if isinstance(value, str):
+                if value.isdigit():
+                    return f"{int(value):,}"
+                try:
+                    val = float(value)
+                    if val.is_integer():
+                        return f"{int(val):,}"
+                    return f"{val:,}"
+                except ValueError:
+                    pass
+            return str(value)
+        except Exception:
+            return str(value)
 
     def _is_external_link(self, href: str) -> bool:
         """Determine if a link is external.
