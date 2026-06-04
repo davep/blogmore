@@ -49,6 +49,8 @@ here](https://github.com/davep/davep.github.com)).
 - **Flexible post URL format** — fully configurable post output paths and URLs
   via the `post_path` option; choose date-based paths, per-post directories,
   category-based layouts, and more
+- **URL redirection** — redirect older or alternative URLs to posts and pages
+  using a `redirect_from` list in frontmatter
 - **Optional reading time display** — estimated reading time shown next to the
   post date, based on 200 words per minute
 - **GitHub-style admonitions** — alert boxes (note, tip, important, warning,
