@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.38.0
 
-**Released: WiP**
+**Released: 2026-06-04**
 
 - Formatted count numbers on the statistics page (such as posts, tags,
   categories, external links, word counts, lifespan, streaks) with commas
