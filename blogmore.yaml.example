@@ -41,6 +41,10 @@ include_drafts: false
 # Can be overridden per-post with show_toc: true/false in frontmatter.
 show_toc: true
 
+# Optional: Whether to show the inline/collapsed Table of Contents on narrow screens by default (default: true)
+# Can be overridden per-post with show_toc_inline: true/false in frontmatter.
+show_toc_inline: true
+
 # Optional: Remove the output directory before generating the site (default: false)
 clean_first: false
 

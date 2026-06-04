@@ -12,6 +12,11 @@
   wider displays, or as a collapsible inline list on narrow displays. Also
   added support for a `show_toc` frontmatter property (on by default).
   ([#588](https://github.com/davep/blogmore/pull/588))
+- Added support for a `show_toc_inline` configuration option and frontmatter
+  property (on by default) to control whether the inline collapsible Table of
+  Contents appears on narrow displays when `show_toc` is enabled.
+  ([#589](https://github.com/davep/blogmore/pull/589))
+
 
 ## v2.37.0
 

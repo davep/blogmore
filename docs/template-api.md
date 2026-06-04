@@ -156,7 +156,9 @@ and `next_post`.
 | `related_posts` | `list[Post]` | List of related Post objects calculated via TF-IDF (populated when `with_related` is enabled). |
 | `toc_html` | `str` | Rendered HTML block containing the post's Table of Contents. |
 | `show_toc` | `bool` | `True` when the post should display a Table of Contents (can be disabled via frontmatter). |
+| `show_toc_inline` | `bool` | `True` when the post should display the inline Table of Contents on narrow screens (can be disabled via frontmatter). |
 | `has_toc` | `bool` (property) | `True` when the post has a non-empty Table of Contents (i.e. contains headings and `show_toc` is enabled). |
+
 
 Helper methods available on `Post`:
 

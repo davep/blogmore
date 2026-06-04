@@ -229,6 +229,25 @@ show_toc: true
 show_toc: false
 ```
 
+#### `show_toc_inline`
+
+Whether to show the inline/collapsed Table of Contents on narrow screens by default. This sets the global default for all posts. It can be overridden per-post by setting `show_toc_inline: true` or `show_toc_inline: false` in individual post frontmatter.
+
+Note that `show_toc` controls whether a Table of Contents is shown at all. If `show_toc` is `true` and `show_toc_inline` is `false`, the floating sidebar Table of Contents will be shown on wide screens as normal, but the inline version will not be displayed on narrow screens.
+
+**Type:** Boolean  
+**Default:** `true`
+
+```yaml
+show_toc_inline: true
+```
+
+```yaml
+# Disable inline/collapsed Table of Contents globally by default
+show_toc_inline: false
+```
+
+
 #### `clean_first`
 
 Remove the output directory before generating the site. Ensures no stale files remain from previous builds.

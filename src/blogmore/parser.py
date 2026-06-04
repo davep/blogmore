@@ -171,6 +171,9 @@ class Post:
     show_toc: bool = True
     """Whether to show the Table of Contents on this post (enabled by default)."""
 
+    show_toc_inline: bool = True
+    """Whether to show the inline/collapsed Table of Contents on narrow screens (enabled by default)."""
+
     @property
     def has_toc(self) -> bool:
         """Check if the post has a non-empty Table of Contents.
@@ -424,6 +427,7 @@ class PostParser:
         image_manager: Any = None,
         content_dir: Path | None = None,
         default_show_toc: bool = True,
+        default_show_toc_inline: bool = True,
     ) -> None:
         """Initialize the parser with markdown extensions.
 
@@ -432,11 +436,13 @@ class PostParser:
             image_manager: Optional ImageManager instance for image optimisation.
             content_dir: Optional content directory for image optimisation.
             default_show_toc: Whether to show the Table of Contents on posts by default.
+            default_show_toc_inline: Whether to show the inline Table of Contents by default.
         """
         self.site_url = site_url or ""
         self.image_manager = image_manager
         self.content_dir = content_dir
         self.default_show_toc = default_show_toc
+        self.default_show_toc_inline = default_show_toc_inline
 
     @property
     def markdown(self) -> markdown.Markdown:
@@ -619,6 +625,14 @@ class PostParser:
             bool(raw_show_toc) if raw_show_toc is not None else self.default_show_toc
         )
 
+        # Check show_toc_inline status
+        raw_show_toc_inline = post_data.get("show_toc_inline")
+        show_toc_inline = (
+            bool(raw_show_toc_inline)
+            if raw_show_toc_inline is not None
+            else self.default_show_toc_inline
+        )
+
         # Convert markdown to HTML
         try:
             # If the optimised images extension is active, tell it which
@@ -644,6 +658,7 @@ class PostParser:
             metadata=dict(post_data.metadata),
             toc_html=toc_html,
             show_toc=show_toc,
+            show_toc_inline=show_toc_inline,
         )
 
     def parse_directory(

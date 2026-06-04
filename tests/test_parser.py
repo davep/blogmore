@@ -1160,6 +1160,7 @@ This post has [an external link](https://external.com) and
         assert "heading-1" in post.toc_html
         assert "heading-2" in post.toc_html
         assert post.show_toc is True
+        assert post.show_toc_inline is True
         assert post.has_toc is True
 
         # Post with headings but show_toc: false (should not have TOC shown)
@@ -1174,7 +1175,19 @@ This post has [an external link](https://external.com) and
         post_disabled = parser.parse_file(post_show_toc_false)
         assert post_disabled.toc_html != ""  # Markdown generates it internally
         assert post_disabled.show_toc is False
+        assert post_disabled.show_toc_inline is True
         assert post_disabled.has_toc is False
+
+        # Post with show_toc_inline: false
+        post_show_toc_inline_false = tmp_path / "show-toc-inline-false.md"
+        post_show_toc_inline_false.write_text(
+            "---\ntitle: Post with show_toc_inline False\nshow_toc_inline: false\n---\n\n"
+            "# Heading 1\n"
+        )
+        post_inline_disabled = parser.parse_file(post_show_toc_inline_false)
+        assert post_inline_disabled.show_toc is True
+        assert post_inline_disabled.show_toc_inline is False
+        assert post_inline_disabled.has_toc is True
 
         # Test with custom default_show_toc=False
         parser_disabled_by_default = PostParser(default_show_toc=False)
@@ -1182,7 +1195,29 @@ This post has [an external link](https://external.com) and
             post_with_headings
         )
         assert post_default_disabled.show_toc is False
+        assert post_default_disabled.show_toc_inline is True
         assert post_default_disabled.has_toc is False
+
+        # Test with custom default_show_toc_inline=False
+        parser_inline_disabled_by_default = PostParser(default_show_toc_inline=False)
+        post_default_inline_disabled = parser_inline_disabled_by_default.parse_file(
+            post_with_headings
+        )
+        assert post_default_inline_disabled.show_toc is True
+        assert post_default_inline_disabled.show_toc_inline is False
+        assert post_default_inline_disabled.has_toc is True
+
+        # Post with show_toc_inline: true overriding the default False
+        post_override_inline_true = tmp_path / "override-inline-true.md"
+        post_override_inline_true.write_text(
+            "---\ntitle: Override Inline True\nshow_toc_inline: true\n---\n\n# Heading 1\nContent\n"
+        )
+        post_override_inline = parser_inline_disabled_by_default.parse_file(
+            post_override_inline_true
+        )
+        assert post_override_inline.show_toc is True
+        assert post_override_inline.show_toc_inline is True
+        assert post_override_inline.has_toc is True
 
         # Post with show_toc: true overriding the default False
         post_override_true = tmp_path / "override-true.md"
@@ -1191,6 +1226,7 @@ This post has [an external link](https://external.com) and
         )
         post_override = parser_disabled_by_default.parse_file(post_override_true)
         assert post_override.show_toc is True
+        assert post_override.show_toc_inline is True
         assert post_override.has_toc is True
 
         # Post with no headings (should have an empty/meaningless TOC)

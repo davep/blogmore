@@ -181,6 +181,15 @@ Whether to show the Table of Contents for this post. If not specified, this defa
 show_toc: false
 ```
 
+#### `show_toc_inline`
+
+Whether to show the inline/collapsed Table of Contents on narrow screens for this post. If not specified, this defaults to the global [`show_toc_inline`](configuration.md#show_toc_inline) setting in your configuration (which itself defaults to `true`). Set to `false` to hide the inline Table of Contents on narrow displays for this specific post (while still showing the floating sidebar Table of Contents on wider displays, provided `show_toc` is enabled).
+
+```yaml
+show_toc_inline: false
+```
+
+
 ### Date formats
 
 BlogMore accepts dates in several formats:
@@ -401,6 +410,10 @@ BlogMore automatically scans your post for all headings (`#` through `######`) a
 - **Disabling the TOC:** If you have headings but do not want a Table of Contents to be displayed at all (neither floating nor inline), you can disable it globally in your [configuration](configuration.md#show_toc) or set the `show_toc` property to `false` in the post's frontmatter:
   ```yaml
   show_toc: false
+  ```
+- **Disabling the inline TOC only:** If you want to keep the floating sidebar TOC on wider screens but hide the inline/collapsed TOC on narrow displays, you can disable it globally in your [configuration](configuration.md#show_toc_inline) or set the `show_toc_inline` property to `false` in the post's frontmatter:
+  ```yaml
+  show_toc_inline: false
   ```
 - The links target the automatically generated heading IDs (see [Heading IDs and anchor links](#heading-ids-and-anchor-links) above).
 - The generated list is automatically nested based on heading levels (e.g., `###` headings are nested under `##` headings).

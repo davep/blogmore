@@ -298,6 +298,13 @@ class SiteConfig:
     command line.  On by default.
     """
 
+    show_toc_inline: bool = True
+    """Whether to show the inline/collapsed Table of Contents on narrow screens by default.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  On by default.
+    """
+
     post_path: str = DEFAULT_POST_PATH
     """Format string used to determine each post's output path and URL.
 

@@ -72,7 +72,7 @@
         {% endif %}
     </header>
     
-    {% if post.has_toc %}
+    {% if post.has_toc and post.show_toc_inline %}
     <!-- Mobile/Tablet Table of Contents (Inline, Collapsible) -->
     <aside class="post-toc-container-mobile">
         <details class="post-toc-details">
@@ -82,7 +82,9 @@
             </nav>
         </details>
     </aside>
+    {% endif %}
 
+    {% if post.has_toc %}
     <!-- Desktop Table of Contents (Floating, Sticky) -->
     <aside class="post-toc-container-desktop">
         <div class="post-toc-title">Table of Contents</div>
