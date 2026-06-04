@@ -1997,6 +1997,26 @@ and <code>next_post</code>.</p>
 <td><code>list[Post]</code></td>
 <td>List of related Post objects calculated via TF-IDF (populated when <code>with_related</code> is enabled).</td>
 </tr>
+<tr>
+<td><code>toc_html</code></td>
+<td><code>str</code></td>
+<td>Rendered HTML block containing the post's Table of Contents.</td>
+</tr>
+<tr>
+<td><code>show_toc</code></td>
+<td><code>bool</code></td>
+<td><code>True</code> when the post should display a Table of Contents (can be disabled via frontmatter).</td>
+</tr>
+<tr>
+<td><code>show_toc_inline</code></td>
+<td><code>bool</code></td>
+<td><code>True</code> when the post should display the inline Table of Contents on narrow screens (can be disabled via frontmatter).</td>
+</tr>
+<tr>
+<td><code>has_toc</code></td>
+<td><code>bool</code> (property)</td>
+<td><code>True</code> when the post has a non-empty Table of Contents (i.e. contains headings and <code>show_toc</code> is enabled).</td>
+</tr>
 </tbody>
 </table>
 <p>Helper methods available on <code>Post</code>:</p>
@@ -2107,6 +2127,26 @@ be misleading.</p>
 <td><code>description</code></td>
 <td><code>str</code> (property)</td>
 <td>Page description (from metadata or first paragraph).</td>
+</tr>
+<tr>
+<td><code>toc_html</code></td>
+<td><code>str</code></td>
+<td>Rendered HTML block containing the page's Table of Contents.</td>
+</tr>
+<tr>
+<td><code>show_toc</code></td>
+<td><code>bool</code></td>
+<td><code>True</code> when the page should display a Table of Contents (can be disabled via frontmatter).</td>
+</tr>
+<tr>
+<td><code>show_toc_inline</code></td>
+<td><code>bool</code></td>
+<td><code>True</code> when the page should display the inline Table of Contents on narrow screens (can be disabled via frontmatter).</td>
+</tr>
+<tr>
+<td><code>has_toc</code></td>
+<td><code>bool</code> (property)</td>
+<td><code>True</code> when the page has a non-empty Table of Contents (i.e. contains headings and <code>show_toc</code> is enabled).</td>
 </tr>
 </tbody>
 </table>
@@ -2529,6 +2569,31 @@ widget.  It is called like this:</p>
 <td><code>.post-navigation</code></td>
 <td><code>nav</code></td>
 <td>Previous/next post links.</td>
+</tr>
+<tr>
+<td><code>.post-toc-container-mobile</code></td>
+<td><code>aside</code></td>
+<td>Collapsible inline container for post TOC on small viewports.</td>
+</tr>
+<tr>
+<td><code>.post-toc-container-desktop</code></td>
+<td><code>aside</code></td>
+<td>Floating sticky container for post TOC on large viewports.</td>
+</tr>
+<tr>
+<td><code>.post-toc-details</code></td>
+<td><code>details</code></td>
+<td>Collapsible details element for responsive post TOC.</td>
+</tr>
+<tr>
+<td><code>.post-toc-summary</code></td>
+<td><code>summary</code></td>
+<td>Table of Contents title and toggle button.</td>
+</tr>
+<tr>
+<td><code>.post-toc</code></td>
+<td><code>nav</code></td>
+<td>Navigation element containing the TOC links list.</td>
 </tr>
 <tr>
 <td><code>.pagination</code></td>

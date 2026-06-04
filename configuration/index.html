@@ -996,6 +996,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#show_toc" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_toc</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show_toc_inline" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_toc_inline</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#clean_first" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -2685,6 +2707,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#show_toc" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_toc</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show_toc_inline" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_toc_inline</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#clean_first" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -4165,6 +4209,25 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><span class="c1"># Include drafts for local testing</span>
 <span class="nt">include_drafts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<h4 id="show_toc"><code>show_toc</code></h4>
+<p>Whether to show the Table of Contents on posts by default. This sets the global default for all posts. It can be overridden per-post by setting <code>show_toc: true</code> or <code>show_toc: false</code> in individual post frontmatter.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>true</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">show_toc</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># Disable Table of Contents globally by default</span>
+<span class="nt">show_toc</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</code></pre></div>
+<h4 id="show_toc_inline"><code>show_toc_inline</code></h4>
+<p>Whether to show the inline/collapsed Table of Contents on narrow screens by default. This sets the global default for all posts. It can be overridden per-post by setting <code>show_toc_inline: true</code> or <code>show_toc_inline: false</code> in individual post frontmatter.</p>
+<p>Note that <code>show_toc</code> controls whether a Table of Contents is shown at all. If <code>show_toc</code> is <code>true</code> and <code>show_toc_inline</code> is <code>false</code>, the floating sidebar Table of Contents will be shown on wide screens as normal, but the inline version will not be displayed on narrow screens.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>true</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">show_toc_inline</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># Disable inline/collapsed Table of Contents globally by default</span>
+<span class="nt">show_toc_inline</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </code></pre></div>
 <h4 id="clean_first"><code>clean_first</code></h4>
 <p>Remove the output directory before generating the site. Ensures no stale files remain from previous builds.</p>

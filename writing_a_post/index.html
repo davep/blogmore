@@ -723,6 +723,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#show_toc" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_toc</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show_toc_inline" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_toc_inline</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -878,6 +900,45 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         Hover anchor links
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Table of Contents
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Table of Contents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Syntax
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        How it works
       </span>
     </span>
   </a>
@@ -1473,6 +1534,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#show_toc" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_toc</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show_toc_inline" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_toc_inline</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1640,6 +1723,45 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Table of Contents
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Table of Contents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Syntax
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        How it works
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#markdown-inside-html-tags" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1764,6 +1886,14 @@ publication date:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">invite_comments_to</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;specific-address@example.com&quot;</span>
 </code></pre></div>
 <p>This key only has an effect when the comment invitation feature is enabled (either globally via <a href="../configuration/#invite_comments"><code>invite_comments</code></a> or via the per-post <code>invite_comments</code> front-matter key above).</p>
+<h4 id="show_toc"><code>show_toc</code></h4>
+<p>Whether to show the Table of Contents for this post. If not specified, this defaults to the global <a href="../configuration/#show_toc"><code>show_toc</code></a> setting in your configuration (which itself defaults to <code>true</code>). Set to <code>false</code> to hide the Table of Contents on this specific post even if it contains headings, or to <code>true</code> to show it even if disabled globally.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">show_toc</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</code></pre></div>
+<h4 id="show_toc_inline"><code>show_toc_inline</code></h4>
+<p>Whether to show the inline/collapsed Table of Contents on narrow screens for this post. If not specified, this defaults to the global <a href="../configuration/#show_toc_inline"><code>show_toc_inline</code></a> setting in your configuration (which itself defaults to <code>true</code>). Set to <code>false</code> to hide the inline Table of Contents on narrow displays for this specific post (while still showing the floating sidebar Table of Contents on wider displays, provided <code>show_toc</code> is enabled).</p>
+<div class="highlight"><pre><span></span><code><span class="nt">show_toc_inline</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</code></pre></div>
 <h3 id="date-formats">Date formats</h3>
 <p>BlogMore accepts dates in several formats:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2024-01-15</span><span class="w">              </span><span class="c1"># Simple date</span>
@@ -1893,6 +2023,36 @@ heading. Clicking the symbol navigates the browser to that heading's URL
 fragment, where the address can be copied from the browser's location bar.</p>
 <p>The anchor appears and disappears with a smooth fade and does not affect the
 layout of the page in any way.</p>
+<h3 id="table-of-contents">Table of Contents</h3>
+<p>For long posts with many sections, a table of contents makes it easy for readers to navigate your content. It provides a quick overview of the post's structure and lets users jump directly to any heading.</p>
+<h4 id="syntax">Syntax</h4>
+<p>To insert a table of contents, place <code>[TOC]</code> on its own line in your Markdown file:</p>
+<div class="highlight"><pre><span></span><code><span class="gh"># My Long Article</span>
+
+Here is an overview of what we will cover:
+
+[TOC]
+
+<span class="gu">## Section One</span>
+...
+<span class="gu">## Section Two</span>
+...
+</code></pre></div>
+<h4 id="how-it-works">How it works</h4>
+<p>BlogMore automatically scans your post for all headings (<code>#</code> through <code>######</code>) and generates a Table of Contents.</p>
+<ul>
+<li><strong>Sidebar &amp; Responsive TOC:</strong> By default, on desktop displays, a floating, sticky Table of Contents is shown in the right-hand margin of the page. On smaller mobile screens, this TOC is presented inline at the top of the post under a collapsible accordion.</li>
+<li><strong>Manual TOC:</strong> You can also insert the TOC manually at a specific place inside the post content by placing <code>[TOC]</code> on its own line.</li>
+<li><strong>Disabling the TOC:</strong> If you have headings but do not want a Table of Contents to be displayed at all (neither floating nor inline), you can disable it globally in your <a href="../configuration/#show_toc">configuration</a> or set the <code>show_toc</code> property to <code>false</code> in the post's frontmatter:
+  <div class="highlight"><pre><span></span><code><span class="nt">show_toc</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</code></pre></div></li>
+<li><strong>Disabling the inline TOC only:</strong> If you want to keep the floating sidebar TOC on wider screens but hide the inline/collapsed TOC on narrow displays, you can disable it globally in your <a href="../configuration/#show_toc_inline">configuration</a> or set the <code>show_toc_inline</code> property to <code>false</code> in the post's frontmatter:
+  <div class="highlight"><pre><span></span><code><span class="nt">show_toc_inline</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</code></pre></div></li>
+<li>The links target the automatically generated heading IDs (see <a href="#heading-ids-and-anchor-links">Heading IDs and anchor links</a> above).</li>
+<li>The generated list is automatically nested based on heading levels (e.g., <code>###</code> headings are nested under <code>##</code> headings).</li>
+<li>The table of contents is pre-styled to match your blog's theme, with hover effects and responsive indentation.</li>
+</ul>
 <h3 id="markdown-inside-html-tags">Markdown inside HTML tags</h3>
 <p>By default, Markdown inside raw HTML blocks is left as-is and is not processed
 further. If you want Markdown to be parsed inside an HTML element, add

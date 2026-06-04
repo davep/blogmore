@@ -684,6 +684,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#show_toc" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_toc</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show_toc_inline" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_toc_inline</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1180,6 +1202,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#show_toc" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_toc</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show_toc_inline" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>show_toc_inline</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1318,6 +1362,14 @@ You can find me on [<span class="nt">GitHub</span>](<span class="na">https://git
 <h4 id="twitter_site"><code>twitter_site</code></h4>
 <p>The Twitter/X handle of the site. Used in Twitter Card meta tags.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">twitter_site</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;@my_blog&quot;</span>
+</code></pre></div>
+<h4 id="show_toc"><code>show_toc</code></h4>
+<p>Whether to show the Table of Contents for this page. If not specified, this defaults to the global <a href="../configuration/#show_toc"><code>show_toc</code></a> setting in your configuration (which itself defaults to <code>true</code>). Set to <code>false</code> to hide the Table of Contents on this specific page even if it contains headings, or to <code>true</code> to show it.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">show_toc</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</code></pre></div>
+<h4 id="show_toc_inline"><code>show_toc_inline</code></h4>
+<p>Whether to show the inline/collapsed Table of Contents on narrow screens for this page. If not specified, this defaults to the global <a href="../configuration/#show_toc_inline"><code>show_toc_inline</code></a> setting in your configuration (which itself defaults to <code>true</code>). Set to <code>false</code> to hide the inline Table of Contents on narrow displays for this specific page (while still showing the floating sidebar Table of Contents on wider displays, provided <code>show_toc</code> is enabled).</p>
+<div class="highlight"><pre><span></span><code><span class="nt">show_toc_inline</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </code></pre></div>
 <h2 id="the-special-case-of-404md">The special case of <code>404.md</code></h2>
 <p>Many hosting services, including GitHub Pages, support a custom 404 page that is shown whenever a visitor tries to access a URL that doesn't exist on your site. BlogMore has built-in support for this.</p>
