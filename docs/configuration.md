@@ -213,6 +213,22 @@ include_drafts: false
 include_drafts: true
 ```
 
+#### `show_toc`
+
+Whether to show the Table of Contents on posts by default. This sets the global default for all posts. It can be overridden per-post by setting `show_toc: true` or `show_toc: false` in individual post frontmatter.
+
+**Type:** Boolean  
+**Default:** `true`
+
+```yaml
+show_toc: true
+```
+
+```yaml
+# Disable Table of Contents globally by default
+show_toc: false
+```
+
 #### `clean_first`
 
 Remove the output directory before generating the site. Ensures no stale files remain from previous builds.

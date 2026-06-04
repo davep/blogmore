@@ -37,6 +37,10 @@ site_url: "https://example.com"
 # Optional: Include posts marked as drafts (default: false)
 include_drafts: false
 
+# Optional: Whether to show the Table of Contents on posts by default (default: true)
+# Can be overridden per-post with show_toc: true/false in frontmatter.
+show_toc: true
+
 # Optional: Remove the output directory before generating the site (default: false)
 clean_first: false
 

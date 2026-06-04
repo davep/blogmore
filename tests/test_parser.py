@@ -1176,6 +1176,23 @@ This post has [an external link](https://external.com) and
         assert post_disabled.show_toc is False
         assert post_disabled.has_toc is False
 
+        # Test with custom default_show_toc=False
+        parser_disabled_by_default = PostParser(default_show_toc=False)
+        post_default_disabled = parser_disabled_by_default.parse_file(
+            post_with_headings
+        )
+        assert post_default_disabled.show_toc is False
+        assert post_default_disabled.has_toc is False
+
+        # Post with show_toc: true overriding the default False
+        post_override_true = tmp_path / "override-true.md"
+        post_override_true.write_text(
+            "---\ntitle: Override True\nshow_toc: true\n---\n\n# Heading 1\nContent\n"
+        )
+        post_override = parser_disabled_by_default.parse_file(post_override_true)
+        assert post_override.show_toc is True
+        assert post_override.has_toc is True
+
         # Post with no headings (should have an empty/meaningless TOC)
         post_no_headings = tmp_path / "no-headings.md"
         post_no_headings.write_text(

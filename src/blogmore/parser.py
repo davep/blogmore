@@ -423,6 +423,7 @@ class PostParser:
         site_url: str | None = None,
         image_manager: Any = None,
         content_dir: Path | None = None,
+        default_show_toc: bool = True,
     ) -> None:
         """Initialize the parser with markdown extensions.
 
@@ -430,10 +431,12 @@ class PostParser:
             site_url: Optional base URL of the site for determining internal vs external links
             image_manager: Optional ImageManager instance for image optimisation.
             content_dir: Optional content directory for image optimisation.
+            default_show_toc: Whether to show the Table of Contents on posts by default.
         """
         self.site_url = site_url or ""
         self.image_manager = image_manager
         self.content_dir = content_dir
+        self.default_show_toc = default_show_toc
 
     @property
     def markdown(self) -> markdown.Markdown:
@@ -611,7 +614,10 @@ class PostParser:
         draft = bool(post_data.get("draft", False))
 
         # Check show_toc status
-        show_toc = bool(post_data.get("show_toc", True))
+        raw_show_toc = post_data.get("show_toc")
+        show_toc = (
+            bool(raw_show_toc) if raw_show_toc is not None else self.default_show_toc
+        )
 
         # Convert markdown to HTML
         try:

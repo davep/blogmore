@@ -175,7 +175,7 @@ This key only has an effect when the comment invitation feature is enabled (eith
 
 #### `show_toc`
 
-Whether to show the Table of Contents for this post. Set to `true` by default. Set to `false` to hide the Table of Contents on this specific post even if it contains headings.
+Whether to show the Table of Contents for this post. If not specified, this defaults to the global [`show_toc`](configuration.md#show_toc) setting in your configuration (which itself defaults to `true`). Set to `false` to hide the Table of Contents on this specific post even if it contains headings, or to `true` to show it even if disabled globally.
 
 ```yaml
 show_toc: false
@@ -398,7 +398,7 @@ BlogMore automatically scans your post for all headings (`#` through `######`) a
 
 - **Sidebar & Responsive TOC:** By default, on desktop displays, a floating, sticky Table of Contents is shown in the right-hand margin of the page. On smaller mobile screens, this TOC is presented inline at the top of the post under a collapsible accordion.
 - **Manual TOC:** You can also insert the TOC manually at a specific place inside the post content by placing `[TOC]` on its own line.
-- **Disabling the TOC:** If you have headings but do not want a Table of Contents to be displayed at all (neither floating nor inline), you can set the `show_toc` property to `false` in the post's frontmatter:
+- **Disabling the TOC:** If you have headings but do not want a Table of Contents to be displayed at all (neither floating nor inline), you can disable it globally in your [configuration](configuration.md#show_toc) or set the `show_toc` property to `false` in the post's frontmatter:
   ```yaml
   show_toc: false
   ```
