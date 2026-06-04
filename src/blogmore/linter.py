@@ -34,7 +34,11 @@ class Linter:
             site_config: The site configuration.
         """
         self.site_config = site_config
-        self.parser = PostParser(site_url=site_config.site_url)
+        self.parser = PostParser(
+            site_url=site_config.site_url,
+            default_show_toc=site_config.show_toc,
+            default_show_toc_inline=site_config.show_toc_inline,
+        )
         self.errors = 0
         self.warnings = 0
 

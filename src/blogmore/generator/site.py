@@ -76,6 +76,8 @@ class SiteGenerator:
             site_url=self.site_config.site_url,
             image_manager=self.image_manager,
             content_dir=content_dir,
+            default_show_toc=self.site_config.show_toc,
+            default_show_toc_inline=self.site_config.show_toc_inline,
         )
         self.renderer = TemplateRenderer(
             self.site_config.templates_dir,

@@ -173,6 +173,23 @@ invite_comments_to: "specific-address@example.com"
 
 This key only has an effect when the comment invitation feature is enabled (either globally via [`invite_comments`](configuration.md#invite_comments) or via the per-post `invite_comments` front-matter key above).
 
+#### `show_toc`
+
+Whether to show the Table of Contents for this post. If not specified, this defaults to the global [`show_toc`](configuration.md#show_toc) setting in your configuration (which itself defaults to `true`). Set to `false` to hide the Table of Contents on this specific post even if it contains headings, or to `true` to show it even if disabled globally.
+
+```yaml
+show_toc: false
+```
+
+#### `show_toc_inline`
+
+Whether to show the inline/collapsed Table of Contents on narrow screens for this post. If not specified, this defaults to the global [`show_toc_inline`](configuration.md#show_toc_inline) setting in your configuration (which itself defaults to `true`). Set to `false` to hide the inline Table of Contents on narrow displays for this specific post (while still showing the floating sidebar Table of Contents on wider displays, provided `show_toc` is enabled).
+
+```yaml
+show_toc_inline: false
+```
+
+
 ### Date formats
 
 BlogMore accepts dates in several formats:
@@ -386,8 +403,18 @@ Here is an overview of what we will cover:
 
 #### How it works
 
-BlogMore automatically scans your post for all headings (`#` through `######`) and generates a nested list of links in place of the `[TOC]` marker. 
+BlogMore automatically scans your post for all headings (`#` through `######`) and generates a Table of Contents.
 
+- **Sidebar & Responsive TOC:** By default, on desktop displays, a floating, sticky Table of Contents is shown in the right-hand margin of the page. On smaller mobile screens, this TOC is presented inline at the top of the post under a collapsible accordion.
+- **Manual TOC:** You can also insert the TOC manually at a specific place inside the post content by placing `[TOC]` on its own line.
+- **Disabling the TOC:** If you have headings but do not want a Table of Contents to be displayed at all (neither floating nor inline), you can disable it globally in your [configuration](configuration.md#show_toc) or set the `show_toc` property to `false` in the post's frontmatter:
+  ```yaml
+  show_toc: false
+  ```
+- **Disabling the inline TOC only:** If you want to keep the floating sidebar TOC on wider screens but hide the inline/collapsed TOC on narrow displays, you can disable it globally in your [configuration](configuration.md#show_toc_inline) or set the `show_toc_inline` property to `false` in the post's frontmatter:
+  ```yaml
+  show_toc_inline: false
+  ```
 - The links target the automatically generated heading IDs (see [Heading IDs and anchor links](#heading-ids-and-anchor-links) above).
 - The generated list is automatically nested based on heading levels (e.g., `###` headings are nested under `##` headings).
 - The table of contents is pre-styled to match your blog's theme, with hover effects and responsive indentation.

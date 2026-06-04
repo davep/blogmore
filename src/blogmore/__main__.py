@@ -225,7 +225,11 @@ def main() -> int:
         try:
             from blogmore.parser import PostParser
 
-            post_parser = PostParser(site_url=site_config.site_url)
+            post_parser = PostParser(
+                site_url=site_config.site_url,
+                default_show_toc=site_config.show_toc,
+                default_show_toc_inline=site_config.show_toc_inline,
+            )
             posts = post_parser.parse_directory(args.content_dir, include_drafts=True)
             for post in posts:
                 if post.draft:
@@ -254,7 +258,11 @@ def main() -> int:
             from blogmore.generator.paths import resolve_post_output_paths
             from blogmore.parser import PostParser
 
-            post_parser = PostParser(site_url=site_config.site_url)
+            post_parser = PostParser(
+                site_url=site_config.site_url,
+                default_show_toc=site_config.show_toc,
+                default_show_toc_inline=site_config.show_toc_inline,
+            )
             posts = post_parser.parse_directory(
                 args.content_dir,
                 include_drafts=site_config.include_drafts,
@@ -319,7 +327,11 @@ def main() -> int:
                 from blogmore.links import dump_external_links
                 from blogmore.parser import PostParser
 
-                post_parser = PostParser(site_url=site_config.site_url)
+                post_parser = PostParser(
+                    site_url=site_config.site_url,
+                    default_show_toc=site_config.show_toc,
+                    default_show_toc_inline=site_config.show_toc_inline,
+                )
                 posts = post_parser.parse_directory(
                     args.content_dir, include_drafts=site_config.include_drafts
                 )
@@ -334,7 +346,11 @@ def main() -> int:
                 from blogmore.links import check_external_links
                 from blogmore.parser import PostParser
 
-                post_parser = PostParser(site_url=site_config.site_url)
+                post_parser = PostParser(
+                    site_url=site_config.site_url,
+                    default_show_toc=site_config.show_toc,
+                    default_show_toc_inline=site_config.show_toc_inline,
+                )
                 posts = post_parser.parse_directory(
                     args.content_dir, include_drafts=site_config.include_drafts
                 )

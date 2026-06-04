@@ -19,6 +19,28 @@
         <a class="u-url" href="{{ page.url }}" style="display:none;">Permalink</a>
     </header>
     
+    {% if page.has_toc and page.show_toc_inline %}
+    <!-- Mobile/Tablet Table of Contents (Inline, Collapsible) -->
+    <aside class="post-toc-container-mobile">
+        <details class="post-toc-details">
+            <summary class="post-toc-summary">Table of Contents</summary>
+            <nav class="post-toc" aria-label="Page table of contents">
+                {{ page.toc_html|safe }}
+            </nav>
+        </details>
+    </aside>
+    {% endif %}
+
+    {% if page.has_toc %}
+    <!-- Desktop Table of Contents (Floating, Sticky) -->
+    <aside class="post-toc-container-desktop">
+        <div class="post-toc-title">Table of Contents</div>
+        <nav class="post-toc" aria-label="Page table of contents">
+            {{ page.toc_html|safe }}
+        </nav>
+    </aside>
+    {% endif %}
+
     <div class="e-content page-content post-content">
         {{ page.html_content|safe }}
     </div>
