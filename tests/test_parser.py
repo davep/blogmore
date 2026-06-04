@@ -1306,3 +1306,48 @@ This post has [an external link](https://external.com) and
         assert "<li>" not in post_empty.toc_html
         assert post_empty.show_toc is True
         assert post_empty.has_toc is False
+
+    def test_parse_redirect_from_post(self, tmp_path: Path) -> None:
+        """Test that redirect_from list/string is parsed correctly for posts."""
+        parser = PostParser()
+        post_file = tmp_path / "redirect-post.md"
+        post_file.write_text(
+            "---\n"
+            "title: Post with Redirects\n"
+            "date: 2024-01-01\n"
+            "redirect_from:\n"
+            "  - /old-path/1\n"
+            "  - /old-path/2.html\n"
+            "---\n"
+            "Content"
+        )
+        post = parser.parse_file(post_file)
+        assert post.redirect_from == ["/old-path/1", "/old-path/2.html"]
+
+        post_file_str = tmp_path / "redirect-post-str.md"
+        post_file_str.write_text(
+            "---\n"
+            "title: Post with Redirect Str\n"
+            "date: 2024-01-01\n"
+            "redirect_from: /old-path/3\n"
+            "---\n"
+            "Content"
+        )
+        post_str = parser.parse_file(post_file_str)
+        assert post_str.redirect_from == ["/old-path/3"]
+
+    def test_parse_redirect_from_page(self, tmp_path: Path) -> None:
+        """Test that redirect_from list/string is parsed correctly for pages."""
+        parser = PostParser()
+        page_file = tmp_path / "redirect-page.md"
+        page_file.write_text(
+            "---\n"
+            "title: Page with Redirects\n"
+            "redirect_from:\n"
+            "  - /old-page/1\n"
+            "  - /old-page/2.html\n"
+            "---\n"
+            "Content"
+        )
+        page = parser.parse_page(page_file)
+        assert page.redirect_from == ["/old-page/1", "/old-page/2.html"]

@@ -174,6 +174,9 @@ class Post:
     show_toc_inline: bool = True
     """Whether to show the inline/collapsed Table of Contents on narrow screens (enabled by default)."""
 
+    redirect_from: list[str] = field(default_factory=list, repr=False, compare=False)
+    """List of URL paths that should redirect to this post."""
+
     @property
     def has_toc(self) -> bool:
         """Check if the post has a non-empty Table of Contents.
@@ -385,6 +388,9 @@ class Page:
 
     show_toc_inline: bool = True
     """Whether to show the inline/collapsed Table of Contents on narrow screens (enabled by default)."""
+
+    redirect_from: list[str] = field(default_factory=list, repr=False, compare=False)
+    """List of URL paths that should redirect to this page."""
 
     @property
     def has_toc(self) -> bool:
@@ -657,6 +663,26 @@ class PostParser:
             else self.default_show_toc_inline
         )
 
+        # Extract redirect_from
+        raw_redirect_from = post_data.get("redirect_from", [])
+        if raw_redirect_from is None:
+            redirect_from: list[str] = []
+        elif isinstance(raw_redirect_from, str):
+            redirect_from = [
+                r.strip() for r in raw_redirect_from.split(",") if r.strip()
+            ]
+        elif isinstance(raw_redirect_from, list):
+            redirect_from = [
+                str(r).strip() for r in raw_redirect_from if str(r).strip()
+            ]
+        else:
+            raise ValueError(
+                f"Post 'redirect_from' in frontmatter must be a string or list in: {path}\n"
+                f"  Found: {raw_redirect_from!r} (type: {type(raw_redirect_from).__name__})\n"
+                f"  Fix: wrap the value in quotes or brackets, e.g. "
+                f" redirect_from: '/old-url'  or  redirect_from: [/old-url1, /old-url2]"
+            )
+
         # Convert markdown to HTML
         try:
             # If the optimised images extension is active, tell it which
@@ -683,6 +709,7 @@ class PostParser:
             toc_html=toc_html,
             show_toc=show_toc,
             show_toc_inline=show_toc_inline,
+            redirect_from=redirect_from,
         )
 
     def parse_directory(
@@ -769,6 +796,26 @@ class PostParser:
             else self.default_show_toc_inline
         )
 
+        # Extract redirect_from
+        raw_redirect_from = page_data.get("redirect_from", [])
+        if raw_redirect_from is None:
+            redirect_from: list[str] = []
+        elif isinstance(raw_redirect_from, str):
+            redirect_from = [
+                r.strip() for r in raw_redirect_from.split(",") if r.strip()
+            ]
+        elif isinstance(raw_redirect_from, list):
+            redirect_from = [
+                str(r).strip() for r in raw_redirect_from if str(r).strip()
+            ]
+        else:
+            raise ValueError(
+                f"Page 'redirect_from' in frontmatter must be a string or list in: {path}\n"
+                f"  Found: {raw_redirect_from!r} (type: {type(raw_redirect_from).__name__})\n"
+                f"  Fix: wrap the value in quotes or brackets, e.g. "
+                f" redirect_from: '/old-url'  or  redirect_from: [/old-url1, /old-url2]"
+            )
+
         # Convert markdown to HTML
         try:
             # If the optimised images extension is active, tell it which
@@ -791,6 +838,7 @@ class PostParser:
             toc_html=toc_html,
             show_toc=show_toc,
             show_toc_inline=show_toc_inline,
+            redirect_from=redirect_from,
         )
 
     def parse_pages_directory(self, directory: Path) -> list[Page]:

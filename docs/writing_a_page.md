@@ -128,6 +128,27 @@ Whether to show the inline/collapsed Table of Contents on narrow screens for thi
 show_toc_inline: false
 ```
 
+#### `redirect_from`
+
+A list of URL paths (or a single URL path) that should redirect to this page. Fallback HTML redirection files containing a `<meta http-equiv="refresh" content="0; url=...">` redirect and a canonical link tag will be written at these alias paths during the build process.
+
+If the redirect path ends with a slash or has no extension, it will be treated as a directory and write an `index.html` file inside it. If it has a file extension (e.g. `.html` or `.htm`), it will write that file directly.
+
+Examples:
+
+```yaml
+# Redirect from legacy URLs
+redirect_from:
+  - /old-page/path
+  - /old-page/file.html
+```
+
+Or a single path:
+
+```yaml
+redirect_from: /old-page-slug
+```
+
 
 ## The special case of `404.md`
 

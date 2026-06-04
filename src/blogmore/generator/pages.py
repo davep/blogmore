@@ -126,6 +126,13 @@ class PageGenerator:
         html = self.renderer.render_post(post, **context)
         write_html(output_path, html, self.site_config.minify_html)
 
+        if post.redirect_from:
+            self._write_redirects(
+                post.redirect_from,
+                target_url=post.url,
+                canonical_url=context["canonical_url"],
+            )
+
     def generate_page(self, page: Page, pages: list[Page], output_path: Path) -> None:
         """Generate a single static page.
 
@@ -142,6 +149,13 @@ class PageGenerator:
 
         html = self.renderer.render_page(page, **context)
         write_html(output_path, html, self.site_config.minify_html)
+
+        if page.redirect_from:
+            self._write_redirects(
+                page.redirect_from,
+                target_url=page.url,
+                canonical_url=context["canonical_url"],
+            )
 
     def generate_404_page(self, page: Page, pages: list[Page]) -> None:
         """Generate the custom 404 page in the root of the output directory.
@@ -241,3 +255,48 @@ class PageGenerator:
             posts, page=1, total_pages=1, base_path="/archive", **context
         )
         write_html(output_path, html, self.site_config.minify_html)
+
+    def _write_redirects(
+        self, redirect_from: list[str], target_url: str, canonical_url: str
+    ) -> None:
+        """Write redirect files for the given alias paths.
+
+        Args:
+            redirect_from: List of alias URL paths.
+            target_url: Destination relative URL path for the redirection.
+            canonical_url: Fully-qualified canonical URL for the link tag.
+        """
+        for alias in redirect_from:
+            alias = alias.strip()
+            if not alias:
+                continue
+
+            clean_path = alias.lstrip("/")
+            if not clean_path:
+                continue
+
+            path_obj = Path(clean_path)
+
+            # Determine output file path based on directory or file form
+            if alias.endswith("/") or not path_obj.suffix:
+                output_path = self.site_config.output_dir / clean_path / "index.html"
+            else:
+                output_path = self.site_config.output_dir / clean_path
+
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+
+            html = (
+                f"<!DOCTYPE html>\n"
+                f"<html>\n"
+                f"<head>\n"
+                f'    <meta charset="utf-8">\n'
+                f"    <title>Redirecting...</title>\n"
+                f'    <link rel="canonical" href="{canonical_url}">\n'
+                f'    <meta http-equiv="refresh" content="0; url={target_url}">\n'
+                f"</head>\n"
+                f"<body>\n"
+                f'    <p>Redirecting to <a href="{target_url}">{target_url}</a>...</p>\n'
+                f"</body>\n"
+                f"</html>\n"
+            )
+            write_html(output_path, html, self.site_config.minify_html)
