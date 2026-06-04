@@ -51,6 +51,7 @@ def test_redirect_generation(tmp_path: Path) -> None:
             content_dir=content_dir,
             output_dir=output_dir,
             site_url="https://example.com",
+            with_sitemap=True,
         )
     )
     generator.generate()
@@ -116,3 +117,17 @@ def test_redirect_generation(tmp_path: Path) -> None:
     assert (
         '<link rel="canonical" href="https://example.com/redirect-page.html">' in html5
     )
+
+    # Verify that the redirect URLs are not in the sitemap
+    sitemap_path = output_dir / "sitemap.xml"
+    assert sitemap_path.exists()
+    sitemap_content = sitemap_path.read_text()
+    assert "old-post/path" not in sitemap_content
+    assert "old-post/path-with-slash" not in sitemap_content
+    assert "old-post/file.html" not in sitemap_content
+    assert "old-page/path" not in sitemap_content
+    assert "old-page/file.html" not in sitemap_content
+
+    # The actual post and page URLs should be in the sitemap
+    assert "2024/01/01/redirect-post.html" in sitemap_content
+    assert "redirect-page.html" in sitemap_content
