@@ -315,7 +315,9 @@ class SiteGenerator:
 
         if self.site_config.with_sitemap:
             with timed_step("Generating XML sitemap..."):
-                feature_gen.generate_sitemap(asset_manager.extras_html_paths)
+                feature_gen.generate_sitemap(
+                    asset_manager.extras_html_paths, posts, pages
+                )
 
         if self.image_manager:
             with timed_step("Deploying optimised responsive images..."):

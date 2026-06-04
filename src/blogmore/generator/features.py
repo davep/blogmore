@@ -254,17 +254,49 @@ class FeatureGenerator:
         if default_page.exists() and default_page != stale_page:
             default_page.unlink()
 
-    def generate_sitemap(self, extras_html_paths: frozenset[str]) -> None:
+    def generate_sitemap(
+        self,
+        extras_html_paths: frozenset[str],
+        posts: list[Post],
+        pages: list[Page],
+    ) -> None:
         """Generate the XML sitemap file.
 
         Args:
             extras_html_paths: Relative paths of HTML files copied from extras.
+            posts: All posts, used to extract redirect aliases.
+            pages: All pages, used to extract redirect aliases.
         """
+        from pathlib import Path
+
+        redirect_paths: set[str] = set()
+        items: list[Post | Page] = []
+        items.extend(posts)
+        items.extend(pages)
+
+        for item in items:
+            for alias in item.redirect_from:
+                alias = alias.strip()
+                if not alias:
+                    continue
+                clean_path = alias.lstrip("/")
+                if not clean_path:
+                    continue
+                path_obj = Path(clean_path)
+                rel_path = (
+                    (path_obj / "index.html").as_posix()
+                    if alias.endswith("/") or not path_obj.suffix
+                    else path_obj.as_posix()
+                )
+                redirect_paths.add(rel_path)
+
+        excluded_paths = extras_html_paths | frozenset(redirect_paths)
+
         write_sitemap(
             self.site_config.output_dir,
             self.site_config.site_url,
             clean_urls=self.site_config.clean_urls,
             search_path=self.site_config.search_path,
-            extra_excluded_paths=extras_html_paths,
+            extra_excluded_paths=excluded_paths,
             extra_urls=self.site_config.sitemap_extras,
         )

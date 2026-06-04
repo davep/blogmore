@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added support for URL aliases and path redirects using a `redirect_from`
+  list in post/page frontmatter.
+  ([#590](https://github.com/davep/blogmore/pull/590))
+
 ## v2.38.0
 
 **Released: 2026-06-04**
