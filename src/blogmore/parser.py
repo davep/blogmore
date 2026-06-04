@@ -377,6 +377,30 @@ class Page:
     url_path: str | None = field(default=None, repr=False, compare=False)
     """Pre-resolved custom URL path for this page, or `None` to use the default URL pattern."""
 
+    toc_html: str = field(default="", repr=False, compare=False)
+    """The HTML content of the Table of Contents."""
+
+    show_toc: bool = True
+    """Whether to show the Table of Contents on this page (enabled by default)."""
+
+    show_toc_inline: bool = True
+    """Whether to show the inline/collapsed Table of Contents on narrow screens (enabled by default)."""
+
+    @property
+    def has_toc(self) -> bool:
+        """Check if the page has a non-empty Table of Contents.
+
+        Returns:
+            True if the page has headings, the toc_html is not empty, and
+            show_toc is True.
+        """
+        if not self.show_toc:
+            return False
+        stripped = self.toc_html.strip()
+        if not stripped:
+            return False
+        return "<li>" in stripped
+
     @property
     def slug(self) -> str:
         """Generate a URL slug from the page filename."""
@@ -731,9 +755,30 @@ class PostParser:
                 f"  Fix: wrap the value in quotes, e.g.  title: 'My Page Title'"
             )
 
+        # Check show_toc status
+        raw_show_toc = page_data.get("show_toc")
+        show_toc = (
+            bool(raw_show_toc) if raw_show_toc is not None else self.default_show_toc
+        )
+
+        # Check show_toc_inline status
+        raw_show_toc_inline = page_data.get("show_toc_inline")
+        show_toc_inline = (
+            bool(raw_show_toc_inline)
+            if raw_show_toc_inline is not None
+            else self.default_show_toc_inline
+        )
+
         # Convert markdown to HTML
         try:
+            # If the optimised images extension is active, tell it which
+            # directory we are currently in so it can resolve relative images.
+            for ext in self.markdown.registeredExtensions:
+                if hasattr(ext, "set_base_dir"):
+                    ext.set_base_dir(path.parent)
+
             html_content = self.markdown.convert(page_data.content)
+            toc_html = getattr(self.markdown, "toc", "")
         finally:
             self.markdown.reset()
 
@@ -743,6 +788,9 @@ class PostParser:
             content=page_data.content,
             html_content=html_content,
             metadata=dict(page_data.metadata),
+            toc_html=toc_html,
+            show_toc=show_toc,
+            show_toc_inline=show_toc_inline,
         )
 
     def parse_pages_directory(self, directory: Path) -> list[Page]:

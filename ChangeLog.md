@@ -8,15 +8,11 @@
   categories, external links, word counts, lifespan, streaks) with commas
   when they run into the thousands.
   ([#586](https://github.com/davep/blogmore/pull/586))
-- Added a responsive table of contents display, which floats to the right on
-  wider displays, or as a collapsible inline list on narrow displays. Also
-  added support for a `show_toc` frontmatter property (on by default).
+- Added a responsive table of contents display to posts and pages, which
+  floats to the right on wider displays, or as a collapsible inline list on
+  narrow displays. Also added support for `show_toc` and `show_toc_inline`
+  frontmatter properties (on by default).
   ([#588](https://github.com/davep/blogmore/pull/588))
-- Added support for a `show_toc_inline` configuration option and frontmatter
-  property (on by default) to control whether the inline collapsible Table of
-  Contents appears on narrow displays when `show_toc` is enabled.
-  ([#589](https://github.com/davep/blogmore/pull/589))
-
 
 ## v2.37.0
 

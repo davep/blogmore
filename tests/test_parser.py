@@ -1141,6 +1141,72 @@ This post has [an external link](https://external.com) and
         assert "9:00am" in page.html_content
         assert "This is paragraph two." in page.html_content
 
+    def test_page_toc_generation(self, tmp_path: Path) -> None:
+        """Test that Table of Contents (TOC) is parsed and has_toc works correctly on Pages."""
+        parser = PostParser()
+
+        # Page with headings (should have a TOC)
+        page_with_headings = tmp_path / "page-with-headings.md"
+        page_with_headings.write_text(
+            "---\ntitle: Page with Headings\n---\n\n"
+            "# Heading 1\n"
+            "Some content.\n\n"
+            "## Heading 2\n"
+            "More content.\n"
+        )
+        page = parser.parse_page(page_with_headings)
+        assert page.toc_html != ""
+        assert "<li>" in page.toc_html
+        assert "heading-1" in page.toc_html
+        assert "heading-2" in page.toc_html
+        assert page.show_toc is True
+        assert page.show_toc_inline is True
+        assert page.has_toc is True
+
+        # Page with headings but show_toc: false (should not have TOC shown)
+        page_show_toc_false = tmp_path / "page-show-toc-false.md"
+        page_show_toc_false.write_text(
+            "---\ntitle: Page with show_toc False\nshow_toc: false\n---\n\n"
+            "# Heading 1\n"
+            "Some content.\n\n"
+            "## Heading 2\n"
+            "More content.\n"
+        )
+        page_disabled = parser.parse_page(page_show_toc_false)
+        assert page_disabled.toc_html != ""  # Markdown generates it internally
+        assert page_disabled.show_toc is False
+        assert page_disabled.show_toc_inline is True
+        assert page_disabled.has_toc is False
+
+        # Page with show_toc_inline: false
+        page_show_toc_inline_false = tmp_path / "page-show-toc-inline-false.md"
+        page_show_toc_inline_false.write_text(
+            "---\ntitle: Page with show_toc_inline False\nshow_toc_inline: false\n---\n\n"
+            "# Heading 1\n"
+        )
+        page_inline_disabled = parser.parse_page(page_show_toc_inline_false)
+        assert page_inline_disabled.show_toc is True
+        assert page_inline_disabled.show_toc_inline is False
+        assert page_inline_disabled.has_toc is True
+
+        # Test with custom default_show_toc=False
+        parser_disabled_by_default = PostParser(default_show_toc=False)
+        page_default_disabled = parser_disabled_by_default.parse_page(
+            page_with_headings
+        )
+        assert page_default_disabled.show_toc is False
+        assert page_default_disabled.show_toc_inline is True
+        assert page_default_disabled.has_toc is False
+
+        # Test with custom default_show_toc_inline=False
+        parser_inline_disabled_by_default = PostParser(default_show_toc_inline=False)
+        page_default_inline_disabled = parser_inline_disabled_by_default.parse_page(
+            page_with_headings
+        )
+        assert page_default_inline_disabled.show_toc is True
+        assert page_default_inline_disabled.show_toc_inline is False
+        assert page_default_inline_disabled.has_toc is True
+
     def test_post_toc_generation(self, tmp_path: Path) -> None:
         """Test that Table of Contents (TOC) is parsed and has_toc works correctly."""
         parser = PostParser()

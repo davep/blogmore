@@ -112,6 +112,23 @@ The Twitter/X handle of the site. Used in Twitter Card meta tags.
 twitter_site: "@my_blog"
 ```
 
+#### `show_toc`
+
+Whether to show the Table of Contents for this page. If not specified, this defaults to the global [`show_toc`](configuration.md#show_toc) setting in your configuration (which itself defaults to `true`). Set to `false` to hide the Table of Contents on this specific page even if it contains headings, or to `true` to show it.
+
+```yaml
+show_toc: false
+```
+
+#### `show_toc_inline`
+
+Whether to show the inline/collapsed Table of Contents on narrow screens for this page. If not specified, this defaults to the global [`show_toc_inline`](configuration.md#show_toc_inline) setting in your configuration (which itself defaults to `true`). Set to `false` to hide the inline Table of Contents on narrow displays for this specific page (while still showing the floating sidebar Table of Contents on wider displays, provided `show_toc` is enabled).
+
+```yaml
+show_toc_inline: false
+```
+
+
 ## The special case of `404.md`
 
 Many hosting services, including GitHub Pages, support a custom 404 page that is shown whenever a visitor tries to access a URL that doesn't exist on your site. BlogMore has built-in support for this.

@@ -238,6 +238,10 @@ be misleading.
 | `slug` | `str` (property) | URL slug derived from filename. |
 | `url` | `str` (property) | URL path (e.g. `/about.html`). |
 | `description` | `str` (property) | Page description (from metadata or first paragraph). |
+| `toc_html` | `str` | Rendered HTML block containing the page's Table of Contents. |
+| `show_toc` | `bool` | `True` when the page should display a Table of Contents (can be disabled via frontmatter). |
+| `show_toc_inline` | `bool` | `True` when the page should display the inline Table of Contents on narrow screens (can be disabled via frontmatter). |
+| `has_toc` | `bool` (property) | `True` when the page has a non-empty Table of Contents (i.e. contains headings and `show_toc` is enabled). |
 
 ## Backlink object
 
