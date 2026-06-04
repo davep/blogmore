@@ -41,6 +41,26 @@ class TestStripHtml:
         html = "<p>a &gt; b</p>"
         assert strip_html(html) == "a > b"
 
+    def test_strips_heading_anchors(self) -> None:
+        """Heading anchor elements are stripped entirely, including their pilcrow symbols."""
+        html = (
+            '<h2>My Heading<a aria-label="Link to this heading" '
+            'class="heading-anchor" href="#my-heading">¶</a></h2>'
+        )
+        assert strip_html(html) == "My Heading"
+
+    def test_preserves_legitimate_pilcrows(self) -> None:
+        """Legitimate pilcrow characters in the text are not stripped."""
+        html = (
+            "<p>This paragraph contains a legitimate pilcrow (¶) character.</p>"
+            '<h2>My Heading with ¶<a aria-label="Link to this heading" '
+            'class="heading-anchor" href="#my-heading-with-">¶</a></h2>'
+        )
+        assert (
+            strip_html(html)
+            == "This paragraph contains a legitimate pilcrow (¶) character. My Heading with ¶"
+        )
+
 
 class TestBuildSearchIndex:
     """Tests for build_search_index."""

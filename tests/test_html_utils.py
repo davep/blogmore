@@ -5,6 +5,8 @@ from blogmore.html_utils import (
     count_words_from_html,
     make_urls_absolute,
     normalize_site_url,
+    remove_heading_anchors,
+    simplify_html_for_feeds,
 )
 
 
@@ -215,3 +217,36 @@ class TestMakeUrlsAbsolute:
         html = "<p>Hello world</p>"
         result = make_urls_absolute(html, "https://example.com")
         assert result == html
+
+
+class TestSimplifyHtmlForFeeds:
+    """Test the simplify_html_for_feeds and remove_heading_anchors functions."""
+
+    def test_remove_heading_anchors_basic(self) -> None:
+        """Test that heading anchor elements are removed."""
+        html = (
+            '<h2>My Heading<a aria-label="Link to this heading" '
+            'class="heading-anchor" href="#my-heading">¶</a></h2>'
+        )
+        assert remove_heading_anchors(html) == "<h2>My Heading</h2>"
+
+    def test_remove_heading_anchors_preserves_legitimate_pilcrows(self) -> None:
+        """Test that legitimate pilcrow characters are not removed."""
+        html = (
+            "<p>This is a pilcrow: ¶</p>"
+            '<h3>My Heading with ¶<a aria-label="Link to this heading" '
+            'class="heading-anchor" href="#my-heading-with-">¶</a></h3>'
+        )
+        assert (
+            remove_heading_anchors(html)
+            == "<p>This is a pilcrow: ¶</p><h3>My Heading with ¶</h3>"
+        )
+
+    def test_simplify_html_for_feeds_removes_heading_anchors(self) -> None:
+        """Test that simplify_html_for_feeds strips heading anchor links and processes picture tags."""
+        html = (
+            '<picture><source srcset="img.webp"><img src="img.png"></picture>'
+            '<h2>Title<a class="heading-anchor" href="#title">¶</a></h2>'
+        )
+        # Should replace picture with img, and strip the heading anchor
+        assert simplify_html_for_feeds(html) == '<img src="img.png"><h2>Title</h2>'
