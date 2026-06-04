@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+from blogmore.html_utils import remove_heading_anchors
 from blogmore.parser import Post
 
 
@@ -13,7 +14,8 @@ def strip_html(html_str: str) -> str:
     """Strip HTML tags from a string, returning plain text.
 
     Replaces tags with spaces to preserve word boundaries, then collapses
-    multiple whitespace characters into a single space.
+    multiple whitespace characters into a single space. Heading anchor elements
+    are stripped out entirely to avoid indexing the anchor symbol.
 
     Args:
         html_str: HTML string to strip.
@@ -21,7 +23,8 @@ def strip_html(html_str: str) -> str:
     Returns:
         Plain text without HTML tags.
     """
-    text = re.sub(r"<[^>]+>", " ", html_str)
+    clean_html = remove_heading_anchors(html_str)
+    text = re.sub(r"<[^>]+>", " ", clean_html)
     text = html.unescape(text)
     text = re.sub(r"\s+", " ", text)
     return text.strip()

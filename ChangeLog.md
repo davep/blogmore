@@ -7,6 +7,10 @@
 - Added support for URL aliases and path redirects using a `redirect_from`
   list in post/page frontmatter.
   ([#590](https://github.com/davep/blogmore/pull/590))
+- Fixed heading anchor `¶` characters appearing in RSS/Atom feeds and the
+  client-side search index, while preserving any legitimate pilcrow
+  characters written in the text.
+  ([#593](https://github.com/davep/blogmore/pull/593))
 
 ## v2.38.0
 
