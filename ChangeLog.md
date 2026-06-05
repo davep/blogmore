@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.39.0
 
-**Released: WiP**
+**Released: 2026-06-05**
 
 - Added support for URL aliases and path redirects using a `redirect_from`
   list in post/page frontmatter.
