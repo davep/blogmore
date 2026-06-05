@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.43">
+      <meta name="generator" content="zensical-0.0.44">
     
     
       
@@ -739,6 +739,17 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         <code>show_toc_inline</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#redirect_from" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>redirect_from</code>
       </span>
     </span>
   </a>
@@ -1556,6 +1567,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#redirect_from" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>redirect_from</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1893,6 +1915,18 @@ publication date:</p>
 <h4 id="show_toc_inline"><code>show_toc_inline</code></h4>
 <p>Whether to show the inline/collapsed Table of Contents on narrow screens for this post. If not specified, this defaults to the global <a href="../configuration/#show_toc_inline"><code>show_toc_inline</code></a> setting in your configuration (which itself defaults to <code>true</code>). Set to <code>false</code> to hide the inline Table of Contents on narrow displays for this specific post (while still showing the floating sidebar Table of Contents on wider displays, provided <code>show_toc</code> is enabled).</p>
 <div class="highlight"><pre><span></span><code><span class="nt">show_toc_inline</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</code></pre></div>
+<h4 id="redirect_from"><code>redirect_from</code></h4>
+<p>A list of URL paths (or a single URL path) that should redirect to this post. Fallback HTML redirection files containing a <code>&lt;meta http-equiv="refresh" content="0; url=..."&gt;</code> redirect and a canonical link tag will be written at these alias paths during the build process.</p>
+<p>If the redirect path ends with a slash or has no extension, it will be treated as a directory and write an <code>index.html</code> file inside it. If it has a file extension (e.g. <code>.html</code> or <code>.htm</code>), it will write that file directly.</p>
+<p>Examples:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Redirect from legacy URLs</span>
+<span class="nt">redirect_from</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/2021/05/my-post/</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/old-category/my-post.html</span>
+</code></pre></div>
+<p>Or a single path:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">redirect_from</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/old-post-slug</span>
 </code></pre></div>
 <h3 id="date-formats">Date formats</h3>
 <p>BlogMore accepts dates in several formats:</p>
