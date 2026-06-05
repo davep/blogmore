@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Series: {{ series }} - {{ site_title }}{% endblock %}
+
+{% block meta_tags %}
+{% from '_listing_meta_tags.html' import listing_meta_tags with context %}
+{{ listing_meta_tags("Series: " ~ series ~ " - " ~ site_title) }}
+{% endblock %}
+
+{% from '_pagination.html' import pagination %}
+{% from '_post_summary.html' import post_summary with context %}
+
+{% block content %}
+<div class="series-page">
+    <h1>Posts in series "{{ series }}"</h1>
+    {{ pagination(page, total_pages, pagination_page_urls) }}
+
+    {% if posts %}
+    {% for post in posts %}
+    {{ post_summary(post) }}
+    {% endfor %}
+    {% else %}
+    <p>No posts in this series.</p>
+    {% endif %}
+
+    {{ pagination(page, total_pages, pagination_page_urls) }}
+</div>
+{% endblock %}

@@ -260,6 +260,35 @@ tags: [tutorial, intermediate, decorators]
 
 Visitors can navigate to `/category/python.html` to see all posts in that category, or to `/tag/tutorial.html` to see all posts tagged with `tutorial`.
 
+## Series
+
+If you publish multi-part articles, you can group them into a cohesive series. Series membership is defined using the `series` frontmatter key.
+
+A post can belong to a single series, or to multiple series. 
+
+### Series formats
+
+Like tags, series can be written as a single string (for a single series) or as a list:
+
+```yaml
+# A single series title
+series: Designing a Static Site Generator
+
+# Multiple series (as a YAML list)
+series: [Designing a Static Site Generator, Web Development Basics]
+
+# Multiple series (as a multi-line YAML list)
+series:
+  - Designing a Static Site Generator
+  - Web Development Basics
+```
+
+### Navigation and sorting
+
+Within each series, posts are automatically sorted in chronological order using their original posting date and time (the `date` frontmatter value; the `modified` date has no effect on sorting).
+
+When generating post pages, BlogMore automatically adds a series banner at the top and bottom of each post belonging to a series. This banner displays a message (e.g. `This post is part of the "Designing a Static Site Generator" series`) and provides previous/next navigation links linking to other parts of the series.
+
 ## Markdown features
 
 BlogMore supports standard Markdown plus several extensions. The following sections cover the most useful ones.

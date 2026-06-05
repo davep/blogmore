@@ -266,3 +266,22 @@ def resolve_sidebar_pages(site_config: SiteConfig, pages: list[Page]) -> list[Pa
         for slug in site_config.sidebar_pages
         if slug in pages_by_slug
     ]
+
+
+def resolve_series_url(slug: str, site_config: SiteConfig) -> str:
+    """Compute the URL for a given series slug.
+
+    Args:
+        slug: The series slug.
+        site_config: The site configuration.
+
+    Returns:
+        The URL path for the series.
+    """
+    from blogmore.series_path import resolve_series_path
+
+    relative = resolve_series_path(slug, site_config.series_path)
+    url_path = "/" + relative
+    if site_config.clean_urls:
+        url_path = make_url_clean(url_path)
+    return url_path

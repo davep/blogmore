@@ -371,6 +371,35 @@ class TemplateRenderer:
             **context,
         )
 
+    def render_series_page(
+        self,
+        series: str,
+        posts: list[Post],
+        page: int = 1,
+        total_pages: int = 1,
+        **context: Any,
+    ) -> str:
+        """Render a series page showing posts in a specific series.
+
+        Args:
+            series: The series name to display posts for
+            posts: List of Post objects in this series
+            page: Current page number (1-indexed)
+            total_pages: Total number of pages
+            **context: Additional context variables
+
+        Returns:
+            Rendered HTML string
+        """
+        return self.render_template(
+            "series.html",
+            series=series,
+            posts=posts,
+            page=page,
+            total_pages=total_pages,
+            **context,
+        )
+
     def render_tags_page(
         self,
         tags: list[dict[str, Any]],

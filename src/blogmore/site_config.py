@@ -12,6 +12,7 @@ from blogmore.html_utils import normalize_site_url
 from blogmore.page_path import DEFAULT_PAGE_PATH
 from blogmore.pagination_path import DEFAULT_PAGE_1_PATH, DEFAULT_PAGE_N_PATH
 from blogmore.post_path import DEFAULT_POST_PATH
+from blogmore.series_path import DEFAULT_SERIES_PATH
 
 ##############################################################################
 # Default archive page path (relative to the output directory).
@@ -317,6 +318,14 @@ class SiteConfig:
     """Format string used to determine each static page's output path and URL.
 
     The only available variable placeholder is ``{slug}``, which is required.
+    """
+
+    series_path: str = DEFAULT_SERIES_PATH
+    """Format string used to determine each series's output path and URL.
+
+    The only available variable placeholder is ``{slug}``, which is required.
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``series/{slug}/index.html``.
     """
 
     search_path: str = DEFAULT_SEARCH_PATH

@@ -811,6 +811,47 @@ page_path: "pages/{slug}/index.html"
 clean_urls: true
 ```
 
+#### `series_path`
+
+Format string that controls the output path (and therefore the URL) of every series listing page.  This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** String  
+**Default:** `series/{slug}/index.html`
+
+```yaml
+series_path: "series/{slug}/index.html"
+```
+
+##### How it works
+
+The format string uses a Python-style `{slug}` placeholder that is substituted with the series slug (which is derived by sanitizing the series name).  The result is joined onto the `output` directory, so the path is always relative to your site root.  Any intermediate subdirectories are created automatically.
+
+Pagination pages (pages 2 and above) within that series are placed relative to the parent directory of this path, following the configured `page_n_path` template.
+
+##### Available variables
+
+| Variable | Description                      | Example value |
+|----------|----------------------------------|---------------|
+| `{slug}` | Series slug derived from the series name. **Required.** | `designing-a-static-site-generator` |
+
+##### Safety
+
+BlogMore always ensures the resolved path remains inside the `output` directory.  A `series_path` value containing `..` segments or other path-traversal constructs is detected and rejected at startup with an error message.
+
+##### Examples
+
+Default — each series in its own directory with clean URLs support:
+
+```yaml
+series_path: "series/{slug}/index.html"
+```
+
+Flat series listing pages:
+
+```yaml
+series_path: "series-{slug}.html"
+```
+
 #### `with_advert`
 
 When `true` (the default), a small "Generated with BlogMore vX.Y.Z" line is included in the footer of every page, linking to the BlogMore website. Set this to `false` to suppress the footer line entirely.  This is a **configuration file only** option — it cannot be set on the command line.

@@ -126,6 +126,7 @@ or `/tag/python/` when `clean_urls` is enabled.
 | `tags.html` | `tags` (dict of display name → post list), `pages`, `canonical_url` |
 | `category.html` | `category`, `safe_category`, `all_posts`, `pages`, `prev_page_url`, `next_page_url`, `canonical_url`, `pagination_page_urls` |
 | `categories.html` | `categories` (dict of display name → post list), `pages`, `canonical_url` |
+| `series.html` | `series` (display name), `posts` (list of posts on current page), `page`, `total_pages`, `pages`, `prev_page_url`, `next_page_url`, `canonical_url`, `pagination_page_urls` |
 | `search.html` | `pages`, `canonical_url` |
 | `stats.html` | `stats` (`BlogStats`), `pages`, `canonical_url` |
 | `calendar.html` | `calendar_years` (list of `CalendarYear`), `pages`, `canonical_url` |
@@ -144,6 +145,8 @@ and `next_post`.
 | `date` | `datetime \| None` | Publication date. |
 | `category` | `str \| None` | Category name. |
 | `tags` | `list[str] \| None` | Tag names. |
+| `series` | `list[str]` | Series names the post belongs to. |
+| `series_info` | `list[dict]` | Navigation and URLs for each series the post belongs to (each dict contains `name`, `slug`, `url`, `prev_post`, `next_post`). |
 | `draft` | `bool` | `True` when the post is a draft. |
 | `metadata` | `dict \| None` | Raw front matter dictionary. |
 | `slug` | `str` (property) | URL slug derived from filename. |

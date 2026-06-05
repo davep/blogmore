@@ -150,6 +150,14 @@ class Post:
     tags: list[str] | None = None
     """A list of tags associated with the post, or `None` if not specified."""
 
+    series: list[str] = field(default_factory=list)
+    """A list of series names that the post belongs to."""
+
+    series_info: list[dict[str, Any]] = field(
+        default_factory=list, repr=False, compare=False
+    )
+    """Information about the series this post belongs to, including links and navigation."""
+
     draft: bool = False
     """Whether the post is a draft (hidden in production builds)."""
 
@@ -646,6 +654,23 @@ class PostParser:
                 f" tags: 'my-tag'  or  tags: [tag1, tag2]"
             )
 
+        # Extract series - can be a single string or a list of strings
+        raw_series = post_data.get("series", [])
+        series: list[str] = []
+        if raw_series is None:
+            series = []
+        elif isinstance(raw_series, str):
+            series = [raw_series.strip()] if raw_series.strip() else []
+        elif isinstance(raw_series, list):
+            series = [str(s).strip() for s in raw_series if str(s).strip()]
+        else:
+            raise ValueError(
+                f"Post 'series' in frontmatter must be a string or list in: {path}\n"
+                f"  Found: {raw_series!r} (type: {type(raw_series).__name__})\n"
+                f"  Fix: wrap the value in quotes or brackets, e.g. "
+                f" series: 'My Series'  or  series: [Series1, Series2]"
+            )
+
         # Check draft status
         draft = bool(post_data.get("draft", False))
 
@@ -704,6 +729,7 @@ class PostParser:
             date=date,
             category=category,
             tags=tags,
+            series=series,
             draft=draft,
             metadata=dict(post_data.metadata),
             toc_html=toc_html,

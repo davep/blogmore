@@ -941,6 +941,7 @@ class TestParseSiteConfigFromDict:
         from blogmore.page_path import DEFAULT_PAGE_PATH
         from blogmore.pagination_path import DEFAULT_PAGE_1_PATH, DEFAULT_PAGE_N_PATH
         from blogmore.post_path import DEFAULT_POST_PATH
+        from blogmore.series_path import DEFAULT_SERIES_PATH
         from blogmore.site_config import (
             DEFAULT_ARCHIVE_PATH,
             DEFAULT_CATEGORIES_PATH,
@@ -955,6 +956,7 @@ class TestParseSiteConfigFromDict:
         assert kwargs["page_path"] == DEFAULT_PAGE_PATH
         assert kwargs["page_1_path"] == DEFAULT_PAGE_1_PATH
         assert kwargs["page_n_path"] == DEFAULT_PAGE_N_PATH
+        assert kwargs["series_path"] == DEFAULT_SERIES_PATH
         assert kwargs["search_path"] == DEFAULT_SEARCH_PATH
         assert kwargs["archive_path"] == DEFAULT_ARCHIVE_PATH
         assert kwargs["tags_path"] == DEFAULT_TAGS_PATH
