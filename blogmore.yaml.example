@@ -217,6 +217,16 @@ posts_per_feed: 20
 # The only available placeholder is {slug}, which is required.
 # page_path: "{slug}.html"
 
+# Optional: Custom series URL path format (default: "series/{slug}/index.html")
+# The only available placeholder is {slug}, which is required.
+# Configuration file only.
+# series_path: "series/{slug}/index.html"
+
+# Optional: Custom series index page path (default: "series.html")
+# Controls where the main index of all series is generated.
+# Configuration file only.
+# series_index_path: "series.html"
+
 # Optional: Output path template for the first page of any paginated listing
 # (main index, year/month/day archives, tag pages, category pages).
 # The path is always appended to the end of the section base path being

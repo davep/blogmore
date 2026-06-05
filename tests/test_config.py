@@ -941,10 +941,12 @@ class TestParseSiteConfigFromDict:
         from blogmore.page_path import DEFAULT_PAGE_PATH
         from blogmore.pagination_path import DEFAULT_PAGE_1_PATH, DEFAULT_PAGE_N_PATH
         from blogmore.post_path import DEFAULT_POST_PATH
+        from blogmore.series_path import DEFAULT_SERIES_PATH
         from blogmore.site_config import (
             DEFAULT_ARCHIVE_PATH,
             DEFAULT_CATEGORIES_PATH,
             DEFAULT_SEARCH_PATH,
+            DEFAULT_SERIES_INDEX_PATH,
             DEFAULT_TAGS_PATH,
         )
 
@@ -955,10 +957,12 @@ class TestParseSiteConfigFromDict:
         assert kwargs["page_path"] == DEFAULT_PAGE_PATH
         assert kwargs["page_1_path"] == DEFAULT_PAGE_1_PATH
         assert kwargs["page_n_path"] == DEFAULT_PAGE_N_PATH
+        assert kwargs["series_path"] == DEFAULT_SERIES_PATH
         assert kwargs["search_path"] == DEFAULT_SEARCH_PATH
         assert kwargs["archive_path"] == DEFAULT_ARCHIVE_PATH
         assert kwargs["tags_path"] == DEFAULT_TAGS_PATH
         assert kwargs["categories_path"] == DEFAULT_CATEGORIES_PATH
+        assert kwargs["series_index_path"] == DEFAULT_SERIES_INDEX_PATH
         assert kwargs["sidebar_pages"] is None
         assert kwargs["head"] == []
         assert kwargs["extra_stylesheets"] is None
@@ -1196,14 +1200,16 @@ class TestParseSiteConfigFromDict:
             "archive_path": "also-bad",
             "tags_path": "no-html",
             "categories_path": "",
+            "series_index_path": "not-valid-extension",
         }
         kwargs, errors = parse_site_config_from_dict(config, tmp_path)
 
-        assert len(errors) == 4
+        assert len(errors) == 5
         assert "search_path" not in kwargs
         assert "archive_path" not in kwargs
         assert "tags_path" not in kwargs
         assert "categories_path" not in kwargs
+        assert "series_index_path" not in kwargs
 
     def test_sidebar_pages_via_pages_key(self, tmp_path: Path) -> None:
         """sidebar_pages is read from the YAML 'pages' key."""

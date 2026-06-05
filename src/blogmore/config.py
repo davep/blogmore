@@ -21,12 +21,14 @@ from blogmore.pagination_path import (
     validate_page_n_path_template,
 )
 from blogmore.post_path import DEFAULT_POST_PATH, validate_post_path_template
+from blogmore.series_path import DEFAULT_SERIES_PATH, validate_series_path_template
 from blogmore.site_config import (
     DEFAULT_ARCHIVE_PATH,
     DEFAULT_CALENDAR_PATH,
     DEFAULT_CATEGORIES_PATH,
     DEFAULT_GRAPH_PATH,
     DEFAULT_SEARCH_PATH,
+    DEFAULT_SERIES_INDEX_PATH,
     DEFAULT_STATS_PATH,
     DEFAULT_TAGS_PATH,
     SiteConfig,
@@ -58,6 +60,8 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
         "page_path",
         "page_1_path",
         "page_n_path",
+        "series_path",
+        "series_index_path",
         "search_path",
         "archive_path",
         "tags_path",
@@ -441,6 +445,7 @@ def parse_site_config_from_dict(
         ("page_path", DEFAULT_PAGE_PATH, validate_page_path_template),
         ("page_1_path", DEFAULT_PAGE_1_PATH, validate_page_1_path_template),
         ("page_n_path", DEFAULT_PAGE_N_PATH, validate_page_n_path_template),
+        ("series_path", DEFAULT_SERIES_PATH, validate_series_path_template),
     ]
     for field_name, default, validator in _path_template_validators:
         raw = config.get(field_name, default)
@@ -468,6 +473,7 @@ def parse_site_config_from_dict(
         ("stats_path", DEFAULT_STATS_PATH),
         ("calendar_path", DEFAULT_CALENDAR_PATH),
         ("graph_path", DEFAULT_GRAPH_PATH),
+        ("series_index_path", DEFAULT_SERIES_INDEX_PATH),
     ]
     for field_name, default in _html_path_defaults:
         raw = config.get(field_name, default)

@@ -3028,9 +3028,14 @@ class TestDumpCLI:
     """Test the 'dump' CLI command."""
 
     def test_dump_command(
-        self, tmp_path: Path, capsys: pytest.CaptureFixture[str], temp_output_dir: Path
+        self,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
+        temp_output_dir: Path,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Test dumping posts as JSON with dump command."""
+        monkeypatch.chdir(tmp_path)
         posts_dir = tmp_path / "posts"
         posts_dir.mkdir()
 

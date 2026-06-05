@@ -12,6 +12,7 @@ from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
 from blogmore.generator.grouping import (
     calculate_cloud_font_sizes,
     group_posts_by_category,
+    group_posts_by_series,
     group_posts_by_tag,
 )
 from blogmore.generator.html import write_html
@@ -39,6 +40,8 @@ class ListingGenerator:
     """The number of posts to show per page on category listing pages."""
     POSTS_PER_PAGE_ARCHIVE: Final[int] = 10
     """The number of posts to show per page on date archive listing pages."""
+    POSTS_PER_PAGE_SERIES: Final[int] = 10
+    """The number of posts to show per page on series listing pages."""
 
     def __init__(
         self,
@@ -415,3 +418,106 @@ class ListingGenerator:
                 context=context,
                 render_func=_render_category,
             )
+
+    def generate_series_pages(self, posts: list[Post], pages: list[Page]) -> None:
+        """Generate pages for each series with pagination.
+
+        Args:
+            posts: All published posts.
+            pages: All static pages, for sidebar navigation.
+        """
+        from blogmore.series_path import compute_series_output_path
+
+        posts_by_series = group_posts_by_series(posts)
+
+        for series_lower, (series_display, series_posts) in posts_by_series.items():
+            series_posts.sort(key=post_sort_key)
+            safe_series = sanitize_for_url(series_lower)
+
+            # Determine where the first page is written.
+            page_1_path = compute_series_output_path(
+                self.site_config.output_dir, safe_series, self.site_config.series_path
+            )
+            relative_path = page_1_path.relative_to(self.site_config.output_dir)
+            series_base_dir = self.site_config.output_dir / relative_path.parent
+            base_url = "/" + relative_path.parent.as_posix()
+
+            context = self.context_builder.get_global_context()
+            context["pages"] = pages
+
+            def _render_series(
+                page_posts: list[Post],
+                page_num: int,
+                total_pages: int,
+                _display: str = series_display,
+                _ctx: dict[str, Any] = context,
+            ) -> str:
+                return self.renderer.render_series_page(
+                    _display,
+                    page_posts,
+                    page=page_num,
+                    total_pages=total_pages,
+                    **_ctx,
+                )
+
+            self.generate_paginated_listing(
+                series_posts,
+                base_url=base_url,
+                output_dir=series_base_dir,
+                posts_per_page=self.POSTS_PER_PAGE_SERIES,
+                context=context,
+                render_func=_render_series,
+            )
+
+    def generate_series_index_page(self, posts: list[Post], pages: list[Page]) -> None:
+        """Generate the series overview/index page.
+
+        Args:
+            posts: All published posts.
+            pages: All static pages, for sidebar navigation.
+        """
+        posts_by_series = group_posts_by_series(posts)
+
+        if not posts_by_series:
+            return
+
+        series_data: list[dict[str, Any]] = []
+        for series_lower, (series_display, series_posts) in posts_by_series.items():
+            from blogmore.generator.paths import resolve_series_url
+
+            series_url = resolve_series_url(
+                sanitize_for_url(series_lower), self.site_config
+            )
+            series_data.append(
+                {
+                    "display_name": series_display,
+                    "url": series_url,
+                    "count": len(series_posts),
+                    "reading_time": sum(post.reading_time for post in series_posts),
+                }
+            )
+
+        # Sort alphabetically by title
+        series_data.sort(key=lambda x: str(x["display_name"]).lower())
+
+        context = self.context_builder.get_global_context()
+        context["pages"] = pages
+        output_path = (
+            self.site_config.output_dir / self.site_config.series_index_path.lstrip("/")
+        ).resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        series_index_url = self.context_builder.get_series_index_url()
+        if self.site_config.clean_urls:
+            context["canonical_url"] = (
+                f"{self.site_config.site_url}{series_index_url}"
+                if self.site_config.site_url
+                else series_index_url
+            )
+        else:
+            context["canonical_url"] = canonical_url_for_path(
+                self.site_config, output_path
+            )
+
+        html = self.renderer.render_series_index_page(series_data, **context)
+        write_html(output_path, html, self.site_config.minify_html)

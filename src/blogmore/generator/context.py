@@ -67,6 +67,7 @@ class ContextBuilder:
         self.fontawesome_is_bundled = fontawesome_is_bundled
         self.theme_js_content = theme_js_content
         self.image_manager = image_manager
+        self.has_series = False
 
     def with_cache_bust(self, url: str) -> str:
         """Return a URL with a cache-busting query parameter appended.
@@ -134,6 +135,14 @@ class ContextBuilder:
             The URL path for the tags page, always starting with ``/``.
         """
         return self.get_configured_url("tags_path")
+
+    def get_series_index_url(self) -> str:
+        """Return the URL path for the configured series index page.
+
+        Returns:
+            The URL path for the series index page, always starting with ``/``.
+        """
+        return self.get_configured_url("series_index_path")
 
     def get_categories_url(self) -> str:
         """Return the URL path for the configured categories overview page.
@@ -219,6 +228,11 @@ class ContextBuilder:
             "archive_url": self.get_archive_url(),
             "tags_url": self.get_tags_url(),
             "categories_url": self.get_categories_url(),
+            "has_series": self.has_series,
+            "series_index_url": self.get_series_index_url(),
+            "series_css_url": self.get_asset_url(
+                "series.css", self.site_config.minify_css
+            ),
             "with_stats": self.site_config.with_stats,
             "stats_url": self.get_stats_url(),
             "with_calendar": self.site_config.with_calendar,

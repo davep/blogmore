@@ -36,6 +36,29 @@
     </nav>
     {% endif %}
     
+    {% if post.series_info %}
+    <div class="post-series-box post-series-box-top">
+        {% for series in post.series_info %}
+        <div class="post-series-item">
+            <span class="post-series-text">This post is part of the <a href="{{ series.url }}" class="post-series-link">"{{ series.name }}"</a> series.</span>
+            {% if series.prev_post or series.next_post %}
+            <span class="post-series-nav">
+                {% if series.prev_post %}
+                <a href="{{ series.prev_post.url }}" class="post-series-nav-link post-series-nav-prev" title="{{ series.prev_post.title }}">« Previous</a>
+                {% endif %}
+                {% if series.prev_post and series.next_post %}
+                <span class="post-series-nav-separator">|</span>
+                {% endif %}
+                {% if series.next_post %}
+                <a href="{{ series.next_post.url }}" class="post-series-nav-link post-series-nav-next" title="{{ series.next_post.title }}">Next »</a>
+                {% endif %}
+            </span>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
     <header class="post-header">
         <h1 class="p-name">{{ post.title }}{% if post.draft %} 🚧{% endif %}</h1>
         <a class="u-url" href="{{ post.url }}" style="display:none;">Permalink</a>
@@ -102,6 +125,29 @@
     <div class="tags">
         {% for tag, safe_tag in post.sorted_tag_pairs() %}
         <a href="/{{ tag_dir }}/{{ safe_tag }}/{{ pagination_page1_suffix }}" class="tag p-category" aria-label="Tag: {{ tag }}">{{ tag }}</a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if post.series_info %}
+    <div class="post-series-box post-series-box-bottom">
+        {% for series in post.series_info %}
+        <div class="post-series-item">
+            <span class="post-series-text">This post is part of the <a href="{{ series.url }}" class="post-series-link">"{{ series.name }}"</a> series.</span>
+            {% if series.prev_post or series.next_post %}
+            <span class="post-series-nav">
+                {% if series.prev_post %}
+                <a href="{{ series.prev_post.url }}" class="post-series-nav-link post-series-nav-prev" title="{{ series.prev_post.title }}">« Previous</a>
+                {% endif %}
+                {% if series.prev_post and series.next_post %}
+                <span class="post-series-nav-separator">|</span>
+                {% endif %}
+                {% if series.next_post %}
+                <a href="{{ series.next_post.url }}" class="post-series-nav-link post-series-nav-next" title="{{ series.next_post.title }}">Next »</a>
+                {% endif %}
+            </span>
+            {% endif %}
+        </div>
         {% endfor %}
     </div>
     {% endif %}

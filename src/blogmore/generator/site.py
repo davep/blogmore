@@ -46,6 +46,7 @@ class SiteGenerator:
                 "site_config.content_dir must be provided for site generation"
             )
         self.site_config = site_config
+        self.posts: list[Post] = []
         self._initialize_components()
 
     def _initialize_components(self) -> None:
@@ -157,6 +158,7 @@ class SiteGenerator:
                 exclude_dirs=[pages_dir],
             )
         print(f"Found {len(posts)} posts")
+        self.posts = posts
 
         for post in posts:
             post.words_per_minute = self.site_config.read_time_wpm
@@ -203,9 +205,40 @@ class SiteGenerator:
         context_builder.fontawesome_css_url = asset_manager.fontawesome_css_url
         context_builder.theme_js_content = asset_manager.get_theme_js_content()
 
-        # Resolve paths
         page_output_paths = resolve_page_output_paths(self.site_config, pages)
         post_output_paths = resolve_post_output_paths(self.site_config, posts)
+
+        # Build series navigation info for posts
+        from blogmore.generator.grouping import group_posts_by_series
+        from blogmore.generator.paths import resolve_series_url
+        from blogmore.parser import post_sort_key, sanitize_for_url
+
+        posts_by_series = group_posts_by_series(posts)
+        context_builder.has_series = bool(posts_by_series)
+        for _series_lower, (_series_display, series_posts) in posts_by_series.items():
+            series_posts.sort(key=post_sort_key)
+
+        for post in posts:
+            post.series_info = []
+
+        for series_lower, (series_display, series_posts) in posts_by_series.items():
+            safe_series = sanitize_for_url(series_lower)
+            series_url = resolve_series_url(safe_series, self.site_config)
+            num_series_posts = len(series_posts)
+            for idx, post in enumerate(series_posts):
+                prev_post = series_posts[idx - 1] if idx > 0 else None
+                next_post = (
+                    series_posts[idx + 1] if idx + 1 < num_series_posts else None
+                )
+                post.series_info.append(
+                    {
+                        "name": series_display,
+                        "slug": safe_series,
+                        "url": series_url,
+                        "prev_post": prev_post,
+                        "next_post": next_post,
+                    }
+                )
 
         # Build backlink map
         backlinks_map: dict[str, list[Backlink]] = {}
@@ -274,6 +307,10 @@ class SiteGenerator:
             listing_gen.generate_category_pages(posts, sidebar_pages)
         with timed_step("Generating categories overview page..."):
             listing_gen.generate_categories_page(posts, sidebar_pages)
+        with timed_step("Generating series pages..."):
+            listing_gen.generate_series_pages(posts, sidebar_pages)
+        with timed_step("Generating series index page..."):
+            listing_gen.generate_series_index_page(posts, sidebar_pages)
 
         # Generate optional feature pages
         with timed_step("Generating RSS and Atom feeds..."):

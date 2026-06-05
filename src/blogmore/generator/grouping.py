@@ -61,6 +61,18 @@ def group_posts_by_category(posts: list[Post]) -> dict[str, tuple[str, list[Post
     return group_posts_by_attribute(posts, lambda p: [p.category] if p.category else [])
 
 
+def group_posts_by_series(posts: list[Post]) -> dict[str, tuple[str, list[Post]]]:
+    """Group posts by series (case-insensitive).
+
+    Args:
+        posts: List of posts to group.
+
+    Returns:
+        Dictionary mapping lowercase series to (display_name, posts).
+    """
+    return group_posts_by_attribute(posts, lambda p: p.series)
+
+
 def calculate_cloud_font_sizes(
     data: list[dict[str, Any]],
     min_size: float = 1.0,

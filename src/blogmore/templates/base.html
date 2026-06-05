@@ -144,6 +144,9 @@
                     <ul>
                         <li><a href="{{ categories_url }}">Categories</a></li>
                         <li><a href="{{ tags_url }}">Tags</a></li>
+                        {% if has_series %}
+                        <li><a href="{{ series_index_url }}">Series</a></li>
+                        {% endif %}
                         <li><a href="{{ archive_url }}">Archive</a></li>
                         {% if with_search %}
                         <li><a href="{{ search_url }}">Search</a></li>

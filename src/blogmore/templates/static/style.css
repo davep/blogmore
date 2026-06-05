@@ -724,6 +724,95 @@ time a:visited {
     color: var(--text-color);
 }
 
+/* Post Series Box styling */
+.post-series-box {
+    margin: 25px 0;
+    padding: 16px 20px;
+    background: var(--tag-bg);
+    border-left: 4px solid var(--hover-color);
+    border-top: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.95em;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.post-series-box-top {
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+
+.post-series-box-bottom {
+    margin-top: 30px;
+    margin-bottom: 25px;
+}
+
+.post-series-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.post-series-text {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.post-series-link {
+    font-weight: 600;
+    color: var(--hover-color);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+}
+
+.post-series-link:hover {
+    color: var(--link-hover-color);
+}
+
+.post-series-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85em;
+}
+
+.post-series-nav-link {
+    text-decoration: none;
+    color: var(--text-secondary);
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color-light);
+    background: var(--bg-color);
+    transition: all 0.2s ease;
+}
+
+.post-series-nav-link:hover {
+    border-color: var(--hover-color);
+    color: var(--hover-color);
+    background: var(--tag-hover-bg);
+}
+
+.post-series-nav-separator {
+    color: var(--border-color-light);
+}
+
+@media (max-width: 600px) {
+    .post-series-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .post-series-nav {
+        margin-top: 4px;
+        align-self: flex-end;
+    }
+}
+
 /* =============================================================================
    NAVIGATION & PAGINATION
    ============================================================================= */
