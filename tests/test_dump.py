@@ -20,6 +20,7 @@ def test_post_to_dict_basic() -> None:
         date=dt.datetime(2026, 5, 31, 10, 0, tzinfo=dt.UTC),
         category="Tech",
         tags=["python", "blogging"],
+        series=["My Series"],
         draft=False,
         url_path="/posts/hello/",
     )
@@ -32,6 +33,9 @@ def test_post_to_dict_basic() -> None:
     assert result["date"] == "2026-05-31T10:00:00+00:00"
     assert result["category"] == "Tech"
     assert result["tags"] == ["python", "blogging"]
+    assert result["series"] == ["My Series"]
+    assert result["safe_series"] == ["my-series"]
+    assert result["series_pairs"] == [("My Series", "my-series")]
     assert result["draft"] is False
     assert result["slug"] == "hello"
     assert result["url"] == "/posts/hello/"

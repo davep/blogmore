@@ -259,6 +259,28 @@ class Post:
         pairs = [(tag, sanitize_for_url(tag)) for tag in self.tags]
         return sorted(pairs, key=lambda pair: pair[0].casefold())
 
+    def safe_series(self) -> list[str]:
+        """Get series names sanitized for use in URLs and filenames.
+
+        Returns:
+            A list of sanitized series names.
+        """
+        if self.series:
+            return [sanitize_for_url(s) for s in self.series]
+        return []
+
+    def series_pairs(self) -> list[tuple[str, str]]:
+        """Get series as (display, safe) pairs sorted in casefold alphabetical order.
+
+        Returns:
+            A list of tuples containing the original display series name and
+            the sanitized series name.
+        """
+        if not self.series:
+            return []
+        pairs = [(s, sanitize_for_url(s)) for s in self.series]
+        return sorted(pairs, key=lambda pair: pair[0].casefold())
+
     @cached_property
     def description(self) -> str:
         """Get the description for the post.

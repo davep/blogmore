@@ -619,6 +619,7 @@ Each post in the dumped JSON array is represented by an object containing the fo
 | `date` | `string` or `null` | The publication date and time of the post in ISO format, or `null` if not specified. |
 | `category` | `string` or `null` | The category of the post, or `null` if not specified. |
 | `tags` | `array` of `string` | A list of tags associated with the post. |
+| `series` | `array` of `string` | A list of series names that the post belongs to. |
 | `draft` | `boolean` | Whether the post is marked as a draft. |
 | `metadata` | `object` | The raw frontmatter metadata parsed from the Markdown file. |
 | `url_path` | `string` or `null` | The custom URL path generated or configured for this post, or `null` if using default URL rules. |
@@ -630,6 +631,8 @@ Each post in the dumped JSON array is represented by an object containing the fo
 | `safe_category` | `string` or `null` | The category name sanitized for use in URLs/filenames, or `null` if not set. |
 | `safe_tags` | `array` of `string` | A list of tag names sanitized for use in URLs/filenames. |
 | `sorted_tag_pairs` | `array` of `array` | A list of `[display_name, safe_name]` pairs for the post's tags, sorted alphabetically. |
+| `safe_series` | `array` of `string` | A list of series names sanitized for use in URLs/filenames. |
+| `series_pairs` | `array` of `array` | A list of `[display_name, safe_name]` pairs for the post's series, sorted alphabetically. |
 | `description` | `string` | The post's description, either from frontmatter or extracted from the first paragraph. |
 | `prose_text` | `string` | The plain text prose of the post, excluding HTML tags and code blocks. |
 | `word_count` | `integer` | The number of words in the post's prose. |
