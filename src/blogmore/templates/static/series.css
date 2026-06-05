@@ -1,0 +1,50 @@
+/* =============================================================================
+   SERIES PAGES & INDEX
+   ============================================================================= */
+
+.series-index-page h1 {
+    margin-bottom: 40px;
+}
+
+.series-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.series-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--tag-bg);
+    border: 1px solid var(--border-color-light);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.series-item:hover {
+    background: var(--tag-hover-bg);
+    border-color: var(--hover-color);
+    transform: translateY(-1px);
+}
+
+.series-link {
+    font-size: 1.15em;
+    font-weight: 500;
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.series-link:hover {
+    color: var(--hover-color);
+    text-decoration: none;
+}
+
+.series-count {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+}

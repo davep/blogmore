@@ -214,6 +214,7 @@ class SiteGenerator:
         from blogmore.parser import post_sort_key, sanitize_for_url
 
         posts_by_series = group_posts_by_series(posts)
+        context_builder.has_series = bool(posts_by_series)
         for _series_lower, (_series_display, series_posts) in posts_by_series.items():
             series_posts.sort(key=post_sort_key)
 
@@ -308,6 +309,8 @@ class SiteGenerator:
             listing_gen.generate_categories_page(posts, sidebar_pages)
         with timed_step("Generating series pages..."):
             listing_gen.generate_series_pages(posts, sidebar_pages)
+        with timed_step("Generating series index page..."):
+            listing_gen.generate_series_index_page(posts, sidebar_pages)
 
         # Generate optional feature pages
         with timed_step("Generating RSS and Atom feeds..."):

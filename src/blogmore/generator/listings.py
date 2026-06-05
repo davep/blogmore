@@ -468,3 +468,56 @@ class ListingGenerator:
                 context=context,
                 render_func=_render_series,
             )
+
+    def generate_series_index_page(self, posts: list[Post], pages: list[Page]) -> None:
+        """Generate the series overview/index page.
+
+        Args:
+            posts: All published posts.
+            pages: All static pages, for sidebar navigation.
+        """
+        posts_by_series = group_posts_by_series(posts)
+
+        if not posts_by_series:
+            return
+
+        series_data: list[dict[str, Any]] = []
+        for series_lower, (series_display, series_posts) in posts_by_series.items():
+            from blogmore.generator.paths import resolve_series_url
+
+            series_url = resolve_series_url(
+                sanitize_for_url(series_lower), self.site_config
+            )
+            series_data.append(
+                {
+                    "display_name": series_display,
+                    "url": series_url,
+                    "count": len(series_posts),
+                    "reading_time": sum(post.reading_time for post in series_posts),
+                }
+            )
+
+        # Sort alphabetically by title
+        series_data.sort(key=lambda x: str(x["display_name"]).lower())
+
+        context = self.context_builder.get_global_context()
+        context["pages"] = pages
+        output_path = (
+            self.site_config.output_dir / self.site_config.series_index_path.lstrip("/")
+        ).resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        series_index_url = self.context_builder.get_series_index_url()
+        if self.site_config.clean_urls:
+            context["canonical_url"] = (
+                f"{self.site_config.site_url}{series_index_url}"
+                if self.site_config.site_url
+                else series_index_url
+            )
+        else:
+            context["canonical_url"] = canonical_url_for_path(
+                self.site_config, output_path
+            )
+
+        html = self.renderer.render_series_index_page(series_data, **context)
+        write_html(output_path, html, self.site_config.minify_html)

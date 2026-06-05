@@ -236,3 +236,173 @@ def test_series_rendering_in_post_pages_clean_urls(
         'class="post-series-link">"Designing Site"</a> series.'
     )
     assert post_1_content.count(expected_clean) == 2
+
+
+def test_series_index_generation(tmp_path: Path, temp_output_dir: Path) -> None:
+    """The generator writes correct series index page and adds it to navigation and sitemap."""
+    content_dir = tmp_path / "content"
+    content_dir.mkdir()
+
+    # Create posts in two different series
+    (content_dir / "post-1.md").write_text(
+        "---\ntitle: Post 1\ndate: 2024-01-01\nseries: B Series\n---\n\nContent 1."
+    )
+    (content_dir / "post-2.md").write_text(
+        "---\ntitle: Post 2\ndate: 2024-01-02\nseries: A Series\n---\n\nContent 2."
+    )
+    (content_dir / "post-3.md").write_text(
+        "---\ntitle: Post 3\ndate: 2024-01-03\nseries: B Series\n---\n\nContent 3."
+    )
+
+    # Test index generation with default series_index_path ("series.html") and clean_urls = False
+    generator = SiteGenerator(
+        site_config=SiteConfig(
+            content_dir=content_dir,
+            output_dir=temp_output_dir,
+            with_sitemap=True,
+        )
+    )
+    generator.generate()
+
+    # Verify series index file is created at the default path
+    index_file = temp_output_dir / "series.html"
+    assert index_file.exists()
+    index_content = index_file.read_text()
+
+    # Verify header nav contains the Series link between Tags and Archive
+    nav_start = index_content.find("<nav>")
+    nav_end = index_content.find("</nav>")
+    assert nav_start != -1 and nav_end != -1
+    nav_content = index_content[nav_start:nav_end]
+
+    tags_idx = nav_content.find('href="/tags.html"')
+    series_idx = nav_content.find('href="/series.html"')
+    archive_idx = nav_content.find('href="/archive.html"')
+    assert tags_idx != -1
+    assert series_idx != -1
+    assert archive_idx != -1
+    assert tags_idx < series_idx < archive_idx
+
+    # Verify series are listed in alphabetical order (A Series first, B Series second)
+    pos_a = index_content.find("A Series")
+    pos_b = index_content.find("B Series")
+    assert pos_a != -1 and pos_b != -1
+    assert pos_a < pos_b
+
+    # Verify post count format
+    assert "A Series" in index_content
+    assert "(1 post)" in index_content
+    assert "B Series" in index_content
+    assert "(2 posts)" in index_content
+
+    # Verify links to the series pages
+    assert '<a href="/series/a-series/index.html" class="series-link">' in index_content
+    assert '<a href="/series/b-series/index.html" class="series-link">' in index_content
+
+    # Verify it is present in sitemap.xml
+    sitemap_file = temp_output_dir / "sitemap.xml"
+    assert sitemap_file.exists()
+    sitemap_content = sitemap_file.read_text()
+    assert "/series.html" in sitemap_content
+
+
+def test_series_index_generation_clean_urls_and_custom_path(
+    tmp_path: Path, temp_output_dir: Path
+) -> None:
+    """The series index page respects custom path and clean_urls configuration."""
+    content_dir = tmp_path / "content"
+    content_dir.mkdir()
+
+    (content_dir / "post-1.md").write_text(
+        "---\ntitle: Post 1\ndate: 2024-01-01\nseries: My Series\n---\n\nContent 1."
+    )
+
+    # Test custom series_index_path and clean_urls = True
+    generator = SiteGenerator(
+        site_config=SiteConfig(
+            content_dir=content_dir,
+            output_dir=temp_output_dir,
+            series_index_path="custom-series/index.html",
+            clean_urls=True,
+            with_sitemap=True,
+        )
+    )
+    generator.generate()
+
+    index_file = temp_output_dir / "custom-series" / "index.html"
+    assert index_file.exists()
+    index_content = index_file.read_text()
+
+    # Navigation link must be clean (points to "/custom-series/")
+    assert '<li><a href="/custom-series/">Series</a></li>' in index_content
+
+    # Link to series page must be clean (points to "/series/my-series/")
+    assert '<a href="/series/my-series/" class="series-link">' in index_content
+
+    # Verify sitemap URL is clean (points to "/custom-series/")
+    sitemap_file = temp_output_dir / "sitemap.xml"
+    assert sitemap_file.exists()
+    sitemap_content = sitemap_file.read_text()
+    assert "/custom-series/" in sitemap_content
+    assert "/custom-series/index.html" not in sitemap_content
+
+
+def test_no_series_index_when_no_series(tmp_path: Path, temp_output_dir: Path) -> None:
+    """The series index page is not created and Series nav link is absent when there are no series."""
+    content_dir = tmp_path / "content"
+    content_dir.mkdir()
+
+    (content_dir / "post-1.md").write_text(
+        "---\ntitle: Post 1\ndate: 2024-01-01\n---\n\nContent 1."
+    )
+
+    generator = SiteGenerator(
+        site_config=SiteConfig(
+            content_dir=content_dir,
+            output_dir=temp_output_dir,
+        )
+    )
+    generator.generate()
+
+    # series.html must not exist
+    assert not (temp_output_dir / "series.html").exists()
+
+    # Index page navigation must not contain Series link
+    post_file = temp_output_dir / "2024" / "01" / "01" / "post-1.html"
+    assert post_file.exists()
+    post_content = post_file.read_text()
+    assert "Series" not in post_content
+
+
+def test_series_index_with_read_time(tmp_path: Path, temp_output_dir: Path) -> None:
+    """The series index page shows total reading time when with_read_time is enabled."""
+    content_dir = tmp_path / "content"
+    content_dir.mkdir()
+
+    # Create post 1 with 400 words (2 mins at 200 wpm)
+    words_1 = "word " * 400
+    (content_dir / "post-1.md").write_text(
+        f"---\ntitle: Post 1\ndate: 2024-01-01\nseries: My Series\n---\n\n{words_1}"
+    )
+
+    # Create post 2 with 600 words (3 mins at 200 wpm)
+    words_2 = "word " * 600
+    (content_dir / "post-2.md").write_text(
+        f"---\ntitle: Post 2\ndate: 2024-01-02\nseries: My Series\n---\n\n{words_2}"
+    )
+
+    generator = SiteGenerator(
+        site_config=SiteConfig(
+            content_dir=content_dir,
+            output_dir=temp_output_dir,
+            with_read_time=True,
+        )
+    )
+    generator.generate()
+
+    index_file = temp_output_dir / "series.html"
+    assert index_file.exists()
+    index_content = index_file.read_text()
+
+    # Verify post count and total reading time (2 + 3 = 5 min read)
+    assert "(2 posts, 5 min read)" in index_content

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}All Series - {{ site_title }}{% endblock %}
+
+{% block meta_tags %}
+{% from '_listing_meta_tags.html' import listing_meta_tags with context %}
+{{ listing_meta_tags("All Series - " ~ site_title) }}
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ series_css_url }}">
+{% endblock %}
+
+{% block content %}
+<div class="series-index-page">
+    <h1>All Series</h1>
+    
+    {% if series %}
+    <ul class="series-list">
+        {% for series_info in series %}
+        <li class="series-item">
+            <a href="{{ series_info.url }}" class="series-link">
+                {{ series_info.display_name }}
+            </a>
+            <span class="series-count">({{ series_info.count }} post{% if series_info.count != 1 %}s{% endif %}{% if with_read_time %}, {{ series_info.reading_time }} min read{% endif %})</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No series yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

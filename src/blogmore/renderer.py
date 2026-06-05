@@ -491,6 +491,26 @@ class TemplateRenderer:
         """
         return self.render_template("graph.html", **context)
 
+    def render_series_index_page(
+        self,
+        series: list[dict[str, Any]],
+        **context: Any,
+    ) -> str:
+        """Render the series index page showing all series and post counts.
+
+        Args:
+            series: List of series dictionaries containing name, url, and count.
+            **context: Additional context variables.
+
+        Returns:
+            Rendered HTML string.
+        """
+        return self.render_template(
+            "series_index.html",
+            series=series,
+            **context,
+        )
+
     def render_template(self, template_name: str, **context: Any) -> str:
         """Render an arbitrary template.
 

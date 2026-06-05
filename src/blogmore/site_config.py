@@ -42,6 +42,10 @@ DEFAULT_CALENDAR_PATH = "calendar.html"
 # Default graph page path (relative to the output directory).
 DEFAULT_GRAPH_PATH = "graph.html"
 
+##############################################################################
+# Default series index page path (relative to the output directory).
+DEFAULT_SERIES_INDEX_PATH = "series.html"
+
 
 @dataclass
 class SiteConfig:
@@ -326,6 +330,25 @@ class SiteConfig:
     The only available variable placeholder is ``{slug}``, which is required.
     This is a **configuration file only** option — it cannot be set on the
     command line.  Defaults to ``series/{slug}/index.html``.
+    """
+
+    series_index_path: str = DEFAULT_SERIES_INDEX_PATH
+    """Path (relative to the output directory) where the series index page is written.
+
+    The path is joined onto the ``output`` directory, so ``series.html``
+    produces ``<output>/series.html``, and ``blog/series/index.html``
+    produces ``<output>/blog/series/index.html``.
+
+    Parent directories are created automatically.  When ``clean_urls`` is
+    enabled and the path ends in ``index.html``, the ``index.html`` portion
+    is omitted in any URL reference to the page.
+
+    The path is always treated as relative to the output directory root, so
+    both ``/series.html`` and ``series.html`` produce the same
+    output location.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to ``series.html``.
     """
 
     search_path: str = DEFAULT_SEARCH_PATH

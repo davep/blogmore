@@ -27,6 +27,8 @@ below lists all variables that are available in every template.
 | `archive_url` | `str` | URL to the archive page (respects `archive_path` and `clean_urls`). |
 | `tags_url` | `str` | URL to the tags overview page (respects `tags_path` and `clean_urls`). |
 | `categories_url` | `str` | URL to the categories overview page (respects `categories_path` and `clean_urls`). |
+| `has_series` | `bool` | `True` when there is at least one series on the blog. |
+| `series_index_url` | `str` | URL to the series index page (respects `series_index_path` and `clean_urls`). |
 | `with_read_time` | `bool` | `True` when reading time display is enabled. |
 | `with_gfi` | `bool` | `True` when Gunning Fog Index calculation is enabled. |
 | `with_backlinks` | `bool` | `True` when the backlinks feature is enabled. |
@@ -46,6 +48,7 @@ below lists all variables that are available in every template.
 | `archive_css_url` | `str` | URL to the archive-page stylesheet (with cache-bust query string). |
 | `calendar_css_url` | `str` | URL to the calendar-page stylesheet (with cache-bust query string). |
 | `tag_cloud_css_url` | `str` | URL to the tag/category-cloud stylesheet (with cache-bust query string). |
+| `series_css_url` | `str` | URL to the series-page stylesheet (with cache-bust query string). |
 | `with_stats` | `bool` | `True` when the statistics page is enabled. |
 | `stats_url` | `str` | URL to the statistics page (respects `stats_path` and `clean_urls`). |
 | `with_calendar` | `bool` | `True` when the calendar page is enabled. |
@@ -127,6 +130,7 @@ or `/tag/python/` when `clean_urls` is enabled.
 | `category.html` | `category`, `safe_category`, `all_posts`, `pages`, `prev_page_url`, `next_page_url`, `canonical_url`, `pagination_page_urls` |
 | `categories.html` | `categories` (dict of display name → post list), `pages`, `canonical_url` |
 | `series.html` | `series` (display name), `posts` (list of posts on current page), `page`, `total_pages`, `pages`, `prev_page_url`, `next_page_url`, `canonical_url`, `pagination_page_urls` |
+| `series_index.html` | `series` (list of dict: each containing `display_name`, `url`, `count`, and `reading_time`), `pages`, `canonical_url` |
 | `search.html` | `pages`, `canonical_url` |
 | `stats.html` | `stats` (`BlogStats`), `pages`, `canonical_url` |
 | `calendar.html` | `calendar_years` (list of `CalendarYear`), `pages`, `canonical_url` |

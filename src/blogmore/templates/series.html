@@ -7,6 +7,10 @@
 {{ listing_meta_tags("Series: " ~ series ~ " - " ~ site_title) }}
 {% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{{ series_css_url }}">
+{% endblock %}
+
 {% from '_pagination.html' import pagination %}
 {% from '_post_summary.html' import post_summary with context %}
 
