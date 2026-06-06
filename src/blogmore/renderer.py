@@ -248,6 +248,10 @@ class TemplateRenderer:
             'class="mermaid"' in post.html_content
             or 'class="language-mermaid"' in post.html_content
         )
+        context["has_math"] = (
+            'class="math-inline"' in post.html_content
+            or 'class="math-block"' in post.html_content
+        )
         return self.render_template("post.html", post=post, **context)
 
     def render_page(self, page: Page, **context: Any) -> str:
@@ -263,6 +267,10 @@ class TemplateRenderer:
         context["has_mermaid"] = (
             'class="mermaid"' in page.html_content
             or 'class="language-mermaid"' in page.html_content
+        )
+        context["has_math"] = (
+            'class="math-inline"' in page.html_content
+            or 'class="math-block"' in page.html_content
         )
         return self.render_template("page.html", page=page, **context)
 
@@ -287,6 +295,11 @@ class TemplateRenderer:
         context["has_mermaid"] = any(
             'class="mermaid"' in p.html_content
             or 'class="language-mermaid"' in p.html_content
+            for p in posts
+        )
+        context["has_math"] = any(
+            'class="math-inline"' in p.html_content
+            or 'class="math-block"' in p.html_content
             for p in posts
         )
         return self.render_template(
@@ -320,6 +333,11 @@ class TemplateRenderer:
         context["has_mermaid"] = any(
             'class="mermaid"' in p.html_content
             or 'class="language-mermaid"' in p.html_content
+            for p in posts
+        )
+        context["has_math"] = any(
+            'class="math-inline"' in p.html_content
+            or 'class="math-block"' in p.html_content
             for p in posts
         )
         return self.render_template(
@@ -356,6 +374,11 @@ class TemplateRenderer:
             or 'class="language-mermaid"' in p.html_content
             for p in posts
         )
+        context["has_math"] = any(
+            'class="math-inline"' in p.html_content
+            or 'class="math-block"' in p.html_content
+            for p in posts
+        )
         return self.render_template(
             "tag.html",
             tag=tag,
@@ -390,6 +413,11 @@ class TemplateRenderer:
             or 'class="language-mermaid"' in p.html_content
             for p in posts
         )
+        context["has_math"] = any(
+            'class="math-inline"' in p.html_content
+            or 'class="math-block"' in p.html_content
+            for p in posts
+        )
         return self.render_template(
             "category.html",
             category=category,
@@ -422,6 +450,11 @@ class TemplateRenderer:
         context["has_mermaid"] = any(
             'class="mermaid"' in p.html_content
             or 'class="language-mermaid"' in p.html_content
+            for p in posts
+        )
+        context["has_math"] = any(
+            'class="math-inline"' in p.html_content
+            or 'class="math-block"' in p.html_content
             for p in posts
         )
         return self.render_template(

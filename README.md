@@ -69,6 +69,7 @@ here](https://github.com/davep/davep.github.com)).
   respects the active light/dark theme
 - **Related posts** — automatically find and display contextually relevant posts for each entry using a build-time TF-IDF and cosine similarity engine
 - **Diagrams (Mermaid)** — optional support for rendering Mermaid diagrams and flowcharts from fenced code blocks (enable with `with_mermaid: true` in configuration)
+- **LaTeX Math Rendering** — optional support for rendering LaTeX equations and formulas using KaTeX or MathJax (enable with `with_maths: true` in configuration)
 - **SEO optimisation** — meta tags, Open Graph tags, and Twitter Card support
 - **Automatic organisation** — tag pages, category pages, and chronological
   archives generated automatically

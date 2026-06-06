@@ -119,6 +119,20 @@ posts_per_feed: 20
 # and pages that actually contain a mermaid block. Configuration file only.
 # with_mermaid: false
 
+# Optional: Enable LaTeX mathematical formula rendering (default: false)
+# When true, BlogMore will support rendering inline equations ($...$) and
+# display block equations ($$...$$) written in standard LaTeX math notation.
+# To keep pages fast, the math rendering library is only loaded on individual posts
+# and pages that actually contain mathematical equations. Configuration file only.
+# with_maths: false
+
+# Optional: The math rendering engine to use (default: 'katex')
+# Options:
+#   - 'katex': Extremely fast, lightweight, renders math almost instantly. (Default)
+#   - 'mathjax': Feature-rich, supports 100% of LaTeX formatting, includes accessibility features.
+# Only meaningful when with_maths is true. Configuration file only.
+# maths_provider: katex
+
 # Optional: Enable automated build-time related posts calculation (default: false)
 # When true, BlogMore uses a pure-Python TF-IDF and Cosine Similarity engine to
 # automatically find and display contextually relevant posts for each entry,

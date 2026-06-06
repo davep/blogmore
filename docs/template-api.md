@@ -59,6 +59,9 @@ below lists all variables that are available in every template.
 | `graph_css_url` | `str` | URL to the graph-page stylesheet (with cache-bust query string). |
 | `with_mermaid` | `bool` | `True` when Mermaid diagram rendering is enabled. |
 | `has_mermaid` | `bool` | `True` if the currently rendered page/post (or any post listed in the current index view) contains a Mermaid diagram. |
+| `with_maths` | `bool` | `True` when LaTeX mathematical formula rendering is enabled. |
+| `maths_provider` | `str` | The selected math rendering engine (`'katex'` or `'mathjax'`). |
+| `has_math` | `bool` | `True` if the currently rendered page/post (or any post listed in the current index view) contains a mathematical equation. |
 | `inline_theme_js` | `bool` | `True` when theme JavaScript inlining is enabled. |
 | `theme_js_content` | `str \| None` | The content of `theme.js` to be inlined. |
 | `theme_js_url` | `str` | URL to `theme.js` (with cache-bust query string). |

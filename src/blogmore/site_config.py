@@ -303,6 +303,20 @@ class SiteConfig:
     command line.  Off by default.
     """
 
+    with_maths: bool = False
+    """Whether to enable LaTeX mathematical formula rendering.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Off by default.
+    """
+
+    maths_provider: str = "katex"
+    """The math rendering engine to use ('katex' or 'mathjax').
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Defaults to 'katex'.
+    """
+
     show_toc: bool = True
     """Whether to show the Table of Contents on posts by default.
 

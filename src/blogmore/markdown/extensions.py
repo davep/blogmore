@@ -9,6 +9,7 @@ from typing import Any
 from blogmore.markdown.admonitions import AdmonitionsExtension
 from blogmore.markdown.external_links import ExternalLinksExtension
 from blogmore.markdown.heading_anchors import HeadingAnchorsExtension
+from blogmore.markdown.math import MathExtension
 from blogmore.markdown.mermaid import MermaidExtension
 from blogmore.markdown.optimised_images import OptimisedImagesExtension
 from blogmore.markdown.strikethrough import StrikethroughExtension
@@ -46,6 +47,7 @@ def create_custom_extensions(
         HeadingAnchorsExtension(),
         StrikethroughExtension(),
         MermaidExtension(),
+        MathExtension(),
     ]
     if with_optimised_images and image_manager is not None:
         extensions.append(
