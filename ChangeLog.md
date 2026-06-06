@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.40.1
 
-**Released: WiP**
+**Released: 2026-06-06**
 
 - Fixed the internal link linter to recognise the series index page
   (respecting `series_index_path`) and all series archive pages (including
