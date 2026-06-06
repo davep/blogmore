@@ -800,6 +800,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#series" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Series
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Series">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#series-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Series formats
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#navigation-and-sorting" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Navigation and sorting
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#markdown-features" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1622,6 +1661,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#series" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Series
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Series">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#series-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Series formats
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#navigation-and-sorting" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Navigation and sorting
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#markdown-features" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1963,6 +2041,25 @@ publication date:</p>
 <span class="nn">---</span>
 </code></pre></div>
 <p>Visitors can navigate to <code>/category/python.html</code> to see all posts in that category, or to <code>/tag/tutorial.html</code> to see all posts tagged with <code>tutorial</code>.</p>
+<h2 id="series">Series</h2>
+<p>If you publish multi-part articles, you can group them into a cohesive series. Series membership is defined using the <code>series</code> frontmatter key.</p>
+<p>A post can belong to a single series, or to multiple series. </p>
+<h3 id="series-formats">Series formats</h3>
+<p>Like tags, series can be written as a single string (for a single series) or as a list:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># A single series title</span>
+<span class="nt">series</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Designing a Static Site Generator</span>
+
+<span class="c1"># Multiple series (as a YAML list)</span>
+<span class="nt">series</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Designing a Static Site Generator</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Web Development Basics</span><span class="p p-Indicator">]</span>
+
+<span class="c1"># Multiple series (as a multi-line YAML list)</span>
+<span class="nt">series</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Designing a Static Site Generator</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Web Development Basics</span>
+</code></pre></div>
+<h3 id="navigation-and-sorting">Navigation and sorting</h3>
+<p>Within each series, posts are automatically sorted in chronological order using their original posting date and time (the <code>date</code> frontmatter value; the <code>modified</code> date has no effect on sorting).</p>
+<p>When generating post pages, BlogMore automatically adds a series banner at the top and bottom of each post belonging to a series. This banner displays a message (e.g. <code>This post is part of the "Designing a Static Site Generator" series</code>) and provides previous/next navigation links linking to other parts of the series.</p>
 <h2 id="markdown-features">Markdown features</h2>
 <p>BlogMore supports standard Markdown plus several extensions. The following sections cover the most useful ones.</p>
 <h3 id="basic-formatting">Basic formatting</h3>

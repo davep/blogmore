@@ -1550,6 +1550,16 @@ below lists all variables that are available in every template.</p>
 <td>URL to the categories overview page (respects <code>categories_path</code> and <code>clean_urls</code>).</td>
 </tr>
 <tr>
+<td><code>has_series</code></td>
+<td><code>bool</code></td>
+<td><code>True</code> when there is at least one series on the blog.</td>
+</tr>
+<tr>
+<td><code>series_index_url</code></td>
+<td><code>str</code></td>
+<td>URL to the series index page (respects <code>series_index_path</code> and <code>clean_urls</code>).</td>
+</tr>
+<tr>
 <td><code>with_read_time</code></td>
 <td><code>bool</code></td>
 <td><code>True</code> when reading time display is enabled.</td>
@@ -1643,6 +1653,11 @@ below lists all variables that are available in every template.</p>
 <td><code>tag_cloud_css_url</code></td>
 <td><code>str</code></td>
 <td>URL to the tag/category-cloud stylesheet (with cache-bust query string).</td>
+</tr>
+<tr>
+<td><code>series_css_url</code></td>
+<td><code>str</code></td>
+<td>URL to the series-page stylesheet (with cache-bust query string).</td>
 </tr>
 <tr>
 <td><code>with_stats</code></td>
@@ -1888,6 +1903,14 @@ or <code>/tag/python/</code> when <code>clean_urls</code> is enabled.</p>
 <td><code>categories</code> (dict of display name → post list), <code>pages</code>, <code>canonical_url</code></td>
 </tr>
 <tr>
+<td><code>series.html</code></td>
+<td><code>series</code> (display name), <code>posts</code> (list of posts on current page), <code>page</code>, <code>total_pages</code>, <code>pages</code>, <code>prev_page_url</code>, <code>next_page_url</code>, <code>canonical_url</code>, <code>pagination_page_urls</code></td>
+</tr>
+<tr>
+<td><code>series_index.html</code></td>
+<td><code>series</code> (list of dict: each containing <code>display_name</code>, <code>url</code>, <code>count</code>, and <code>reading_time</code>), <code>pages</code>, <code>canonical_url</code></td>
+</tr>
+<tr>
 <td><code>search.html</code></td>
 <td><code>pages</code>, <code>canonical_url</code></td>
 </tr>
@@ -1946,6 +1969,16 @@ and <code>next_post</code>.</p>
 <td><code>tags</code></td>
 <td><code>list[str] \| None</code></td>
 <td>Tag names.</td>
+</tr>
+<tr>
+<td><code>series</code></td>
+<td><code>list[str]</code></td>
+<td>Series names the post belongs to.</td>
+</tr>
+<tr>
+<td><code>series_info</code></td>
+<td><code>list[dict]</code></td>
+<td>Navigation and URLs for each series the post belongs to (each dict contains <code>name</code>, <code>slug</code>, <code>url</code>, <code>prev_post</code>, <code>next_post</code>).</td>
 </tr>
 <tr>
 <td><code>draft</code></td>
