@@ -499,6 +499,23 @@ Off by default.
 with_graph: true
 ```
 
+#### `with_mermaid`
+
+Enable Mermaid diagram rendering. When `true`, BlogMore will support rendering diagrams written inside fenced code blocks labeled with the `mermaid` language tag.
+
+To optimize page loading and keep builds fast, the Mermaid JS library is loaded dynamically from CDN only on pages (posts, pages, or index/listings) that actually contain a diagram block. 
+
+This is a **configuration file only** option — it cannot be set on the command line.
+
+Off by default.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+with_mermaid: true
+```
+
 #### `with_related`
 
 Enable automated build-time related posts calculation. When `true`, BlogMore uses a pure-Python TF-IDF and Cosine Similarity engine to automatically calculate and list contextually relevant posts for each entry, with zero runtime overhead for readers.

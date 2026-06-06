@@ -1,5 +1,12 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added Mermaid diagram rendering support via the `with_mermaid`
+  configuration option. ([#600](https://github.com/davep/blogmore/pull/600))
+
 ## v2.40.1
 
 **Released: 2026-06-06**

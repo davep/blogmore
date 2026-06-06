@@ -64,6 +64,68 @@
     <script src="{{ theme_js_url }}"></script>
     {% endif %}
     <script src="{{ codeblocks_js_url }}" defer></script>
+    {% if with_mermaid and has_mermaid %}
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        // Helper to check if dark mode is active
+        function isDarkTheme() {
+            return document.documentElement.getAttribute('data-theme') === 'dark' ||
+                (!document.documentElement.getAttribute('data-theme') &&
+                 window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        }
+
+        // Save original diagram code before Mermaid replaces it
+        const elements = document.querySelectorAll('.mermaid');
+        elements.forEach(el => {
+            el.setAttribute('data-original-code', el.textContent);
+        });
+
+        // Initialize with active theme
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: isDarkTheme() ? 'dark' : 'default',
+            securityLevel: 'loose'
+        });
+
+        mermaid.run();
+
+        // Listen for real-time theme changes and dynamically re-render diagrams
+        const themeObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'data-theme') {
+                    const currentDark = isDarkTheme();
+                    mermaid.initialize({
+                        startOnLoad: false,
+                        theme: currentDark ? 'dark' : 'default',
+                        securityLevel: 'loose'
+                    });
+
+                    const elList = document.querySelectorAll('.mermaid');
+                    let needsReRun = false;
+                    elList.forEach(el => {
+                        const original = el.getAttribute('data-original-code');
+                        if (original) {
+                            el.removeAttribute('data-processed');
+                            el.removeAttribute('id');
+                            el.textContent = original;
+                            needsReRun = true;
+                        }
+                    });
+
+                    if (needsReRun) {
+                        mermaid.run();
+                    }
+                }
+            });
+        });
+
+        themeObserver.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme']
+        });
+    </script>
+    {% endif %}
     {% if prev_page_url %}<link rel="prev" href="{{ prev_page_url }}">{% endif %}
     {% if next_page_url %}<link rel="next" href="{{ next_page_url }}">{% endif %}
     {% block extra_head %}{% endblock %}

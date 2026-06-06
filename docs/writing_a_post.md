@@ -336,6 +336,26 @@ def greet(name: str) -> str:
 
 A wide range of languages are supported, including `python`, `javascript`, `typescript`, `bash`, `yaml`, `json`, `html`, `css`, `sql`, `rust`, `go`, and many more.
 
+### Diagrams (Mermaid)
+
+If enabled, BlogMore supports rendering diagrams and flowcharts written inside fenced code blocks using the `mermaid` language identifier:
+
+````markdown
+```mermaid
+graph TD
+    A[Start] --> B[Process]
+    B --> C{Decision}
+    C -->|Yes| D[Success]
+    C -->|No| E[Fail]
+```
+````
+
+To use Mermaid diagrams:
+
+* **Enable the feature:** You must turn on Mermaid rendering globally by setting [`with_mermaid: true`](configuration.md#with_mermaid) in your `blogmore.yaml` configuration file.
+* **Efficient loading:** To keep page load speeds fast, the Mermaid JS library is only loaded from a CDN on pages (posts, pages, or index/listings) that actually contain a diagram block.
+* **More options:** For full syntax details, layout options, and diagram types (such as sequence diagrams, pie charts, gantt charts, and user journeys), see the official [Mermaid documentation](https://mermaid.js.org/).
+
 ### Tables
 
 ```markdown

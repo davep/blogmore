@@ -296,6 +296,13 @@ class SiteConfig:
     include_drafts: bool = False
     """Whether to include draft posts in generation."""
 
+    with_mermaid: bool = False
+    """Whether to enable Mermaid diagram rendering.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.  Off by default.
+    """
+
     show_toc: bool = True
     """Whether to show the Table of Contents on posts by default.
 

@@ -1814,3 +1814,150 @@ class TestTemplateRenderer:
 
         assert "🚧" not in html
         assert "draft-title" not in html
+
+    def test_render_post_with_mermaid(self, sample_post: Post) -> None:
+        """Test rendering a post with mermaid enabled and containing diagram."""
+        renderer = TemplateRenderer()
+
+        # When Mermaid is disabled (with_mermaid=False)
+        html_disabled = renderer.render_post(
+            sample_post,
+            with_mermaid=False,
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/mermaid" not in html_disabled
+
+        # When Mermaid is enabled but post doesn't have diagram
+        html_enabled_no_diag = renderer.render_post(
+            sample_post,
+            with_mermaid=True,
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/mermaid" not in html_enabled_no_diag
+
+        # When Mermaid is enabled and post has diagram
+        sample_post_with_diag = Post(
+            path=sample_post.path,
+            title=sample_post.title,
+            content=sample_post.content,
+            html_content='<pre class="mermaid">graph TD\n A --&gt; B</pre>',
+            date=sample_post.date,
+            category=sample_post.category,
+            tags=sample_post.tags,
+            series=sample_post.series,
+            draft=sample_post.draft,
+            metadata=sample_post.metadata,
+            toc_html=sample_post.toc_html,
+            show_toc=sample_post.show_toc,
+            show_toc_inline=sample_post.show_toc_inline,
+            redirect_from=sample_post.redirect_from,
+        )
+        html_enabled_with_diag = renderer.render_post(
+            sample_post_with_diag,
+            with_mermaid=True,
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/mermaid" in html_enabled_with_diag
+
+    def test_render_page_with_mermaid(self, sample_page: Page) -> None:
+        """Test rendering a page with mermaid enabled and containing diagram."""
+        renderer = TemplateRenderer()
+
+        # When Mermaid is disabled
+        html_disabled = renderer.render_page(
+            sample_page,
+            with_mermaid=False,
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/mermaid" not in html_disabled
+
+        # When Mermaid is enabled but page has no diagram
+        html_enabled_no_diag = renderer.render_page(
+            sample_page,
+            with_mermaid=True,
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/mermaid" not in html_enabled_no_diag
+
+        # When Mermaid is enabled and page has diagram
+        sample_page_with_diag = Page(
+            path=sample_page.path,
+            title=sample_page.title,
+            content=sample_page.content,
+            html_content='<pre class="mermaid">graph TD\n A --&gt; B</pre>',
+            metadata=sample_page.metadata,
+            toc_html=sample_page.toc_html,
+            show_toc=sample_page.show_toc,
+            show_toc_inline=sample_page.show_toc_inline,
+            redirect_from=sample_page.redirect_from,
+        )
+        html_enabled_with_diag = renderer.render_page(
+            sample_page_with_diag,
+            with_mermaid=True,
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/mermaid" in html_enabled_with_diag
+
+    def test_render_listings_with_mermaid(self, sample_post: Post) -> None:
+        """Test rendering index and other listing pages with mermaid enabled and containing diagram."""
+        renderer = TemplateRenderer()
+
+        sample_post_with_diag = Post(
+            path=sample_post.path,
+            title=sample_post.title,
+            content=sample_post.content,
+            html_content='<pre class="mermaid">graph TD\n A --&gt; B</pre>',
+            date=sample_post.date,
+            category=sample_post.category,
+            tags=sample_post.tags,
+            series=sample_post.series,
+            draft=sample_post.draft,
+            metadata=sample_post.metadata,
+            toc_html=sample_post.toc_html,
+            show_toc=sample_post.show_toc,
+            show_toc_inline=sample_post.show_toc_inline,
+            redirect_from=sample_post.redirect_from,
+        )
+
+        # Index page
+        html_index = renderer.render_index(
+            posts=[sample_post_with_diag],
+            with_mermaid=True,
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/mermaid" in html_index
+
+        # Archive page
+        html_archive = renderer.render_archive(
+            posts=[sample_post_with_diag],
+            with_mermaid=True,
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/mermaid" in html_archive
+
+        # Tag page
+        html_tag = renderer.render_tag_page(
+            tag="python",
+            posts=[sample_post_with_diag],
+            with_mermaid=True,
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/mermaid" in html_tag
+
+        # Category page
+        html_category = renderer.render_category_page(
+            category="coding",
+            posts=[sample_post_with_diag],
+            with_mermaid=True,
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/mermaid" in html_category
+
+        # Series page
+        html_series = renderer.render_series_page(
+            series="tutorials",
+            posts=[sample_post_with_diag],
+            with_mermaid=True,
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/mermaid" in html_series
