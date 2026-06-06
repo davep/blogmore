@@ -12,13 +12,21 @@ from urllib.parse import urljoin, urlparse
 from blogmore.console import print_error, print_warning
 from blogmore.generator.constants import CATEGORY_DIR, TAG_DIR
 from blogmore.generator.context import ContextBuilder
-from blogmore.generator.grouping import group_posts_by_category, group_posts_by_tag
+from blogmore.generator.grouping import (
+    group_posts_by_category,
+    group_posts_by_series,
+    group_posts_by_tag,
+)
+from blogmore.generator.listings import ListingGenerator
 from blogmore.generator.paths import (
+    build_pagination_page_urls,
     resolve_page_output_paths,
     resolve_post_output_paths,
+    resolve_series_url,
 )
 from blogmore.markdown.external_links import is_external_link
 from blogmore.parser import PostParser, sanitize_for_url
+from blogmore.series_path import compute_series_output_path
 
 if TYPE_CHECKING:
     from blogmore.site_config import SiteConfig
@@ -163,6 +171,39 @@ class Linter:
             valid_urls.add(cb.get_calendar_url())
         if self.site_config.with_graph:
             valid_urls.add(cb.get_graph_url())
+
+        # Series index and series archives (only if series exist)
+        posts_by_series = group_posts_by_series(posts)
+        if posts_by_series:
+            # 1. Series index page
+            valid_urls.add(cb.get_series_index_url())
+
+            # 2. Individual series pages & their paginated pages
+            posts_per_page = ListingGenerator.POSTS_PER_PAGE_SERIES
+            for series_lower, (_, series_posts) in posts_by_series.items():
+                safe_series = sanitize_for_url(series_lower)
+
+                # Series page 1 / canonical URL
+                series_url = resolve_series_url(safe_series, self.site_config)
+                valid_urls.add(series_url)
+
+                # Paginated pages for this series
+                page_1_path = compute_series_output_path(
+                    self.site_config.output_dir,
+                    safe_series,
+                    self.site_config.series_path,
+                )
+                try:
+                    relative_path = page_1_path.relative_to(self.site_config.output_dir)
+                    base_url = "/" + relative_path.parent.as_posix()
+                except ValueError:
+                    base_url = f"/series/{safe_series}"
+
+                total_pages = (len(series_posts) + posts_per_page - 1) // posts_per_page
+                page_urls = build_pagination_page_urls(
+                    self.site_config, base_url, total_pages
+                )
+                valid_urls.update(page_urls)
 
         # Main index and archive
         valid_urls.add("/index.html")

@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed the internal link linter to recognise the series index page
+  (respecting `series_index_path`) and all series archive pages (including
+  paginated pages) as valid internal URLs.
+  ([#598](https://github.com/davep/blogmore/pull/598))
+
 ## v2.40.0
 
 **Released: 2026-06-06**
