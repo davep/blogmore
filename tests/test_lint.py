@@ -378,6 +378,60 @@ class TestLintCommand:
         result = lint_site(site_config)
         assert result == 1
 
+    def test_lint_series_links(self, tmp_path: Path, temp_output_dir: Path) -> None:
+        """Test that links to series index and series archive pages are recognized as valid."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Create 12 posts in a series to force pagination (page 1 and page 2)
+        for i in range(1, 13):
+            (content_dir / f"post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\nseries: My Series\n---\n"
+                f"[Series Index](/series.html)\n[Series Page](/series/my-series/index.html)\n"
+                f"[Series Page 2](/series/my-series/page-2.html)\n"
+            )
+
+        site_config = SiteConfig(
+            content_dir=content_dir,
+            output_dir=temp_output_dir,
+            series_index_path="series.html",
+            series_path="series/{slug}/index.html",
+            page_1_path="index.html",
+            page_n_path="page-{page}.html",
+            clean_urls=False,
+        )
+
+        result = lint_site(site_config)
+        assert result == 0
+
+    def test_lint_series_links_clean_urls(
+        self, tmp_path: Path, temp_output_dir: Path
+    ) -> None:
+        """Test that clean links to series index and series archive pages are recognized as valid."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Create 12 posts in a series to force pagination (page 1 and page 2)
+        for i in range(1, 13):
+            (content_dir / f"post-{i}.md").write_text(
+                f"---\ntitle: Post {i}\ndate: 2024-01-{i:02d}\nseries: My Series\n---\n"
+                f"[Series Index](/series/)\n[Series Page](/series/my-series/)\n"
+                f"[Series Page 2](/series/my-series/page-2.html)\n"
+            )
+
+        site_config = SiteConfig(
+            content_dir=content_dir,
+            output_dir=temp_output_dir,
+            series_index_path="series/index.html",
+            series_path="series/{slug}/index.html",
+            page_1_path="index.html",
+            page_n_path="page-{page}.html",
+            clean_urls=True,
+        )
+
+        result = lint_site(site_config)
+        assert result == 0
+
     def test_main_lint_command(self, posts_dir: Path, temp_output_dir: Path) -> None:
         """Test lint command via main()."""
         with (
