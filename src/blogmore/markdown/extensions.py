@@ -20,6 +20,8 @@ def create_custom_extensions(
     image_manager: Any = None,
     content_dir: Any = None,
     with_optimised_images: bool = True,
+    with_mermaid: bool = False,
+    with_maths: bool = False,
 ) -> list[Any]:
     """Create instances of all custom BlogMore Markdown extensions.
 
@@ -31,12 +33,16 @@ def create_custom_extensions(
 
     Args:
         site_url: Base URL of the site; forwarded to
-            :class:`~blogmore.markdown.external_links.ExternalLinksExtension`
+            [`ExternalLinksExtension`][blogmore.markdown.external_links.ExternalLinksExtension]
             so it can distinguish internal from external links.
         image_manager: Optional ImageManager instance for image optimisation.
         content_dir: Optional content directory for image optimisation.
         with_optimised_images: Whether to include the image optimisation
             extension. Defaults to True.
+        with_mermaid: Whether to include the Mermaid diagram extension.
+            Defaults to False.
+        with_maths: Whether to include the LaTeX math extension.
+            Defaults to False.
 
     Returns:
         A list of configured custom Markdown extension instances.
@@ -46,9 +52,11 @@ def create_custom_extensions(
         ExternalLinksExtension(site_url=site_url),
         HeadingAnchorsExtension(),
         StrikethroughExtension(),
-        MermaidExtension(),
-        MathExtension(),
     ]
+    if with_mermaid:
+        extensions.append(MermaidExtension())
+    if with_maths:
+        extensions.append(MathExtension())
     if with_optimised_images and image_manager is not None:
         extensions.append(
             OptimisedImagesExtension(

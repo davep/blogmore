@@ -229,6 +229,8 @@ def main() -> int:
                 site_url=site_config.site_url,
                 default_show_toc=site_config.show_toc,
                 default_show_toc_inline=site_config.show_toc_inline,
+                with_mermaid=site_config.with_mermaid,
+                with_maths=site_config.with_maths,
             )
             posts = post_parser.parse_directory(args.content_dir, include_drafts=True)
             for post in posts:
@@ -262,6 +264,8 @@ def main() -> int:
                 site_url=site_config.site_url,
                 default_show_toc=site_config.show_toc,
                 default_show_toc_inline=site_config.show_toc_inline,
+                with_mermaid=site_config.with_mermaid,
+                with_maths=site_config.with_maths,
             )
             posts = post_parser.parse_directory(
                 args.content_dir,
@@ -331,6 +335,8 @@ def main() -> int:
                     site_url=site_config.site_url,
                     default_show_toc=site_config.show_toc,
                     default_show_toc_inline=site_config.show_toc_inline,
+                    with_mermaid=site_config.with_mermaid,
+                    with_maths=site_config.with_maths,
                 )
                 posts = post_parser.parse_directory(
                     args.content_dir, include_drafts=site_config.include_drafts
@@ -350,6 +356,8 @@ def main() -> int:
                     site_url=site_config.site_url,
                     default_show_toc=site_config.show_toc,
                     default_show_toc_inline=site_config.show_toc_inline,
+                    with_mermaid=site_config.with_mermaid,
+                    with_maths=site_config.with_maths,
                 )
                 posts = post_parser.parse_directory(
                     args.content_dir, include_drafts=site_config.include_drafts

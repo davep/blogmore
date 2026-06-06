@@ -79,6 +79,8 @@ class SiteGenerator:
             content_dir=content_dir,
             default_show_toc=self.site_config.show_toc,
             default_show_toc_inline=self.site_config.show_toc_inline,
+            with_mermaid=self.site_config.with_mermaid,
+            with_maths=self.site_config.with_maths,
         )
         self.renderer = TemplateRenderer(
             self.site_config.templates_dir,

@@ -488,6 +488,8 @@ class PostParser:
         content_dir: Path | None = None,
         default_show_toc: bool = True,
         default_show_toc_inline: bool = True,
+        with_mermaid: bool = False,
+        with_maths: bool = False,
     ) -> None:
         """Initialize the parser with markdown extensions.
 
@@ -497,12 +499,16 @@ class PostParser:
             content_dir: Optional content directory for image optimisation.
             default_show_toc: Whether to show the Table of Contents on posts by default.
             default_show_toc_inline: Whether to show the inline Table of Contents by default.
+            with_mermaid: Whether to enable Mermaid diagram rendering.
+            with_maths: Whether to enable LaTeX mathematical formula rendering.
         """
         self.site_url = site_url or ""
         self.image_manager = image_manager
         self.content_dir = content_dir
         self.default_show_toc = default_show_toc
         self.default_show_toc_inline = default_show_toc_inline
+        self.with_mermaid = with_mermaid
+        self.with_maths = with_maths
 
     @property
     def markdown(self) -> markdown.Markdown:
@@ -522,8 +528,12 @@ class PostParser:
         #
         # We also include image_manager and content_dir presence/identity to
         # ensure rotation when image optimisation is toggled or configured.
+        # We also include with_mermaid and with_maths values to ensure rotation.
         manager_id = id(self.image_manager) if self.image_manager else "none"
-        cache_key = f"markdown_{self.site_url}_{manager_id}"
+        cache_key = (
+            f"markdown_{self.site_url}_{manager_id}_"
+            f"{self.with_mermaid}_{self.with_maths}"
+        )
         if not hasattr(_thread_local, cache_key):
             setattr(
                 _thread_local,
@@ -541,6 +551,8 @@ class PostParser:
                             site_url=self.site_url,
                             image_manager=self.image_manager,
                             content_dir=self.content_dir,
+                            with_mermaid=self.with_mermaid,
+                            with_maths=self.with_maths,
                         ),
                     ],
                     extension_configs={
