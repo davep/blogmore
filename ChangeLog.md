@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.40.0
 
-**Released: WiP**
+**Released: 2026-06-06**
 
 - Added a series feature to group multi-part articles.
   ([#595](https://github.com/davep/blogmore/pull/595))
