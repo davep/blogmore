@@ -40,6 +40,7 @@ BlogMore focuses on simplicity and efficiency in creating blog-focused websites.
 - **Post graph** — optional interactive force-directed graph connecting posts, tags, and categories via internal links
 - **Related posts** - Automatically find and display contextually relevant posts for each entry using a build-time TF-IDF and cosine similarity engine (enable with `--with-related`)
 - **Diagrams (Mermaid)** - Optional support for rendering Mermaid diagrams and flowcharts from fenced code blocks (enable with `with_mermaid: true` in your configuration)
+- **LaTeX Math Rendering** - Optional support for rendering LaTeX equations and formulas using KaTeX or MathJax (enable with `with_maths: true` in your configuration)
 
 ## Installation
 

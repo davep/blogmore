@@ -46,6 +46,8 @@ class Linter:
             site_url=site_config.site_url,
             default_show_toc=site_config.show_toc,
             default_show_toc_inline=site_config.show_toc_inline,
+            with_mermaid=site_config.with_mermaid,
+            with_maths=site_config.with_maths,
         )
         self.errors = 0
         self.warnings = 0

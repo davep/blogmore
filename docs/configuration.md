@@ -516,6 +516,41 @@ Off by default.
 with_mermaid: true
 ```
 
+#### `with_maths`
+
+Enable LaTeX mathematical formula rendering. When `true`, BlogMore will support rendering inline equations (wrapped in single dollar signs, e.g. `$x^2$`) and block equations (wrapped in double dollar signs, e.g. `$$x^2$$`) written in standard LaTeX math notation.
+
+To optimize page loading and keep builds fast, the math rendering library is loaded dynamically from CDN only on pages (posts, pages, or index/listings) that actually contain mathematical equations.
+
+This is a **configuration file only** option — it cannot be set on the command line.
+
+Off by default.
+
+**Type:** Boolean  
+**Default:** `false`
+
+```yaml
+with_maths: true
+```
+
+#### `maths_provider`
+
+Select the mathematical rendering engine to use when [`with_maths`](#with_maths) is enabled. 
+
+Supported options are:
+
+*   `katex` — (Default) An extremely fast, lightweight rendering engine that loads math formulas almost instantly with minimal impact on page load times.
+*   `mathjax` — A highly feature-rich rendering engine that supports 100% of LaTeX environments, along with built-in accessibility features (like standard screen-reader math parsing and zoom-on-click menus).
+
+This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** String  
+**Default:** `katex`
+
+```yaml
+maths_provider: katex
+```
+
 #### `with_related`
 
 Enable automated build-time related posts calculation. When `true`, BlogMore uses a pure-Python TF-IDF and Cosine Similarity engine to automatically calculate and list contextually relevant posts for each entry, with zero runtime overhead for readers.

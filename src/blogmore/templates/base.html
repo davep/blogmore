@@ -64,6 +64,44 @@
     <script src="{{ theme_js_url }}"></script>
     {% endif %}
     <script src="{{ codeblocks_js_url }}" defer></script>
+    {% if with_maths and has_math %}
+    {% if maths_provider == 'mathjax' %}
+    <script>
+        window.MathJax = {
+            options: {
+                ignoreHtmlClass: '.*',
+                processHtmlClass: 'math-inline|math-block'
+            },
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    {% else %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.math-inline').forEach(el => {
+                let text = el.textContent.trim();
+                if (text.startsWith('$') && text.endsWith('$')) {
+                    text = text.substring(1, text.length - 1);
+                }
+                katex.render(text, el, { throwOnError: false, displayMode: false });
+            });
+            document.querySelectorAll('.math-block').forEach(el => {
+                let text = el.textContent.trim();
+                if (text.startsWith('$$') && text.endsWith('$$')) {
+                    text = text.substring(2, text.length - 2);
+                }
+                katex.render(text, el, { throwOnError: false, displayMode: true });
+            });
+        });
+    </script>
+    {% endif %}
+    {% endif %}
     {% if with_mermaid and has_mermaid %}
     <script type="module">
         import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';

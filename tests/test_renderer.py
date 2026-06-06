@@ -1961,3 +1961,91 @@ class TestTemplateRenderer:
             site_title="Test Blog",
         )
         assert "https://cdn.jsdelivr.net/npm/mermaid" in html_series
+
+    def test_render_post_with_math(self, sample_post: Post) -> None:
+        """Test rendering a post with math enabled and containing formula."""
+        renderer = TemplateRenderer()
+
+        # When Math is disabled
+        html_disabled = renderer.render_post(
+            sample_post,
+            with_maths=False,
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/katex" not in html_disabled
+        assert "https://cdn.jsdelivr.net/npm/mathjax" not in html_disabled
+
+        # When Math is enabled but post doesn't have math
+        html_enabled_no_math = renderer.render_post(
+            sample_post,
+            with_maths=True,
+            maths_provider="katex",
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/katex" not in html_enabled_no_math
+
+        # When Math is enabled with KaTeX and post has math
+        sample_post_with_math = Post(
+            path=sample_post.path,
+            title=sample_post.title,
+            content=sample_post.content,
+            html_content='This is <span class="math-inline">$x^2$</span> formula.',
+            date=sample_post.date,
+            category=sample_post.category,
+            tags=sample_post.tags,
+            series=sample_post.series,
+            draft=sample_post.draft,
+            metadata=sample_post.metadata,
+            toc_html=sample_post.toc_html,
+            show_toc=sample_post.show_toc,
+            show_toc_inline=sample_post.show_toc_inline,
+            redirect_from=sample_post.redirect_from,
+        )
+        html_katex = renderer.render_post(
+            sample_post_with_math,
+            with_maths=True,
+            maths_provider="katex",
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/katex" in html_katex
+        assert "https://cdn.jsdelivr.net/npm/mathjax" not in html_katex
+
+        # When Math is enabled with MathJax and post has math
+        html_mathjax = renderer.render_post(
+            sample_post_with_math,
+            with_maths=True,
+            maths_provider="mathjax",
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/mathjax" in html_mathjax
+        assert "https://cdn.jsdelivr.net/npm/katex" not in html_mathjax
+
+    def test_render_listings_with_math(self, sample_post: Post) -> None:
+        """Test rendering index and listing pages with math enabled and containing formula."""
+        renderer = TemplateRenderer()
+
+        sample_post_with_math = Post(
+            path=sample_post.path,
+            title=sample_post.title,
+            content=sample_post.content,
+            html_content='This is <span class="math-inline">$x^2$</span> formula.',
+            date=sample_post.date,
+            category=sample_post.category,
+            tags=sample_post.tags,
+            series=sample_post.series,
+            draft=sample_post.draft,
+            metadata=sample_post.metadata,
+            toc_html=sample_post.toc_html,
+            show_toc=sample_post.show_toc,
+            show_toc_inline=sample_post.show_toc_inline,
+            redirect_from=sample_post.redirect_from,
+        )
+
+        # Index page
+        html_index = renderer.render_index(
+            posts=[sample_post_with_math],
+            with_maths=True,
+            maths_provider="katex",
+            site_title="Test Blog",
+        )
+        assert "https://cdn.jsdelivr.net/npm/katex" in html_index

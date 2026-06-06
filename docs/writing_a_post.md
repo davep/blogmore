@@ -356,6 +356,24 @@ To use Mermaid diagrams:
 * **Efficient loading:** To keep page load speeds fast, the Mermaid JS library is only loaded from a CDN on pages (posts, pages, or index/listings) that actually contain a diagram block.
 * **More options:** For full syntax details, layout options, and diagram types (such as sequence diagrams, pie charts, gantt charts, and user journeys), see the official [Mermaid documentation](https://mermaid.js.org/).
 
+### LaTeX Math Rendering
+
+If enabled, BlogMore supports rendering mathematical equations and formulas written in standard LaTeX notation:
+
+*   **Inline math:** Enclose the formula between single dollar signs, like `$e^{i\pi} + 1 = 0$` (note: there must be no space immediately inside the delimiters).
+*   **Block math:** Enclose the formula between double dollar signs on separate lines:
+    ```latex
+    $$
+    f(x) = \int_{-\infty}^{\infty} \hat{f}(\xi) e^{2 \pi i x \xi} d\xi
+    $$
+    ```
+
+To use LaTeX math equations:
+
+*   **Enable the feature:** You must turn on math rendering globally by setting [`with_maths: true`](configuration.md#with_maths) in your `blogmore.yaml` configuration file.
+*   **Select a rendering engine:** You can configure your preferred engine via [`maths_provider`](configuration.md#maths_provider) (defaults to `'katex'` for instant rendering, or `'mathjax'` for full feature support and accessibility).
+*   **Efficient loading:** To keep page load speeds fast, the chosen rendering library is only loaded from a CDN on pages that actually contain mathematical equations.
+
 ### Tables
 
 ```markdown

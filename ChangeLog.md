@@ -6,6 +6,9 @@
 
 - Added Mermaid diagram rendering support via the `with_mermaid`
   configuration option. ([#600](https://github.com/davep/blogmore/pull/600))
+- Added LaTeX math rendering support via the `with_maths` and
+  `maths_provider` configuration options.
+  ([#604](https://github.com/davep/blogmore/pull/604))
 
 ## v2.40.1
 
