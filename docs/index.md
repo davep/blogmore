@@ -39,6 +39,7 @@ BlogMore focuses on simplicity and efficiency in creating blog-focused websites.
 - **Calendar view** — Optional full-history year calendar view of all posts, with links to day, month, and year archives (enable with `--with-calendar`)
 - **Post graph** — optional interactive force-directed graph connecting posts, tags, and categories via internal links
 - **Related posts** - Automatically find and display contextually relevant posts for each entry using a build-time TF-IDF and cosine similarity engine (enable with `--with-related`)
+- **Diagrams (Mermaid)** - Optional support for rendering Mermaid diagrams and flowcharts from fenced code blocks (enable with `with_mermaid: true` in your configuration)
 
 ## Installation
 

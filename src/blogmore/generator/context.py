@@ -240,6 +240,8 @@ class ContextBuilder:
             "calendar_url": self.get_calendar_url(),
             "with_graph": self.site_config.with_graph,
             "graph_url": self.get_graph_url(),
+            "with_mermaid": self.site_config.with_mermaid,
+            "has_mermaid": False,
             "with_read_time": self.site_config.with_read_time,
             "with_gfi": self.site_config.with_gfi,
             "with_backlinks": self.site_config.with_backlinks,

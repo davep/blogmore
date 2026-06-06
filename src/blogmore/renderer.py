@@ -244,6 +244,10 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
+        context["has_mermaid"] = (
+            'class="mermaid"' in post.html_content
+            or 'class="language-mermaid"' in post.html_content
+        )
         return self.render_template("post.html", post=post, **context)
 
     def render_page(self, page: Page, **context: Any) -> str:
@@ -256,6 +260,10 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
+        context["has_mermaid"] = (
+            'class="mermaid"' in page.html_content
+            or 'class="language-mermaid"' in page.html_content
+        )
         return self.render_template("page.html", page=page, **context)
 
     def render_index(
@@ -276,6 +284,11 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
+        context["has_mermaid"] = any(
+            'class="mermaid"' in p.html_content
+            or 'class="language-mermaid"' in p.html_content
+            for p in posts
+        )
         return self.render_template(
             "index.html",
             posts=posts,
@@ -304,6 +317,11 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
+        context["has_mermaid"] = any(
+            'class="mermaid"' in p.html_content
+            or 'class="language-mermaid"' in p.html_content
+            for p in posts
+        )
         return self.render_template(
             "archive.html",
             posts=posts,
@@ -333,6 +351,11 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
+        context["has_mermaid"] = any(
+            'class="mermaid"' in p.html_content
+            or 'class="language-mermaid"' in p.html_content
+            for p in posts
+        )
         return self.render_template(
             "tag.html",
             tag=tag,
@@ -362,6 +385,11 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
+        context["has_mermaid"] = any(
+            'class="mermaid"' in p.html_content
+            or 'class="language-mermaid"' in p.html_content
+            for p in posts
+        )
         return self.render_template(
             "category.html",
             category=category,
@@ -391,6 +419,11 @@ class TemplateRenderer:
         Returns:
             Rendered HTML string
         """
+        context["has_mermaid"] = any(
+            'class="mermaid"' in p.html_content
+            or 'class="language-mermaid"' in p.html_content
+            for p in posts
+        )
         return self.render_template(
             "series.html",
             series=series,

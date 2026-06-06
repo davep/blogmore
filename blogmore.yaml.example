@@ -112,6 +112,13 @@ posts_per_feed: 20
 # bar automatically, between Calendar and RSS. Configuration file only.
 # with_graph: false
 
+# Optional: Enable Mermaid diagram rendering (default: false)
+# When true, BlogMore will support rendering diagrams written inside
+# fenced code blocks labeled with the 'mermaid' language tag.
+# To keep pages fast, the Mermaid library is only loaded on individual posts
+# and pages that actually contain a mermaid block. Configuration file only.
+# with_mermaid: false
+
 # Optional: Enable automated build-time related posts calculation (default: false)
 # When true, BlogMore uses a pure-Python TF-IDF and Cosine Similarity engine to
 # automatically find and display contextually relevant posts for each entry,
