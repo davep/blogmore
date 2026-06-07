@@ -1205,6 +1205,39 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#with_mermaid" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>with_mermaid</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#with_maths" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>with_maths</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maths_provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>maths_provider</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#with_related" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -3016,6 +3049,39 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#with_mermaid" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>with_mermaid</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#with_maths" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>with_maths</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maths_provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>maths_provider</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#with_related" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -4575,6 +4641,36 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <p><strong>Type:</strong> Boolean<br />
 <strong>Default:</strong> <code>false</code></p>
 <div class="highlight"><pre><span></span><code><span class="nt">with_graph</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<h4 id="with_mermaid"><code>with_mermaid</code></h4>
+<p>Enable Mermaid diagram rendering. When <code>true</code>, BlogMore will support rendering diagrams written inside fenced code blocks labeled with the <code>mermaid</code> language tag.</p>
+<p>To optimize page loading and keep builds fast, the Mermaid JS library is loaded dynamically from CDN only on pages (posts, pages, or index/listings) that actually contain a diagram block. </p>
+<p>This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
+<p>Off by default.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">with_mermaid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<h4 id="with_maths"><code>with_maths</code></h4>
+<p>Enable LaTeX mathematical formula rendering. When <code>true</code>, BlogMore will support rendering inline equations (wrapped in single dollar signs, e.g. <code>$x^2$</code>) and block equations (wrapped in double dollar signs, e.g. <code>$$x^2$$</code>) written in standard LaTeX math notation.</p>
+<p>To optimize page loading and keep builds fast, the math rendering library is loaded dynamically from CDN only on pages (posts, pages, or index/listings) that actually contain mathematical equations.</p>
+<p>This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
+<p>Off by default.</p>
+<p><strong>Type:</strong> Boolean<br />
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">with_maths</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<h4 id="maths_provider"><code>maths_provider</code></h4>
+<p>Select the mathematical rendering engine to use when <a href="#with_maths"><code>with_maths</code></a> is enabled. </p>
+<p>Supported options are:</p>
+<ul>
+<li><code>katex</code> — (Default) An extremely fast, lightweight rendering engine that loads math formulas almost instantly with minimal impact on page load times.</li>
+<li><code>mathjax</code> — A highly feature-rich rendering engine that supports 100% of LaTeX environments, along with built-in accessibility features (like standard screen-reader math parsing and zoom-on-click menus).</li>
+</ul>
+<p>This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
+<p><strong>Type:</strong> String<br />
+<strong>Default:</strong> <code>katex</code></p>
+<div class="highlight"><pre><span></span><code><span class="nt">maths_provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">katex</span>
 </code></pre></div>
 <h4 id="with_related"><code>with_related</code></h4>
 <p>Enable automated build-time related posts calculation. When <code>true</code>, BlogMore uses a pure-Python TF-IDF and Cosine Similarity engine to automatically calculate and list contextually relevant posts for each entry, with zero runtime overhead for readers.</p>

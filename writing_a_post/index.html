@@ -890,6 +890,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#diagrams-mermaid" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Diagrams (Mermaid)
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#latex-math-rendering" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        LaTeX Math Rendering
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#tables" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1751,6 +1773,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#diagrams-mermaid" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Diagrams (Mermaid)
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#latex-math-rendering" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        LaTeX Math Rendering
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#tables" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -2091,6 +2135,38 @@ publication date:</p>
 <span class="sb">```</span>
 </code></pre></div>
 <p>A wide range of languages are supported, including <code>python</code>, <code>javascript</code>, <code>typescript</code>, <code>bash</code>, <code>yaml</code>, <code>json</code>, <code>html</code>, <code>css</code>, <code>sql</code>, <code>rust</code>, <code>go</code>, and many more.</p>
+<h3 id="diagrams-mermaid">Diagrams (Mermaid)</h3>
+<p>If enabled, BlogMore supports rendering diagrams and flowcharts written inside fenced code blocks using the <code>mermaid</code> language identifier:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```mermaid</span>
+<span class="s">graph TD</span>
+<span class="s">    A[Start] --&gt; B[Process]</span>
+<span class="s">    B --&gt; C{Decision}</span>
+<span class="s">    C --&gt;|Yes| D[Success]</span>
+<span class="s">    C --&gt;|No| E[Fail]</span>
+<span class="sb">```</span>
+</code></pre></div>
+<p>To use Mermaid diagrams:</p>
+<ul>
+<li><strong>Enable the feature:</strong> You must turn on Mermaid rendering globally by setting <a href="../configuration/#with_mermaid"><code>with_mermaid: true</code></a> in your <code>blogmore.yaml</code> configuration file.</li>
+<li><strong>Efficient loading:</strong> To keep page load speeds fast, the Mermaid JS library is only loaded from a CDN on pages (posts, pages, or index/listings) that actually contain a diagram block.</li>
+<li><strong>More options:</strong> For full syntax details, layout options, and diagram types (such as sequence diagrams, pie charts, gantt charts, and user journeys), see the official <a href="https://mermaid.js.org/">Mermaid documentation</a>.</li>
+</ul>
+<h3 id="latex-math-rendering">LaTeX Math Rendering</h3>
+<p>If enabled, BlogMore supports rendering mathematical equations and formulas written in standard LaTeX notation:</p>
+<ul>
+<li><strong>Inline math:</strong> Enclose the formula between single dollar signs, like <code>$e^{i\pi} + 1 = 0$</code> (note: there must be no space immediately inside the delimiters).</li>
+<li><strong>Block math:</strong> Enclose the formula between double dollar signs on separate lines:
+    <div class="highlight"><pre><span></span><code><span class="sb">$$</span>
+<span class="nb">f</span><span class="o">(</span><span class="nb">x</span><span class="o">)</span><span class="nb"> </span><span class="o">=</span><span class="nb"> </span><span class="nv">\int</span><span class="nb">_{</span><span class="o">-</span><span class="nv">\infty</span><span class="nb">}^{</span><span class="nv">\infty</span><span class="nb">} </span><span class="nv">\hat</span><span class="nb">{f}</span><span class="o">(</span><span class="nv">\xi</span><span class="o">)</span><span class="nb"> e^{</span><span class="m">2</span><span class="nb"> </span><span class="nv">\pi</span><span class="nb"> i x </span><span class="nv">\xi</span><span class="nb">} d</span><span class="nv">\xi</span>
+<span class="s">$$</span>
+</code></pre></div></li>
+</ul>
+<p>To use LaTeX math equations:</p>
+<ul>
+<li><strong>Enable the feature:</strong> You must turn on math rendering globally by setting <a href="../configuration/#with_maths"><code>with_maths: true</code></a> in your <code>blogmore.yaml</code> configuration file.</li>
+<li><strong>Select a rendering engine:</strong> You can configure your preferred engine via <a href="../configuration/#maths_provider"><code>maths_provider</code></a> (defaults to <code>'katex'</code> for instant rendering, or <code>'mathjax'</code> for full feature support and accessibility).</li>
+<li><strong>Efficient loading:</strong> To keep page load speeds fast, the chosen rendering library is only loaded from a CDN on pages that actually contain mathematical equations.</li>
+</ul>
 <h3 id="tables">Tables</h3>
 <div class="highlight"><pre><span></span><code>| Feature       | Supported |
 |---------------|-----------|

@@ -1700,6 +1700,31 @@ below lists all variables that are available in every template.</p>
 <td>URL to the graph-page stylesheet (with cache-bust query string).</td>
 </tr>
 <tr>
+<td><code>with_mermaid</code></td>
+<td><code>bool</code></td>
+<td><code>True</code> when Mermaid diagram rendering is enabled.</td>
+</tr>
+<tr>
+<td><code>has_mermaid</code></td>
+<td><code>bool</code></td>
+<td><code>True</code> if the currently rendered page/post (or any post listed in the current index view) contains a Mermaid diagram.</td>
+</tr>
+<tr>
+<td><code>with_maths</code></td>
+<td><code>bool</code></td>
+<td><code>True</code> when LaTeX mathematical formula rendering is enabled.</td>
+</tr>
+<tr>
+<td><code>maths_provider</code></td>
+<td><code>str</code></td>
+<td>The selected math rendering engine (<code>'katex'</code> or <code>'mathjax'</code>).</td>
+</tr>
+<tr>
+<td><code>has_math</code></td>
+<td><code>bool</code></td>
+<td><code>True</code> if the currently rendered page/post (or any post listed in the current index view) contains a mathematical equation.</td>
+</tr>
+<tr>
 <td><code>inline_theme_js</code></td>
 <td><code>bool</code></td>
 <td><code>True</code> when theme JavaScript inlining is enabled.</td>
