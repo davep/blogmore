@@ -370,6 +370,21 @@ def create_parser() -> argparse.ArgumentParser:
 
     add_common_arguments(categories_parser)
 
+    # Dump tags sub-command
+    tags_parser = dump_subparsers.add_parser(
+        "tags",
+        help="Dump all tags to stdout as JSON",
+    )
+
+    tags_parser.add_argument(
+        "content_dir",
+        type=Path,
+        nargs="?",
+        help="Directory containing markdown blog posts",
+    )
+
+    add_common_arguments(tags_parser)
+
     # Cache command
     cache_parser = subparsers.add_parser(
         "cache",

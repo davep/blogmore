@@ -12,6 +12,10 @@
   categories to stdout as JSON pairs of `[slug, display_name]`, using the
   most common casing variant of each category across all posts.
   ([#610](https://github.com/davep/blogmore/pull/610))
+- Added a `tags` subcommand to the `dump` command to export all blog tags to
+  stdout as JSON pairs of `[slug, display_name]`, using the most common
+  casing variant of each tag across all posts.
+  ([#611](https://github.com/davep/blogmore/pull/611))
 
 ## v2.41.0
 

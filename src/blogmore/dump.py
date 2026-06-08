@@ -190,3 +190,31 @@ def dump_categories(posts: list[Post]) -> None:
 
     json.dump(category_pairs, sys.stdout, indent=2)
     sys.stdout.write("\n")
+
+
+def dump_tags(posts: list[Post]) -> None:
+    """Dump all tags found in posts to stdout as a JSON structure.
+
+    The structure is a list of pairs, where the first item is the URL-safe slug
+    for the tag, and the second is the most common text for that tag.
+    The order of the tags matches the tag cloud page (sorted
+    case-insensitively by the display name).
+
+    Args:
+        posts: The list of posts to process.
+    """
+    from blogmore.generator.grouping import group_posts_by_tag
+    from blogmore.parser import sanitize_for_url
+
+    posts_by_tag = group_posts_by_tag(posts)
+
+    tag_pairs: list[tuple[str, str]] = []
+    for tag_lower, (tag_display, _) in posts_by_tag.items():
+        slug = sanitize_for_url(tag_lower)
+        tag_pairs.append((slug, tag_display))
+
+    # Sort case-insensitively by display name to match the tag cloud page
+    tag_pairs.sort(key=lambda pair: pair[1].lower())
+
+    json.dump(tag_pairs, sys.stdout, indent=2)
+    sys.stdout.write("\n")
