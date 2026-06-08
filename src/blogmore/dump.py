@@ -218,3 +218,31 @@ def dump_tags(posts: list[Post]) -> None:
 
     json.dump(tag_pairs, sys.stdout, indent=2)
     sys.stdout.write("\n")
+
+
+def dump_series(posts: list[Post]) -> None:
+    """Dump all series found in posts to stdout as a JSON structure.
+
+    The structure is a list of pairs, where the first item is the URL-safe slug
+    for the series, and the second is the most common text for that series.
+    The order of the series matches the series index page (sorted
+    case-insensitively by the display name).
+
+    Args:
+        posts: The list of posts to process.
+    """
+    from blogmore.generator.grouping import group_posts_by_series
+    from blogmore.parser import sanitize_for_url
+
+    posts_by_series = group_posts_by_series(posts)
+
+    series_pairs: list[tuple[str, str]] = []
+    for series_lower, (series_display, _) in posts_by_series.items():
+        slug = sanitize_for_url(series_lower)
+        series_pairs.append((slug, series_display))
+
+    # Sort case-insensitively by display name to match the series index page
+    series_pairs.sort(key=lambda pair: pair[1].lower())
+
+    json.dump(series_pairs, sys.stdout, indent=2)
+    sys.stdout.write("\n")

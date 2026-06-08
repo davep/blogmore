@@ -385,6 +385,21 @@ def create_parser() -> argparse.ArgumentParser:
 
     add_common_arguments(tags_parser)
 
+    # Dump series sub-command
+    series_parser = dump_subparsers.add_parser(
+        "series",
+        help="Dump all series to stdout as JSON",
+    )
+
+    series_parser.add_argument(
+        "content_dir",
+        type=Path,
+        nargs="?",
+        help="Directory containing markdown blog posts",
+    )
+
+    add_common_arguments(series_parser)
+
     # Cache command
     cache_parser = subparsers.add_parser(
         "cache",

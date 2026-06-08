@@ -285,3 +285,87 @@ def test_dump_tags_tie(capsys: pytest.CaptureFixture[str]) -> None:
     assert data == [
         ["python", "python"],
     ]
+
+
+def test_dump_series(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test dump_series writes unique series with most common casing to stdout as JSON.
+
+    Args:
+        capsys: The pytest capture fixture.
+    """
+    from blogmore.dump import dump_series
+
+    post1 = Post(
+        path=Path("post1.md"),
+        title="Post 1",
+        content="...",
+        html_content="...",
+        series=["Daily Journal"],
+    )
+    post2 = Post(
+        path=Path("post2.md"),
+        title="Post 2",
+        content="...",
+        html_content="...",
+        series=["daily journal"],
+    )
+    post3 = Post(
+        path=Path("post3.md"),
+        title="Post 3",
+        content="...",
+        html_content="...",
+        series=["Daily Journal"],
+    )
+    post4 = Post(
+        path=Path("post4.md"),
+        title="Post 4",
+        content="...",
+        html_content="...",
+        series=["Coding"],
+    )
+
+    # We expect two series: "Daily Journal" and "Coding"
+    # "Daily Journal" slug is "daily-journal". The most common casing is "Daily Journal" (2 occurrences vs 1)
+    # "Coding" slug is "coding", display is "Coding".
+    # Sorting by display name lower: "Coding", "Daily Journal"
+    dump_series([post1, post2, post3, post4])
+
+    captured = capsys.readouterr()
+    data = json.loads(captured.out)
+    assert data == [
+        ["coding", "Coding"],
+        ["daily-journal", "Daily Journal"],
+    ]
+
+
+def test_dump_series_tie(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test dump_series tie-breaking defaults to first-occurring casing.
+
+    Args:
+        capsys: The pytest capture fixture.
+    """
+    from blogmore.dump import dump_series
+
+    post1 = Post(
+        path=Path("post1.md"),
+        title="Post 1",
+        content="...",
+        html_content="...",
+        series=["daily journal"],
+    )
+    post2 = Post(
+        path=Path("post2.md"),
+        title="Post 2",
+        content="...",
+        html_content="...",
+        series=["Daily Journal"],
+    )
+
+    # Both casing versions occur once. The first one is "daily journal".
+    dump_series([post1, post2])
+
+    captured = capsys.readouterr()
+    data = json.loads(captured.out)
+    assert data == [
+        ["daily-journal", "daily journal"],
+    ]

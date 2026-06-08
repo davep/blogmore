@@ -16,6 +16,11 @@
   stdout as JSON pairs of `[slug, display_name]`, using the most common
   casing variant of each tag across all posts.
   ([#611](https://github.com/davep/blogmore/pull/611))
+- Added a `series` subcommand to the `dump` command to export all blog
+  series to stdout as JSON pairs of `[slug, display_name]`, using the most
+  common casing variant of each series across all posts.
+  ([#612](https://github.com/davep/blogmore/pull/612))
+
 
 ## v2.41.0
 

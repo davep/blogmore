@@ -3361,6 +3361,87 @@ class TestDumpCLI:
                 ["python-coding", "Python Coding"],
             ]
 
+    def test_dump_series_cli(
+        self,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
+        temp_output_dir: Path,
+    ) -> None:
+        """Test dumping series as JSON with dump series command."""
+        posts_dir = tmp_path / "posts"
+        posts_dir.mkdir()
+
+        # Create posts with series
+        post1_file = posts_dir / "first.md"
+        post1_file.write_text(
+            "---\n"
+            "title: First Post\n"
+            "date: 2024-01-15\n"
+            "series:\n"
+            "  - Python Coding\n"
+            "  - blogging\n"
+            "---\n"
+            "Content of the first post.\n"
+        )
+
+        post2_file = posts_dir / "second.md"
+        post2_file.write_text(
+            "---\n"
+            "title: Second Post\n"
+            "date: 2024-01-20\n"
+            "series:\n"
+            "  - python coding\n"
+            "---\n"
+            "Content of the second post.\n"
+        )
+
+        post3_file = posts_dir / "third.md"
+        post3_file.write_text(
+            "---\n"
+            "title: Third Post\n"
+            "date: 2024-01-25\n"
+            "series:\n"
+            "  - Python Coding\n"
+            "---\n"
+            "Content of the third post.\n"
+        )
+
+        post4_file = posts_dir / "fourth.md"
+        post4_file.write_text(
+            "---\n"
+            "title: Fourth Post\n"
+            "date: 2024-01-30\n"
+            "series:\n"
+            "  - Analytics\n"
+            "---\n"
+            "Content of the fourth post.\n"
+        )
+
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "blogmore",
+                "dump",
+                "series",
+                str(posts_dir),
+                "-o",
+                str(temp_output_dir),
+            ],
+        ):
+            result = main()
+            assert result == 0
+            captured = capsys.readouterr()
+
+            import json
+
+            data = json.loads(captured.out)
+            assert data == [
+                ["analytics", "Analytics"],
+                ["blogging", "blogging"],
+                ["python-coding", "Python Coding"],
+            ]
+
     def test_preprocess_args_cases(self) -> None:
         """Test the preprocess_args utility with various input scenarios."""
         from blogmore.__main__ import preprocess_args
@@ -3427,5 +3508,15 @@ class TestDumpCLI:
         assert preprocess_args(["dump", "tags", "my_posts"]) == [
             "dump",
             "tags",
+            "my_posts",
+        ]
+
+        # Case 15: dump series -> unchanged
+        assert preprocess_args(["dump", "series"]) == ["dump", "series"]
+
+        # Case 16: dump series my_posts -> unchanged
+        assert preprocess_args(["dump", "series", "my_posts"]) == [
+            "dump",
+            "series",
             "my_posts",
         ]
