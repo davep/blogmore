@@ -3205,6 +3205,81 @@ class TestDumpCLI:
             assert "posts" in captured.out
             assert "Dump site content to stdout" in captured.out
 
+    def test_dump_categories_cli(
+        self,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
+        temp_output_dir: Path,
+    ) -> None:
+        """Test dumping categories as JSON with dump categories command."""
+        posts_dir = tmp_path / "posts"
+        posts_dir.mkdir()
+
+        # Create posts with categories
+        post1_file = posts_dir / "first.md"
+        post1_file.write_text(
+            "---\n"
+            "title: First Post\n"
+            "date: 2024-01-15\n"
+            "category: Python Coding\n"
+            "---\n"
+            "Content of the first post.\n"
+        )
+
+        post2_file = posts_dir / "second.md"
+        post2_file.write_text(
+            "---\n"
+            "title: Second Post\n"
+            "date: 2024-01-20\n"
+            "category: python coding\n"
+            "---\n"
+            "Content of the second post.\n"
+        )
+
+        post3_file = posts_dir / "third.md"
+        post3_file.write_text(
+            "---\n"
+            "title: Third Post\n"
+            "date: 2024-01-25\n"
+            "category: Python Coding\n"
+            "---\n"
+            "Content of the third post.\n"
+        )
+
+        post4_file = posts_dir / "fourth.md"
+        post4_file.write_text(
+            "---\n"
+            "title: Fourth Post\n"
+            "date: 2024-01-30\n"
+            "category: Analytics\n"
+            "---\n"
+            "Content of the fourth post.\n"
+        )
+
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "blogmore",
+                "dump",
+                "categories",
+                str(posts_dir),
+                "-o",
+                str(temp_output_dir),
+            ],
+        ):
+            result = main()
+            assert result == 0
+            captured = capsys.readouterr()
+
+            import json
+
+            data = json.loads(captured.out)
+            assert data == [
+                ["analytics", "Analytics"],
+                ["python-coding", "Python Coding"],
+            ]
+
     def test_preprocess_args_cases(self) -> None:
         """Test the preprocess_args utility with various input scenarios."""
         from blogmore.__main__ import preprocess_args
@@ -3253,3 +3328,13 @@ class TestDumpCLI:
 
         # Case 10: links dump -> unchanged
         assert preprocess_args(["links", "dump"]) == ["links", "dump"]
+
+        # Case 11: dump categories -> unchanged
+        assert preprocess_args(["dump", "categories"]) == ["dump", "categories"]
+
+        # Case 12: dump categories my_posts -> unchanged
+        assert preprocess_args(["dump", "categories", "my_posts"]) == [
+            "dump",
+            "categories",
+            "my_posts",
+        ]
