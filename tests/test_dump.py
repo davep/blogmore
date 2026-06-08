@@ -199,3 +199,89 @@ def test_dump_categories_tie(capsys: pytest.CaptureFixture[str]) -> None:
     assert data == [
         ["learning-python", "learning python"],
     ]
+
+
+def test_dump_tags(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test dump_tags writes unique tags with most common casing to stdout as JSON.
+
+    Args:
+        capsys: The pytest capture fixture.
+    """
+    from blogmore.dump import dump_tags
+
+    post1 = Post(
+        path=Path("post1.md"),
+        title="Post 1",
+        content="...",
+        html_content="...",
+        tags=["Python", "Blogging"],
+    )
+    post2 = Post(
+        path=Path("post2.md"),
+        title="Post 2",
+        content="...",
+        html_content="...",
+        tags=["python"],
+    )
+    post3 = Post(
+        path=Path("post3.md"),
+        title="Post 3",
+        content="...",
+        html_content="...",
+        tags=["Python"],
+    )
+    post4 = Post(
+        path=Path("post4.md"),
+        title="Post 4",
+        content="...",
+        html_content="...",
+        tags=["Coding"],
+    )
+
+    # We expect three tags: "Python", "Blogging", "Coding"
+    # "Python" slug is "python". The most common casing is "Python" (2 occurrences vs 1)
+    # "Blogging" slug is "blogging", display is "Blogging".
+    # "Coding" slug is "coding", display is "Coding".
+    # Sorting by display name lower: "Blogging", "Coding", "Python"
+    dump_tags([post1, post2, post3, post4])
+
+    captured = capsys.readouterr()
+    data = json.loads(captured.out)
+    assert data == [
+        ["blogging", "Blogging"],
+        ["coding", "Coding"],
+        ["python", "Python"],
+    ]
+
+
+def test_dump_tags_tie(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test dump_tags tie-breaking defaults to first-occurring casing.
+
+    Args:
+        capsys: The pytest capture fixture.
+    """
+    from blogmore.dump import dump_tags
+
+    post1 = Post(
+        path=Path("post1.md"),
+        title="Post 1",
+        content="...",
+        html_content="...",
+        tags=["python"],
+    )
+    post2 = Post(
+        path=Path("post2.md"),
+        title="Post 2",
+        content="...",
+        html_content="...",
+        tags=["Python"],
+    )
+
+    # Both casing versions occur once. The first one is "python".
+    dump_tags([post1, post2])
+
+    captured = capsys.readouterr()
+    data = json.loads(captured.out)
+    assert data == [
+        ["python", "python"],
+    ]

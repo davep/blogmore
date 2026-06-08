@@ -17,7 +17,7 @@ BlogMore provides several commands:
 - **`publish`** - Build and publish the site to a git branch
 - **`lint`** - Check the site for common issues (broken links, etc.)
 - **`drafts`** - List the path to all posts marked as drafts
-- **`dump`** - Dump site content (posts or categories) to stdout as JSON (defaults to `posts`)
+- **`dump`** - Dump site content (posts, categories, or tags) to stdout as JSON (defaults to `posts`)
 - **`cache`** - Manage the BlogMore cache
 
 ### Command Aliases
@@ -686,6 +686,28 @@ blogmore dump categories [content_dir] [options]
 Dump all categories to a JSON file:
 ```bash
 blogmore dump categories posts/ > categories_dump.json
+```
+
+#### `tags`
+
+Dump all tags found in the posts in the content directory to stdout as a JSON structure. The structure is a list of pairs, where the first item is the URL-safe slug for the tag, and the second is the most common text (display name casing) for that tag. The tags are sorted case-insensitively by their display name, matching the tag cloud page.
+
+##### Synopsis
+
+```bash
+blogmore dump tags [content_dir] [options]
+```
+
+##### Arguments
+
+**`content_dir`** (optional)
+: Directory containing your Markdown blog posts.
+
+##### Examples
+
+Dump all tags to a JSON file:
+```bash
+blogmore dump tags posts/ > tags_dump.json
 ```
 
 ## Links Command
