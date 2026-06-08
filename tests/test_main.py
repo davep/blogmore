@@ -3145,3 +3145,111 @@ class TestDumpCLI:
             assert result == 1
             captured = capsys.readouterr()
             assert "Error: Content directory not found" in captured.err
+
+    def test_dump_posts_explicit(
+        self,
+        capsys: pytest.CaptureFixture[str],
+        tmp_path: Path,
+    ) -> None:
+        """Test that explicit dump posts command works identical to dump command."""
+        posts_dir = tmp_path / "posts"
+        posts_dir.mkdir()
+        temp_output_dir = tmp_path / "output"
+        temp_output_dir.mkdir()
+
+        post_file = posts_dir / "first.md"
+        post_file.write_text(
+            "---\n"
+            "title: First Post\n"
+            "date: 2024-01-15\n"
+            "---\n"
+            "Content of the first post.\n"
+        )
+
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "blogmore",
+                "dump",
+                "posts",
+                str(posts_dir),
+                "-o",
+                str(temp_output_dir),
+            ],
+        ):
+            result = main()
+            assert result == 0
+            captured = capsys.readouterr()
+
+            import json
+
+            data = json.loads(captured.out)
+            assert len(data) == 1
+            assert data[0]["title"] == "First Post"
+
+    def test_dump_help_does_not_insert_posts(
+        self,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        """Test that dump help does not automatically insert posts subcommand."""
+        with patch.object(
+            sys,
+            "argv",
+            ["blogmore", "dump", "-h"],
+        ):
+            with pytest.raises(SystemExit) as exc_info:
+                main()
+            assert exc_info.value.code == 0
+            captured = capsys.readouterr()
+            assert "posts" in captured.out
+            assert "Dump site content to stdout" in captured.out
+
+    def test_preprocess_args_cases(self) -> None:
+        """Test the preprocess_args utility with various input scenarios."""
+        from blogmore.__main__ import preprocess_args
+
+        # Case 1: dump with no args -> dump posts
+        assert preprocess_args(["dump"]) == ["dump", "posts"]
+
+        # Case 2: dump posts -> unchanged
+        assert preprocess_args(["dump", "posts"]) == ["dump", "posts"]
+
+        # Case 3: dump posts content_dir -> unchanged
+        assert preprocess_args(["dump", "posts", "my_posts"]) == [
+            "dump",
+            "posts",
+            "my_posts",
+        ]
+
+        # Case 4: dump content_dir -> dump posts content_dir
+        assert preprocess_args(["dump", "my_posts"]) == ["dump", "posts", "my_posts"]
+
+        # Case 5: dump -c config.yaml my_posts -> dump posts -c config.yaml my_posts
+        assert preprocess_args(["dump", "-c", "config.yaml", "my_posts"]) == [
+            "dump",
+            "posts",
+            "-c",
+            "config.yaml",
+            "my_posts",
+        ]
+
+        # Case 6: dump --site-title posts -> dump posts --site-title posts
+        assert preprocess_args(["dump", "--site-title", "posts"]) == [
+            "dump",
+            "posts",
+            "--site-title",
+            "posts",
+        ]
+
+        # Case 7: dump -h -> unchanged
+        assert preprocess_args(["dump", "-h"]) == ["dump", "-h"]
+
+        # Case 8: dump posts -h -> unchanged
+        assert preprocess_args(["dump", "posts", "-h"]) == ["dump", "posts", "-h"]
+
+        # Case 9: other command -> unchanged
+        assert preprocess_args(["build", "posts"]) == ["build", "posts"]
+
+        # Case 10: links dump -> unchanged
+        assert preprocess_args(["links", "dump"]) == ["links", "dump"]
