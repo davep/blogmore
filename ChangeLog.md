@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.42.0
 
-**Released: WiP**
+**Released: 2026-06-08**
 
 - Restructured the `dump` command to support subcommands, converting the
   original post-dumping functionality into a `dump posts` subcommand while
@@ -20,7 +20,6 @@
   series to stdout as JSON pairs of `[slug, display_name]`, using the most
   common casing variant of each series across all posts.
   ([#612](https://github.com/davep/blogmore/pull/612))
-
 
 ## v2.41.0
 
