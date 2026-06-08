@@ -123,3 +123,79 @@ def test_dump_posts(capsys: pytest.CaptureFixture[str]) -> None:
     # Check internal/external link values in dump output
     assert data[0]["internal_links"] == []
     assert data[1]["internal_links"] == ["post2.md"]
+
+
+def test_dump_categories(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test dump_categories writes unique categories with most common casing to stdout as JSON."""
+    from blogmore.dump import dump_categories
+
+    post1 = Post(
+        path=Path("post1.md"),
+        title="Post 1",
+        content="...",
+        html_content="...",
+        category="Learning Python",
+    )
+    post2 = Post(
+        path=Path("post2.md"),
+        title="Post 2",
+        content="...",
+        html_content="...",
+        category="learning python",
+    )
+    post3 = Post(
+        path=Path("post3.md"),
+        title="Post 3",
+        content="...",
+        html_content="...",
+        category="Learning Python",
+    )
+    post4 = Post(
+        path=Path("post4.md"),
+        title="Post 4",
+        content="...",
+        html_content="...",
+        category="Coding",
+    )
+
+    # We expect two categories: "Learning Python" and "Coding"
+    # "Learning Python" slug is "learning-python". The most common casing is "Learning Python" (2 occurrences vs 1)
+    # "Coding" slug is "coding", display is "Coding".
+    # Sorting by display name lower: "Coding", "Learning Python"
+    dump_categories([post1, post2, post3, post4])
+
+    captured = capsys.readouterr()
+    data = json.loads(captured.out)
+    assert data == [
+        ["coding", "Coding"],
+        ["learning-python", "Learning Python"],
+    ]
+
+
+def test_dump_categories_tie(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test dump_categories tie-breaking defaults to first-occurring casing."""
+    from blogmore.dump import dump_categories
+
+    post1 = Post(
+        path=Path("post1.md"),
+        title="Post 1",
+        content="...",
+        html_content="...",
+        category="learning python",
+    )
+    post2 = Post(
+        path=Path("post2.md"),
+        title="Post 2",
+        content="...",
+        html_content="...",
+        category="Learning Python",
+    )
+
+    # Both casing versions occur once. The first one is "learning python".
+    dump_categories([post1, post2])
+
+    captured = capsys.readouterr()
+    data = json.loads(captured.out)
+    assert data == [
+        ["learning-python", "learning python"],
+    ]

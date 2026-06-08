@@ -8,6 +8,10 @@
   original post-dumping functionality into a `dump posts` subcommand while
   maintaining `posts` as the default subcommand for backward compatibility.
   ([#609](https://github.com/davep/blogmore/pull/609))
+- Added a `categories` subcommand to the `dump` command to export all blog
+  categories to stdout as JSON pairs of `[slug, display_name]`, using the
+  most common casing variant of each category across all posts.
+  ([#610](https://github.com/davep/blogmore/pull/610))
 
 ## v2.41.0
 

@@ -162,3 +162,31 @@ def dump_posts(posts: list[Post], content_dir: Path, site_url: str = "") -> None
 
     json.dump(post_dicts, sys.stdout, indent=2, cls=BlogmoreJSONEncoder)
     sys.stdout.write("\n")
+
+
+def dump_categories(posts: list[Post]) -> None:
+    """Dump all categories found in posts to stdout as a JSON structure.
+
+    The structure is a list of pairs, where the first item is the URL-safe slug
+    for the category, and the second is the most common text for that category.
+    The order of the categories matches the category cloud page (sorted
+    case-insensitively by the display name).
+
+    Args:
+        posts: The list of posts to process.
+    """
+    from blogmore.generator.grouping import group_posts_by_category
+    from blogmore.parser import sanitize_for_url
+
+    posts_by_category = group_posts_by_category(posts)
+
+    category_pairs: list[tuple[str, str]] = []
+    for category_lower, (category_display, _) in posts_by_category.items():
+        slug = sanitize_for_url(category_lower)
+        category_pairs.append((slug, category_display))
+
+    # Sort case-insensitively by display name to match the category cloud page
+    category_pairs.sort(key=lambda pair: pair[1].lower())
+
+    json.dump(category_pairs, sys.stdout, indent=2)
+    sys.stdout.write("\n")

@@ -12,9 +12,9 @@ def group_posts_by_attribute(
 ) -> dict[str, tuple[str, list[Post]]]:
     """Group posts by a string attribute (case-insensitive).
 
-    The first occurrence of each value is used as the display name; all
-    subsequent occurrences of the same value (compared case-insensitively)
-    are accumulated under the same key.
+    The display name for each unique value (compared case-insensitively) is
+    the most common (frequent) casing version of that value across all posts.
+    If there is a tie, the first-occurring casing is used.
 
     Args:
         posts: List of posts to group.
@@ -26,14 +26,31 @@ def group_posts_by_attribute(
         Dictionary mapping the lowercase attribute value to a
         ``(display_name, posts)`` tuple.
     """
-    result: dict[str, tuple[str, list[Post]]] = {}
+    from collections import Counter
+
+    # Raw results mapping: lowercase_value -> (casing_counts, unique_casings_in_order, posts)
+    result_raw: dict[str, tuple[Counter[str], list[str], list[Post]]] = {}
+
     for post in posts:
         for value in get_values(post):
             value_lower = value.lower()
-            if value_lower not in result:
-                # Store the first occurrence as the display name.
-                result[value_lower] = (value, [])
-            result[value_lower][1].append(post)
+            if value_lower not in result_raw:
+                result_raw[value_lower] = (Counter(), [], [])
+            counter, order, posts_list = result_raw[value_lower]
+            counter[value] += 1
+            if value not in order:
+                order.append(value)
+            posts_list.append(post)
+
+    result: dict[str, tuple[str, list[Post]]] = {}
+    for value_lower, (counter, order, posts_list) in result_raw.items():
+        # Find the most common casing with first-occurrence order as a tie-breaker.
+        best_casing = min(
+            order,
+            key=lambda val: (-counter[val], order.index(val)),
+        )
+        result[value_lower] = (best_casing, posts_list)
+
     return result
 
 
