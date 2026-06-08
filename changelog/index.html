@@ -779,6 +779,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v2420" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        v2.42.0
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v2410" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1711,6 +1722,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v2420" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        v2.42.0
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v2410" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -2587,6 +2609,26 @@
 
 
 <h1 id="blogmore-changelog">BlogMore ChangeLog</h1>
+<h2 id="v2420">v2.42.0</h2>
+<p><strong>Released: 2026-06-08</strong></p>
+<ul>
+<li>Restructured the <code>dump</code> command to support subcommands, converting the
+  original post-dumping functionality into a <code>dump posts</code> subcommand while
+  maintaining <code>posts</code> as the default subcommand for backward compatibility.
+  (<a href="https://github.com/davep/blogmore/pull/609">#609</a>)</li>
+<li>Added a <code>categories</code> subcommand to the <code>dump</code> command to export all blog
+  categories to stdout as JSON pairs of <code>[slug, display_name]</code>, using the
+  most common casing variant of each category across all posts.
+  (<a href="https://github.com/davep/blogmore/pull/610">#610</a>)</li>
+<li>Added a <code>tags</code> subcommand to the <code>dump</code> command to export all blog tags to
+  stdout as JSON pairs of <code>[slug, display_name]</code>, using the most common
+  casing variant of each tag across all posts.
+  (<a href="https://github.com/davep/blogmore/pull/611">#611</a>)</li>
+<li>Added a <code>series</code> subcommand to the <code>dump</code> command to export all blog
+  series to stdout as JSON pairs of <code>[slug, display_name]</code>, using the most
+  common casing variant of each series across all posts.
+  (<a href="https://github.com/davep/blogmore/pull/612">#612</a>)</li>
+</ul>
 <h2 id="v2410">v2.41.0</h2>
 <p><strong>Released: 2026-06-07</strong></p>
 <ul>
