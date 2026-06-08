@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 import sys
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -164,6 +165,32 @@ def dump_posts(posts: list[Post], content_dir: Path, site_url: str = "") -> None
     sys.stdout.write("\n")
 
 
+def _dump_grouped_items(
+    posts: list[Post],
+    grouping_fn: Callable[[list[Post]], dict[str, tuple[str, list[Post]]]],
+) -> None:
+    """Dump grouped post attributes to stdout as a JSON structure.
+
+    Args:
+        posts: The list of posts to process.
+        grouping_fn: A function that groups posts by the desired attribute.
+    """
+    from blogmore.parser import sanitize_for_url
+
+    grouped = grouping_fn(posts)
+
+    pairs: list[tuple[str, str]] = []
+    for lower_key, (display_name, _) in grouped.items():
+        slug = sanitize_for_url(lower_key)
+        pairs.append((slug, display_name))
+
+    # Sort case-insensitively by display name
+    pairs.sort(key=lambda pair: pair[1].lower())
+
+    json.dump(pairs, sys.stdout, indent=2)
+    sys.stdout.write("\n")
+
+
 def dump_categories(posts: list[Post]) -> None:
     """Dump all categories found in posts to stdout as a JSON structure.
 
@@ -176,20 +203,8 @@ def dump_categories(posts: list[Post]) -> None:
         posts: The list of posts to process.
     """
     from blogmore.generator.grouping import group_posts_by_category
-    from blogmore.parser import sanitize_for_url
 
-    posts_by_category = group_posts_by_category(posts)
-
-    category_pairs: list[tuple[str, str]] = []
-    for category_lower, (category_display, _) in posts_by_category.items():
-        slug = sanitize_for_url(category_lower)
-        category_pairs.append((slug, category_display))
-
-    # Sort case-insensitively by display name to match the category cloud page
-    category_pairs.sort(key=lambda pair: pair[1].lower())
-
-    json.dump(category_pairs, sys.stdout, indent=2)
-    sys.stdout.write("\n")
+    _dump_grouped_items(posts, group_posts_by_category)
 
 
 def dump_tags(posts: list[Post]) -> None:
@@ -204,20 +219,8 @@ def dump_tags(posts: list[Post]) -> None:
         posts: The list of posts to process.
     """
     from blogmore.generator.grouping import group_posts_by_tag
-    from blogmore.parser import sanitize_for_url
 
-    posts_by_tag = group_posts_by_tag(posts)
-
-    tag_pairs: list[tuple[str, str]] = []
-    for tag_lower, (tag_display, _) in posts_by_tag.items():
-        slug = sanitize_for_url(tag_lower)
-        tag_pairs.append((slug, tag_display))
-
-    # Sort case-insensitively by display name to match the tag cloud page
-    tag_pairs.sort(key=lambda pair: pair[1].lower())
-
-    json.dump(tag_pairs, sys.stdout, indent=2)
-    sys.stdout.write("\n")
+    _dump_grouped_items(posts, group_posts_by_tag)
 
 
 def dump_series(posts: list[Post]) -> None:
@@ -232,17 +235,5 @@ def dump_series(posts: list[Post]) -> None:
         posts: The list of posts to process.
     """
     from blogmore.generator.grouping import group_posts_by_series
-    from blogmore.parser import sanitize_for_url
 
-    posts_by_series = group_posts_by_series(posts)
-
-    series_pairs: list[tuple[str, str]] = []
-    for series_lower, (series_display, _) in posts_by_series.items():
-        slug = sanitize_for_url(series_lower)
-        series_pairs.append((slug, series_display))
-
-    # Sort case-insensitively by display name to match the series index page
-    series_pairs.sort(key=lambda pair: pair[1].lower())
-
-    json.dump(series_pairs, sys.stdout, indent=2)
-    sys.stdout.write("\n")
+    _dump_grouped_items(posts, group_posts_by_series)
