@@ -68,7 +68,7 @@ def preprocess_args(argv: list[str]) -> list[str]:
         "--delay",
     }
 
-    known_subcommands = {"posts", "categories", "tags"}
+    known_subcommands = {"posts", "categories", "tags", "series"}
     has_subcommand = False
 
     i = 0
@@ -442,6 +442,42 @@ def main(argv: list[str] | None = None) -> int:
             except Exception as e:
                 print_error(f"Error dumping tags: {e}")
                 return 1
+        elif args.dump_command == "series":
+            # Validate that content_dir is provided
+            if args.content_dir is None:
+                print_error(
+                    "Error: content_dir is required. Specify it on the command line or in the config file."
+                )
+                return 1
+
+            # Validate inputs
+            if not args.content_dir.exists():
+                print_error(f"Error: Content directory not found: {args.content_dir}")
+                return 1
+
+            try:
+                from blogmore.dump import dump_series
+                from blogmore.parser import PostParser
+
+                post_parser = PostParser(
+                    site_url=site_config.site_url,
+                    default_show_toc=site_config.show_toc,
+                    default_show_toc_inline=site_config.show_toc_inline,
+                    with_mermaid=site_config.with_mermaid,
+                    with_maths=site_config.with_maths,
+                )
+                posts = post_parser.parse_directory(
+                    args.content_dir,
+                    include_drafts=site_config.include_drafts,
+                    exclude_dirs=[args.content_dir / "pages"],
+                )
+
+                dump_series(posts)
+                return 0
+            except Exception as e:
+                print_error(f"Error dumping series: {e}")
+                return 1
+
         else:
             parser.print_help()
             return 1
