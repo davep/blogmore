@@ -331,17 +331,29 @@ def create_parser() -> argparse.ArgumentParser:
     # Dump command
     dump_parser = subparsers.add_parser(
         "dump",
+        help="Dump site content to stdout as JSON",
+        description="Dump site content to stdout as JSON",
+    )
+
+    dump_subparsers = dump_parser.add_subparsers(
+        dest="dump_command",
+        help="Type of content to dump",
+    )
+
+    # Dump posts sub-command
+    posts_parser = dump_subparsers.add_parser(
+        "posts",
         help="Dump all posts to stdout as JSON in posting time order",
     )
 
-    dump_parser.add_argument(
+    posts_parser.add_argument(
         "content_dir",
         type=Path,
         nargs="?",
         help="Directory containing markdown blog posts",
     )
 
-    add_common_arguments(dump_parser)
+    add_common_arguments(posts_parser)
 
     # Cache command
     cache_parser = subparsers.add_parser(

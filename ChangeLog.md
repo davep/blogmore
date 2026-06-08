@@ -1,5 +1,14 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Restructured the `dump` command to support subcommands, converting the
+  original post-dumping functionality into a `dump posts` subcommand while
+  maintaining `posts` as the default subcommand for backward compatibility.
+  ([#609](https://github.com/davep/blogmore/pull/609))
+
 ## v2.41.0
 
 **Released: 2026-06-07**

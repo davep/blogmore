@@ -17,7 +17,7 @@ BlogMore provides several commands:
 - **`publish`** - Build and publish the site to a git branch
 - **`lint`** - Check the site for common issues (broken links, etc.)
 - **`drafts`** - List the path to all posts marked as drafts
-- **`dump`** - Dump all posts to stdout as JSON in posting time order
+- **`dump`** - Dump site content to stdout as JSON (defaults to `posts`)
 - **`cache`** - Manage the BlogMore cache
 
 ### Command Aliases
@@ -592,20 +592,34 @@ blogmore drafts posts/
 
 ## Dump Command
 
-Dump all blog posts to stdout as a JSON array in posting time order (oldest first). This is a utility command that includes all available properties of each post, making it easy to integrate with custom external tools or scripts.
+Dump site content to stdout as JSON. This is a utility command to export site data for integration with custom external tools or scripts.
 
 ### Synopsis
 
 ```bash
-blogmore dump [content_dir] [options]
+blogmore dump <subcommand> [content_dir] [options]
 ```
 
-### Arguments
+To maintain backward compatibility, running `blogmore dump` without a subcommand defaults to `dump posts`.
+
+### Subcommands
+
+#### `posts`
+
+Dump all blog posts to stdout as a JSON array in posting time order (oldest first). This includes all available properties of each post.
+
+##### Synopsis
+
+```bash
+blogmore dump posts [content_dir] [options]
+```
+
+##### Arguments
 
 **`content_dir`** (optional)
 : Directory containing your Markdown blog posts.
 
-### Output Properties
+##### Output Properties
 
 Each post in the dumped JSON array is represented by an object containing the following properties:
 
@@ -640,9 +654,14 @@ Each post in the dumped JSON array is represented by an object containing the fo
 | `gfi` | `float` | The Gunning Fog Index readability score for the post's prose (0.0 if empty). |
 | `modified_date` | `string` or `null` | The modified date and time of the post in ISO format, or `null` if not set in metadata. |
 
-### Examples
+##### Examples
 
-Dump all posts to a JSON file:
+Dump all posts to a JSON file explicitly:
+```bash
+blogmore dump posts posts/ > blog_dump.json
+```
+
+Or using the default subcommand:
 ```bash
 blogmore dump posts/ > blog_dump.json
 ```

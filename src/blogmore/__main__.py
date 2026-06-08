@@ -24,10 +24,91 @@ from blogmore.server import serve_site
 from blogmore.site_config import SiteConfig, site_config_defaults
 
 
-def main() -> int:
-    """Main entry point for the blogmore CLI."""
+def preprocess_args(argv: list[str]) -> list[str]:
+    """Preprocess CLI arguments to insert the default subcommand for dump.
+
+    If `dump` is specified but no subcommand is provided, this function
+    inserts `posts` as the default subcommand.
+
+    Args:
+        argv: The list of command-line arguments.
+
+    Returns:
+        The preprocessed list of command-line arguments.
+    """
+    new_argv = list(argv)
+    if not new_argv or new_argv[0] != "dump":
+        return new_argv
+
+    dump_idx = 0
+    dump_args = new_argv[1:]
+
+    # Option flags that take an argument, used to distinguish them from subcommands.
+    options_with_args = {
+        "-c",
+        "--config",
+        "-t",
+        "--templates",
+        "-o",
+        "--output",
+        "--site-title",
+        "--site-subtitle",
+        "--site-description",
+        "--site-keywords",
+        "--site-url",
+        "--posts-per-feed",
+        "--extra-stylesheet",
+        "--default-author",
+        "--default-author-url",
+        "--icon-source",
+        "-p",
+        "--port",
+        "--branch",
+        "--remote",
+        "--delay",
+    }
+
+    known_subcommands = {"posts"}
+    has_subcommand = False
+
+    i = 0
+    while i < len(dump_args):
+        arg = dump_args[i]
+        if arg in ("-h", "--help"):
+            # If the user is asking for help, let argparse handle it.
+            return new_argv
+        if arg.startswith("-"):
+            if arg in options_with_args:
+                i += 2
+            else:
+                i += 1
+        else:
+            if arg in known_subcommands:
+                has_subcommand = True
+            break
+
+    if not has_subcommand:
+        new_argv.insert(dump_idx + 1, "posts")
+
+    return new_argv
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Main entry point for the blogmore CLI.
+
+    Args:
+        argv: Optional list of command-line arguments to parse (excluding the
+            program name). If not provided, sys.argv[1:] will be used.
+
+    Returns:
+        The exit code of the command.
+    """
+    argv = sys.argv[1:] if argv is None else list(argv)
+
+    argv = preprocess_args(argv)
+
     parser = create_parser()
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     # Expand user home directory in path arguments from CLI
     if hasattr(args, "content_dir") and args.content_dir is not None:
@@ -243,52 +324,56 @@ def main() -> int:
 
     # Handle dump command
     if args.command == "dump":
-        # Validate that content_dir is provided
-        if args.content_dir is None:
-            print_error(
-                "Error: content_dir is required. Specify it on the command line or in the config file."
-            )
-            return 1
+        if args.dump_command == "posts":
+            # Validate that content_dir is provided
+            if args.content_dir is None:
+                print_error(
+                    "Error: content_dir is required. Specify it on the command line or in the config file."
+                )
+                return 1
 
-        # Validate inputs
-        if not args.content_dir.exists():
-            print_error(f"Error: Content directory not found: {args.content_dir}")
-            return 1
+            # Validate inputs
+            if not args.content_dir.exists():
+                print_error(f"Error: Content directory not found: {args.content_dir}")
+                return 1
 
-        try:
-            from blogmore.dump import dump_posts
-            from blogmore.generator.paths import resolve_post_output_paths
-            from blogmore.parser import PostParser
+            try:
+                from blogmore.dump import dump_posts
+                from blogmore.generator.paths import resolve_post_output_paths
+                from blogmore.parser import PostParser
 
-            post_parser = PostParser(
-                site_url=site_config.site_url,
-                default_show_toc=site_config.show_toc,
-                default_show_toc_inline=site_config.show_toc_inline,
-                with_mermaid=site_config.with_mermaid,
-                with_maths=site_config.with_maths,
-            )
-            posts = post_parser.parse_directory(
-                args.content_dir,
-                include_drafts=site_config.include_drafts,
-                exclude_dirs=[args.content_dir / "pages"],
-            )
+                post_parser = PostParser(
+                    site_url=site_config.site_url,
+                    default_show_toc=site_config.show_toc,
+                    default_show_toc_inline=site_config.show_toc_inline,
+                    with_mermaid=site_config.with_mermaid,
+                    with_maths=site_config.with_maths,
+                )
+                posts = post_parser.parse_directory(
+                    args.content_dir,
+                    include_drafts=site_config.include_drafts,
+                    exclude_dirs=[args.content_dir / "pages"],
+                )
 
-            # Resolve paths to populate post.url_path and post.url correctly
-            resolve_post_output_paths(site_config, posts)
+                # Resolve paths to populate post.url_path and post.url correctly
+                resolve_post_output_paths(site_config, posts)
 
-            for post in posts:
-                post.words_per_minute = site_config.read_time_wpm
+                for post in posts:
+                    post.words_per_minute = site_config.read_time_wpm
 
-            if site_config.with_related:
-                from blogmore.similarity import SimilarityEngine
+                if site_config.with_related:
+                    from blogmore.similarity import SimilarityEngine
 
-                similarity_engine = SimilarityEngine(site_config)
-                similarity_engine.calculate_related_posts(posts)
+                    similarity_engine = SimilarityEngine(site_config)
+                    similarity_engine.calculate_related_posts(posts)
 
-            dump_posts(posts, args.content_dir, site_url=site_config.site_url)
-            return 0
-        except Exception as e:
-            print_error(f"Error dumping posts: {e}")
+                dump_posts(posts, args.content_dir, site_url=site_config.site_url)
+                return 0
+            except Exception as e:
+                print_error(f"Error dumping posts: {e}")
+                return 1
+        else:
+            parser.print_help()
             return 1
 
     # Handle lint command
