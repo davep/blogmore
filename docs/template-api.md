@@ -57,11 +57,16 @@ below lists all variables that are available in every template.
 | `with_graph` | `bool` | `True` when the graph page is enabled. |
 | `graph_url` | `str` | URL to the graph page (respects `graph_path` and `clean_urls`). |
 | `graph_css_url` | `str` | URL to the graph-page stylesheet (with cache-bust query string). |
+| `force_graph_js_url` | `str` | URL to the Force-Graph JS library script. |
 | `with_mermaid` | `bool` | `True` when Mermaid diagram rendering is enabled. |
 | `has_mermaid` | `bool` | `True` if the currently rendered page/post (or any post listed in the current index view) contains a Mermaid diagram. |
+| `mermaid_script_url` | `str` | URL to the Mermaid ESM script. |
 | `with_maths` | `bool` | `True` when LaTeX mathematical formula rendering is enabled. |
 | `maths_provider` | `str` | The selected math rendering engine (`'katex'` or `'mathjax'`). |
 | `has_math` | `bool` | `True` if the currently rendered page/post (or any post listed in the current index view) contains a mathematical equation. |
+| `katex_css_url` | `str` | URL to the KaTeX stylesheet. |
+| `katex_js_url` | `str` | URL to the KaTeX script. |
+| `mathjax_js_url` | `str` | URL to the MathJax script. |
 | `inline_theme_js` | `bool` | `True` when theme JavaScript inlining is enabled. |
 | `theme_js_content` | `str \| None` | The content of `theme.js` to be inlined. |
 | `theme_js_url` | `str` | URL to `theme.js` (with cache-bust query string). |
@@ -70,6 +75,7 @@ below lists all variables that are available in every template.
 | `has_platform_icons` | `bool` | `True` when generated platform icons are present. |
 | `fontawesome_css_url` | `str \| None` | Font Awesome CSS URL, when social icons are used. |
 | `fontawesome_is_bundled` | `bool` | `True` when Font Awesome is included in the bundle. |
+| `fontawesome_woff2_url` | `str` | Font Awesome brands WOFF2 font file URL. |
 | `extra_stylesheets` | `list[str]` | List of extra stylesheet URLs from configuration. |
 | `tag_dir` | `str` | URL prefix for tag pages (e.g. `/tags`). |
 | `category_dir` | `str` | URL prefix for category pages (e.g. `/categories`). |

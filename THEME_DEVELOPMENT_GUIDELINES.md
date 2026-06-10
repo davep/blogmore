@@ -140,6 +140,7 @@ v2.x.  Key ones that appear in nearly every template:
 - `bundle_css`, `bundle_css_url`, `fontawesome_is_bundled` — for CSS bundling support
 - `inline_theme_js`, `theme_js_content` — for theme JavaScript inlining support
 - `with_related`, `related_title` — for related posts feature support
+- `mermaid_script_url`, `katex_css_url`, `katex_js_url`, `mathjax_js_url`, `fontawesome_woff2_url`, `force_graph_js_url` — for third-party script/resource configuration support
 
 ### Stable Post attributes
 
