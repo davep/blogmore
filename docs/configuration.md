@@ -551,6 +551,50 @@ This is a **configuration file only** option — it cannot be set on the command
 maths_provider: katex
 ```
 
+#### `third_party`
+
+Allows overriding the URLs and script/stylesheet locations for third-party libraries (Mermaid, KaTeX, MathJax, FontAwesome, and Force-Graph). By default, these point to public CDN locations. This configuration allows you to pin specific versions or point to custom CDN/local asset locations.
+
+This is a **configuration file only** option — it cannot be set on the command line.
+
+**Type:** Mapping  
+**Default:** (See default CDN URLs in the example below)
+
+Within `third_party`, you can configure the following mappings:
+
+*   `mermaid`
+    *   `script_url` — The script module URL for Mermaid.
+*   `katex`
+    *   `css_url` — The stylesheet URL for KaTeX.
+    *   `js_url` — The script URL for KaTeX.
+*   `mathjax`
+    *   `js_url` — The script URL for MathJax.
+*   `fontawesome`
+    *   `metadata_url` — The URL to fetch FontAwesome icon metadata (Unicode mappings) for CSS optimization.
+    *   `webfonts_base` — The base URL for FontAwesome brands WOFF2 and TTF web font files.
+    *   `css_url` — Fallback full stylesheet URL when CSS optimization fails.
+    *   `woff2_url` — FontAwesome brands WOFF2 preload URL.
+*   `force_graph`
+    *   `js_url` — The script URL for the Force-Graph visualization library.
+
+```yaml
+third_party:
+  mermaid:
+    script_url: "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs"
+  katex:
+    css_url: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+    js_url: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+  mathjax:
+    js_url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  fontawesome:
+    metadata_url: "https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.7.2/metadata/icons.json"
+    webfonts_base: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/webfonts"
+    css_url: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    woff2_url: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/webfonts/fa-brands-400.woff2"
+  force_graph:
+    js_url: "https://unpkg.com/force-graph"
+```
+
 #### `with_related`
 
 Enable automated build-time related posts calculation. When `true`, BlogMore uses a pure-Python TF-IDF and Cosine Similarity engine to automatically calculate and list contextually relevant posts for each entry, with zero runtime overhead for readers.

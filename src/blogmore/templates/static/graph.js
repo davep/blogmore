@@ -2,7 +2,7 @@
     'use strict';
 
     /** Force-graph CDN URL (loaded once, only on this page). */
-    var FORCE_GRAPH_CDN = 'https://unpkg.com/force-graph';
+    var FORCE_GRAPH_CDN = window.FORCE_GRAPH_CDN || 'https://unpkg.com/force-graph';
 
     /** Base size (radius-equivalent) used when drawing custom node shapes. */
     var NODE_SIZE = 6;

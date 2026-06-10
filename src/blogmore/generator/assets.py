@@ -15,7 +15,6 @@ from blogmore.cache import get_blog_cache_dir
 from blogmore.code_styles import build_code_css
 from blogmore.console import print_warning, timed_step
 from blogmore.fontawesome import (
-    FONTAWESOME_CDN_CSS_URL,
     FONTAWESOME_LOCAL_CSS_MINIFIED_PATH,
     FONTAWESOME_LOCAL_CSS_PATH,
     FontAwesomeOptimizer,
@@ -47,7 +46,9 @@ class AssetManager:
             site_config: The site configuration.
         """
         self.site_config = site_config
-        self.fontawesome_css_url: str = FONTAWESOME_CDN_CSS_URL
+        self.fontawesome_css_url: str = site_config.third_party["fontawesome"][
+            "css_url"
+        ]
         self._fontawesome_css_content: str | None = None
         self.extras_html_paths: frozenset[str] = frozenset()
 
@@ -175,7 +176,11 @@ class AssetManager:
             for social in socials
             if isinstance(social, dict) and "site" in social
         ]
-        optimizer = FontAwesomeOptimizer(icon_names)
+        optimizer = FontAwesomeOptimizer(
+            icon_names,
+            metadata_url=self.site_config.third_party["fontawesome"]["metadata_url"],
+            webfonts_base=self.site_config.third_party["fontawesome"]["webfonts_base"],
+        )
 
         try:
             with timed_step("Downloading FontAwesome metadata..."):
@@ -183,7 +188,9 @@ class AssetManager:
         except (urllib.error.URLError, ValueError, OSError) as error:
             print_warning(f"Warning: Could not fetch FontAwesome metadata: {error}")
             print_warning("Falling back to full FontAwesome CDN stylesheet.")
-            self.fontawesome_css_url = FONTAWESOME_CDN_CSS_URL
+            self.fontawesome_css_url = self.site_config.third_party["fontawesome"][
+                "css_url"
+            ]
             return None
 
         self.fontawesome_css_url = (

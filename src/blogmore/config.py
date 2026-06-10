@@ -81,6 +81,7 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
         "external_links_check_timeout",
         "image_widths",
         "stop_words",
+        "third_party",
     }
 )
 
@@ -749,5 +750,57 @@ def parse_site_config_from_dict(
                 "stats in the configuration file must be a dictionary; ignoring value"
             )
         kwargs["stop_words"] = []
+
+    # --- third_party ---------------------------------------------------------
+    third_party_defaults = {
+        "mermaid": {
+            "script_url": "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs"
+        },
+        "katex": {
+            "css_url": "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css",
+            "js_url": "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js",
+        },
+        "mathjax": {
+            "js_url": "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+        },
+        "fontawesome": {
+            "metadata_url": "https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.7.2/metadata/icons.json",
+            "webfonts_base": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/webfonts",
+            "css_url": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css",
+            "woff2_url": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/webfonts/fa-brands-400.woff2",
+        },
+        "force_graph": {"js_url": "https://unpkg.com/force-graph"},
+    }
+
+    raw_third_party = config.get("third_party")
+    if raw_third_party is None:
+        kwargs["third_party"] = third_party_defaults
+    elif isinstance(raw_third_party, dict):
+        merged = {}
+        for section, default_keys in third_party_defaults.items():
+            merged[section] = dict(default_keys)
+            user_section = raw_third_party.get(section)
+            if isinstance(user_section, dict):
+                for key in default_keys:
+                    user_val = user_section.get(key)
+                    if user_val is not None:
+                        if isinstance(user_val, str):
+                            merged[section][key] = user_val
+                        else:
+                            errors.append(
+                                f"third_party.{section}.{key} in the configuration file "
+                                "must be a string; ignoring value"
+                            )
+            elif user_section is not None:
+                errors.append(
+                    f"third_party.{section} in the configuration file must be a mapping; "
+                    "ignoring value"
+                )
+        kwargs["third_party"] = merged
+    else:
+        errors.append(
+            "third_party in the configuration file must be a mapping; ignoring value"
+        )
+        kwargs["third_party"] = third_party_defaults
 
     return kwargs, errors

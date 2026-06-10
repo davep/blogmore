@@ -1343,6 +1343,96 @@ class TestParseSiteConfigFromDict:
         assert kwargs["clean_urls"] is True
         assert kwargs["with_advert"] is False
 
+    def test_third_party_defaults(self, tmp_path: Path) -> None:
+        """Verify third_party script configuration defaults are set correctly."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict({}, tmp_path)
+
+        assert errors == []
+        third_party = kwargs["third_party"]
+        assert (
+            third_party["mermaid"]["script_url"]
+            == "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs"
+        )
+        assert (
+            third_party["katex"]["css_url"]
+            == "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+        )
+        assert third_party["force_graph"]["js_url"] == "https://unpkg.com/force-graph"
+
+    def test_third_party_overrides(self, tmp_path: Path) -> None:
+        """Verify third_party script configuration overrides are merged with defaults."""
+        from blogmore.config import parse_site_config_from_dict
+
+        kwargs, errors = parse_site_config_from_dict(
+            {
+                "third_party": {
+                    "mermaid": {"script_url": "/custom-mermaid.js"},
+                    "force_graph": {"js_url": "/local/force-graph.js"},
+                }
+            },
+            tmp_path,
+        )
+
+        assert errors == []
+        third_party = kwargs["third_party"]
+        # Overridden values
+        assert third_party["mermaid"]["script_url"] == "/custom-mermaid.js"
+        assert third_party["force_graph"]["js_url"] == "/local/force-graph.js"
+        # Non-overridden values remain default
+        assert (
+            third_party["katex"]["css_url"]
+            == "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+        )
+        assert (
+            third_party["fontawesome"]["woff2_url"]
+            == "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/webfonts/fa-brands-400.woff2"
+        )
+
+    def test_third_party_validation_errors(self, tmp_path: Path) -> None:
+        """Verify third_party validation handles incorrect types gracefully."""
+        from blogmore.config import parse_site_config_from_dict
+
+        # Case 1: third_party is not a mapping
+        kwargs, errors = parse_site_config_from_dict(
+            {"third_party": "not-a-mapping"}, tmp_path
+        )
+        assert len(errors) == 1
+        assert "third_party in the configuration file must be a mapping" in errors[0]
+        assert (
+            kwargs["third_party"]["mermaid"]["script_url"]
+            == "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs"
+        )
+
+        # Case 2: nested section is not a mapping
+        kwargs, errors = parse_site_config_from_dict(
+            {"third_party": {"mermaid": "not-a-mapping"}}, tmp_path
+        )
+        assert len(errors) == 1
+        assert (
+            "third_party.mermaid in the configuration file must be a mapping"
+            in errors[0]
+        )
+        assert (
+            kwargs["third_party"]["mermaid"]["script_url"]
+            == "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs"
+        )
+
+        # Case 3: nested key value is not a string
+        kwargs, errors = parse_site_config_from_dict(
+            {"third_party": {"mermaid": {"script_url": 123}}}, tmp_path
+        )
+        assert len(errors) == 1
+        assert (
+            "third_party.mermaid.script_url in the configuration file must be a string"
+            in errors[0]
+        )
+        assert (
+            kwargs["third_party"]["mermaid"]["script_url"]
+            == "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs"
+        )
+
     def test_overlapping_scalar_absent_resets_to_default(self, tmp_path: Path) -> None:
         """Overlapping CLI+config scalars absent from config reset to SiteConfig defaults.
 

@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Any
 
 from blogmore import __version__
 from blogmore.clean_url import make_url_clean
-from blogmore.fontawesome import FONTAWESOME_CDN_BRANDS_WOFF2_URL
 from blogmore.generator.constants import (
     ARCHIVE_CSS_FILENAME,
     BUNDLE_CSS_FILENAME,
@@ -264,7 +263,14 @@ class ContextBuilder:
             "theme_js_content": self.theme_js_content,
             "fontawesome_is_bundled": self.fontawesome_is_bundled,
             "fontawesome_css_url": self.with_cache_bust(self.fontawesome_css_url),
-            "fontawesome_woff2_url": FONTAWESOME_CDN_BRANDS_WOFF2_URL,
+            "fontawesome_woff2_url": self.site_config.third_party["fontawesome"][
+                "woff2_url"
+            ],
+            "mermaid_script_url": self.site_config.third_party["mermaid"]["script_url"],
+            "katex_css_url": self.site_config.third_party["katex"]["css_url"],
+            "katex_js_url": self.site_config.third_party["katex"]["js_url"],
+            "mathjax_js_url": self.site_config.third_party["mathjax"]["js_url"],
+            "force_graph_js_url": self.site_config.third_party["force_graph"]["js_url"],
             "styles_css_url": self.get_asset_url(
                 CSS_FILENAME, self.site_config.minify_css
             ),

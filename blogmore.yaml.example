@@ -133,6 +133,28 @@ posts_per_feed: 20
 # Only meaningful when with_maths is true. Configuration file only.
 # maths_provider: katex
 
+# Optional: Third-party script and stylesheet resource URLs
+# By default, these point to public CDN locations. You can override individual
+# URLs (for example, to target different versions, use custom CDN providers,
+# or point to locally-served files).
+# Configuration file only.
+#
+# third_party:
+#   mermaid:
+#     script_url: "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs"
+#   katex:
+#     css_url: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+#     js_url: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+#   mathjax:
+#     js_url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+#   fontawesome:
+#     metadata_url: "https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.7.2/metadata/icons.json"
+#     webfonts_base: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/webfonts"
+#     css_url: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+#     woff2_url: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/webfonts/fa-brands-400.woff2"
+#   force_graph:
+#     js_url: "https://unpkg.com/force-graph"
+
 # Optional: Enable automated build-time related posts calculation (default: false)
 # When true, BlogMore uses a pure-Python TF-IDF and Cosine Similarity engine to
 # automatically find and display contextually relevant posts for each entry,

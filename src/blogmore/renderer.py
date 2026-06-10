@@ -589,12 +589,18 @@ class TemplateRenderer:
         """
         template = self.env.get_template(template_name)
 
-        # Ensure defaults for author variables are present in the context.
+        # Ensure defaults for author and third-party variables are present in the context.
         render_context = {
             "show_author": False,
             "default_author": None,
             "default_author_url": None,
             "extra_stylesheets": self.extra_stylesheets,
+            "mermaid_script_url": "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs",
+            "katex_css_url": "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css",
+            "katex_js_url": "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js",
+            "mathjax_js_url": "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js",
+            "fontawesome_woff2_url": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/webfonts/fa-brands-400.woff2",
+            "force_graph_js_url": "https://unpkg.com/force-graph",
             **context,
         }
 
