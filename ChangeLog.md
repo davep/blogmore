@@ -1,5 +1,16 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added a `third_party` configuration mapping to allow overriding the script
+  and stylesheet URLs/locations for Mermaid, KaTeX, MathJax, FontAwesome,
+  and Force-Graph. ([#615](https://github.com/davep/blogmore/pull/615))
+- Refactored the FontAwesome metadata caching to hash the configured URL,
+  ensuring cache invalidation when a user updates their targeted version.
+  ([#615](https://github.com/davep/blogmore/pull/615))
+
 ## v2.42.0
 
 **Released: 2026-06-08**

@@ -5,6 +5,7 @@ actually used in the site configuration, reducing CSS payload from ~80KB to
 ~2-5KB.
 """
 
+import hashlib
 import json
 import urllib.error
 import urllib.request
@@ -65,14 +66,23 @@ class FontAwesomeOptimizer:
     sites.
     """
 
-    def __init__(self, icon_names: list[str]) -> None:
+    def __init__(
+        self,
+        icon_names: list[str],
+        metadata_url: str = FONTAWESOME_METADATA_URL,
+        webfonts_base: str = FONTAWESOME_CDN_WEBFONTS_BASE,
+    ) -> None:
         """Initialize the optimizer with the set of icons to include.
 
         Args:
             icon_names: List of FontAwesome brand icon names (e.g.
                 ``["github", "mastodon"]``).
+            metadata_url: URL to fetch FontAwesome icon metadata from.
+            webfonts_base: Base URL for webfont files.
         """
         self.icon_names = icon_names
+        self.metadata_url = metadata_url
+        self.webfonts_base = webfonts_base
 
     def fetch_icon_metadata(self) -> dict[str, Any]:
         """Fetch FontAwesome icon metadata with local caching.
@@ -91,7 +101,8 @@ class FontAwesomeOptimizer:
             ValueError: If the response cannot be parsed as JSON.
         """
         cache_dir = get_user_cache_dir()
-        cache_file = cache_dir / f"fa-metadata-{FONTAWESOME_VERSION}.json"
+        url_hash = hashlib.sha256(self.metadata_url.encode("utf-8")).hexdigest()[:12]
+        cache_file = cache_dir / f"fa-metadata-{url_hash}.json"
 
         # Try to load from cache first
         if cache_file.exists():
@@ -102,7 +113,7 @@ class FontAwesomeOptimizer:
                 pass
 
         # Network fetch
-        with urllib.request.urlopen(FONTAWESOME_METADATA_URL) as response:
+        with urllib.request.urlopen(self.metadata_url) as response:
             content = response.read().decode("utf-8")
 
         # Update cache
@@ -128,8 +139,8 @@ class FontAwesomeOptimizer:
             rules, and one `::before` rule per requested icon found in the
             metadata.
         """
-        woff2_url = f"{FONTAWESOME_CDN_WEBFONTS_BASE}/fa-brands-400.woff2"
-        ttf_url = f"{FONTAWESOME_CDN_WEBFONTS_BASE}/fa-brands-400.ttf"
+        woff2_url = f"{self.webfonts_base.rstrip('/')}/fa-brands-400.woff2"
+        ttf_url = f"{self.webfonts_base.rstrip('/')}/fa-brands-400.ttf"
 
         lines: list[str] = [
             "@font-face {",

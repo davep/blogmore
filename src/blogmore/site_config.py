@@ -317,6 +317,33 @@ class SiteConfig:
     command line.  Defaults to 'katex'.
     """
 
+    third_party: dict[str, dict[str, str]] = field(
+        default_factory=lambda: {
+            "mermaid": {
+                "script_url": "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs"
+            },
+            "katex": {
+                "css_url": "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css",
+                "js_url": "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js",
+            },
+            "mathjax": {
+                "js_url": "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+            },
+            "fontawesome": {
+                "metadata_url": "https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.7.2/metadata/icons.json",
+                "webfonts_base": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/webfonts",
+                "css_url": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css",
+                "woff2_url": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/webfonts/fa-brands-400.woff2",
+            },
+            "force_graph": {"js_url": "https://unpkg.com/force-graph"},
+        }
+    )
+    """URLs and metadata settings for third-party scripts and stylesheets.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.
+    """
+
     show_toc: bool = True
     """Whether to show the Table of Contents on posts by default.
 

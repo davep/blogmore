@@ -241,4 +241,11 @@ Rules:
     following the patterns used for `sidebar_pages`, `head`,
     `extra_stylesheets`, and the path template fields.
 
+  * **Third-party scripts/stylesheets**: if we ever add another third-party resource,
+    its URLs/endpoints should be added to the nested `third_party` configuration mapping
+    (e.g., `third_party.resource_name.url_type`) rather than creating a top-level property.
+    This keeps all external script and stylesheet configuration grouped and consistent.
+    Follow the validation and merge patterns established in `config.py` for the existing
+    `third_party` fields.
+
 [//]: # (AGENTS.md ends here)

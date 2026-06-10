@@ -60,6 +60,7 @@
     {% if with_related and related_graph_data_json %}
     window.RELATED_GRAPH_DATA = {{ related_graph_data_json | safe }};
     {% endif %}
+    window.FORCE_GRAPH_CDN = "{{ force_graph_js_url }}";
 </script>
 <script src="{{ graph_js_url }}"></script>
 {% endblock %}
