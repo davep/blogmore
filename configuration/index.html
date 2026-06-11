@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.44">
+      <meta name="generator" content="zensical-0.0.45">
     
     
       
@@ -1231,6 +1231,17 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         <code>maths_provider</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#third_party" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>third_party</code>
       </span>
     </span>
   </a>
@@ -3082,6 +3093,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#third_party" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>third_party</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#with_related" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -4671,6 +4693,54 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <p><strong>Type:</strong> String<br />
 <strong>Default:</strong> <code>katex</code></p>
 <div class="highlight"><pre><span></span><code><span class="nt">maths_provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">katex</span>
+</code></pre></div>
+<h4 id="third_party"><code>third_party</code></h4>
+<p>Allows overriding the URLs and script/stylesheet locations for third-party libraries (Mermaid, KaTeX, MathJax, FontAwesome, and Force-Graph). By default, these point to public CDN locations. This configuration allows you to pin specific versions or point to custom CDN/local asset locations.</p>
+<p>This is a <strong>configuration file only</strong> option — it cannot be set on the command line.</p>
+<p><strong>Type:</strong> Mapping<br />
+<strong>Default:</strong> (See default CDN URLs in the example below)</p>
+<p>Within <code>third_party</code>, you can configure the following mappings:</p>
+<ul>
+<li><code>mermaid</code><ul>
+<li><code>script_url</code> — The script module URL for Mermaid.</li>
+</ul>
+</li>
+<li><code>katex</code><ul>
+<li><code>css_url</code> — The stylesheet URL for KaTeX.</li>
+<li><code>js_url</code> — The script URL for KaTeX.</li>
+</ul>
+</li>
+<li><code>mathjax</code><ul>
+<li><code>js_url</code> — The script URL for MathJax.</li>
+</ul>
+</li>
+<li><code>fontawesome</code><ul>
+<li><code>metadata_url</code> — The URL to fetch FontAwesome icon metadata (Unicode mappings) for CSS optimization.</li>
+<li><code>webfonts_base</code> — The base URL for FontAwesome brands WOFF2 and TTF web font files.</li>
+<li><code>css_url</code> — Fallback full stylesheet URL when CSS optimization fails.</li>
+<li><code>woff2_url</code> — FontAwesome brands WOFF2 preload URL.</li>
+</ul>
+</li>
+<li><code>force_graph</code><ul>
+<li><code>js_url</code> — The script URL for the Force-Graph visualization library.</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="nt">third_party</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">mermaid</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">script_url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs&quot;</span>
+<span class="w">  </span><span class="nt">katex</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">css_url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css&quot;</span>
+<span class="w">    </span><span class="nt">js_url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js&quot;</span>
+<span class="w">  </span><span class="nt">mathjax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">js_url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js&quot;</span>
+<span class="w">  </span><span class="nt">fontawesome</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">metadata_url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.7.2/metadata/icons.json&quot;</span>
+<span class="w">    </span><span class="nt">webfonts_base</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/webfonts&quot;</span>
+<span class="w">    </span><span class="nt">css_url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css&quot;</span>
+<span class="w">    </span><span class="nt">woff2_url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/webfonts/fa-brands-400.woff2&quot;</span>
+<span class="w">  </span><span class="nt">force_graph</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">js_url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://unpkg.com/force-graph&quot;</span>
 </code></pre></div>
 <h4 id="with_related"><code>with_related</code></h4>
 <p>Enable automated build-time related posts calculation. When <code>true</code>, BlogMore uses a pure-Python TF-IDF and Cosine Similarity engine to automatically calculate and list contextually relevant posts for each entry, with zero runtime overhead for readers.</p>
