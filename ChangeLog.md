@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.43.0
 
-**Released: WiP**
+**Released: 2026-06-11**
 
 - Added a `third_party` configuration mapping to allow overriding the script
   and stylesheet URLs/locations for Mermaid, KaTeX, MathJax, FontAwesome,
