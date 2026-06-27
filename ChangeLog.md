@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.44.0
 
-**Released: WiP**
+**Released: 2026-06-27**
 
 - Added automated social media cover image (Open Graph/Twitter Card)
   generation, supporting `auto_covers` configuration and per-post
