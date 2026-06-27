@@ -328,3 +328,52 @@ def test_cover_generator_caching(temp_dir: Path) -> None:
     # Second run: cache hit, should NOT regenerate (mtime remains unchanged)
     generator.generate_covers([post])
     assert cached_file.stat().st_mtime == first_mtime
+
+
+def test_editorial_cover_description(temp_dir: Path) -> None:
+    """Test generating a cover with editorial layout and description."""
+    content_dir = temp_dir / "content"
+    content_dir.mkdir()
+
+    post = Post(
+        path=content_dir / "posts" / "desc-test.md",
+        title="Testing Editorial Cover with Description",
+        content="This is the post content.",
+        html_content="<p>This is the post content.</p>",
+        date=dt.datetime(2026, 6, 27, 9, 0, 0),
+        category="Python",
+        tags=["pytest"],
+        draft=False,
+        metadata={
+            "title": "Testing Editorial Cover with Description",
+            "description": "This is a custom post description for the editorial layout cover image.",
+        },
+    )
+
+    config_dict = {
+        "auto_covers": {
+            "enabled": True,
+            "layout": "editorial",
+            "background_type": "solid",
+            "background_color": "#0f172a",
+            "text_color": "#ffffff",
+            "accent_color": "#38bdf8",
+        }
+    }
+
+    kwargs, errors = parse_site_config_from_dict(config_dict, output_dir=temp_dir)
+    assert not errors
+
+    site_config = SiteConfig(output_dir=temp_dir, content_dir=content_dir, **kwargs)
+
+    generator = CoverGenerator(site_config)
+    generator.assign_cover_metadata([post])
+    generator.generate_covers([post])
+
+    expected_file = (
+        temp_dir / "static" / "images" / "auto_covers" / "posts-desc-test.webp"
+    )
+    assert expected_file.is_file()
+
+    with Image.open(expected_file) as img:
+        assert img.size == (1200, 630)
