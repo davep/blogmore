@@ -7,6 +7,7 @@ for posts based on metadata and configurable layout styles.
 import hashlib
 import os
 import re
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -50,6 +51,7 @@ def _wrap_text(text: str, font: Any, max_width: int) -> list[str]:
     return lines
 
 
+@lru_cache(maxsize=128)
 def _find_system_font(font_family: str, bold: bool = False) -> Path | None:
     """Find a system font file path matching the given family.
 
@@ -155,6 +157,7 @@ def _find_system_font(font_family: str, bold: bool = False) -> Path | None:
     return None
 
 
+@lru_cache(maxsize=128)
 def _get_font(font_family: str, size: int, bold: bool = False) -> Any:
     """Load a font object of the specified family and size.
 
@@ -207,6 +210,144 @@ class CoverGenerator:
             from blogmore.cache import get_blog_cache_dir
 
             self.cache_dir = get_blog_cache_dir(content_dir.expanduser()) / "covers"
+
+        self._logo_loaded: bool = False
+        self._logo_image: Image.Image | None = None
+        self._logo_w: int = 0
+        self._logo_h: int = 0
+
+        self._bg_loaded: bool = False
+        self._bg_image: Image.Image | None = None
+
+        self._gradient_loaded: bool = False
+        self._gradient_image: Image.Image | None = None
+
+    def _get_resized_logo(self) -> tuple[Image.Image | None, int, int]:
+        """Load and resize the branding/site logo to fit the required dimensions.
+
+        The logo is retrieved from the site configuration and resized to fit within
+        a 240x240 pixel bounding box using high-quality LANCZOS filtering, preserving
+        its original aspect ratio.
+
+        Returns:
+            A tuple of (logo_image, width, height) where logo_image is the resized
+            RGBA Image object (or None if logo is not found or disabled), and width
+            and height are the resized dimensions.
+        """
+        if self._logo_loaded:
+            return self._logo_image, self._logo_w, self._logo_h
+
+        logo_path = (
+            self.site_config.sidebar_config.get("site_logo")
+            if self.site_config.sidebar_config
+            else None
+        )
+        show_logo_val = self.config_block.get("show_logo", True)
+        if not logo_path or not self.site_config.content_dir or not show_logo_val:
+            self._logo_loaded = True
+            return None, 0, 0
+
+        logo_clean = logo_path.split("#")[0].split("?")[0].lstrip("/")
+        src_logo = self.site_config.content_dir / logo_clean
+        if not src_logo.is_file():
+            extras_logo = self.site_config.content_dir / "extras" / logo_clean
+            if extras_logo.is_file():
+                src_logo = extras_logo
+
+        if src_logo.is_file():
+            try:
+                with Image.open(src_logo) as opened_logo:
+                    logo_img = opened_logo.convert("RGBA")
+                    logo_img.thumbnail((240, 240), Image.Resampling.LANCZOS)
+                    self._logo_image = logo_img
+                    self._logo_w, self._logo_h = logo_img.size
+            except Exception:
+                pass
+
+        self._logo_loaded = True
+        return self._logo_image, self._logo_w, self._logo_h
+
+    def _get_resized_background(
+        self, width: int = 1200, height: int = 630
+    ) -> Image.Image | None:
+        """Load and resize the cover background image to fill the canvas.
+
+        The background image is searched in the extras directory under various
+        common extensions. If found, it is resized to exactly the specified width
+        and height using high-quality LANCZOS filtering.
+
+        Args:
+            width: The target width in pixels.
+            height: The target height in pixels.
+
+        Returns:
+            The resized background Image object, or None if the image was not found
+            or could not be opened.
+        """
+        if self._bg_loaded:
+            return self._bg_image
+
+        if not self.site_config.content_dir:
+            self._bg_loaded = True
+            return None
+
+        for ext in (".png", ".jpg", ".jpeg", ".webp"):
+            bg_path = self.site_config.content_dir / "extras" / f"cover_background{ext}"
+            if bg_path.is_file():
+                try:
+                    with Image.open(bg_path) as bg_img:
+                        self._bg_image = bg_img.resize(
+                            (width, height), Image.Resampling.LANCZOS
+                        )
+                        break
+                except Exception:
+                    pass
+
+        self._bg_loaded = True
+        return self._bg_image
+
+    def _get_resized_gradient_background(
+        self, width: int = 1200, height: int = 630
+    ) -> Image.Image | None:
+        """Create and cache the gradient background image.
+
+        Args:
+            width: Target width in pixels.
+            height: Target height in pixels.
+
+        Returns:
+            The resized gradient Image object, or None if configured incorrectly.
+        """
+        if self._gradient_loaded:
+            return self._gradient_image
+
+        gradient_colors = self.config_block.get(
+            "gradient_colors", ["#1e293b", "#0f172a"]
+        )
+        if len(gradient_colors) < 2:
+            self._gradient_loaded = True
+            return None
+
+        try:
+            c1 = ImageColor.getrgb(gradient_colors[0])
+            c2 = ImageColor.getrgb(gradient_colors[1])
+            pixels = []
+            for y in range(height):
+                ratio = y / (height - 1)
+                r = int(c1[0] + (c2[0] - c1[0]) * ratio)
+                g = int(c1[1] + (c2[1] - c1[1]) * ratio)
+                b = int(c1[2] + (c2[2] - c1[2]) * ratio)
+                pixels.append((r, g, b))
+            grad_1d = Image.new("RGB", (1, height))
+            grad_1d.putdata(pixels)
+            self._gradient_image = grad_1d.resize(
+                (width, height), Image.Resampling.BILINEAR
+            )
+        except ValueError:
+            pass
+
+        self._gradient_loaded = True
+        return self._gradient_image
 
     def assign_cover_metadata(self, posts: list[Post]) -> None:
         """Assign the relative cover image path to eligible posts' metadata.
@@ -419,41 +560,16 @@ class CoverGenerator:
 
         # Background rendering
         if bg_type == "image" and self.site_config.content_dir:
-            bg_drawn = False
-            for ext in (".png", ".jpg", ".jpeg", ".webp"):
-                bg_path = (
-                    self.site_config.content_dir / "extras" / f"cover_background{ext}"
-                )
-                if bg_path.is_file():
-                    try:
-                        with Image.open(bg_path) as bg_img:
-                            # Resize to cover canvas
-                            bg_resized = bg_img.resize(
-                                (width, height), Image.Resampling.LANCZOS
-                            )
-                            img.paste(bg_resized, (0, 0))
-                            bg_drawn = True
-                            break
-                    except Exception:
-                        pass
-            if not bg_drawn:
+            bg_resized = self._get_resized_background(width, height)
+            if bg_resized is not None:
+                img.paste(bg_resized, (0, 0))
+            else:
                 draw.rectangle([(0, 0), (width, height)], fill=bg_color)
         elif bg_type == "gradient" and len(gradient_colors) >= 2:
-            try:
-                c1 = ImageColor.getrgb(gradient_colors[0])
-                c2 = ImageColor.getrgb(gradient_colors[1])
-                pixels = []
-                for y in range(height):
-                    ratio = y / (height - 1)
-                    r = int(c1[0] + (c2[0] - c1[0]) * ratio)
-                    g = int(c1[1] + (c2[1] - c1[1]) * ratio)
-                    b = int(c1[2] + (c2[2] - c1[2]) * ratio)
-                    pixels.append((r, g, b))
-                grad_1d = Image.new("RGB", (1, height))
-                grad_1d.putdata(pixels)
-                gradient = grad_1d.resize((width, height), Image.Resampling.BILINEAR)
+            gradient = self._get_resized_gradient_background(width, height)
+            if gradient is not None:
                 img.paste(gradient, (0, 0))
-            except ValueError:
+            else:
                 draw.rectangle([(0, 0), (width, height)], fill=bg_color)
         else:
             draw.rectangle([(0, 0), (width, height)], fill=bg_color)
@@ -535,7 +651,7 @@ class CoverGenerator:
                 accent_color_hex,
             )
 
-        img.save(output_path, "WEBP", lossless=True)
+        img.save(output_path, "WEBP", lossless=True, method=3)
 
     def _draw_minimalist_layout(
         self,
@@ -674,30 +790,18 @@ class CoverGenerator:
 
         # Draw a decorative element on the right (35% width, x starts around 840)
         # Try loading the site logo from site_config and draw it resized on the right
-        logo_path = self.site_config.sidebar_config.get("site_logo")
         logo_drawn = False
         show_logo_val = self.config_block.get("show_logo", True)
-        if logo_path and self.site_config.content_dir and show_logo_val:
-            logo_clean = logo_path.split("#")[0].split("?")[0].lstrip("/")
-            src_logo = self.site_config.content_dir / logo_clean
-            if not src_logo.is_file():
-                extras_logo = self.site_config.content_dir / "extras" / logo_clean
-                if extras_logo.is_file():
-                    src_logo = extras_logo
-
-            if src_logo.is_file():
-                try:
-                    logo_img = Image.open(src_logo).convert("RGBA")
-                    # Resize to fit within 240x240 box
-                    logo_img.thumbnail((240, 240), Image.Resampling.LANCZOS)
-                    logo_w, logo_h = logo_img.size
-                    # Paste centered vertically on the right side (x_center = 980)
-                    paste_x = 980 - logo_w // 2
-                    paste_y = 315 - logo_h // 2
-                    img.paste(logo_img, (paste_x, paste_y), mask=logo_img)
-                    logo_drawn = True
-                except Exception:
-                    pass
+        logo_img, logo_w, logo_h = self._get_resized_logo()
+        if logo_img is not None:
+            try:
+                # Paste centered vertically on the right side (x_center = 980)
+                paste_x = 980 - logo_w // 2
+                paste_y = 315 - logo_h // 2
+                img.paste(logo_img, (paste_x, paste_y), mask=logo_img)
+                logo_drawn = True
+            except Exception:
+                pass
 
         # Fallback decorative visual if no logo was drawn
         if not logo_drawn and show_logo_val:
@@ -742,32 +846,7 @@ class CoverGenerator:
             accent_color: Hex color for accents/branding.
         """
         # Check if logo is available
-        logo_path = (
-            self.site_config.sidebar_config.get("site_logo")
-            if self.site_config.sidebar_config
-            else None
-        )
-        logo_img = None
-        logo_w = 0
-        show_logo_val = self.config_block.get("show_logo", True)
-
-        if logo_path and self.site_config.content_dir and show_logo_val:
-            logo_clean = logo_path.split("#")[0].split("?")[0].lstrip("/")
-            src_logo = self.site_config.content_dir / logo_clean
-            if not src_logo.is_file():
-                extras_logo = self.site_config.content_dir / "extras" / logo_clean
-                if extras_logo.is_file():
-                    src_logo = extras_logo
-
-            if src_logo.is_file():
-                try:
-                    with Image.open(src_logo) as opened_logo:
-                        logo_img = opened_logo.convert("RGBA")
-                        logo_img.thumbnail((240, 240), Image.Resampling.LANCZOS)
-                        logo_w, logo_h = logo_img.size
-                except Exception:
-                    logo_img = None
-                    logo_w = 0
+        logo_img, logo_w, _ = self._get_resized_logo()
 
         # Calculate safe width for title wrapping to avoid logo collision (right margin is at 1120)
         safe_width = 1120 - logo_w - 80 - 40 if logo_img is not None else 1040
