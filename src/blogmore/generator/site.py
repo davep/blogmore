@@ -196,6 +196,12 @@ class SiteGenerator:
         # Create output directory
         self.site_config.output_dir.mkdir(parents=True, exist_ok=True)
 
+        # Assign metadata paths for automated cover images
+        from blogmore.generator.covers import CoverGenerator
+
+        with timed_step("Assigning automated social cover metadata..."):
+            CoverGenerator(self.site_config).assign_cover_metadata(posts)
+
         # Process assets
         asset_manager.generate_icons()
         fontawesome_css_content = asset_manager.prepare_fontawesome_css()
@@ -348,6 +354,13 @@ class SiteGenerator:
 
         # Finalize static assets & sitemap
         asset_manager.copy_static_assets()
+
+        # Generate automated cover images
+        from blogmore.generator.covers import CoverGenerator
+
+        with timed_step("Generating automated social cover images..."):
+            CoverGenerator(self.site_config).generate_covers(posts)
+
         if fontawesome_css_content is not None:
             asset_manager.write_fontawesome_css(fontawesome_css_content)
         asset_manager.copy_extras()

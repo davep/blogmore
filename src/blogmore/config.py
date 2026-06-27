@@ -82,6 +82,7 @@ _EXPLICIT_HANDLED_FIELDS: frozenset[str] = frozenset(
         "image_widths",
         "stop_words",
         "third_party",
+        "auto_covers",
     }
 )
 
@@ -802,5 +803,109 @@ def parse_site_config_from_dict(
             "third_party in the configuration file must be a mapping; ignoring value"
         )
         kwargs["third_party"] = third_party_defaults
+
+    # --- auto_covers ---------------------------------------------------------
+    auto_covers_defaults = {
+        "enabled": False,
+        "layout": "minimalist",
+        "background_type": "gradient",
+        "background_color": "#0f172a",
+        "gradient_colors": ["#1e293b", "#0f172a"],
+        "text_color": "#f8fafc",
+        "meta_color": "#94a3b8",
+        "accent_color": "#38bdf8",
+        "font_family": "Inter",
+        "show_author": True,
+        "show_read_time": True,
+        "show_date": True,
+        "show_logo": True,
+    }
+
+    raw_auto_covers = config.get("auto_covers")
+    if raw_auto_covers is None:
+        kwargs["auto_covers"] = auto_covers_defaults
+    elif isinstance(raw_auto_covers, dict):
+        merged_covers = dict(auto_covers_defaults)
+
+        # enabled
+        if "enabled" in raw_auto_covers:
+            val = raw_auto_covers["enabled"]
+            if isinstance(val, bool):
+                merged_covers["enabled"] = val
+            else:
+                errors.append(
+                    "auto_covers.enabled in the configuration file must be a boolean; ignoring value"
+                )
+
+        # layout
+        if "layout" in raw_auto_covers:
+            val = raw_auto_covers["layout"]
+            if isinstance(val, str) and val in ("minimalist", "split", "editorial"):
+                merged_covers["layout"] = val
+            else:
+                errors.append(
+                    "auto_covers.layout in the configuration file must be "
+                    "'minimalist', 'split', or 'editorial'; ignoring value"
+                )
+
+        # background_type
+        if "background_type" in raw_auto_covers:
+            val = raw_auto_covers["background_type"]
+            if isinstance(val, str) and val in ("solid", "gradient", "image"):
+                merged_covers["background_type"] = val
+            else:
+                errors.append(
+                    "auto_covers.background_type in the configuration file must be "
+                    "'solid', 'gradient', or 'image'; ignoring value"
+                )
+
+        # background_color
+        if "background_color" in raw_auto_covers:
+            val = raw_auto_covers["background_color"]
+            if isinstance(val, str):
+                merged_covers["background_color"] = val
+            else:
+                errors.append(
+                    "auto_covers.background_color in the configuration file must be a string; ignoring value"
+                )
+
+        # gradient_colors
+        if "gradient_colors" in raw_auto_covers:
+            val = raw_auto_covers["gradient_colors"]
+            if isinstance(val, list) and all(isinstance(item, str) for item in val):
+                merged_covers["gradient_colors"] = val
+            else:
+                errors.append(
+                    "auto_covers.gradient_colors in the configuration file must be a list of strings; ignoring value"
+                )
+
+        # text_color, meta_color, accent_color, font_family
+        for color_key in ("text_color", "meta_color", "accent_color", "font_family"):
+            if color_key in raw_auto_covers:
+                val = raw_auto_covers[color_key]
+                if isinstance(val, str):
+                    merged_covers[color_key] = val
+                else:
+                    errors.append(
+                        f"auto_covers.{color_key} in the configuration file must be a string; ignoring value"
+                    )
+
+        # show_author, show_read_time, show_date, show_logo
+        for bool_key in ("show_author", "show_read_time", "show_date", "show_logo"):
+            if bool_key in raw_auto_covers:
+                val = raw_auto_covers[bool_key]
+                if isinstance(val, bool):
+                    merged_covers[bool_key] = val
+                else:
+                    errors.append(
+                        f"auto_covers.{bool_key} in the configuration file must be a boolean; ignoring value"
+                    )
+
+        kwargs["auto_covers"] = merged_covers
+    else:
+        errors.append(
+            "auto_covers in the configuration file must be a mapping; ignoring value"
+        )
+        kwargs["auto_covers"] = auto_covers_defaults
 
     return kwargs, errors

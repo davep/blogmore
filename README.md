@@ -43,6 +43,7 @@ here](https://github.com/davep/davep.github.com)).
 - **Automatic image optimisation** — optional multi-size "ladder" generation and
   next-gen WebP conversion for local images in Markdown posts; simple `<img>`
   tags are replaced with stable, responsive `<picture>` elements
+- **Automated cover images** — automatically generate social media sharing images (Open Graph / Twitter Cards) in lossless WebP format using Pillow. Includes customizable layouts (`minimalist`, `split`, and `editorial`), background fills (solid, gradient, or image), typography, and smart visual caching to keep build times fast.
 - **CSS minification** — optional minification of the generated stylesheet
 - **JavaScript minification** — optional minification of generated scripts
 - **HTML minification** — optional minification of every generated HTML page

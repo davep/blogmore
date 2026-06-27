@@ -481,3 +481,34 @@ no_watch: false
 #     - wobble
 
 
+# Automated Social Media Cover Image (Open Graph) Generation
+#
+# Generates 1200x630 pixel cover images for sharing cards dynamically.
+# auto_covers:
+#   # Enable cover image generation globally for posts (default: false)
+#   enabled: false
+#
+#   # Standard layout template: 'minimalist', 'split', or 'editorial' (default: minimalist)
+#   layout: minimalist
+#
+#   # Background settings: type is 'solid', 'gradient', or 'image' (default: gradient)
+#   background_type: gradient
+#   background_color: "#0f172a"
+#   gradient_colors:
+#     - "#1e293b"
+#     - "#0f172a"
+#
+#   # Typography and colors
+#   font_family: "Inter"
+#   text_color: "#f8fafc"
+#   meta_color: "#94a3b8"
+#   accent_color: "#38bdf8"
+#
+#   # Display controls
+#   show_author: true
+#   show_read_time: true
+#   show_date: true
+#   show_logo: true
+
+
+

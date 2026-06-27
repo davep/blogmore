@@ -1,5 +1,16 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Added automated social media cover image (Open Graph/Twitter Card)
+  generation, supporting `auto_covers` configuration and per-post
+  `auto_cover` frontmatter layout overrides. Features customizable styles
+  (minimalist, split, editorial), support for solid, gradient, and image
+  backgrounds, bullet-separated wrapping tags, and logo integration.
+  ([#620](https://github.com/davep/blogmore/pull/620))
+
 ## v2.43.0
 
 **Released: 2026-06-11**
