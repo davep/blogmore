@@ -1524,6 +1524,31 @@ auto_covers:
   show_logo: true
 ```
 
+The sub-values control the following properties:
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `enabled` | Boolean | `false` | Enables global cover image generation for posts that don't have a custom `cover` frontmatter setting. If set to `false`, you can still override this per-post by setting `auto_cover: minimalist/split/editorial/default` in the post frontmatter. |
+| `layout` | String | `"minimalist"` | The default layout style template. Supported options are `"minimalist"` (centered text), `"split"` (left-aligned text, logo/graphic on right), or `"editorial"` (top-aligned title, bottom metadata footer). |
+| `background_type` | String | `"gradient"` | Visual background style: `"solid"` (solid fill), `"gradient"` (vertical linear gradient), or `"image"` (background picture). |
+| `background_color` | String | `"#0f172a"` | Hex color code used as the solid color fill or as the fallback color if the gradient colors or background image cannot be loaded. |
+| `gradient_colors` | List of Strings | `["#1e293b", "#0f172a"]` | A list of two hex color codes used to draw the vertical gradient background. |
+| `font_family` | String | `"Inter"` | The preferred system font family name. The generator will scan standard system font paths to match this name, falling back to standard Arial or Helvetica if not found. |
+| `text_color` | String | `"#f8fafc"` | Hex color code for the main post title text. |
+| `meta_color` | String | `"#94a3b8"` | Hex color code for metadata text (author, date, read time), separator lines, and tag dividers. |
+| `accent_color` | String | `"#38bdf8"` | Hex color code for site branding title, category pills, and secondary design accents. |
+| `show_author` | Boolean | `true` | Toggles whether to display the post author name. |
+| `show_read_time` | Boolean | `true` | Toggles whether to display the estimated post reading time. |
+| `show_date` | Boolean | `true` | Toggles whether to display the post publication date. |
+| `show_logo` | Boolean | `true` | Toggles whether to display site branding elements (the blog site title and subtitle) and the site logo image. When set to `false`, both the text branding and the logo image are hidden. |
+
+##### Background Image Setup (`background_type: image`)
+When `background_type` is set to `"image"`, the generator searches for a background image file in the `extras/` subdirectory under your `content_dir`. It will look for files matching the name `cover_background` with standard extensions (`.png`, `.jpg`, `.jpeg`, `.webp`), such as:
+- `extras/cover_background.png`
+- `extras/cover_background.webp`
+
+If a file is found, it will be scaled to cover the `1200x630` px canvas. If no matching file is found, the generator gracefully falls back to using the `background_color`.
+
 
 #### `extra_stylesheets`
 
