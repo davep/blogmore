@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.45">
+      <meta name="generator" content="zensical-0.0.46">
     
     
       
@@ -32,7 +32,7 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.fba56155.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.19d3147f.min.css">
       
         
           
@@ -2104,6 +2104,34 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#auto_covers" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>auto_covers</code>
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="auto_covers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#background-image-setup-background_type-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Background Image Setup (<code>background_type: image</code>)
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#extra_stylesheets" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -3959,6 +3987,34 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#auto_covers" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>auto_covers</code>
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="auto_covers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#background-image-setup-background_type-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Background Image Setup (<code>background_type: image</code>)
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#extra_stylesheets" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -5355,6 +5411,133 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
 <div class="highlight"><pre><span></span><code><span class="nt">dark_mode_code_style</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">monokai</span>
 </code></pre></div>
 <p>See the <a href="https://pygments.org/styles/">Pygments style gallery</a> for all available style names.</p>
+<h4 id="auto_covers"><code>auto_covers</code></h4>
+<p>Configuration mapping block for automated social sharing cover image (Open Graph / Twitter Card) generation. Automatically generates sharing images under <code>/static/images/auto_covers/</code> using Pillow.</p>
+<p><strong>Type:</strong> Mapping<br />
+<strong>Default:</strong> Settings under <code>auto_covers</code> are disabled by default.<br />
+<strong>Configuration file only</strong> — cannot be set on the command line.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">auto_covers</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># Enable dynamic social cover image generation (default: false)</span>
+<span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="w">  </span><span class="c1"># Default layout style: &#39;minimalist&#39;, &#39;split&#39;, or &#39;editorial&#39; (default: minimalist)</span>
+<span class="w">  </span><span class="nt">layout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">minimalist</span>
+
+<span class="w">  </span><span class="c1"># Background settings: type is &#39;solid&#39;, &#39;gradient&#39;, or &#39;image&#39; (default: gradient)</span>
+<span class="w">  </span><span class="nt">background_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gradient</span>
+<span class="w">  </span><span class="nt">background_color</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;#0f172a&quot;</span>
+<span class="w">  </span><span class="nt">gradient_colors</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#1e293b&quot;</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#0f172a&quot;</span>
+
+<span class="w">  </span><span class="c1"># Typography and color settings</span>
+<span class="w">  </span><span class="nt">font_family</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Inter&quot;</span>
+<span class="w">  </span><span class="nt">text_color</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;#f8fafc&quot;</span>
+<span class="w">  </span><span class="nt">meta_color</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;#94a3b8&quot;</span>
+<span class="w">  </span><span class="nt">accent_color</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;#38bdf8&quot;</span>
+
+<span class="w">  </span><span class="c1"># Visibility flags</span>
+<span class="w">  </span><span class="nt">show_author</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">show_read_time</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">show_date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">show_logo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<p>The sub-values control the following properties:</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td>Boolean</td>
+<td><code>false</code></td>
+<td>Enables global cover image generation for posts that don't have a custom <code>cover</code> frontmatter setting. If set to <code>false</code>, you can still override this per-post by setting <code>auto_cover: minimalist/split/editorial/default</code> in the post frontmatter.</td>
+</tr>
+<tr>
+<td><code>layout</code></td>
+<td>String</td>
+<td><code>"minimalist"</code></td>
+<td>The default layout style template. Supported options are <code>"minimalist"</code> (centered text), <code>"split"</code> (left-aligned text, logo/graphic on right), or <code>"editorial"</code> (top-aligned title, bottom metadata footer).</td>
+</tr>
+<tr>
+<td><code>background_type</code></td>
+<td>String</td>
+<td><code>"gradient"</code></td>
+<td>Visual background style: <code>"solid"</code> (solid fill), <code>"gradient"</code> (vertical linear gradient), or <code>"image"</code> (background picture).</td>
+</tr>
+<tr>
+<td><code>background_color</code></td>
+<td>String</td>
+<td><code>"#0f172a"</code></td>
+<td>Hex color code used as the solid color fill or as the fallback color if the gradient colors or background image cannot be loaded.</td>
+</tr>
+<tr>
+<td><code>gradient_colors</code></td>
+<td>List of Strings</td>
+<td><code>["#1e293b", "#0f172a"]</code></td>
+<td>A list of two hex color codes used to draw the vertical gradient background.</td>
+</tr>
+<tr>
+<td><code>font_family</code></td>
+<td>String</td>
+<td><code>"Inter"</code></td>
+<td>The preferred system font family name. The generator will scan standard system font paths to match this name, falling back to standard Arial or Helvetica if not found.</td>
+</tr>
+<tr>
+<td><code>text_color</code></td>
+<td>String</td>
+<td><code>"#f8fafc"</code></td>
+<td>Hex color code for the main post title text.</td>
+</tr>
+<tr>
+<td><code>meta_color</code></td>
+<td>String</td>
+<td><code>"#94a3b8"</code></td>
+<td>Hex color code for metadata text (author, date, read time), separator lines, and tag dividers.</td>
+</tr>
+<tr>
+<td><code>accent_color</code></td>
+<td>String</td>
+<td><code>"#38bdf8"</code></td>
+<td>Hex color code for site branding title, category pills, and secondary design accents.</td>
+</tr>
+<tr>
+<td><code>show_author</code></td>
+<td>Boolean</td>
+<td><code>true</code></td>
+<td>Toggles whether to display the post author name.</td>
+</tr>
+<tr>
+<td><code>show_read_time</code></td>
+<td>Boolean</td>
+<td><code>true</code></td>
+<td>Toggles whether to display the estimated post reading time.</td>
+</tr>
+<tr>
+<td><code>show_date</code></td>
+<td>Boolean</td>
+<td><code>true</code></td>
+<td>Toggles whether to display the post publication date.</td>
+</tr>
+<tr>
+<td><code>show_logo</code></td>
+<td>Boolean</td>
+<td><code>true</code></td>
+<td>Toggles whether to display site branding elements (the blog site title and subtitle) and the site logo image. When set to <code>false</code>, both the text branding and the logo image are hidden.</td>
+</tr>
+</tbody>
+</table>
+<h5 id="background-image-setup-background_type-image">Background Image Setup (<code>background_type: image</code>)</h5>
+<p>When <code>background_type</code> is set to <code>"image"</code>, the generator searches for a background image file in the <code>extras/</code> subdirectory under your <code>content_dir</code>. It will look for files matching the name <code>cover_background</code> with standard extensions (<code>.png</code>, <code>.jpg</code>, <code>.jpeg</code>, <code>.webp</code>), such as:
+- <code>extras/cover_background.png</code>
+- <code>extras/cover_background.webp</code></p>
+<p>If a file is found, it will be scaled to cover the <code>1200x630</code> px canvas. If no matching file is found, the generator gracefully falls back to using the <code>background_color</code>.</p>
 <h4 id="extra_stylesheets"><code>extra_stylesheets</code></h4>
 <p>List of additional stylesheets to include. Can be absolute URLs or paths relative to your site root.</p>
 <p><strong>Type:</strong> List of strings (URLs or paths)<br />
@@ -5863,10 +6046,10 @@ blogmore<span class="w"> </span>build<span class="w"> </span>--site-title<span c
     
       
       
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.tabs","navigation.indexes","navigation.tabs.sticky","navigation.footer","content.code.copy"],"search":"../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.tabs","navigation.indexes","navigation.tabs.sticky","navigation.footer","content.code.copy"],"search":"../assets/javascripts/workers/search.b6b7e04f.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.6e5f0216.min.js"></script>
+      <script src="../assets/javascripts/bundle.ee611ef6.min.js"></script>
       
     
   </body>
