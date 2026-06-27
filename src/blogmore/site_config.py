@@ -763,6 +763,32 @@ class SiteConfig:
     command line.  Defaults to ``"github-dark"``.
     """
 
+    auto_covers: dict[str, Any] = field(
+        default_factory=lambda: {
+            "enabled": False,
+            "layout": "minimalist",
+            "background_type": "gradient",
+            "background_color": "#0f172a",
+            "gradient_colors": ["#1e293b", "#0f172a"],
+            "text_color": "#f8fafc",
+            "meta_color": "#94a3b8",
+            "accent_color": "#38bdf8",
+            "font_family": "Inter",
+            "show_author": True,
+            "show_read_time": True,
+            "show_date": True,
+            "show_logo": True,
+        }
+    )
+    """Configuration for automated social cover image generation.
+
+    Contains settings for enabling cover generation, layout style,
+    colors, gradients, typography, and visibility toggles.
+
+    This is a **configuration file only** option — it cannot be set on the
+    command line.
+    """
+
     def __post_init__(self) -> None:
         """Normalise fields after initialisation."""
         self.site_url = normalize_site_url(self.site_url)

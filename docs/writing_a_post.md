@@ -124,6 +124,19 @@ A URL or path to a cover image, used for Open Graph, Twitter Card, and JSON-LD s
 cover: /images/my-post-cover.png
 ```
 
+#### `auto_cover`
+
+Instructs BlogMore to automatically generate a cover image for the post if no custom `cover` image is provided. Possible values are:
+* `none` (Default): Do not generate a cover image.
+* `default`: Generate a cover image using the default layout template configured under `auto_covers` in `blogmore.yaml`.
+* `minimalist`: Generate a cover image using the minimalist layout.
+* `split`: Generate a cover image using the split layout.
+* `editorial`: Generate a cover image using the editorial layout.
+
+```yaml
+auto_cover: split
+```
+
 #### `twitter_creator`
 
 The Twitter/X handle of the post's author. Used in Twitter Card meta tags.

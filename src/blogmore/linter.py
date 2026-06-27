@@ -155,6 +155,34 @@ class Linter:
         # Posts and Pages
         for post in posts:
             valid_urls.add(post.url)
+            # Add auto_cover image URL if it is configured to be generated
+            cover_val = post.metadata.get("cover") if post.metadata else None
+            if not cover_val:
+                auto_cover_val = (
+                    post.metadata.get("auto_cover") if post.metadata else None
+                )
+                global_enabled = self.site_config.auto_covers.get("enabled", False)
+                if auto_cover_val is None:
+                    auto_cover = "default" if global_enabled else "none"
+                else:
+                    auto_cover = str(auto_cover_val).strip().lower()
+
+                if auto_cover != "none":
+                    if self.site_config.content_dir:
+                        try:
+                            rel_path = post.path.relative_to(
+                                self.site_config.content_dir
+                            )
+                        except ValueError:
+                            rel_path = Path(post.path.name)
+                    else:
+                        rel_path = Path(post.path.name)
+
+                    rel_posix = rel_path.with_suffix("").as_posix()
+                    sanitized = re.sub(r"[^a-zA-Z0-9_\-/]", "_", rel_posix)
+                    filename = sanitized.replace("/", "-") + ".webp"
+                    valid_urls.add(f"/static/images/auto_covers/{filename}")
+
         for page in pages:
             valid_urls.add(page.url)
         if page_404:

@@ -1488,6 +1488,43 @@ dark_mode_code_style: monokai
 
 See the [Pygments style gallery](https://pygments.org/styles/) for all available style names.
 
+#### `auto_covers`
+
+Configuration mapping block for automated social sharing cover image (Open Graph / Twitter Card) generation. Automatically generates sharing images under `/static/images/auto_covers/` using Pillow.
+
+**Type:** Mapping  
+**Default:** Settings under `auto_covers` are disabled by default.  
+**Configuration file only** — cannot be set on the command line.
+
+```yaml
+auto_covers:
+  # Enable dynamic social cover image generation (default: false)
+  enabled: true
+
+  # Default layout style: 'minimalist', 'split', or 'editorial' (default: minimalist)
+  layout: minimalist
+
+  # Background settings: type is 'solid', 'gradient', or 'image' (default: gradient)
+  background_type: gradient
+  background_color: "#0f172a"
+  gradient_colors:
+    - "#1e293b"
+    - "#0f172a"
+
+  # Typography and color settings
+  font_family: "Inter"
+  text_color: "#f8fafc"
+  meta_color: "#94a3b8"
+  accent_color: "#38bdf8"
+
+  # Visibility flags
+  show_author: true
+  show_read_time: true
+  show_date: true
+  show_logo: true
+```
+
+
 #### `extra_stylesheets`
 
 List of additional stylesheets to include. Can be absolute URLs or paths relative to your site root.

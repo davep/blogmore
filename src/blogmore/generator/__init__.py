@@ -5,8 +5,10 @@ directly from the ``blogmore.generator`` module, ensuring full backward
 compatibility for existing imports.
 """
 
+from blogmore.generator.covers import CoverGenerator
 from blogmore.generator.site import SiteGenerator
 
 __all__ = [
     "SiteGenerator",
+    "CoverGenerator",
 ]
