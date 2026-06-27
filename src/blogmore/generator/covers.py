@@ -362,6 +362,20 @@ class CoverGenerator:
             [(k, v) for k, v in self.config_block.items() if k != "enabled"]
         )
 
+        # Include mtime of background image if type is image
+        bg_mtime = ""
+        if (
+            self.config_block.get("background_type") == "image"
+            and self.site_config.content_dir
+        ):
+            for ext in (".png", ".jpg", ".jpeg", ".webp"):
+                bg_path = (
+                    self.site_config.content_dir / "extras" / f"cover_background{ext}"
+                )
+                if bg_path.is_file():
+                    bg_mtime = str(bg_path.stat().st_mtime)
+                    break
+
         tags_str = ",".join(sorted(post.tags)) if post.tags else ""
 
         state_str = (
@@ -373,6 +387,7 @@ class CoverGenerator:
             f"read_time:{read_time_str}\n"
             f"category:{post.category or ''}\n"
             f"tags:{tags_str}\n"
+            f"bg_mtime:{bg_mtime}\n"
             f"layout:{layout}\n"
             f"config:{str(config_items)}"
         )
@@ -403,7 +418,27 @@ class CoverGenerator:
         font_family = self.config_block.get("font_family", "Inter")
 
         # Background rendering
-        if bg_type == "gradient" and len(gradient_colors) >= 2:
+        if bg_type == "image" and self.site_config.content_dir:
+            bg_drawn = False
+            for ext in (".png", ".jpg", ".jpeg", ".webp"):
+                bg_path = (
+                    self.site_config.content_dir / "extras" / f"cover_background{ext}"
+                )
+                if bg_path.is_file():
+                    try:
+                        with Image.open(bg_path) as bg_img:
+                            # Resize to cover canvas
+                            bg_resized = bg_img.resize(
+                                (width, height), Image.Resampling.LANCZOS
+                            )
+                            img.paste(bg_resized, (0, 0))
+                            bg_drawn = True
+                            break
+                    except Exception:
+                        pass
+            if not bg_drawn:
+                draw.rectangle([(0, 0), (width, height)], fill=bg_color)
+        elif bg_type == "gradient" and len(gradient_colors) >= 2:
             try:
                 c1 = ImageColor.getrgb(gradient_colors[0])
                 c2 = ImageColor.getrgb(gradient_colors[1])
@@ -641,7 +676,8 @@ class CoverGenerator:
         # Try loading the site logo from site_config and draw it resized on the right
         logo_path = self.site_config.sidebar_config.get("site_logo")
         logo_drawn = False
-        if logo_path and self.site_config.content_dir:
+        show_logo_val = self.config_block.get("show_logo", True)
+        if logo_path and self.site_config.content_dir and show_logo_val:
             logo_clean = logo_path.split("#")[0].split("?")[0].lstrip("/")
             src_logo = self.site_config.content_dir / logo_clean
             if not src_logo.is_file():
@@ -664,7 +700,7 @@ class CoverGenerator:
                     pass
 
         # Fallback decorative visual if no logo was drawn
-        if not logo_drawn:
+        if not logo_drawn and show_logo_val:
             # Draw a beautiful abstract geometric accent on the right
             draw.arc(
                 [(900, 215), (1060, 375)], start=0, end=360, fill=accent_color, width=4
@@ -713,8 +749,9 @@ class CoverGenerator:
         )
         logo_img = None
         logo_w = 0
+        show_logo_val = self.config_block.get("show_logo", True)
 
-        if logo_path and self.site_config.content_dir:
+        if logo_path and self.site_config.content_dir and show_logo_val:
             logo_clean = logo_path.split("#")[0].split("?")[0].lstrip("/")
             src_logo = self.site_config.content_dir / logo_clean
             if not src_logo.is_file():
