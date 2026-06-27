@@ -867,6 +867,48 @@ class CoverGenerator:
             draw.text((80, y_cursor), line, fill=text_color, font=font_title)
             y_cursor += line_heights[i] + 15
 
+        # Draw description below title if present
+        desc_text = post.description
+        if desc_text:
+            desc_lines = _wrap_text(desc_text, font_subtitle, safe_width)
+
+            # Calculate line heights
+            desc_heights: list[int] = []
+            for line in desc_lines:
+                bbox = font_subtitle.getbbox(line)
+                desc_heights.append(bbox[3] - bbox[1])
+
+            # Limit description lines to fit within vertical budget
+            valid_desc_lines: list[str] = []
+            temp_y = y_cursor + 15
+            for i, line in enumerate(desc_lines):
+                line_h = desc_heights[i]
+                # Stop if we go beyond y = 370 or exceed 2 lines
+                if temp_y + line_h > 370 or len(valid_desc_lines) >= 2:
+                    if valid_desc_lines:
+                        # Append ellipse to the last added line if it doesn't already have it
+                        if not valid_desc_lines[-1].endswith("..."):
+                            valid_desc_lines[-1] = valid_desc_lines[-1] + "..."
+                    else:
+                        valid_desc_lines.append(line + "...")
+                    break
+                valid_desc_lines.append(line)
+                temp_y += line_h + 10
+
+            if valid_desc_lines:
+                # If there are more lines that we truncated, make sure the end line is ellipsis-terminated
+                if len(desc_lines) > len(valid_desc_lines) and not valid_desc_lines[
+                    -1
+                ].endswith("..."):
+                    valid_desc_lines[-1] = valid_desc_lines[-1] + "..."
+
+                y_cursor += 15
+                for line in valid_desc_lines:
+                    draw.text((80, y_cursor), line, fill=meta_color, font=font_subtitle)
+                    bbox = font_subtitle.getbbox(line)
+                    y_cursor += (bbox[3] - bbox[1]) + 10
+                y_cursor += 10
+
         # Draw category pill and tags row below title
         pill_y1 = y_cursor + 20
         cat_h = 0
