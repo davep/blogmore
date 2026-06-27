@@ -29,6 +29,7 @@ BlogMore focuses on simplicity and efficiency in creating blog-focused websites.
 - **Sidebar customisation** - Optional logo, custom links, and social media icons
 - **SEO optimisation** - Proper meta tags, Open Graph tags, and Twitter Card support
 - **Automatic image optimisation** - Optional multi-size "ladder" generation and next-gen WebP conversion for local images in Markdown posts; simple `<img>` tags are replaced with stable, responsive `<picture>` elements
+- **Automated cover images** - Automatically generate social media sharing images (Open Graph / Twitter Cards) in lossless WebP format using Pillow. Includes customizable layouts (`minimalist`, `split`, and `editorial`), background fills (solid, gradient, or image), typography, and smart visual caching to keep build times fast.
 - **Automatic icon generation** - Generate favicons and platform-specific icons (iOS, Android, Windows) from a single source image
 - **Client-side search** - Optional full-text search across post titles and content, running entirely in the browser with no external services (enable with `--with-search`)
 - **XML sitemap** - Optional `sitemap.xml` generation for search engine indexing (enable with `--with-sitemap`)
