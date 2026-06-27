@@ -278,3 +278,53 @@ def test_split_and_editorial_layouts(temp_dir: Path) -> None:
         temp_dir / "static" / "images" / "auto_covers" / "post-split.webp"
     ).is_file()
     assert (temp_dir / "static" / "images" / "auto_covers" / "post-edit.webp").is_file()
+
+
+def test_cover_generator_caching(temp_dir: Path) -> None:
+    """Test that cover generation correctly caches and reuses files."""
+    content_dir = temp_dir / "content"
+    content_dir.mkdir()
+
+    post = Post(
+        path=content_dir / "cache-test.md",
+        title="Cache Test Post",
+        content="Some content.",
+        html_content="<p>Some content.</p>",
+        date=dt.datetime(2026, 6, 27, 9, 0, 0),
+        category="Python",
+        tags=[],
+        draft=False,
+        metadata={"title": "Cache Test Post"},
+    )
+
+    config_dict = {
+        "auto_covers": {
+            "enabled": True,
+        }
+    }
+
+    kwargs, errors = parse_site_config_from_dict(config_dict, output_dir=temp_dir)
+    site_config = SiteConfig(output_dir=temp_dir, content_dir=content_dir, **kwargs)
+
+    generator = CoverGenerator(site_config)
+    assert generator.cache_dir is not None
+
+    # First run: cache miss, renders image
+    generator.assign_cover_metadata([post])
+    generator.generate_covers([post])
+
+    # Check cache directory contains the hashed file
+    state_hash = generator._compute_state_hash(post, "minimalist")
+    cached_file = generator.cache_dir / f"{state_hash}.webp"
+    assert cached_file.is_file()
+
+    # Destination file should also exist
+    dest_file = temp_dir / "static" / "images" / "auto_covers" / "cache-test.webp"
+    assert dest_file.is_file()
+
+    # Get first mtime of cached file
+    first_mtime = cached_file.stat().st_mtime
+
+    # Second run: cache hit, should NOT regenerate (mtime remains unchanged)
+    generator.generate_covers([post])
+    assert cached_file.stat().st_mtime == first_mtime
