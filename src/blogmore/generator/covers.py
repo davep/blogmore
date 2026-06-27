@@ -338,6 +338,7 @@ class CoverGenerator:
             A hex string of the SHA-256 hash representing the visual state.
         """
         brand_name = self.site_config.site_title or "My Blog"
+        site_subtitle = self.site_config.site_subtitle or ""
         date_str = ""
         if post.date and self.config_block.get("show_date", True):
             date_str = post.date.strftime("%b %d, %Y")
@@ -361,13 +362,17 @@ class CoverGenerator:
             [(k, v) for k, v in self.config_block.items() if k != "enabled"]
         )
 
+        tags_str = ",".join(sorted(post.tags)) if post.tags else ""
+
         state_str = (
             f"title:{post.title}\n"
             f"brand_name:{brand_name}\n"
+            f"site_subtitle:{site_subtitle}\n"
             f"author:{author_str}\n"
             f"date:{date_str}\n"
             f"read_time:{read_time_str}\n"
             f"category:{post.category or ''}\n"
+            f"tags:{tags_str}\n"
             f"layout:{layout}\n"
             f"config:{str(config_items)}"
         )
@@ -422,6 +427,7 @@ class CoverGenerator:
         font_title = _get_font(font_family, 60, bold=True)
         font_brand = _get_font(font_family, 28, bold=True)
         font_meta = _get_font(font_family, 24, bold=False)
+        font_subtitle = _get_font(font_family, 20, bold=False)
 
         # Metadata parsing
         brand_name = self.site_config.site_title or "My Blog"
@@ -460,6 +466,7 @@ class CoverGenerator:
                 font_title,
                 font_brand,
                 font_meta,
+                font_subtitle,
                 text_color_hex,
                 meta_color_hex,
                 accent_color_hex,
@@ -467,12 +474,14 @@ class CoverGenerator:
         elif layout == "editorial":
             self._draw_editorial_layout(
                 draw,
+                img,
                 post,
                 brand_name,
                 meta_text,
                 font_title,
                 font_brand,
                 font_meta,
+                font_subtitle,
                 text_color_hex,
                 meta_color_hex,
                 accent_color_hex,
@@ -573,6 +582,7 @@ class CoverGenerator:
         font_title: Any,
         font_brand: Any,
         font_meta: Any,
+        font_subtitle: Any,
         text_color: str,
         meta_color: str,
         accent_color: str,
@@ -588,6 +598,7 @@ class CoverGenerator:
             font_title: Font for the post title.
             font_brand: Font for site branding.
             font_meta: Font for metadata.
+            font_subtitle: Font for site subtitle.
             text_color: Hex color for main text.
             meta_color: Hex color for metadata.
             accent_color: Hex color for accents/branding.
@@ -597,7 +608,12 @@ class CoverGenerator:
 
         # Draw branding at top-left
         if self.config_block.get("show_logo", True):
-            draw.text((80, 80), brand_name, fill=accent_color, font=font_brand)
+            subtitle = self.site_config.site_subtitle
+            if subtitle:
+                draw.text((80, 75), brand_name, fill=accent_color, font=font_brand)
+                draw.text((80, 115), subtitle, fill=meta_color, font=font_subtitle)
+            else:
+                draw.text((80, 80), brand_name, fill=accent_color, font=font_brand)
 
         # Title wrapping and drawing
         title_lines = _wrap_text(post.title, font_title, left_safe_width)
@@ -661,12 +677,14 @@ class CoverGenerator:
     def _draw_editorial_layout(
         self,
         draw: ImageDraw.ImageDraw,
+        img: Image.Image,
         post: Post,
         brand_name: str,
         meta_text: str,
         font_title: Any,
         font_brand: Any,
         font_meta: Any,
+        font_subtitle: Any,
         text_color: str,
         meta_color: str,
         accent_color: str,
@@ -675,18 +693,47 @@ class CoverGenerator:
 
         Args:
             draw: The ImageDraw drawing context.
+            img: The PIL Image canvas.
             post: The post being rendered.
             brand_name: The site brand name.
             meta_text: The joined metadata string.
             font_title: Font for the post title.
             font_brand: Font for site branding.
             font_meta: Font for metadata.
+            font_subtitle: Font for site subtitle.
             text_color: Hex color for main text.
             meta_color: Hex color for metadata.
             accent_color: Hex color for accents/branding.
         """
-        # Margins = 80 px, safe width = 1040 px
-        safe_width = 1040
+        # Check if logo is available
+        logo_path = (
+            self.site_config.sidebar_config.get("site_logo")
+            if self.site_config.sidebar_config
+            else None
+        )
+        logo_img = None
+        logo_w = 0
+
+        if logo_path and self.site_config.content_dir:
+            logo_clean = logo_path.split("#")[0].split("?")[0].lstrip("/")
+            src_logo = self.site_config.content_dir / logo_clean
+            if not src_logo.is_file():
+                extras_logo = self.site_config.content_dir / "extras" / logo_clean
+                if extras_logo.is_file():
+                    src_logo = extras_logo
+
+            if src_logo.is_file():
+                try:
+                    with Image.open(src_logo) as opened_logo:
+                        logo_img = opened_logo.convert("RGBA")
+                        logo_img.thumbnail((240, 240), Image.Resampling.LANCZOS)
+                        logo_w, logo_h = logo_img.size
+                except Exception:
+                    logo_img = None
+                    logo_w = 0
+
+        # Calculate safe width for title wrapping to avoid logo collision (right margin is at 1120)
+        safe_width = 1120 - logo_w - 80 - 40 if logo_img is not None else 1040
 
         # Draw Title top-left (y starts at 100)
         title_lines = _wrap_text(post.title, font_title, safe_width)
@@ -704,7 +751,11 @@ class CoverGenerator:
             draw.text((80, y_cursor), line, fill=text_color, font=font_title)
             y_cursor += line_heights[i] + 15
 
-        # Excerpt or category pill if present below title
+        # Draw category pill and tags row below title
+        pill_y1 = y_cursor + 20
+        cat_h = 0
+
+        # Draw category if present
         category = post.category
         if category:
             cat_text = category.upper()
@@ -712,24 +763,48 @@ class CoverGenerator:
             cat_w = cat_bbox[2] - cat_bbox[0]
             cat_h = cat_bbox[3] - cat_bbox[1]
 
-            pill_x1 = 80
-            pill_y1 = y_cursor + 20
-            pill_x2 = pill_x1 + cat_w + 30
+            pill_x2 = 80 + cat_w + 30
             pill_y2 = pill_y1 + cat_h + 16
 
-            # Draw pill background
+            # Draw filled pill background
             draw.rounded_rectangle(
-                [(pill_x1, pill_y1), (pill_x2, pill_y2)],
+                [(80, pill_y1), (pill_x2, pill_y2)],
                 radius=8,
                 fill=accent_color,
             )
 
             # Center coordinates of the pill with a visual offset correction
-            cx = (pill_x1 + pill_x2) // 2
+            cx = (80 + pill_x2) // 2
             cy = (pill_y1 + pill_y2) // 2 + 2
 
             # Contrast color for text inside pill, centered perfectly
             draw.text((cx, cy), cat_text, fill="#0f172a", font=font_meta, anchor="mm")
+
+        # Draw tags on the line below category (or below title if category is absent)
+        if post.tags:
+            tags_y = pill_y1 + cat_h + 16 + 12 if category else y_cursor + 20
+            # Use non-breaking spaces internally within tags so they don't break across lines
+            tag_items = [f"#{t.lower().replace(' ', '\xa0')}" for t in post.tags]
+            tags_text = "  •  ".join(tag_items)
+            # Wrap the tags text to fit within safe width (1040px)
+            tags_lines = _wrap_text(tags_text, font_meta, 1040)
+
+            for line in tags_lines:
+                bbox = font_meta.getbbox(line)
+                line_h = bbox[3] - bbox[1]
+                # Avoid drawing tags that overflow below the separator line (480)
+                if tags_y + line_h > 470:
+                    break
+                # Replace non-breaking spaces back to regular spaces for compatibility when drawing
+                line_clean = line.replace("\xa0", " ")
+                draw.text((80, tags_y), line_clean, fill=meta_color, font=font_meta)
+                tags_y += line_h + 8
+
+        # Draw logo if available (top right)
+        if logo_img is not None:
+            logo_x = 1120 - logo_w
+            logo_y = 80
+            img.paste(logo_img, (logo_x, logo_y), mask=logo_img)
 
         # Draw a beautiful horizontal dividing line above footer
         draw.line([(80, 480), (1120, 480)], fill=meta_color, width=2)
@@ -737,7 +812,14 @@ class CoverGenerator:
         # Footer row: brand name on left, metadata on right
         footer_y = 510
         if self.config_block.get("show_logo", True):
-            draw.text((80, footer_y), brand_name, fill=accent_color, font=font_brand)
+            subtitle = self.site_config.site_subtitle
+            if subtitle:
+                draw.text((80, 500), brand_name, fill=accent_color, font=font_brand)
+                draw.text((80, 540), subtitle, fill=meta_color, font=font_subtitle)
+            else:
+                draw.text(
+                    (80, footer_y), brand_name, fill=accent_color, font=font_brand
+                )
 
         if meta_text:
             meta_bbox = font_meta.getbbox(meta_text)
