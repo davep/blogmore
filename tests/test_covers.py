@@ -377,3 +377,89 @@ def test_editorial_cover_description(temp_dir: Path) -> None:
 
     with Image.open(expected_file) as img:
         assert img.size == (1200, 630)
+
+
+def test_cover_generator_cache_invalidation(temp_dir: Path) -> None:
+    """Test that cover generation correctly invalidates the cache when post details change.
+
+    Args:
+        temp_dir: The temporary directory Path fixture.
+    """
+    content_dir = temp_dir / "content"
+    content_dir.mkdir()
+
+    post = Post(
+        path=content_dir / "cache-invalidation-test.md",
+        title="Cache Invalidation Test Post",
+        content="First paragraph text.",
+        html_content="<p>First paragraph text.</p>",
+        date=dt.datetime(2026, 6, 27, 9, 0, 0),
+        category="Python",
+        tags=[],
+        draft=False,
+        metadata={"title": "Cache Invalidation Test Post"},
+    )
+
+    config_dict = {
+        "auto_covers": {
+            "enabled": True,
+        }
+    }
+
+    kwargs, errors = parse_site_config_from_dict(config_dict, output_dir=temp_dir)
+    site_config = SiteConfig(output_dir=temp_dir, content_dir=content_dir, **kwargs)
+
+    generator = CoverGenerator(site_config)
+    generator.assign_cover_metadata([post])
+
+    # 1. First run: cache miss, renders image
+    generator.generate_covers([post])
+    hash_1 = generator._compute_state_hash(post, "minimalist")
+    assert generator.cache_dir is not None
+    cached_file_1 = generator.cache_dir / f"{hash_1}.webp"
+    assert cached_file_1.is_file()
+
+    # 2. Change metadata description
+    assert post.metadata is not None
+    post.metadata["description"] = "New description via front matter"
+    if "description" in post.__dict__:
+        del post.__dict__["description"]
+
+    hash_2 = generator._compute_state_hash(post, "minimalist")
+    assert hash_1 != hash_2
+
+    # Run generator, new cached file should be created
+    generator.generate_covers([post])
+    cached_file_2 = generator.cache_dir / f"{hash_2}.webp"
+    assert cached_file_2.is_file()
+
+    # 3. Remove metadata description, and change first paragraph content instead
+    assert post.metadata is not None
+    del post.metadata["description"]
+    if "description" in post.__dict__:
+        del post.__dict__["description"]
+
+    post.html_content = "<p>Completely different first paragraph text.</p>"
+    hash_3 = generator._compute_state_hash(post, "minimalist")
+    assert hash_3 != hash_2
+    assert hash_3 != hash_1
+
+    generator.generate_covers([post])
+    cached_file_3 = generator.cache_dir / f"{hash_3}.webp"
+    assert cached_file_3.is_file()
+
+    # 4. Change word count / content
+    post.content = "Word " * 500
+    post.html_content = "<p>" + "Word " * 500 + "</p>"
+    for key in ("word_count", "reading_time", "prose_text", "description"):
+        if key in post.__dict__:
+            del post.__dict__[key]
+
+    hash_4 = generator._compute_state_hash(post, "minimalist")
+    assert hash_4 != hash_3
+    assert hash_4 != hash_2
+    assert hash_4 != hash_1
+
+    generator.generate_covers([post])
+    cached_file_4 = generator.cache_dir / f"{hash_4}.webp"
+    assert cached_file_4.is_file()

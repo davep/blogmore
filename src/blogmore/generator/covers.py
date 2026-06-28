@@ -486,10 +486,7 @@ class CoverGenerator:
 
         read_time_str = ""
         if self.config_block.get("show_read_time", True):
-            words = len(post.content.split()) if post.content else 0
-            wpm = self.site_config.read_time_wpm or 200
-            minutes = max(1, (words + wpm - 1) // wpm)
-            read_time_str = f"{minutes} min read"
+            read_time_str = f"{post.reading_time} min read"
 
         author_str = ""
         if self.config_block.get("show_author", True):
@@ -517,18 +514,41 @@ class CoverGenerator:
                     bg_mtime = str(bg_path.stat().st_mtime)
                     break
 
+        # Include logo information if shown
+        logo_path_str = ""
+        logo_mtime = ""
+        if self.config_block.get("show_logo", True) and self.site_config.sidebar_config:
+            logo_path = self.site_config.sidebar_config.get("site_logo")
+            if logo_path:
+                logo_path_str = str(logo_path)
+                if self.site_config.content_dir:
+                    logo_clean = logo_path.split("#")[0].split("?")[0].lstrip("/")
+                    src_logo = self.site_config.content_dir / logo_clean
+                    if not src_logo.is_file():
+                        extras_logo = (
+                            self.site_config.content_dir / "extras" / logo_clean
+                        )
+                        if extras_logo.is_file():
+                            src_logo = extras_logo
+                    if src_logo.is_file():
+                        logo_mtime = str(src_logo.stat().st_mtime)
+
         tags_str = ",".join(sorted(post.tags)) if post.tags else ""
 
         state_str = (
             f"title:{post.title}\n"
+            f"description:{post.description}\n"
             f"brand_name:{brand_name}\n"
             f"site_subtitle:{site_subtitle}\n"
             f"author:{author_str}\n"
             f"date:{date_str}\n"
             f"read_time:{read_time_str}\n"
+            f"word_count:{post.word_count}\n"
             f"category:{post.category or ''}\n"
             f"tags:{tags_str}\n"
             f"bg_mtime:{bg_mtime}\n"
+            f"logo_path:{logo_path_str}\n"
+            f"logo_mtime:{logo_mtime}\n"
             f"layout:{layout}\n"
             f"config:{str(config_items)}"
         )
@@ -588,11 +608,7 @@ class CoverGenerator:
 
         read_time_str = ""
         if self.config_block.get("show_read_time", True):
-            # Calculate reading time
-            words = len(post.content.split()) if post.content else 0
-            wpm = self.site_config.read_time_wpm or 200
-            minutes = max(1, (words + wpm - 1) // wpm)
-            read_time_str = f"{minutes} min read"
+            read_time_str = f"{post.reading_time} min read"
 
         author_str = ""
         if self.config_block.get("show_author", True):
