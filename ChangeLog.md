@@ -1,5 +1,13 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed cover generator cache invalidation to detect even more post and
+  configuration changes.
+  ([#623](https://github.com/davep/blogmore/pull/623))
+
 ## v2.44.0
 
 **Released: 2026-06-27**
