@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.44.1
 
-**Released: WiP**
+**Released: 2026-06-28**
 
 - Fixed cover generator cache invalidation to detect even more post and
   configuration changes.
