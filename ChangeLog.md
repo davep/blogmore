@@ -9,7 +9,7 @@
   `FileOpenedEvent` and `FileClosedNoWriteEvent` when the config file is
   read during a reload; `ConfigChangeHandler` now discards these read-only
   access events, matching the existing behaviour of `ContentChangeHandler`.
-  ([#631](https://github.com/davep/blogmore/pull/631))
+  ([#632](https://github.com/davep/blogmore/pull/632))
 
 ## v2.44.1
 
