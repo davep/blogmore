@@ -2826,6 +2826,50 @@ class TestConfigChangeHandler:
             captured = capsys.readouterr()
             assert "archive_path" in captured.err
 
+    def test_on_any_event_ignores_read_only_file_events(
+        self, posts_dir: Path, temp_output_dir: Path, tmp_path: Path
+    ) -> None:
+        """Test that read-only file access events do not trigger a config reload.
+
+        On Linux, watchdog (via inotify) emits FileOpenedEvent and
+        FileClosedNoWriteEvent when a file is opened for reading — including
+        when the config file is read during a reload.  Treating these events as
+        config changes would cause an endless regeneration loop, so they must
+        be discarded.
+        """
+        import yaml
+        from watchdog.events import FileClosedNoWriteEvent, FileOpenedEvent
+
+        from blogmore.generator import SiteGenerator
+
+        config_file = tmp_path / "blogmore.yaml"
+        with open(config_file, "w") as f:
+            yaml.dump({}, f)
+
+        generator = SiteGenerator(
+            site_config=SiteConfig(content_dir=posts_dir, output_dir=temp_output_dir)
+        )
+
+        handler = ConfigChangeHandler(
+            config_path=config_file,
+            generator=generator,
+            cli_overrides={},
+            debounce_seconds=0.05,
+        )
+
+        with patch.object(handler, "_reload_and_regenerate") as mock_reload:
+            for event in (
+                FileOpenedEvent(str(config_file)),
+                FileClosedNoWriteEvent(str(config_file)),
+            ):
+                handler.on_any_event(event)
+
+            # Wait for any debounce timer that might have been set
+            time.sleep(0.2)
+
+        # Neither read-only event should have triggered a reload
+        assert mock_reload.call_count == 0
+
 
 class TestCacheCLI:
     """Test the 'cache' CLI command."""

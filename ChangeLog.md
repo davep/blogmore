@@ -1,5 +1,16 @@
 # BlogMore ChangeLog
 
+## Unreleased
+
+**Released: WiP**
+
+- Fixed a constant regeneration loop in `blogmore serve` on GNU/Linux when
+  editing the configuration file. On Linux, watchdog (via inotify) emits
+  `FileOpenedEvent` and `FileClosedNoWriteEvent` when the config file is
+  read during a reload; `ConfigChangeHandler` now discards these read-only
+  access events, matching the existing behaviour of `ContentChangeHandler`.
+  ([#631](https://github.com/davep/blogmore/pull/631))
+
 ## v2.44.1
 
 **Released: 2026-06-28**

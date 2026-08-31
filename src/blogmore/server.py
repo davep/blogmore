@@ -354,6 +354,14 @@ class ConfigChangeHandler(FileSystemEventHandler):
         if event.is_directory:
             return
 
+        # Ignore read-only file access events.  On Linux, watchdog (via
+        # inotify) emits FileOpenedEvent and FileClosedNoWriteEvent whenever
+        # a file is read — including when the config is read during reload.
+        # Treating these as config changes would cause an endless regeneration
+        # loop, so they are explicitly discarded here.
+        if isinstance(event, (FileOpenedEvent, FileClosedNoWriteEvent)):
+            return
+
         # Only react to changes to the config file we're watching
         src_path = event.src_path
         if isinstance(src_path, bytes):
