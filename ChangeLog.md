@@ -1,8 +1,8 @@
 # BlogMore ChangeLog
 
-## Unreleased
+## v2.44.2
 
-**Released: WiP**
+**Released: 2026-08-31**
 
 - Fixed a constant regeneration loop in `blogmore serve` on GNU/Linux when
   editing the configuration file. On Linux, watchdog (via inotify) emits
